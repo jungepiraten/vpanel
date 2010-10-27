@@ -10,6 +10,10 @@ class Auth {
 		$this->username = $username;
 		$this->permissions = $permissions;
 	}
+
+	public function isSignedIn() {
+		return $this->userid !== null;
+	}
 	
 	public function isAllowed($permission) {
 		return in_array($permission, $this->permissions);

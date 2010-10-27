@@ -6,17 +6,34 @@ interface Language {
 	public function getString($str);
 }
 
-class EmptyLanguage implements Language {
+abstract class AbstractLanguage implements Language {
+	private $lang = array();
+
 	public function getEncoding() {
 		return "UTF-8";
 	}
 
 	public function hasString($str) {
-		return false;
+		return isset($this->lang[$str]);
 	}
 
 	public function getString($str) {
-		return null;
+		return $this->lang[$str];
+	}
+
+	protected function setLang($lang) {
+		$this->lang = $lang;
+	}
+}
+
+class EmptyLanguage extends AbstractLanguage {
+}
+
+class PHPLanguage extends AbstractLanguage {
+	public function __construct($filename) {
+		$lang = array();
+		include($filename);
+		$this->setLang($lang);
 	}
 }
 

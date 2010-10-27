@@ -1,7 +1,4 @@
 {include file=header.html.tpl}
-<ul class="users">
-{foreach from=$users item=user}
- <li class="user"><a href="{"users_details"|___:$user.userid}">{$user.username}</a> <a href="{"users_del"|___:$user.userid}" class="deluser">{"entfernen"|__}</a></li>
-{/foreach}
-</ul>
+{include file=userlist.block.tpl users=$users}
+<a href="{"users_create"|___}">{"Neuer Benutzer"|__}</a>
 {include file=footer.html.tpl}

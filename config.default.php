@@ -4,6 +4,7 @@ define("VPANEL_ROOT",		dirname(__FILE__));
 define("VPANEL_CORE",		VPANEL_ROOT . "/core");
 define("VPANEL_STORAGE",	VPANEL_CORE . "/storage");
 define("VPANEL_UI",		VPANEL_ROOT . "/ui");
+define("VPANEL_LANGUAGE",	VPANEL_UI . "/language");
 
 require_once(VPANEL_UI . "/session.class.php");
 require_once(VPANEL_UI . "/language.class.php");

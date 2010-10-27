@@ -19,7 +19,7 @@ class MySQLStorage extends SQLStorage {
 	}
 
 	public function getInsertID() {
-		return $this->insert_id;
+		return $this->mysqli->insert_id;
 	}
 }
 

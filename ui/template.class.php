@@ -14,6 +14,9 @@ class Template {
 		$this->smarty->compile_dir = dirname(__FILE__) . "/templates_c";
 		$this->smarty->register_modifier("__", array($this, "translate"));
 		$this->smarty->register_modifier("___", array($this, "link"));
+
+		$this->smarty->assign("session", $this->session);
+		$this->smarty->assign("charset", $this->session->getEncoding());
 	}
 
 	public function translate() {
@@ -31,6 +34,11 @@ class Template {
 		return call_user_func_array(array($this->session, "getLink"), $params);
 	}
 	
+
+	public function viewIndex() {
+		$this->smarty->assign("", "");
+		$this->smarty->display("index.html.tpl");
+	}
 
 	public function viewLogin($loginfailed = false) {
 		$errors = array();
@@ -54,16 +62,26 @@ class Template {
 		$this->smarty->display("userdetails.html.tpl");
 	}
 
+	public function viewUserCreate() {
+		$this->smarty->display("usercreate.html.tpl");
+	}
+
 	public function viewRoleList($roles) {
 		$this->smarty->assign("roles", $roles);
 		$this->smarty->display("rolelist.html.tpl");
 	}
 
-	public function viewRoleDetails($role, $roleusers, $users) {
+	public function viewRoleDetails($role, $roleusers, $users, $rolepermissions, $permissions) {
 		$this->smarty->assign("role", $role);
 		$this->smarty->assign("roleusers", $roleusers);
 		$this->smarty->assign("users", $users);
+		$this->smarty->assign("rolepermissions", $rolepermissions);
+		$this->smarty->assign("permissions", $permissions);
 		$this->smarty->display("roledetails.html.tpl");
+	}
+
+	public function viewRoleCreate() {
+		$this->smarty->display("rolecreate.html.tpl");
 	}
 
 	public function redirect($url = null) {

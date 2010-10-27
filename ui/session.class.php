@@ -1,6 +1,7 @@
 <?php
 
 require_once(VPANEL_CORE . "/auth.class.php");
+require_once(VPANEL_UI . "/template.class.php");
 
 class Session {
 	private $config;
@@ -21,7 +22,7 @@ class Session {
 		if ($userid == false) {
 			throw new Exception("Login failed.");
 		}
-		$permissions = $this->getStorage()->getPermissions($userid);
+		$permissions = $this->getStorage()->getUserPermissions($userid);
 		$this->setAuth(new Auth($userid, $username, $permissions));
 	}
 	public function logout() {
@@ -55,6 +56,9 @@ class Session {
 	}
 	public function getStorage() {
 		return $this->config->getStorage();
+	}
+	public function getTemplate() {
+		return new Template($this);
 	}
 }
 

@@ -1,18 +1,20 @@
 {include file=header.html.tpl}
-<form action="{"role_details"|___:$role.roleid}" method="post" class="login">
+{include file=roleform.block.tpl role=$role}
+<form action="{"roles_details"|___:$role.roleid}" method="post" class="permissions">
  <fieldset>
-  <label for="label">{"Bezeichnung:"|__}</label>
-  <input class="label" type="text" name="label" value="{$role.label|escape:html}" />
-  <label for="description">{"Beschreibung:"|__}</label>
-  <textarea name="description">{$role.description|escape:html}</textarea>
-  <input class="submit" type="submit" name="save" value="{"Speichern"|__}" />
+  <table>
+  {foreach from=$permissions item=permission}
+  <tr>
+   <td><input type="checkbox" name="permissions[]" value="{$permission.permissionid|escape:html}" {if in_array($permission.label, $rolepermissions)}checked="checked"{/if} /></td>
+   <th>{$permission.label|__|escape:html}</th>
+   <td>{$permission.description|escape:html}</td>
+  </tr>
+  {/foreach}
+  </table>
+  <input type="submit" name="savepermissions" value="{"Speichern"|__}" />
  </fieldset>
 </form>
-<ul class="users">
-{foreach from=$roleusers item=user}
- <li class="user"><a href="{"users_details"|___:$user.userid}">{$user.username}</a> <a href="{"roles_deluser"|___:$user.userid:$role.roleid}" class="roledeluser">{"entfernen"|__}</a></li>
-{/foreach}
-</ul>
+{include file=userlist.block.tpl users=$roleusers}
 <form action="{"roles_adduser"|___:$role.roleid}" method="post" class="roleadduser">
  <fieldset>
   <input type="hidden" name="redirect" value="{$smarty.server.REQUEST_URI}" />
@@ -22,5 +24,5 @@
   <input class="submit" type="submit" name="do" value="{"Hinzufuegen"|__}" />
  </fieldset>
 </form>
-<a href="{"roles"|___}">{"Rollenuebersicht"|__}</a>
+<a href="{"roles"|___}">{"Rollenverwaltung"|__}</a>
 {include file=footer.html.tpl}

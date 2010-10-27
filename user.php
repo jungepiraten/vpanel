@@ -4,8 +4,7 @@ require_once(dirname(__FILE__) . "/config.inc.php");
 
 require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
-require_once(VPANEL_UI . "/template.class.php");
-$ui = new Template($session);
+$ui = $session->getTemplate();
 
 if (!$session->getAuth()->isAllowed("users_show")) {
 	$ui->viewLogin();
@@ -56,6 +55,29 @@ case "details":
 	$permissions = $session->getStorage()->getPermissions($userid);
 
 	$ui->viewUserDetails($user, $userroles, $roles, $permissions);
+	exit;
+case "create":
+	if (isset($_REQUEST["save"])) {
+		if (!$session->getAuth()->isAllowed("users_create")) {
+			$ui->viewLogin();
+			exit;
+		}
+		$username = stripslashes($_REQUEST["username"]);
+		$password = stripslashes($_REQUEST["password"]);
+		$userid = $session->getStorage()->addUser($username, $password);
+		$ui->redirect($session->getLink("users_details", $userid));
+	}
+
+	$ui->viewUserCreate();
+	exit;
+case "delete":
+	if (!$session->getAuth()->isAllowed("users_delete")) {
+		$ui->viewLogin();
+		exit;
+	}
+	$userid = intval($_REQUEST["userid"]);
+	$session->getStorage()->delUser($userid);
+	$ui->redirect();
 	exit;
 default:
 	$users = $session->getStorage()->getUserList();

@@ -1,0 +1,13 @@
+body {
+	font-family:sans-serif;
+}
+fieldset {
+	border:0px; margin:0px; padding:0px;
+}
+
+.role {
+	background-color:#ccc;
+	margin:2px;
+	border:1px solid black;
+	padding:2px;
+}

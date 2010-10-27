@@ -35,6 +35,34 @@ abstract class SQLStorage implements Storage {
 	}
 
 	/**
+	 * Berechtigungen
+	 */
+	public function getPermissions() {
+		$sql = "SELECT `permissionid`, `label`, `description` FROM `permissions`";
+		return $this->fetchAsArray($this->query($sql), "permissionid");
+	}
+
+	public function getUserPermissions($userid) {
+		$sql = "SELECT `permissions`.`permissionid` AS 'permissionid', `permissions`.`label` AS 'permission' FROM `userroles` LEFT JOIN `rolepermissions` USING (`roleid`) LEFT JOIN `permissions` USING (`permissionid`) WHERE `userroles`.`userid` = '" . $this->escape($userid) . "' GROUP BY `permissions`.`permissionid`";
+		return $this->fetchAsArray($this->query($sql), "permissionid", "permission");
+	}
+
+	public function getRolePermissions($roleid) {
+		$sql = "SELECT `permissions`.`permissionid` AS 'permissionid', `permissions`.`label` AS 'permission' FROM `rolepermissions` LEFT JOIN `permissions` USING (`permissionid`) WHERE `rolepermissions`.`roleid` = '" . $this->escape($roleid) . "'";
+		return $this->fetchAsArray($this->query($sql), "permissionid", "permission");
+	}
+
+	public function addRolePermission($roleid, $permid) {
+		$sql = "INSERT INTO `rolepermissions` (`roleid`, `permissionid`) VALUES (" . intval($roleid) . ", " . intval($permid) . ")";
+		return $this->query($sql);
+	}
+
+	public function delRolePermission($roleid, $permid) {
+		$sql = "DELETE FROM `rolepermissions` WHERE `roleid` = " . intval($roleid) . " and `permissionid` = " . intval($permid);
+		return $this->query($sql);
+	}
+
+	/**
 	 * Benutzer
 	 */
 	public function validLogin($username, $password) {
@@ -51,7 +79,7 @@ abstract class SQLStorage implements Storage {
 		if ($userid !== null) {
 			$sql .= " WHERE `userid` = " . intval($userid);
 		}
-		return $this->fetchAsArray($this->query($sql));
+		return $this->fetchAsArray($this->query($sql), "userid");
 	}
 
 	public function addUser($username, $password) {
@@ -65,14 +93,16 @@ abstract class SQLStorage implements Storage {
 		return $this->query($sql);
 	}
 
-	public function changePassword($userid, $password) {
-		$sql = "UPDATE `users` SET `password` = '" . $this->escape($this->hash($password)) . "' WHERE `userid` = " . intval($userid);
+	public function delUser($userid) {
+		$sql = "DELETE FROM `userroles` WHERE `userid` = " . intval($userid);
+		$this->query($sql);
+		$sql = "DELETE FROM `users` WHERE `userid` = " . intval($userid);
 		return $this->query($sql);
 	}
 
-	public function getPermissions($userid) {
-		$sql = "SELECT `permissions`.`permissionid` AS 'permissionid', `permissions`.`label` AS 'permission' FROM `userroles` LEFT JOIN `rolepermissions` USING (`roleid`) LEFT JOIN `permissions` USING (`permissionid`) WHERE `userroles`.`userid` = '" . $this->escape($userid) . "' GROUP BY `permissions`.`permissionid`";
-		return $this->fetchAsArray($this->query($sql), null, "permission");
+	public function changePassword($userid, $password) {
+		$sql = "UPDATE `users` SET `password` = '" . $this->escape($this->hash($password)) . "' WHERE `userid` = " . intval($userid);
+		return $this->query($sql);
 	}
 
 	/**
@@ -86,7 +116,7 @@ abstract class SQLStorage implements Storage {
 		if ($roleid !== null) {
 			$sql .= " WHERE `roleid` = " . intval($roleid);
 		}
-		return $this->fetchAsArray($this->query($sql));
+		return $this->fetchAsArray($this->query($sql), "roleid");
 	}
 
 	public function addRole($label, $description) {
@@ -97,6 +127,13 @@ abstract class SQLStorage implements Storage {
 
 	public function modRole($roleid, $label, $description) {
 		$sql = "UPDATE `roles` SET `label` = '" . $this->escape($label) . "', `description` = '" . $this->escape($description) . "' WHERE `roleid` = " . intval($roleid);
+		return $this->query($sql);
+	}
+
+	public function delRole($roleid) {
+		$sql = "DELETE FROM `userroles` WHERE `roleid` = " . intval($roleid);
+		$this->query($sql);
+		$sql = "DELETE FROM `roles` WHERE `roleid` = " . intval($roleid);
 		return $this->query($sql);
 	}
 

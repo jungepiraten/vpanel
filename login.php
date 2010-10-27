@@ -4,8 +4,7 @@ require_once(dirname(__FILE__) . "/config.inc.php");
 
 require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
-require_once(VPANEL_UI . "/template.class.php");
-$ui = new Template($session);
+$ui = $session->getTemplate();
 
 // Login-Seite
 if (isset($_POST["login"])) {
@@ -16,7 +15,8 @@ if (isset($_POST["login"])) {
 		$session->login($username, $password);
 		$ui->redirect();
 	} catch (Exception $e) {
-		var_dump($e);
+		$ui->viewLogin(true);
+		exit;
 	}
 }
 
@@ -25,6 +25,10 @@ if (isset($_REQUEST["logout"])) {
 	$ui->redirect();
 }
 
-$ui->viewLogin();
+if ($session->getAuth()->isSignedIn()) {
+	// TODO
+} else {
+	$ui->viewLogin();
+}
 
 ?>
