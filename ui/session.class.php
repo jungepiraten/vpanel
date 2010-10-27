@@ -17,13 +17,25 @@ class Session {
 	}
 
 	public function login($username, $password) {
-		$this->setAuth(new Auth($username, $password));
+		$userid = $this->getStorage()->validLogin($username, $password);
+		if ($userid == false) {
+			throw new Exception("Login failed.");
+		}
+		$permissions = $this->getStorage()->getPermissions($userid);
+		$this->setAuth(new Auth($userid, $username, $permissions));
+	}
+	public function logout() {
+		$this->setAuth(null);
 	}
 	public function setAuth($auth) {
 		$this->stor["auth"] = $auth;
 	}
 	public function getAuth() {
-		return $this->stor["auth"];
+		if ($this->stor["auth"] !== null) {
+			return $this->stor["auth"];
+		}
+		// TODO Anonymous-Auth
+		return new Auth(null, null, array());
 	}
 
 	public function setLang($lang) {
@@ -33,8 +45,16 @@ class Session {
 		return $this->config->getLang($this->stor["lang"]);
 	}
 
-	public function getLink($name) {
-		return $this->config->getLink($name);
+	public function getEncoding() {
+		return "UTF-8";
+	}
+
+	public function getLink() {
+		$params = func_get_args();
+		return call_user_func_array(array($this->config, "getLink"), $params);
+	}
+	public function getStorage() {
+		return $this->config->getStorage();
 	}
 }
 

@@ -14,10 +14,17 @@ if (isset($_POST["login"])) {
 
 	try {
 		$session->login($username, $password);
+		$ui->redirect();
 	} catch (Exception $e) {
-		
+		var_dump($e);
 	}
 }
+
+if (isset($_REQUEST["logout"])) {
+	$session->logout();
+	$ui->redirect();
+}
+
 $ui->viewLogin();
 
 ?>

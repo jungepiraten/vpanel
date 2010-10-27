@@ -1,13 +1,18 @@
 <?php
 
 class Auth {
-	public function __construct($username, $password) {
-		
+	private $userid;
+	private $username;
+	private $permissions;
+	
+	public function __construct($userid, $username, $permissions = array()) {
+		$this->userid = $userid;
+		$this->username = $username;
+		$this->permissions = $permissions;
 	}
 	
 	public function isAllowed($permission) {
-		// TODO *G*
-		return true;
+		return in_array($permission, $this->permissions);
 	}
 }
 

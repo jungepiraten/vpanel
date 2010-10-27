@@ -1,5 +1,6 @@
 {include file=header.html.tpl}
-<form action="{$loginaction}" method="post" class="login">
+{if is_array($errors) && !empty($errors)}{include file=errors.html.tpl errors=$errors}{/if}
+<form action="{"login"|___}" method="post" class="login">
  <fieldset>
   <input type="hidden" name="redirect" value="{if isset($smarty.post.redirect)}{$smarty.post.redirect|stripslashes|escape:html}{else}{$smarty.server.REQUEST_URI|escape:html}{/if}" />
   <label for="username">{"Username:"|__}</label>

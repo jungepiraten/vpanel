@@ -12,24 +12,66 @@ class Template {
 		$this->smarty = new Smarty;
 		$this->smarty->template_dir = dirname(__FILE__) . "/templates";
 		$this->smarty->compile_dir = dirname(__FILE__) . "/templates_c";
-		$this->smarty->register_modifier("__", array($this, "formatLang"));
+		$this->smarty->register_modifier("__", array($this, "translate"));
+		$this->smarty->register_modifier("___", array($this, "link"));
 	}
 
-	public function formatLang($string) {
+	public function translate() {
 		$params = func_get_args();
 		$string = array_shift($params);
 
 		if ($this->session->getLang()->hasString($string)) {
-			$string = $this->session->getLang()->getString($string);
+			$string = iconv($this->session->getLang()->getEncoding(), $this->session->getEncoding(), $this->session->getLang()->getString($string));
 		}
 
-		// TODO rftm sprintf
-		return sprintf($string, $params);
+		return vsprintf($string, $params);
+	}
+	public function link($name) {
+		$params = func_get_args();
+		return call_user_func_array(array($this->session, "getLink"), $params);
 	}
 	
-	public function viewLogin() {
-		$this->smarty->assign("loginaction", $this->session->getLink("login"));
+
+	public function viewLogin($loginfailed = false) {
+		$errors = array();
+		if ($loginfailed) {
+			$errors[] = $this->translate("Login failed");
+		}
+		$this->smarty->assign("errors", $errors);
 		$this->smarty->display("login.html.tpl");
+	}
+
+	public function viewUserList($users) {
+		$this->smarty->assign("users", $users);
+		$this->smarty->display("userlist.html.tpl");
+	}
+
+	public function viewUserDetails($user, $userroles, $roles, $permissions) {
+		$this->smarty->assign("user", $user);
+		$this->smarty->assign("userroles", $userroles);
+		$this->smarty->assign("roles", $roles);
+		$this->smarty->assign("permissions", $permissions);
+		$this->smarty->display("userdetails.html.tpl");
+	}
+
+	public function viewRoleList($roles) {
+		$this->smarty->assign("roles", $roles);
+		$this->smarty->display("rolelist.html.tpl");
+	}
+
+	public function viewRoleDetails($role, $roleusers, $users) {
+		$this->smarty->assign("role", $role);
+		$this->smarty->assign("roleusers", $roleusers);
+		$this->smarty->assign("users", $users);
+		$this->smarty->display("roledetails.html.tpl");
+	}
+
+	public function redirect($url = null) {
+		if ($url === null) {
+			$url = isset($_REQUEST["redirect"]) ? $_REQUEST["redirect"] : $_SERVER["HTTP_REFERER"];
+		}
+		header('Location: ' . $url);
+		echo 'Sie werden weitergeleitet: <a href="'.$url.'">'.$url.'</a>';
 	}
 }
 

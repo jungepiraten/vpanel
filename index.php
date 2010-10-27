@@ -6,8 +6,8 @@ require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
 require_once(VPANEL_UI . "/template.class.php");
 $ui = new Template($session);
-// Startseite
 
-$ui->viewLogin();
+// TODO uebersichtsseite
+var_dump($_SESSION);
 
 ?>
