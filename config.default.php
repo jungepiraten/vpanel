@@ -15,6 +15,14 @@ class DefaultConfig {
 		return new Session($this);
 	}
 
+	/** Fuer GlobaleIDs **/
+	protected function getHostPart() {
+		return "example.org";
+	}
+	public function generateGlobalID() {
+		return uniqid("", true) . "@" . $this->getHostPart();
+	}
+
 	/** Mehrsprachen-Support **/
 	private $langs;
 	public function getLang($lang) {

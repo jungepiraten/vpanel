@@ -26,7 +26,7 @@ if (isset($_REQUEST["logout"])) {
 }
 
 if ($session->getAuth()->isSignedIn()) {
-	// TODO
+	$ui->redirect($session->getLink("index"));
 } else {
 	$ui->viewLogin();
 }
