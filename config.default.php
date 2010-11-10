@@ -46,10 +46,10 @@ class DefaultConfig {
 	}
 
 	private $storage;
+	public function setStorage($storage) {
+		$this->storage = $storage;
+	}
 	public function getStorage() {
-		if (!isset($this->storage)) {
-			$this->storage = new MySQLStorage("localhost", "root", "anything92", "vpanel");
-		}
 		return $this->storage;
 	}
 }
