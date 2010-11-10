@@ -1,8 +1,26 @@
 body {
 	font-family:sans-serif;
+    font-size:13px;
+    margin:0px;
+    background-color:#e5e5e5;
 }
+
+img {
+    border:none;
+}
+
 fieldset {
 	border:0px; margin:0px; padding:0px;
+}
+
+a {
+    text-decoration:none;
+    color:#332f2c;
+    font-weight:bold;
+}
+
+a:hover {
+    color:#ff8d00;
 }
 
 .role {
@@ -10,4 +28,152 @@ fieldset {
 	margin:2px;
 	border:1px solid black;
 	padding:2px;
+}
+
+.header {
+    margin:0px;
+    background-color:#404040;
+    border-bottom:2px solid #666666;
+    height:28px;
+    padding:0px 10px;
+    margin-bottom:20px;
+}
+
+.logo {
+    color:white;
+    font-weight:bold;
+    font-size:20px;
+}
+
+.login {
+    float:right;
+    padding-top:5px;
+}
+
+.login a {
+    color:white;
+    padding-left:22px;
+    background:url("images/logout-grey.png") no-repeat;
+}
+
+.login a:hover {
+    color:#ff8d00;
+    background:url("images/logout.png") no-repeat;
+}
+
+.navigation {
+    margin-left:10px;
+    float:left;
+    border:2px solid #404040;
+    padding:10px;
+    width:180px;
+    background-color:white;
+}
+
+.navigation ul {
+    margin:0px;
+    padding:0px;
+}
+
+.navigation li {
+    list-style-type:none;
+    margin-bottom:2px;
+}
+
+.content {
+    margin-right:10px;
+    margin-left:230px;
+    border:2px solid #404040;
+    padding:10px;
+    background-color:white;
+}
+
+.entrylist {
+    margin:20px 0px;
+    padding:0px;
+    width:99%;
+    list-style-type:none;
+    border:1px solid grey;
+    padding:4px;
+}
+
+.entrylist li {
+    padding:3px;
+}
+
+.entrylist li:hover {
+    background-color:#ffcb8c;
+}
+
+.entrylist a:hover {
+    color:black;
+}
+
+.entryodd {
+}
+
+.entryeven {
+    background-color:#cfcfcf;
+}
+
+.listentry li {
+    list-style-type:none;
+    display:inline;
+}
+
+.hover {
+    background-color:#ffcb8c;
+}
+
+.neuset {
+    font-size:70%;
+    color:#4c4b4a;
+}
+
+.separator {
+    color:#8f8f8f;
+    font-weight:bold;
+}
+
+.description {
+    font-size:80%;
+}
+
+.sideinfo {
+    float:right;
+    width:47%;
+    padding-left:3%;
+}
+
+.sideinfoheader {
+    font-size:120%;
+    margin:0px;
+}
+
+.mainform {
+    float:left;
+    width:50%
+}
+
+.pagetitle {
+    font-weight:900;
+    font-size:25px;
+    margin:0px;
+    padding-bottom:5px;
+    border-bottom:2px solid #404040;
+    margin-bottom:10px;
+}
+
+.permissionlist {
+    text-align:left;
+}
+
+.delimg {
+    background:url("images/delete-grey.png") no-repeat;
+    width:15px;
+    display:inline-block;
+}
+
+.delimg:hover {
+    background:url("images/delete.png") no-repeat;
 }

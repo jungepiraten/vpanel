@@ -1,3 +1,4 @@
 {include file=header.html.tpl}
-<p>Willkommen *g*</p>
+<p class="pagetitle">Startseite</p>
+<p>VPanel</p>
 {include file=footer.html.tpl}
