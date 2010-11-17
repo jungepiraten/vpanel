@@ -3,6 +3,7 @@ body {
     font-size:13px;
     margin:0px;
     background-color:#e5e5e5;
+    color:#332f2c;
 }
 
 img {
@@ -176,4 +177,10 @@ a:hover {
 
 .delimg:hover {
     background:url("images/delete.png") no-repeat;
+}
+
+.error {
+    color:red;
+    font-size:17px;
+    font-weight:bold;
 }
