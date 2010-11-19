@@ -6,7 +6,7 @@
 </div>
 <div class="sideinfo">
 <span class="sideinfoheader">Rollen:</span>
-{include file=rolelist.block.tpl roles=$userroles}
+{include file=rolelist.block.tpl showuserdel=1 userid=$user.userid roles=$userroles}
 <form action="{"users_addrole"|___:$user.userid}" method="post" class="useraddrole">
  <fieldset>
   <input type="hidden" name="redirect" value="{$smarty.server.REQUEST_URI}" />
