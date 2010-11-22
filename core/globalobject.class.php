@@ -1,9 +1,12 @@
 <?php
 
-abstract class GlobalClass {
-	private $globalid;
+require_once(VPANEL_CORE . "/storageobject.class.php");
+
+abstract class GlobalClass extends StorageClass {
+	private $globalid = null;
 	
-	public function __construct($globalid) {
+	public function __construct(Storage $storage = null, $globalid = null) {
+		parent::__construct($storage);
 		$this->setGlobalId($globalid);
 	}
 	

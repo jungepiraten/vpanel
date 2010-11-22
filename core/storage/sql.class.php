@@ -70,6 +70,11 @@ abstract class SQLStorage implements Storage {
 		$result = array_shift($this->fetchAsArray($this->query($sql), "userid"));
 		return $result["password"] == $this->hash($password) ? $result["userid"] : false;
 	}
+
+	public function getUser($userid) {
+		$sql = "SELECT `userid`, `username` FROM `users` WHERE `userid` = '" . intval($userid) . "'";
+		return first($this->fetchAsArray($this->query($sql)));
+	}
 	
 	public function getUserList($userid = null, $roleid = null) {
 		$sql = "SELECT `userid`, `username` FROM `users`";
@@ -139,11 +144,72 @@ abstract class SQLStorage implements Storage {
 
 	public function addUserRole($userid, $roleid) {
 		$sql = "INSERT INTO `userroles` (`userid`, `roleid`) VALUES (" . intval($userid) . ", " . intval($roleid) . ")";
-		return $this->query($sql);
+		$this->query($sql);
+		return $this->getInsertID();
 	}
 
 	public function delUserRole($userid, $roleid) {
 		$sql = "DELETE FROM `userroles` WHERE `userid` = " . intval($userid) . " and `roleid` = " . intval($roleid);
+		return $this->query($sql);
+	}
+
+	/**
+	 * Mitgliederverwaltung
+	 **/
+	public function getMitgliederList() {
+		$sql = "SELECT `mitglieder`.`mitgliedid`, `mitglieder`.`eintritt`, `mitglieder`.`austritt`, `mitgliederrevisions`.`revisionid` as `latestrevisionid`, `mitgliederrevisions`.`timestamp` AS `latestrevisiontimestamp` FROM `mitglieder` LEFT JOIN `mitgliederrevisions` ON (`mitgliederrevisions`.`mitgliedid` = `mitglieder`.`mitgliedid`) HAVING `mitgliederrevisions`.`timestamp` = MAX(`mitgliederrevisions`.`timestamp`)";
+		return $this->fetchAsArray($this->query($sql), "mitgliedid");
+	}
+
+	public function addMitglied($globalid, $eintritt, $austritt) {
+		$sql = "INSERT INTO `mitglieder` (`globalid`, `eintritt`, `austritt`) VALUES ('" . $db->escape($globalid) . "', '" . date("Y-m-d", $eintritt) . "', " . ($austritt == null ? "NULL" : "'" . date("Y-m-d", $austritt) . "'") . ")";
+		$this->query($sql);
+		return $this->getInsertID();
+	}
+
+	public function modMitglied($mitgliedid, $globalid, $eintritt, $austritt) {
+		$sql = "UPDATE `mitglieder` SET `globalid` = '" . $db->escape($globalid) . "', `eintritt` = '" . date("Y-m-d", $eintritt) . "', `austritt` = " . ($austritt == null ? "NULL" : "'" . date("Y-m-d", $austritt) . "'") . " WHERE `mitgliedid` = " . intval($mitgliedid);
+		return $this->query($sql);
+	}
+
+	public function getMitgliederRevisionList($mitgliedid = null) {
+		$sql = "SELECT `revisionid`, `globalid`, UNIX_TIMESTAMP(`timestamp`), `userid`, `mitgliedid`, `mitgliedschaftsid`, `gliederungsid`, `geloescht`, `mitglied_piraten`, `verteiler_eingetragen`, `beitrag`, `natpersonid`, `jurpersonid`, `kontaktid` FROM `mitgliederrevisions`";
+		if ($mitgliedid != null) {
+			$sql .= " WHERE `mitgliedid` = " . intval($mitgliedid);
+		}
+		$sql .= " ORDER BY `timestamp`";
+		return $this->fetchAsArray($this->query($sql), "revisionid");
+	}
+
+	public function addMitgliederRevision() {
+		
+	}
+
+	/**
+	 * NatPerson
+	 **/
+	public function addNatPerson($name, $vorname, $geburtsdatum, $nationalitaet) {
+		$sql = "INSERT INTO `natperson` (`name`, `vorname`, `geburtsdatum`, `nationalitaet`) VALUES ('" . $this->escape($name) . "', '" . $this->escape($vorname) . "', '" . date("Y-m-d", $geburtsdatum) . "', '" . $this->escape($nationalitaet) . "')";
+		$this->query($sql);
+		return $this->getInsertID();
+	}
+
+	public function delNatPerson($natpersonid) {
+		$sql = "DELETE FROM `natperson` WHERE `natpersonid` = " . intval($natpersonid);
+		return $this->query($sql);
+	}
+
+	/**
+	 * JurPerson
+	 **/
+	public function addJurPerson($firma) {
+		$sql = "INSERT INTO `jurperson` (`firma`) VALUES ('" . $this->escape($firma) . "')";
+		$this->query($sql);
+		return $this->getInsertID();
+	}
+
+	public function delJurPerson($jurpersonid) {
+		$sql = "DELETE FROM `jurperson` WHERE `jurpersonid` = " . intval($jurpersonid);
 		return $this->query($sql);
 	}
 }

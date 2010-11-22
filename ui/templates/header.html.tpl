@@ -25,6 +25,9 @@
 {if $auth->isAllowed("roles_show")}
 <li><a href="{"roles"|___}">{"Rollenverwaltung"|__}</a></li>
 {/if}
+{if $auth->isAllowed("mitglieder_show")}
+<li><a href="{"mitglieder"|___}">{"Mitgliederverwaltung"|__}</a></li>
+{/if}
 </ul>
 </div>
 

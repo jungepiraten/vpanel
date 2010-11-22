@@ -84,6 +84,10 @@ class Template {
 		$this->smarty->display("rolecreate.html.tpl");
 	}
 
+	public function viewMitgliederList() {
+		
+	}
+
 	public function redirect($url = null) {
 		if ($url === null) {
 			$url = isset($_REQUEST["redirect"]) ? $_REQUEST["redirect"] : $_SERVER["HTTP_REFERER"];

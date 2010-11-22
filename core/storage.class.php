@@ -21,6 +21,19 @@ interface Storage {
 
 	public function addUserRole($userid, $roleid);
 	public function delUserRole($userid, $roleid);
+
+	public function getMitgliederList();
+	public function addMitglied($globalid, $eintritt, $austritt);
+	public function modMitglied($mitgliedid, $globalid, $eintritt, $austritt);
+
+	public function getMitgliederRevisionList($mitgliedid = null);
+	public function addMitgliederRevision();
+
+	public function addNatPerson($name, $vorname, $geburtsdatum, $nationalitaet);
+	public function delNatPerson($natpersonid);
+
+	public function addJurPerson($firma);
+	public function delJurPerson($jurpersonid);
 }
 
 ?>
