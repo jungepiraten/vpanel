@@ -17,6 +17,7 @@ require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 switch ($_REQUEST["mode"]) {
 case "details":
 	$mitgliedid = intval($_REQUEST["mitgliedid"]);
+	$mitglied = $session->getStorage()->getMitglied($mitgliedid);
 
 	if (isset($_REQUEST["save"])) {
 		if (!$session->getAuth()->isAllowed("mitglieder_modify")) {
@@ -34,7 +35,10 @@ case "details":
 	$permissions = $session->getStorage()->getPermissions();
 **/
 
-	$ui->viewRoleDetails($role, $roleusers, $users, $rolepermissions, $permissions);
+	$orte = $session->getStorage()->getOrtList();
+	$states = $session->getStorage()->getStateList();
+
+	$ui->viewMitgliedDetails($mitglied, $orte, $states);
 	exit;
 case "create":
 	$mitgliedschaftid = intval($_REQUEST["mitgliedschaftid"]);
@@ -42,6 +46,7 @@ case "create":
 
 	if (isset($_REQUEST["save"])) {
 		$globalid = uniqid() . "@test.prauscher";
+		$persontyp = stripslashes($_POST["persontyp"]);
 		$name = stripslashes($_POST["name"]);
 		$vorname = stripslashes($_POST["vorname"]);
 		$geburtsdatum = strtotime($_POST["geburtsdatum"]);
@@ -49,18 +54,18 @@ case "create":
 		$firma = stripslashes($_POST["firma"]);
 		$strasse = stripslashes($_POST["strasse"]);
 		$hausnummer = stripslashes($_POST["hausnummer"]);
-		$ortid = stripslashes($_POST["ortid"]);
+		$ortid = intval($_POST["ortid"]);
 		$plz = stripslashes($_POST["plz"]);
 		$ortname = stripslashes($_POST["ort"]);
-		$stateid = stripslashes($_POST["stateid"]);
+		$stateid = intval($_POST["stateid"]);
 		$telefon = stripslashes($_POST["telefon"]);
 		$handy = stripslashes($_POST["handy"]);
 		$email = stripslashes($_POST["email"]);
-		$gliederungid = stripslashes($_POST["gliederungid"]); $gliederungid = 1;
+		$gliederungid = intval($_POST["gliederungid"]); $gliederungid = 1;
 		$gliederung = $session->getStorage()->getGliederung($gliederungid);
 		$mitgliedpiraten = isset($_POST["mitgliedpiraten"]);
 		$verteilerpiraten = isset($_POST["verteilerpiraten"]);
-		$beitrag = stripslashes($_POST["beitrag"]);
+		$beitrag = doubleval($_POST["beitrag"]);
 
 		if (!$session->isAllowed("mitglieder_create")) {
 			$ui->viewLogin();
@@ -69,7 +74,7 @@ case "create":
 
 		$natperson = null;
 		$jurperson = null;
-		if ($isnatuerlich or true) {
+		if ($persontyp == "nat") {
 			$natperson = $session->getStorage()->searchNatPerson($name, $vorname, $geburtsdatum, $nationalitaet);
 		} else {
 			$jurperson = $session->getStorage()->searchJurPerson($firma);
@@ -103,7 +108,7 @@ case "create":
 		$revision->setKontakt($kontakt);
 		$revision->save();
 
-		//$ui->redirect($session->getLink("mitglieder_details", $mitglied->getMitgliedID()));
+		$ui->redirect($session->getLink("mitglieder_details", $mitglied->getMitgliedID()));
 	}
 
 	$orte = $session->getStorage()->getOrtList();

@@ -30,8 +30,8 @@ $config->registerPage("roles_deluser", "user.php?mode=delrole&roleid=%d&userid=%
 
 $config->registerPage("mitglieder", "mitglieder.php");
 $config->registerPage("mitglieder_create", "mitglieder.php?mode=create&mitgliedschaftid=%d");
-$config->registerPage("mitglieder_details", "mitglieder.php?mode=details&mitgliederid=%d");
-$config->registerPage("mitglieder_del", "mitglieder.php?mode=delete&mitgliederid=%d");
+$config->registerPage("mitglieder_details", "mitglieder.php?mode=details&mitgliedid=%d");
+$config->registerPage("mitglieder_del", "mitglieder.php?mode=delete&mitgliedid=%d");
 
 #$config->registerPage("");
 

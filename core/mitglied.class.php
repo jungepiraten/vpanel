@@ -6,7 +6,7 @@ require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 class Mitglied extends GlobalClass {
 	private $mitgliedid;
 	private $eintrittsdatum;
-	private $austritttsdatum;
+	private $austrittsdatum;
 	
 	private $revisions = array();
 	
@@ -14,8 +14,8 @@ class Mitglied extends GlobalClass {
 		$mitglied = new Mitglied($storage);
 		$mitglied->setMitgliedID($row["mitgliedid"]);
 		$mitglied->setGlobalID($row["globaleid"]);
-		$mitglied->setEintrittsdatum($row["eintrittsdatum"]);
-		$mitglied->setAustrittsdatum($row["austritsdatum"]);
+		$mitglied->setEintrittsdatum($row["eintritt"]);
+		$mitglied->setAustrittsdatum($row["austritt"]);
 		return $mitglied;
 	}
 
@@ -43,13 +43,17 @@ class Mitglied extends GlobalClass {
 		$this->austrittsdatum = $austrittsdatum;
 	}
 
-	public function istMitglied() {
+	public function isMitglied() {
 		return $this->austrittsdatum == null;
 	}
 	
-	public function getRevision($revisionid) {
+	public function addRevision($revision) {
+		$this->revisions[$revision->getRevisionID()] = $revision;
+	}
+	
+	public function &getRevision($revisionid) {
 		// TODO getFromStorage
-		if (!isset($this->revisions[$revisionid])) {
+		if (!isset($this->revisions[$revisionid]) or $this->revisions[$revisionid] == null) {
 			$this->revisions[$revisionid] = $this->getStorage()->getMitgliedRevision($revisionid);
 		}
 		return $this->revisions[$revisionid];
@@ -57,21 +61,11 @@ class Mitglied extends GlobalClass {
 
 	public function getLatestRevision() {
 		// TODO ...
-		return $this->getRevision(first($this->getRevisionIDs()));
+		return $this->getRevision(reset($this->getRevisionIDs()));
 	}
 	
 	public function getRevisionIDs() {
 		return array_keys($this->revisions);
-	}
-
-	public function load() {
-		if ($this->mitgliederid != null) {
-			$row = $storage->getMitglied($this->getMitgliederID());
-			$this->setMitgliedID($row["mitgliedid"]);
-			$this->setGlobalID($row["globalid"]);
-			$this->setEintrittsdatum($row["eintrittsdatum"]);
-			$this->setAustrittsdatum($row["austrittsdatum"]);
-		}
 	}
 
 	public function save(Storage $storage = null) {

@@ -71,11 +71,70 @@ class Template {
 
 	protected function parseMitglied($mitglied) {
 		$row = array();
+		$row["mitgliedid"] = $mitglied->getMitgliedID();
+		$row["globalid"] = $mitglied->getGlobalID();
+		$row["eintritt"] = $mitglied->getEintrittsdatum();
+		$row["austritt"] = $mitglied->getAustrittsdatum();
+		$row["latest"] = $this->parseMitgliedRevision($mitglied->getLatestRevision());
 		return $row;
 	}
 
 	protected function parseMitglieder($rows) {
 		return array_map(array($this, parseMitglied), $rows);
+	}
+
+	protected function parseMitgliedRevision($revision) {
+		$row = array();
+		$row["revisionid"] = $revision->getRevisionID();
+		$row["globalid"] = $revision->getGlobalID();
+		$row["timestamp"] = $revision->getTimestamp();
+		$row["user"] = $this->parseUser($revision->getUser());
+		$row["mitgliedschaft"] = $this->parseMitgliedschaft($revision->getMitgliedschaft());
+		if ($revision->getNatPersonID() != null) {
+			$row["natperson"] = $this->parseNatPerson($revision->getNatPerson());
+		}
+		if ($revision->getJurPersonID() != null) {
+			$row["jurperson"] = $this->parseJurPerson($revision->getJurPerson());
+		}
+		$row["kontakt"] = $this->parseKontakt($revision->getKontakt());
+		$row["beitrag"] = $revision->getBeitrag();
+		$row["mitglied_piraten"] = $revision->isMitgliedPiraten();
+		$row["verteiler_eingetragen"] = $revision->isVerteilerEingetragen();
+		$row["geloescht"] = $revision->isGeloescht();
+		return $row;
+	}
+
+	protected function parseMitgliedRevisions($rows) {
+		return array_map(array($this, parseMitgliedRevision), $rows);
+	}
+
+	protected function parseNatPerson($natperson) {
+		$row = array();
+		$row["natpersonid"] = $natperson->getNatPersonID();
+		$row["vorname"] = $natperson->getVorname();
+		$row["name"] = $natperson->getName();
+		$row["geburtsdatum"] = $natperson->getGeburtsdatum();
+		$row["nationalitaet"] = $natperson->getNationalitaet();
+		return $row;
+	}
+
+	protected function parseJurPerson($jurperson) {
+		$row = array();
+		$row["jurpersonid"] = $jurperson->getJurPersonID();
+		$row["label"] = $jurperson->getLabel();
+		return $row;
+	}
+
+	protected function parseKontakt($kontakt) {
+		$row = array();
+		$row["kontaktid"] = $kontakt->getKontaktID();
+		$row["strasse"] = $kontakt->getStrasse();
+		$row["hausnummer"] = $kontakt->getHausnummer();
+		$row["ort"] = $this->parseOrt($kontakt->getOrt());
+		$row["telefon"] = $kontakt->getTelefonnummer();
+		$row["handy"] = $kontakt->getHandynummer();
+		$row["email"] = $kontakt->getEMail();
+		return $row;
 	}
 
 	protected function parseMitgliedschaft($mitgliedschaft) {
@@ -179,6 +238,14 @@ class Template {
 		$this->smarty->assign("mitglieder", $this->parseMitglieder($mitglieder));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
 		$this->smarty->display("mitgliederlist.html.tpl");
+	}
+
+	public function viewMitgliedDetails($mitglied, $orte, $states) {
+		$this->smarty->assign("mitglied", $this->parseMitglied($mitglied));
+		$this->smarty->assign("mitgliedrevision", $this->parseMitgliedRevision($mitglied->getLatestRevision()));
+		$this->smarty->assign("orte", $this->parseOrte($orte));
+		$this->smarty->assign("states", $this->parseStates($states));
+		$this->smarty->display("mitgliederdetails.html.tpl");
 	}
 
 	public function viewMitgliedCreate($mitgliedschaft, $orte, $states) {

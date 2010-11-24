@@ -6,10 +6,10 @@ class JurPerson extends Person {
 	private $jurpersonid;
 	private $firma;
 	
-	public static function factoryByJurPersonID(Storage $storage, $jurpersonid) {
+	public static function factory(Storage $storage, $row) {
 		$jurperson = new JurPerson($storage);
-		$jurpersion->setJurPersonID($jurpersonid);
-		$jurperson->load();
+		$jurperson->setJurPersonID($row["jurpersonid"]);
+		$jurperson->setFirma($row["label"]);
 		return $jurperson;
 	}
 

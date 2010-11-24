@@ -21,7 +21,7 @@ class Kontakt extends GlobalClass {
 		$kontakt->setHausnummer($row["hausnummer"]);
 		$kontakt->setOrtID($row["ortid"]);
 		$kontakt->setTelefonnummer($row["telefonnummer"]);
-		$kontakt->setHausnummer($row["handynummer"]);
+		$kontakt->setHandynummer($row["handynummer"]);
 		$kontakt->setEMail($row["email"]);
 		return $kontakt;
 	}

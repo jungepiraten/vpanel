@@ -3,7 +3,7 @@
 {foreach from=$mitgliedschaften item=mitgliedschaft}
  <a href="{"mitglieder_create"|___:$mitgliedschaft.mitgliedschaftid}" class="neuset">{"Neu: %s"|__:$mitgliedschaft.label}</a>
 {/foreach}
-{include file=rolelist.block.tpl showroledel=1 roles=$roles}
+{include file=mitgliederlist.block.tpl mitglieder=$mitglieder}
 {foreach from=$mitgliedschaften item=mitgliedschaft}
  <a href="{"mitglieder_create"|___:$mitgliedschaft.mitgliedschaftid}" class="neuset">{"Neu: %s"|__:$mitgliedschaft.label}</a>
 {/foreach}

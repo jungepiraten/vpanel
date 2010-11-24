@@ -29,7 +29,19 @@ abstract class SQLStorage implements Storage {
 				$item = $row[$field];
 			}
 			if ($class !== null) {
-				$item = call_user_func(array($class, "factory"), $this, $item);
+				if (is_array($class)) {
+					$values = array();
+					foreach ($row as $col => $val) {
+						list($prefix, $col) = explode("_", $col, 2);
+						$values[$prefix][$col] = $val;
+					}
+					$item = array();
+					foreach ($class as $l => $c) {
+						$item[$l] = call_user_func(array($c, "factory"), $this, $values[$l]);
+					}
+				} else {
+					$item = call_user_func(array($class, "factory"), $this, $row);
+				}
 			}
 			if ($keyfield === null) {
 				$rows[] = $item;
@@ -158,12 +170,124 @@ abstract class SQLStorage implements Storage {
 	 * Mitglieder
 	 **/
 	public function getMitgliederList() {
-		$sql = "SELECT `mitglieder`.`mitgliedid`, `mitglieder`.`eintritt`, `mitglieder`.`austritt`, `mitgliederrevisions`.`revisionid` as `latestrevisionid`, `mitgliederrevisions`.`timestamp` AS `latestrevisiontimestamp` FROM `mitglieder` LEFT JOIN `mitgliederrevisions` ON (`mitgliederrevisions`.`mitgliedid` = `mitglieder`.`mitgliedid`) HAVING `mitgliederrevisions`.`timestamp` = MAX(`mitgliederrevisions`.`timestamp`)";
-		return $this->fetchAsArray($this->query($sql), "mitgliedid", null, Mitglied);
+		$sql = "SELECT	`r`.`timestamp` AS `null`,
+				`m`.`mitgliedid` as `m_mitgliedid`,
+				`m`.`eintritt` as `m_eintritt`,
+				`m`.`austritt` as `m_austritt`,
+				`r`.`revisionid` AS `r_revisionid`,
+				`r`.`globaleid` AS `r_globaleid`,
+				UNIX_TIMESTAMP(`r`.`timestamp`) AS `r_timestamp`,
+				`r`.`userid` AS `r_userid`,
+				`r`.`mitgliedid` AS `r_mitgliedid`,
+				`r`.`mitgliedschaftid` AS `r_mitgliedschaftid`,
+				`r`.`gliederungsid` AS `r_gliederungsid`,
+				`r`.`geloescht` AS `r_geloescht`,
+				`r`.`mitglied_piraten` AS `r_mitglied_piraten`,
+				`r`.`verteiler_eingetragen` AS `r_verteiler_eingetragen`,
+				`r`.`beitrag` AS `r_beitrag`,
+				`r`.`natpersonid` AS `r_natpersonid`,
+				`r`.`jurpersonid` AS `r_jurpersonid`,
+				`r`.`kontaktid` AS `r_kontaktid`,
+				`n`.`natpersonid` AS `n_natpersonid`,
+				`n`.`name` AS `n_name`,
+				`n`.`vorname` AS `n_vorname`,
+				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
+				`n`.`nationalitaet` AS `n_nationalitaet`,
+				`j`.`jurpersonid` AS `j_jurpersonid`,
+				`j`.`label` AS `j_label`,
+				`k`.`kontaktid` AS `k_kontaktid`,
+				`k`.`strasse` AS `k_strasse`,
+				`k`.`hausnummer` AS `k_hausnummer`,
+				`k`.`ortid` AS `k_ortid`,
+				`k`.`telefonnummer` AS `k_telefonnummer`,
+				`k`.`handynummer` AS `k_handynummer`,
+				`k`.`email` AS `k_email`,
+				`o`.`ortid` AS `k_ortid`,
+				`o`.`plz` AS `o_plz`,
+				`o`.`label` AS `o_label`,
+				`o`.`stateid` AS `o_stateid`
+			FROM	`mitglieder` `m`
+			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
+			LEFT JOIN `natperson` `n` USING (`natpersonid`)
+			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
+			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
+			LEFT JOIN `orte` `o` USING (`ortid`)
+			GROUP BY `r`.`mitgliedid`
+			HAVING	`r`.`timestamp` = MAX(`r`.`timestamp`)
+			ORDER BY `r`.`timestamp`";
+		$os = $this->fetchAsArray($this->query($sql), "revisionid", null, array("r" => MitgliedRevision, "n" => NatPerson, "j" => JurPerson, "k" => Kontakt, "o" => Ort, "m" => Mitglied));
+		$objs = array();
+		foreach ($os as $o) {
+			$o["k"]->setOrt($o["o"]);
+			if ($o["r"]->getNatPersonID() !== null) {
+				$o["r"]->setNatPerson($o["n"]);
+			}
+			if ($o["r"]->getJurPersonID() !== null) {
+				$o["r"]->setJurPerson($o["j"]);
+			}
+			$o["r"]->setKontakt($o["k"]);
+			$o["m"]->addRevision($o["r"]);
+			$objs[] = $o["m"];
+		}
+		return $objs;
 	}
 	public function getMitglied($mitgliedid) {
-		$sql = "SELECT `mitglieder`.`mitgliedid`, `mitglieder`.`eintritt`, `mitglieder`.`austritt`, `mitgliederrevisions`.`revisionid` as `latestrevisionid`, `mitgliederrevisions`.`timestamp` AS `latestrevisiontimestamp` FROM `mitglieder` LEFT JOIN `mitgliederrevisions` ON (`mitgliederrevisions`.`mitgliedid` = `mitglieder`.`mitgliedid`) WHERE `mitglieder`.`mitgliedid` = " . intval($mitgliedid) . " HAVING `mitgliederrevisions`.`timestamp` = MAX(`mitgliederrevisions`.`timestamp`)";
-		return reset($this->fetchAsArray($this->query($sql), "mitgliedid", null, Mitglied));
+		$sql = "SELECT	`r`.`timestamp` AS `null`,
+				`m`.`mitgliedid` as `m_mitgliedid`,
+				`m`.`eintritt` as `m_eintritt`,
+				`m`.`austritt` as `m_austritt`,
+				`r`.`revisionid` AS `r_revisionid`,
+				`r`.`globaleid` AS `r_globaleid`,
+				UNIX_TIMESTAMP(`r`.`timestamp`) AS `r_timestamp`,
+				`r`.`userid` AS `r_userid`,
+				`r`.`mitgliedid` AS `r_mitgliedid`,
+				`r`.`mitgliedschaftid` AS `r_mitgliedschaftid`,
+				`r`.`gliederungsid` AS `r_gliederungsid`,
+				`r`.`geloescht` AS `r_geloescht`,
+				`r`.`mitglied_piraten` AS `r_mitglied_piraten`,
+				`r`.`verteiler_eingetragen` AS `r_verteiler_eingetragen`,
+				`r`.`beitrag` AS `r_beitrag`,
+				`r`.`natpersonid` AS `r_natpersonid`,
+				`r`.`jurpersonid` AS `r_jurpersonid`,
+				`r`.`kontaktid` AS `r_kontaktid`,
+				`n`.`natpersonid` AS `n_natpersonid`,
+				`n`.`name` AS `n_name`,
+				`n`.`vorname` AS `n_vorname`,
+				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
+				`n`.`nationalitaet` AS `n_nationalitaet`,
+				`j`.`jurpersonid` AS `j_jurpersonid`,
+				`j`.`label` AS `j_label`,
+				`k`.`kontaktid` AS `k_kontaktid`,
+				`k`.`strasse` AS `k_strasse`,
+				`k`.`hausnummer` AS `k_hausnummer`,
+				`k`.`ortid` AS `k_ortid`,
+				`k`.`telefonnummer` AS `k_telefonnummer`,
+				`k`.`handynummer` AS `k_handynummer`,
+				`k`.`email` AS `k_email`,
+				`o`.`ortid` AS `o_ortid`,
+				`o`.`plz` AS `o_plz`,
+				`o`.`label` AS `o_label`,
+				`o`.`stateid` AS `o_stateid`
+			FROM	`mitglieder` `m`
+			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
+			LEFT JOIN `natperson` `n` USING (`natpersonid`)
+			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
+			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
+			LEFT JOIN `orte` `o` USING (`ortid`)
+			WHERE	`r`.`mitgliedid` = " . intval($mitgliedid) . "
+			GROUP BY `r`.`mitgliedid`
+			HAVING	`r`.`timestamp` = MAX(`r`.`timestamp`)";
+		$o = reset($this->fetchAsArray($this->query($sql), "r_revisionid", null, array("r" => MitgliedRevision, "n" => NatPerson, "j" => JurPerson, "k" => Kontakt, "o" => Ort, "m" => Mitglied)));
+		$o["k"]->setOrt($o["o"]);
+		if ($o["r"]->getNatPersonID() !== null) {
+			$o["r"]->setNatPerson($o["n"]);
+		}
+		if ($o["r"]->getJurPersonID() !== null) {
+			$o["r"]->setJurPerson($o["j"]);
+		}
+		$o["r"]->setKontakt($o["k"]);
+		$o["m"]->addRevision($o["r"]);
+		return $o["m"];
 	}
 	public function setMitglied($mitgliedid, $globalid, $eintritt, $austritt) {
 		if ($mitgliedid == null) {
@@ -183,21 +307,81 @@ abstract class SQLStorage implements Storage {
 	 * MitgliederRevisions
 	 **/
 	public function getMitgliederRevisionList($mitgliedid = null) {
-		$sql = "SELECT `revisionid`, `globaleid`, UNIX_TIMESTAMP(`timestamp`), `userid`, `mitgliedid`, `mitgliedschaftid`, `gliederungsid`, `geloescht`, `mitglied_piraten`, `verteiler_eingetragen`, `beitrag`, `natpersonid`, `jurpersonid`, `kontaktid` FROM `mitgliederrevisions`";
+		$sql = "SELECT	`r`.`revisionid` AS `r_revisionid`,
+				`r`.`globaleid` AS `r_globaleid`,
+				UNIX_TIMESTAMP(`r`.`timestamp`) AS `r_timestamp`,
+				`r`.`userid` AS `r_userid`,
+				`r`.`mitgliedid` AS `r_mitgliedid`,
+				`r`.`mitgliedschaftid` AS `r_mitgliedschaftid`,
+				`r`.`gliederungsid` AS `r_gliederungsid`,
+				`r`.`geloescht` AS `r_geloescht`,
+				`r`.`mitglied_piraten` AS `r_mitglied_piraten`,
+				`r`.`verteiler_eingetragen` AS `r_verteiler_eingetragen`,
+				`r`.`beitrag` AS `r_beitrag`,
+				`r`.`natpersonid` AS `r_natpersonid`,
+				`r`.`jurpersonid` AS `r_jurpersonid`,
+				`r`.`kontaktid` AS `r_kontaktid`,
+				`n`.`natpersonid` AS `n_natpersonid`,
+				`n`.`name` AS `n_name`,
+				`n`.`vorname` AS `n_vorname`,
+				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
+				`n`.`nationalitaet` AS `n_nationalitaet`,
+				`j`.`jurpersonid` AS `j_jurpersonid`,
+				`j`.`firma` AS `j_firma`,
+				`k`.`kontaktid` AS `k_kontaktid`,
+				`k`.`strasse` AS `k_strasse`,
+				`k`.`hausnummer` AS `k_hausnummer`,
+				`k`.`ortid` AS `k_ortid`,
+				`k`.`telefon` AS `k_telefon`,
+				`k`.`handy` AS `k_handy`,
+				`k`.`email` AS `k_email`,
+				`o`.`ortid` AS `k_ortid`,
+				`o`.`plz` AS `o_plz`,
+				`o`.`label` AS `o_label`,
+				`o`.`stateid` AS `o_stateid`
+			FROM	`mitgliederrevisions` `r`
+			LEFT JOIN `natperson` `n` USING (`natpersonid`)
+			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
+			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
+			LEFT JOIN `kontakte` `o` USING (`ortid`)";
 		if ($mitgliedid != null) {
-			$sql .= " WHERE `mitgliedid` = " . intval($mitgliedid);
+			$sql .= " WHERE `m`.`mitgliedid` = " . intval($mitgliedid);
 		}
-		$sql .= " ORDER BY `timestamp`";
-		return $this->fetchAsArray($this->query($sql), "revisionid", null, MitgliederRevision);
+		$sql .= " ORDER BY `r`.`timestamp`";
+		$os = $this->fetchAsArray($this->query($sql), "revisionid", null, array("r" => MitgliederRevision, "n" => NatPerson, "j" => JurPerson, "k" => Kontakt, "u" => User));
+		$objs = array();
+		foreach ($os as $k => &$o) {
+			$o["k"]->setOrt($o["o"]);
+			$o["r"]->setNatPerson($o["n"]);
+			$o["r"]->setJurPerson($o["j"]);
+			$o["r"]->setKontakt($o["k"]);
+			$objs[$k] = $o["r"];
+		}
+		return $objs;
 	}
 	public function getMitgliederRevision($revisionid) {
-		$sql = "SELECT `revisionid`, `globaleid`, UNIX_TIMESTAMP(`timestamp`), `userid`, `mitgliedid`, `mitgliedschaftid`, `gliederungsid`, `geloescht`, `mitglied_piraten`, `verteiler_eingetragen`, `beitrag`, `natpersonid`, `jurpersonid`, `kontaktid` FROM `mitgliederrevisions` WHERE `revisionid` = " . intval($mitgliedid);
+		$sql = "SELECT	`mitgliederrevisions`.`revisionid`,
+				`mitgliederrevisions`.`globaleid`,
+				UNIX_TIMESTAMP(`mitgliederrevisions`.`timestamp`),
+				`mitgliederrevisions`.`userid`,
+				`mitgliederrevisions`.`mitgliedid`,
+				`mitgliederrevisions`.`mitgliedschaftid`,
+				`mitgliederrevisions`.`gliederungsid`,
+				`mitgliederrevisions`.`geloescht`,
+				`mitgliederrevisions`.`mitglied_piraten`,
+				`mitgliederrevisions`.`verteiler_eingetragen`,
+				`mitgliederrevisions`.`beitrag`,
+				`mitgliederrevisions`.`natpersonid`,
+				`mitgliederrevisions`.`jurpersonid`,
+				`mitgliederrevisions`.`kontaktid`
+			FROM	`mitgliederrevisions`
+			WHERE	`revisionid` = " . intval($mitgliedid);
 	}
 	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $mitgliedpiraten, $verteilereingetragen, $beitrag, $natpersonid, $jurpersonid, $kontaktid) {
 		if ($revisionid == null) {
-			$sql = "INSERT INTO `mitgliederrevisions` (`globaleid`, `timestamp`, `userid`, `mitgliedid`, `mitgliedschaftid`, `gliederungsid`, `geloescht`, `mitglied_piraten`, `verteiler_eingetragen`, `beitrag`, `natpersonid`, `jurpersonid`, `kontaktid`) VALUES ('" . $this->escape($globalid) . "', '" . date("Y-m-d H:i:s", $timestamp) . "', " . intval($userid) . ", " . intval($mitgliedid) . ", " . intval($mitgliedschaftid) . ", " . intval($gliederungid) . ", " . ($geloescht ? 1 : 0) . ", " . ($mitgliedpiraten ? 1 : 0) . ", " . ($verteilereingetragen ? 1 : 0) . ", " . doubleval($beitrag) . ", " . intval($natpersonid) . ", " . intval($jurpersonid) . ", " . intval($kontaktid) . ")";
+			$sql = "INSERT INTO `mitgliederrevisions` (`globaleid`, `timestamp`, `userid`, `mitgliedid`, `mitgliedschaftid`, `gliederungsid`, `geloescht`, `mitglied_piraten`, `verteiler_eingetragen`, `beitrag`, `natpersonid`, `jurpersonid`, `kontaktid`) VALUES ('" . $this->escape($globalid) . "', '" . date("Y-m-d H:i:s", $timestamp) . "', " . intval($userid) . ", " . intval($mitgliedid) . ", " . intval($mitgliedschaftid) . ", " . intval($gliederungid) . ", " . ($geloescht ? 1 : 0) . ", " . ($mitgliedpiraten ? 1 : 0) . ", " . ($verteilereingetragen ? 1 : 0) . ", " . doubleval($beitrag) . ", " . ($natpersonid == null ? "NULL" : intval($natpersonid)) . ", " . ($jurpersonid == null ? "NULL" : intval($jurpersonid)) . ", " . intval($kontaktid) . ")";
 		} else {
-			$sql = "UPDATE `mitgliederrevisions` SET `globaleid` = '" . $this->escape($globalid) . "', `timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "', `userid` = " . intval($userid) . ", `mitgliedid` = " . intval($mitgliedid) . ", `mitgliedschaftid` = " . intval($mitgliedschaftid) . ", `gliederungsid` = " . intval($gliederungid) . ", `geloescht` = " . ($geloescht ? 1 : 0) . ", `mitglied_piraten` = " . ($mitgliedpiraten ? 1 : 0) . ", `verteiler_eingetragen` = " . ($verteilereingetragen ? 1 : 0) . ", " . doubleval($beitrag) . ", `natpersonid` = " . intval($natpersonid) . ",`jurpersonid` = " . intval($jurpersonid) . ", `kontaktid` = " . intval($kontaktid) . " WHERE `revisionid` = " . intval($revisionid);
+			$sql = "UPDATE `mitgliederrevisions` SET `globaleid` = '" . $this->escape($globalid) . "', `timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "', `userid` = " . intval($userid) . ", `mitgliedid` = " . intval($mitgliedid) . ", `mitgliedschaftid` = " . intval($mitgliedschaftid) . ", `gliederungsid` = " . intval($gliederungid) . ", `geloescht` = " . ($geloescht ? 1 : 0) . ", `mitglied_piraten` = " . ($mitgliedpiraten ? 1 : 0) . ", `verteiler_eingetragen` = " . ($verteilereingetragen ? 1 : 0) . ", " . doubleval($beitrag) . ", `natpersonid` = " . ($natpersonid == null ? "NULL" : intval($natpersonid)) . ",`jurpersonid` = " . ($jurpersonid == null ? "NULL" : intval($jurpersonid)) . ", `kontaktid` = " . intval($kontaktid) . " WHERE `revisionid` = " . intval($revisionid);
 		}
 		$this->query($sql);
 		if ($revisionid == null) {
@@ -414,14 +598,14 @@ abstract class SQLStorage implements Storage {
 	 * JurPerson
 	 **/
 	public function getJurPerson($jurpersonid) {
-		$sql = "SELECT `jurpersonid`, `firma` FROM `jurperson` WHERE `jurpersonid` = " . intval($jurpersonid);
+		$sql = "SELECT `jurpersonid`, `label` FROM `jurperson` WHERE `jurpersonid` = " . intval($jurpersonid);
 		return reset($this->fetchAsArray($this->query($sql), null, null, JurPerson));
 	}
 	public function setJurPerson($jurpersonid, $firma) {
 		if ($jurpersonid == null) {
-			$sql = "INSERT INTO `jurperson` (`firma`) VALUES ('" . $this->escape($firma) . "')";
+			$sql = "INSERT INTO `jurperson` (`label`) VALUES ('" . $this->escape($firma) . "')";
 		} else {
-			$sql = "UPDATE `jurperson` SET `firma` = '" . $this->escape($firma) . "' WHERE `jurpersonid` = " . intval($jurpersonid);
+			$sql = "UPDATE `jurperson` SET `label` = '" . $this->escape($firma) . "' WHERE `jurpersonid` = " . intval($jurpersonid);
 		}
 		$this->query($sql);
 		if ($jurpersonid == null) {
@@ -434,7 +618,7 @@ abstract class SQLStorage implements Storage {
 		return $this->query($sql);
 	}
 	public function searchJurPerson($firma) {
-		$sql = "SELECT `jurpersonid`, `firma` FROM `jurperson` WHERE `firma` = '" . $this->escape($firma) . "'";
+		$sql = "SELECT `jurpersonid`, `label` FROM `jurperson` WHERE `label` = '" . $this->escape($firma) . "'";
 		$array = $this->fetchAsArray($this->query($sql), "jurpersonid", null, JurPerson);
 		if (count($array) > 0) {
 			return reset($array);

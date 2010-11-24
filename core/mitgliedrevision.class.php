@@ -20,6 +20,8 @@ class MitgliedRevision extends GlobalClass {
 	private $mitglied_piraten;
 	private $verteiler_eingetragen;
 	private $beitrag;
+	private $natpersonid;
+	private $jurpersonid;
 	private $kontaktid;
 	
 	private $user;
@@ -30,10 +32,22 @@ class MitgliedRevision extends GlobalClass {
 	private $jurperson;
 	private $kontakt;
 
-	public static function factoryByRevID(Storage $storage, $revid = null) {
+	public static function factory(Storage $storage, $row) {
 		$revision = new MitgliedRevision($storage);
-		$revision->setRevisionID($revid);
-		$revision->load();
+		$revision->setRevisionID($row["revisionid"]);
+		$revision->setGlobalID($row["globaleid"]);
+		$revision->setTimestamp($row["timestamp"]);
+		$revision->setUserID($row["userid"]);
+		$revision->setMitgliedID($row["mitgliedid"]);
+		$revision->setMitgliedschaftID($row["mitgliedschaftid"]);
+		$revision->setGliederungID($row["gliederungsid"]);
+		$revision->isGeloescht($row["geloescht"]);
+		$revision->isMitgliedPiraten($row["mitglied_piraten"]);
+		$revision->isVerteilerEingetragen($row["verteiler_eingetragen"]);
+		$revision->setBeitrag($row["beitrag"]);
+		$revision->setNatPersonID($row["natpersonid"]);
+		$revision->setJurPersonID($row["jurpersonid"]);
+		$revision->setRevisionID($row["kontaktid"]);
 		return $revision;
 	}
 
@@ -146,22 +160,22 @@ class MitgliedRevision extends GlobalClass {
 	}
 
 	public function isGeloescht($geloescht = null) {
-		if ($geloescht != null) {
+		if ($geloescht !== null) {
 			$this->geloescht = $geloescht == true;
 		}
 		return $this->geloescht;
 	}
 
 	public function isMitgliedPiraten($mitgliedpiraten = null) {
-		if ($mitgliedpiraten != null) {
-			$this->mitgliedpiraten = $mitgliedpiraten == true;
+		if ($mitgliedpiraten !== null) {
+			$this->mitglied_piraten = $mitgliedpiraten == true;
 		}
 		return $this->mitglied_piraten;
 	}
 
 	public function isVerteilerEingetragen($verteilereingetragen = null) {
-		if ($verteilereingetragen != null) {
-			$this->verteilereingetragen = $verteilereingetragen == null;
+		if ($verteilereingetragen !== null) {
+			$this->verteiler_eingetragen = $verteilereingetragen == true;
 		}
 		return $this->verteiler_eingetragen;
 	}
