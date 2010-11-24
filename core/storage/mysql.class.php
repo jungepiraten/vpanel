@@ -8,6 +8,7 @@ class MySQLStorage extends SQLStorage {
 	public function __construct($host, $user, $pass, $db) {
 		parent::__construct();
 		$this->mysqli = new MySQLi($host, $user, $pass, $db);
+		$this->mysqli->set_charset("utf8");
 	}
 
 	public function query($sql) {

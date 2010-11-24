@@ -1,6 +1,7 @@
 <?php
 
 require_once(VPANEL_CORE . "/globalobject.class.php");
+require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 
 class Mitglied extends GlobalClass {
 	private $mitgliedid;
@@ -9,10 +10,12 @@ class Mitglied extends GlobalClass {
 	
 	private $revisions = array();
 	
-	public static function factoryByMitgliedID(Storage $storage, $mitgliedid) {
+	public static function factory(Storage $storage, $row) {
 		$mitglied = new Mitglied($storage);
-		$mitglied->setMitgliedID($mitgliedid);
-		$mitglied->load();
+		$mitglied->setMitgliedID($row["mitgliedid"]);
+		$mitglied->setGlobalID($row["globaleid"]);
+		$mitglied->setEintrittsdatum($row["eintrittsdatum"]);
+		$mitglied->setAustrittsdatum($row["austritsdatum"]);
 		return $mitglied;
 	}
 
@@ -63,7 +66,7 @@ class Mitglied extends GlobalClass {
 
 	public function load() {
 		if ($this->mitgliederid != null) {
-			$row = $storage->getMitglied($this->mitgliederid);
+			$row = $storage->getMitglied($this->getMitgliederID());
 			$this->setMitgliedID($row["mitgliedid"]);
 			$this->setGlobalID($row["globalid"]);
 			$this->setEintrittsdatum($row["eintrittsdatum"]);
@@ -75,11 +78,11 @@ class Mitglied extends GlobalClass {
 		if ($storage === null) {
 			$storage = $this->getStorage();
 		}
-		$storage->setMitglied(
+		$this->setMitgliedID( $storage->setMitglied(
 			$this->getMitgliedID(),
 			$this->getGlobalID(),
 			$this->getEintrittsdatum(),
-			$this->getAustrittsdatum() );
+			$this->getAustrittsdatum() ));
 		// TODO revisions speichern
 	}
 }

@@ -6,7 +6,7 @@ require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
 $ui = $session->getTemplate();
 
-if (!$session->getAuth()->isAllowed("roles_show")) {
+if (!$session->isAllowed("roles_show")) {
 	$ui->viewLogin();
 	exit;
 }
@@ -14,56 +14,62 @@ if (!$session->getAuth()->isAllowed("roles_show")) {
 switch ($_REQUEST["mode"]) {
 case "details":
 	$roleid = intval($_REQUEST["roleid"]);
+	$role = $session->getStorage()->getRole($roleid);
 
 	if (isset($_REQUEST["save"])) {
-		if (!$session->getAuth()->isAllowed("roles_modify")) {
+		if (!$session->isAllowed("roles_modify")) {
 			$ui->viewLogin();
 			exit;
 		}
 		$label = stripslashes($_REQUEST["label"]);
 		$description = stripslashes($_REQUEST["description"]);
-		$session->getStorage()->modRole($roleid, $label, $description);
+
+		$role->setLabel($label);
+		$role->setDescription($description);
+		$role->save();
 	}
 
 	if (isset($_REQUEST["savepermissions"])) {
-		if (!$session->getAuth()->isAllowed("roles_modify")) {
+		if (!$session->isAllowed("roles_modify")) {
 			$ui->viewLogin();
 			exit;
 		}
 		$permissions = $_REQUEST["permissions"];
-		$rolepermissions = array_keys($session->getStorage()->getRolePermissions($roleid));
+		$rolepermissions = array_keys($role->getPermissions());
 		foreach (array_diff($permissions, $rolepermissions) as $perm) {
-			$session->getStorage()->addRolePermission($roleid, $perm);
+			$role->addPermission($perm);
 		}
 		foreach (array_diff($rolepermissions, $permissions) as $perm) {
-			$session->getStorage()->delRolePermission($roleid, $perm);
+			$role->delPermission($perm);
 		}
 	}
 
-	$role = reset($session->getStorage()->getRoleList($roleid));
-	$roleusers = $session->getStorage()->getUserList(null, $roleid);
 	$users = $session->getStorage()->getUserList();
-	$rolepermissions = $session->getStorage()->getRolePermissions($roleid);
-	$permissions = $session->getStorage()->getPermissions();
+	$permissions = $session->getStorage()->getPermissionList();
 
-	$ui->viewRoleDetails($role, $roleusers, $users, $rolepermissions, $permissions);
+	$ui->viewRoleDetails($role, $users, $permissions);
 	exit;
 case "create":
 	if (isset($_REQUEST["save"])) {
-		if (!$session->getAuth()->isAllowed("roles_create")) {
+		if (!$session->isAllowed("roles_create")) {
 			$ui->viewLogin();
 			exit;
 		}
 		$label = stripslashes($_REQUEST["label"]);
 		$description = stripslashes($_REQUEST["description"]);
-		$roleid = $session->getStorage()->addRole($label, $description);
-		$ui->redirect($session->getLink("roles_details", $roleid));
+
+		$role = new Role($session->getStorage());
+		$role->setLabel($label);
+		$role->setDescription($description);
+		$role->save();
+
+		$ui->redirect($session->getLink("roles_details", $role->getRoleID()));
 	}
 
 	$ui->viewRoleCreate();
 	exit;
 case "delete":
-	if (!$session->getAuth()->isAllowed("roles_delete")) {
+	if (!$session->isAllowed("roles_delete")) {
 		$ui->viewLogin();
 		exit;
 	}

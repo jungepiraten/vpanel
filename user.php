@@ -6,72 +6,85 @@ require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
 $ui = $session->getTemplate();
 
-if (!$session->getAuth()->isAllowed("users_show")) {
+if (!$session->isAllowed("users_show")) {
 	$ui->viewLogin();
 	exit;
 }
 
+require_once(VPANEL_CORE . "/user.class.php");
+require_once(VPANEL_CORE . "/role.class.php");
+
 switch ($_REQUEST["mode"]) {
 case "addrole":
-	if (!$session->getAuth()->isAllowed("users_modify")) {
+	if (!$session->isAllowed("users_modify")) {
 		$ui->viewLogin();
 		exit;
 	}
 	$userid = intval($_REQUEST["userid"]);
 	$roleid = intval($_REQUEST["roleid"]);
-	$session->getStorage()->addUserRole($userid, $roleid);
+	$user = $session->getStorage()->getUser($userid);
+	$user->addRoleID($roleid);
+	$user->save();
 	$ui->redirect();
 	exit;
 case "delrole":
-	if (!$session->getAuth()->isAllowed("users_modify")) {
+	if (!$session->isAllowed("users_modify")) {
 		$ui->viewLogin();
 		exit;
 	}
 	$userid = intval($_REQUEST["userid"]);
 	$roleid = intval($_REQUEST["roleid"]);
-	$session->getStorage()->delUserRole($userid, $roleid);
+	$user = $session->getStorage()->getUser($userid);
+	$user->delRoleID($roleid);
+	$user->save();
 	$ui->redirect();
 	exit;
 case "details":
 	$userid = intval($_REQUEST["userid"]);
+	$user = $session->getStorage()->getUser($userid);
 
 	if (isset($_REQUEST["save"])) {
-		if (!$session->getAuth()->isAllowed("users_modify")) {
+		if (!$session->isAllowed("users_modify")) {
 			$ui->viewLogin();
 			exit;
 		}
+
 		$username = stripslashes($_REQUEST["username"]);
 		$password = stripslashes($_REQUEST["password"]);
-		$session->getStorage()->modUser($userid, $username);
 
+		$user->setUserID($userid);
+		$user->setUsername($username);
 		if (!empty($password)) {
-			$session->getStorage()->changePassword($userid, $password);
+			$user->changePassword($password);
 		}
+		$user->save();
 	}
 
-	$user = reset($session->getStorage()->getUserList($userid));
-	$userroles = $session->getStorage()->getRoleList(null, $userid);
 	$roles = $session->getStorage()->getRoleList();
-	$permissions = $session->getStorage()->getPermissions($userid);
 
-	$ui->viewUserDetails($user, $userroles, $roles, $permissions);
+	$ui->viewUserDetails($user, $roles);
 	exit;
 case "create":
 	if (isset($_REQUEST["save"])) {
-		if (!$session->getAuth()->isAllowed("users_create")) {
+		if (!$session->isAllowed("users_create")) {
 			$ui->viewLogin();
 			exit;
 		}
 		$username = stripslashes($_REQUEST["username"]);
 		$password = stripslashes($_REQUEST["password"]);
-		$userid = $session->getStorage()->addUser($username, $password);
-		$ui->redirect($session->getLink("users_details", $userid));
+
+		$user = new User($session->getStorage());
+		$user->setUsername($username);
+		$user->setPassword($password);
+		$user->save();
+
+		$ui->redirect($session->getLink("users_details", $user->getUserID()));
 	}
 
 	$ui->viewUserCreate();
 	exit;
 case "delete":
-	if (!$session->getAuth()->isAllowed("users_delete")) {
+	if (!$session->isAllowed("users_delete")) {
 		$ui->viewLogin();
 		exit;
 	}

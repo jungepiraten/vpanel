@@ -7,14 +7,14 @@ abstract class GlobalClass extends StorageClass {
 	
 	public function __construct(Storage $storage = null, $globalid = null) {
 		parent::__construct($storage);
-		$this->setGlobalId($globalid);
+		$this->setGlobalID($globalid);
 	}
 	
-	public function getGlobalId() {
+	public function getGlobalID() {
 		return $this->globalid;
 	}
 
-	public function setGlobalId($globalid) {
+	public function setGlobalID($globalid) {
 		$this->globalid = $globalid;
 	}
 }
