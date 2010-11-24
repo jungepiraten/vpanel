@@ -54,11 +54,11 @@
      </tr>
      <tr>
          <td><label for="mitglied_pp">{"Mitglied PP:"|__}</label></td>
-         <td><input class="mitglied_piraten" type="checkbox" name="mitglied_pp" {if isset($mitgliedrevision.kontakt) and $mitgliedrevision.kontakt.mitglied_piraten}checked="checked"{/if}" /></td>
+         <td><input class="mitglied_piraten" type="checkbox" name="mitglied_piraten" {if isset($mitgliedrevision) and $mitgliedrevision.mitglied_piraten}checked="checked"{/if}" /></td>
      </tr>
      <tr>
          <td><label for="verteiler_eingetragen">{"Verteiler Eingetragen:"|__}</label></td>
-         <td><input class="verteiler_eingetragen" type="checkbox" name="verteiler_eingetragen" {if isset($mitgliedrevision.kontakt) and $mitgliedrevision.kontakt.verteiler_eingetragen}checked="checked"{/if}" /></td>
+         <td><input class="verteiler_eingetragen" type="checkbox" name="verteiler_eingetragen" {if isset($mitgliedrevision) and $mitgliedrevision.verteiler_eingetragen}checked="checked"{/if}" /></td>
      </tr>
      <tr>
          <td><label for="beitrag">{"Beitrag:"|__}</label></td>
