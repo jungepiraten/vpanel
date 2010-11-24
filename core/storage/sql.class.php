@@ -208,14 +208,15 @@ abstract class SQLStorage implements Storage {
 				`o`.`stateid` AS `o_stateid`
 			FROM	`mitglieder` `m`
 			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
-			LEFT JOIN `natperson` `n` USING (`natpersonid`)
-			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
-			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
-			LEFT JOIN `orte` `o` USING (`ortid`)
-			GROUP BY `r`.`mitgliedid`
-			HAVING	`r`.`timestamp` = MAX(`r`.`timestamp`)
+			LEFT JOIN `mitgliederrevisions` `rmax` USING (`mitgliedid`)
+			LEFT JOIN `natperson` `n` ON (`n`.`natpersonid` = `r`.`natpersonid`)
+			LEFT JOIN `jurperson` `j` ON (`j`.`jurpersonid` = `r`.`jurpersonid`)
+			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
+			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
+			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
+			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
 			ORDER BY `r`.`timestamp`";
-		$os = $this->fetchAsArray($this->query($sql), "revisionid", null, array("r" => MitgliedRevision, "n" => NatPerson, "j" => JurPerson, "k" => Kontakt, "o" => Ort, "m" => Mitglied));
+		$os = $this->fetchAsArray($this->query($sql), "m_mitgliedid", null, array("r" => MitgliedRevision, "n" => NatPerson, "j" => JurPerson, "k" => Kontakt, "o" => Ort, "m" => Mitglied));
 		$objs = array();
 		foreach ($os as $o) {
 			$o["k"]->setOrt($o["o"]);
@@ -270,13 +271,14 @@ abstract class SQLStorage implements Storage {
 				`o`.`stateid` AS `o_stateid`
 			FROM	`mitglieder` `m`
 			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
-			LEFT JOIN `natperson` `n` USING (`natpersonid`)
-			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
-			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
-			LEFT JOIN `orte` `o` USING (`ortid`)
+			LEFT JOIN `mitgliederrevisions` `rmax` USING (`mitgliedid`)
+			LEFT JOIN `natperson` `n` ON (`n`.`natpersonid` = `r`.`natpersonid`)
+			LEFT JOIN `jurperson` `j` ON (`j`.`jurpersonid` = `r`.`jurpersonid`)
+			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
+			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
 			WHERE	`r`.`mitgliedid` = " . intval($mitgliedid) . "
-			GROUP BY `r`.`mitgliedid`
-			HAVING	`r`.`timestamp` = MAX(`r`.`timestamp`)";
+			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
+			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)";
 		$o = reset($this->fetchAsArray($this->query($sql), "r_revisionid", null, array("r" => MitgliedRevision, "n" => NatPerson, "j" => JurPerson, "k" => Kontakt, "o" => Ort, "m" => Mitglied)));
 		$o["k"]->setOrt($o["o"]);
 		if ($o["r"]->getNatPersonID() !== null) {
@@ -624,7 +626,7 @@ abstract class SQLStorage implements Storage {
 			return reset($array);
 		}
 		$jurperson = new JurPerson($this);
-		$jurperson->setFirma($firma);
+		$jurperson->setLabel($firma);
 		$jurperson->save();
 		return $jurperson;
 	}

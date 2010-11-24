@@ -4,12 +4,12 @@ require_once(VPANEL_CORE . "/person.class.php");
 
 class JurPerson extends Person {
 	private $jurpersonid;
-	private $firma;
+	private $label;
 	
 	public static function factory(Storage $storage, $row) {
 		$jurperson = new JurPerson($storage);
 		$jurperson->setJurPersonID($row["jurpersonid"]);
-		$jurperson->setFirma($row["label"]);
+		$jurperson->setLabel($row["label"]);
 		return $jurperson;
 	}
 
@@ -21,29 +21,21 @@ class JurPerson extends Person {
 		$this->jurpersonid = $jurpersonid;
 	}
 
-	public function getFirma() {
-		return $this->firma;
+	public function getLabel() {
+		return $this->label;
 	}
 
-	public function setFirma($firma) {
-		$this->firma = $firma;
-	}
-
-	public function load() {
-		if ($this->jurpersonid == null) {
-			$row = $this->getStorage()->getJurPerson($this->getJurPersonID());
-			$this->setJurPersonID($row["jurpersonid"]);
-			$this->setFirma($row["firma"]);
-		}
+	public function setLabel($label) {
+		$this->label = $label;
 	}
 
 	public function save(Storage $storage = null) {
 		if ($storage == null) {
 			$storage = $this->getStorage();
 		}
-		$storage->setJurPerson(
+		$this->setJurPersonID( $storage->setJurPerson(
 			$this->getJurPersonID(),
-			$this->getFirma() );
+			$this->getLabel() ));
 	}
 }
 

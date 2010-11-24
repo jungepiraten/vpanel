@@ -64,12 +64,12 @@ class NatPerson extends Person {
 		if ($storage == null) {
 			$storage = $this->getStorage();
 		}
-		$storage->setNatPerson(
+		$this->setNatPersonID( $storage->setNatPerson(
 			$this->getNatPersonID(),
 			$this->getName(),
 			$this->getVorname(),
 			$this->getGeburtsdatum(),
-			$this->getNationalitaet() );
+			$this->getNationalitaet() ));
 	}
 }
 

@@ -3,7 +3,7 @@
  <table>
      <tr>
          <td>{"Mitgliedsart:"|__}</td>
-         <td>{if isset($mitglied)}{$mitglied.mitgliedschaft.label|escape:html}{else}{$mitgliedschaft.label|escape:html}{/if}</td>
+         <td><select name="mitgliedschaftid">{foreach from=$mitgliedschaften item=m}<option value="{$m.mitgliedschaftid}" {if isset($mitgliedrevision) and $m.mitgliedschaftid == $mitgliedrevision.mitgliedschaft.mitgliedschaftid or $m.mitgliedschaftid == $mitgliedschaft.mitgliedschaftid}selected="selected"{/if}>{$m.label|escape:html}</option>{/foreach}</select></td>
      </tr>
      <tr>
          <td>{"Typ:"|__}</td>
@@ -26,7 +26,7 @@
      </tr>
      <tr id="jur_0">
          <td><label for="firma">{"Firma:"|__}</label></td>
-         <td><input class="firma" type="text" name="firma" size="40" value="{if isset($mitgliedrevision.jurperson)}{$mitgliedrevision.jurperson.firma|escape:html}{/if}" /></td>
+         <td><input class="firma" type="text" name="firma" size="40" value="{if isset($mitgliedrevision.jurperson)}{$mitgliedrevision.jurperson.label|escape:html}{/if}" /></td>
      </tr>
      <tr>
          <td><label for="strasse">{"Adresse:"|__}</label></td>
@@ -54,7 +54,7 @@
      </tr>
      <tr>
          <td><label for="mitglied_pp">{"Mitglied PP:"|__}</label></td>
-         <td><input class="mitglied_pp" type="checkbox" name="mitglied_pp" {if isset($mitgliedrevision.kontakt) and $mitgliedrevision.kontakt.mitglied_pp}checked="checked"{/if}" /></td>
+         <td><input class="mitglied_piraten" type="checkbox" name="mitglied_pp" {if isset($mitgliedrevision.kontakt) and $mitgliedrevision.kontakt.mitglied_piraten}checked="checked"{/if}" /></td>
      </tr>
      <tr>
          <td><label for="verteiler_eingetragen">{"Verteiler Eingetragen:"|__}</label></td>
