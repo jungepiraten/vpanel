@@ -24,10 +24,10 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 	$firma = stripslashes($_POST["firma"]);
 	$strasse = stripslashes($_POST["strasse"]);
 	$hausnummer = stripslashes($_POST["hausnummer"]);
-	$ortid = intval($_POST["ortid"]);
+	$ortid = is_numeric($_POST["ortid"]) ? $_POST["ortid"] : null;
 	$plz = stripslashes($_POST["plz"]);
 	$ortname = stripslashes($_POST["ort"]);
-	$stateid = intval($_POST["stateid"]);
+	$stateid = is_numeric($_POST["stateid"]) ? $_POST["stateid"] : null;
 	$telefon = stripslashes($_POST["telefon"]);
 	$handy = stripslashes($_POST["handy"]);
 	$email = stripslashes($_POST["email"]);
@@ -48,7 +48,9 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 	}
 	if (is_numeric($ortid)) {
 		$ort = $session->getStorage()->getOrt($ortid);
-	} else {
+	}
+
+	if ($ort == null) {
 		$ort = $session->getStorage()->searchOrt($plz, $ortname, $stateid);
 	}
 
