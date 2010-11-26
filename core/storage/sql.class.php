@@ -172,6 +172,7 @@ abstract class SQLStorage implements Storage {
 	public function getMitgliederList() {
 		$sql = "SELECT	`r`.`timestamp` AS `null`,
 				`m`.`mitgliedid` as `m_mitgliedid`,
+				`m`.`globalid` as `m_globalid`,
 				UNIX_TIMESTAMP(`m`.`eintritt`) as `m_eintritt`,
 				UNIX_TIMESTAMP(`m`.`austritt`) as `m_austritt`,
 				`r`.`revisionid` AS `r_revisionid`,
@@ -235,6 +236,7 @@ abstract class SQLStorage implements Storage {
 	public function getMitglied($mitgliedid) {
 		$sql = "SELECT	`r`.`timestamp` AS `null`,
 				`m`.`mitgliedid` as `m_mitgliedid`,
+				`m`.`globalid` as `m_globalid`,
 				UNIX_TIMESTAMP(`m`.`eintritt`) as `m_eintritt`,
 				UNIX_TIMESTAMP(`m`.`austritt`) as `m_austritt`,
 				`r`.`revisionid` AS `r_revisionid`,

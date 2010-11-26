@@ -13,7 +13,7 @@ class Mitglied extends GlobalClass {
 	public static function factory(Storage $storage, $row) {
 		$mitglied = new Mitglied($storage);
 		$mitglied->setMitgliedID($row["mitgliedid"]);
-		$mitglied->setGlobalID($row["globaleid"]);
+		$mitglied->setGlobalID($row["globalid"]);
 		$mitglied->setEintrittsdatum($row["eintritt"]);
 		$mitglied->setAustrittsdatum($row["austritt"]);
 		return $mitglied;
