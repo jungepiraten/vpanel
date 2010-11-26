@@ -4,6 +4,7 @@ body {
     margin:0px;
     background-color:#e5e5e5;
     color:#332f2c;
+    margin-bottom:50px;
 }
 
 img {
@@ -21,7 +22,7 @@ a {
 }
 
 a:hover {
-    color:#ff8d00;
+    color:#ff8800;
 }
 
 .role {
@@ -58,7 +59,7 @@ a:hover {
 }
 
 .login a:hover {
-    color:#ff8d00;
+    color:#ff8800;
     background:url("images/logout.png") no-repeat;
 }
 
@@ -103,7 +104,7 @@ a:hover {
 }
 
 .entrylist li:hover {
-    background-color:#ffcb8c;
+    background-color:#ff8800;
 }
 
 .entrylist a:hover {
@@ -128,11 +129,23 @@ a:hover {
 
 .neuset {
     font-size:70%;
-    color:#4c4b4a;
+    color:white;
+    background-color:#404040;
+    padding:4px;
+    -webkit-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.neuset:hover {
+	color:white;
+	background-color:#ff8800;
+
 }
 
 .separator {
-    color:#8f8f8f;
+    color:#404040;
     font-weight:bold;
 }
 
@@ -194,10 +207,61 @@ a:hover {
 }
 
 #ex:hover {
-    background-color:#FFA38C;
+    background-color:#FF0900;
+    color:white;
+}
+
+#ex:hover a {
+	color:white;
 }
 
 .exmessage {
     color:red;
-    font-size:14px;
+    font-size:15px;
+    font-weight:bold;
+    margin:0px;
+}
+
+.neubuttons {
+	margin:0px;
+	padding:0px;
+}
+
+.neumitglied  {
+	color:white;
+	background-color:#404040;
+	padding:4px;
+	font-size:70%;
+	font-weight:bold;
+	margin-left:0px;
+	margin-right:0px;
+}
+
+.neumitglied a {
+	margin:0px;
+	padding:0px;
+}
+
+#l {
+    -webkit-border-top-left-radius: 3px;
+    -webkit-border-bottom-left-radius: 3px;
+    -khtml-border-top-left-radius: 3px;
+    -khtml-border-bottom-left-radius: 3px;
+    -moz-border-radius-topleft: 3px;
+    -moz-border-radius-bottomleft: 3px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+
+}
+
+#r {
+    -webkit-border-top-right-radius: 3px;
+    -webkit-border-bottom-right-radius: 3px;
+    -khtml-border-top-right-radius: 3px;
+    -khtml-border-bottom-right-radius: 3px;
+    -moz-border-radius-topright: 3px;
+    -moz-border-radius-bottomright: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    width:3px;
 }
