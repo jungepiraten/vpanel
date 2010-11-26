@@ -47,8 +47,23 @@ class MitgliedRevision extends GlobalClass {
 		$revision->setBeitrag($row["beitrag"]);
 		$revision->setNatPersonID($row["natpersonid"]);
 		$revision->setJurPersonID($row["jurpersonid"]);
-		$revision->setRevisionID($row["kontaktid"]);
+		$revision->setKontaktID($row["kontaktid"]);
 		return $revision;
+	}
+
+	public function fork() {
+		$r = new MitgliedRevision($this->getStorage());
+		$r->setMitgliedID($this->getMitgliedID());
+		$r->setMitgliedschaftID($this->getMitgliedschaftID());
+		$r->setGliederungID($this->getGliederungID());
+		$r->isGeloescht($this->isGeloescht());
+		$r->isMitgliedPiraten($this->isMitgliedPiraten());
+		$r->isVerteilerEingetragen($this->isVerteilerEingetragen());
+		$r->setBeitrag($this->getBeitrag());
+		$r->setNatPersonID($this->getNatPersonID());
+		$r->setJurPersonID($this->getJurPersonID());
+		$r->setKontaktID($this->getKontaktID());
+		return $r;
 	}
 
 	public function getRevisionID() {

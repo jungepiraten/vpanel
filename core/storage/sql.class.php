@@ -172,8 +172,8 @@ abstract class SQLStorage implements Storage {
 	public function getMitgliederList() {
 		$sql = "SELECT	`r`.`timestamp` AS `null`,
 				`m`.`mitgliedid` as `m_mitgliedid`,
-				`m`.`eintritt` as `m_eintritt`,
-				`m`.`austritt` as `m_austritt`,
+				UNIX_TIMESTAMP(`m`.`eintritt`) as `m_eintritt`,
+				UNIX_TIMESTAMP(`m`.`austritt`) as `m_austritt`,
 				`r`.`revisionid` AS `r_revisionid`,
 				`r`.`globaleid` AS `r_globaleid`,
 				UNIX_TIMESTAMP(`r`.`timestamp`) AS `r_timestamp`,
@@ -235,8 +235,8 @@ abstract class SQLStorage implements Storage {
 	public function getMitglied($mitgliedid) {
 		$sql = "SELECT	`r`.`timestamp` AS `null`,
 				`m`.`mitgliedid` as `m_mitgliedid`,
-				`m`.`eintritt` as `m_eintritt`,
-				`m`.`austritt` as `m_austritt`,
+				UNIX_TIMESTAMP(`m`.`eintritt`) as `m_eintritt`,
+				UNIX_TIMESTAMP(`m`.`austritt`) as `m_austritt`,
 				`r`.`revisionid` AS `r_revisionid`,
 				`r`.`globaleid` AS `r_globaleid`,
 				UNIX_TIMESTAMP(`r`.`timestamp`) AS `r_timestamp`,
@@ -295,7 +295,7 @@ abstract class SQLStorage implements Storage {
 		if ($mitgliedid == null) {
 			$sql = "INSERT INTO `mitglieder` (`globalid`, `eintritt`, `austritt`) VALUES ('" . $this->escape($globalid) . "', '" . date("Y-m-d", $eintritt) . "', " . ($austritt == null ? "NULL" : "'" . date("Y-m-d", $austritt) . "'") . ")";
 		} else {
-			$sql = "UPDATE `mitglieder` SET `globalid` = '" . $db->escape($globalid) . "', `eintritt` = '" . date("Y-m-d", $eintritt) . "', `austritt` = " . ($austritt == null ? "NULL" : "'" . date("Y-m-d", $austritt) . "'") . " WHERE `mitgliedid` = " . intval($mitgliedid);
+			$sql = "UPDATE `mitglieder` SET `globalid` = '" . $this->escape($globalid) . "', `eintritt` = '" . date("Y-m-d", $eintritt) . "', `austritt` = " . ($austritt == null ? "NULL" : "'" . date("Y-m-d", $austritt) . "'") . " WHERE `mitgliedid` = " . intval($mitgliedid);
 		}
 		$this->query($sql);
 		if ($mitgliedid == null) {

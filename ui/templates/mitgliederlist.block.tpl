@@ -3,7 +3,7 @@
 <li class="entry{cycle values="odd,even"}">
 <div style="float:left; padding-top:7px;">
 {if $showmitglieddel}
- <a href="{"mitglied_del"|___:$mitglied.mitgliedid}" class="delimg" title="Mitglied entfernen" onClick="return confirm('Mitglied wirklich löschen?');">&nbsp;</a>
+ <a href="{"mitglieder_del"|___:$mitglied.mitgliedid}" class="delimg" title="Mitglied entfernen" onClick="return confirm('Mitglied wirklich löschen?');">&nbsp;</a>
 {/if}
 </div>
 <div style="width: 2px; height: 30px; background-color: #8f8f8f; float:left; margin-left:10px;"></div>

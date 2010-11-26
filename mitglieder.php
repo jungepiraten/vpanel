@@ -15,7 +15,6 @@ require_once(VPANEL_CORE . "/mitglied.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 
 function parseMitgliederFormular($session, &$mitglied = null) {
-	$globalid = uniqid() . "@test.prauscher";
 	$persontyp = stripslashes($_POST["persontyp"]);
 	$name = stripslashes($_POST["name"]);
 	$vorname = stripslashes($_POST["vorname"]);
@@ -58,14 +57,12 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 
 	if ($mitglied == null) {
 		$mitglied = new Mitglied($session->getStorage());
-		$mitglied->setGlobalID($globalid);
 		$mitglied->setEintrittsdatum(time());
 		$mitglied->setAustrittsdatum(null);
 		$mitglied->save();
 	}
 
 	$revision = new MitgliedRevision($session->getStorage());
-	$revision->setGlobalID($globalid);
 	$revision->setTimestamp(time());
 	$revision->setUser($session->getUser());
 	$revision->setMitglied($mitglied);
@@ -129,8 +126,17 @@ case "delete":
 		exit;
 	}
 	$mitgliedid = intval($_REQUEST["mitgliedid"]);
-	$session->getStorage()->delMitglied($mitgliedid);
-	$ui->redirect();
+	$mitglied = $session->getStorage()->getMitglied($mitgliedid);
+	$mitglied->setAustrittsdatum(time());
+	$mitglied->save();
+
+	$revision = $mitglied->getLatestRevision()->fork();
+	$revision->setTimestamp(time());
+	$revision->setUser($session->getUser());
+	$revision->isGeloescht(true);
+	$revision->save();
+
+	$ui->redirect($session->getLink("mitglieder"));
 	exit;
 default:
 	$mitglieder = $session->getStorage()->getMitgliederList();
