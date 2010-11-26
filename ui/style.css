@@ -184,3 +184,20 @@ a:hover {
     font-size:17px;
     font-weight:bold;
 }
+
+#ex {
+    color:#949494;
+}
+
+#ex a {
+    color:#949494;
+}
+
+#ex:hover {
+    background-color:#FFA38C;
+}
+
+.exmessage {
+    color:red;
+    font-size:14px;
+}
