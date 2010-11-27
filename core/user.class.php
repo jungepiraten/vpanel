@@ -70,7 +70,7 @@ class User extends StorageClass {
 
 	public function addRoleID($roleid) {
 		$this->getRoles();
-		$this->roles[$roleid] = Role::factoryByRoleID($roleid);
+		$this->roles[$roleid] = $this->getStorage()->getRole($roleid);
 	}
 
 	public function save(Storage $storage = null) {
@@ -82,7 +82,7 @@ class User extends StorageClass {
 			$this->getUsername(),
 			$this->getPassword() ));
 		
-		$storage->setUserRoles(
+		$storage->setUserRoleList(
 			$this->getUserID(),
 			$this->getRoles() );
 	}

@@ -9,7 +9,7 @@
 {include file=rolelist.block.tpl showuserdel=1 userid=$user.userid roles=$userroles}
 <form action="{"users_addrole"|___:$user.userid}" method="post" class="useraddrole">
  <fieldset>
-  <input type="hidden" name="redirect" value="{$smarty.server.REQUEST_URI}" />
+  <input type="hidden" name="redirect" value/vpanel/user.php?mode=details&userid=4" />
   <select name="roleid">
    {foreach from=$roles item=role}<option value="{$role.roleid|escape:html}">{$role.label|escape:html}</option>{/foreach}
   </select>

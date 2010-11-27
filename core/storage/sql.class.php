@@ -85,7 +85,7 @@ abstract class SQLStorage implements Storage {
 	}
 	public function setUser($userid, $username, $password) {
 		if ($userid == null) {
-			$sql = "INSERT INTO `users` (`username`, `password`) VALUES ('" . $this->escape($username) . "', '" . $this->escape($this->hash($password)) . "')";
+			$sql = "INSERT INTO `users` (`username`, `password`) VALUES ('" . $this->escape($username) . "', '" . $this->escape($password) . "')";
 		} else {
 			$sql = "UPDATE `users` SET `username` = '" . $this->escape($username) . "', `password` = '" . $this->escape($password) . "' WHERE `userid` = " . intval($userid);
 		}
@@ -106,7 +106,12 @@ abstract class SQLStorage implements Storage {
 		return $this->fetchAsArray($this->query($sql), "roleid", null, Role);
 	}
 	public function setUserRoleList($userid, $roleids) {
-		// TODO
+		$sql = "INSERT INTO `userroles` (`userid`, `roleid`) VALUES ";
+        foreach ($roleids as $roleid) {
+            $sql .= "(`" . $this->escape($userid) . "`, `" . $roleid->getRoleID() . "`)";
+        }
+        echo $sql;
+        return $this->query($sql);
 	}
 
 	/**

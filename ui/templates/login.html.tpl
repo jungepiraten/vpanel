@@ -1,5 +1,8 @@
-{include file=header.html.tpl}
-{if is_array($errors) && !empty($errors)}{include file=errors.html.tpl errors=$errors}{/if}
+{include file=header.html.tpl ansicht="Login"}
+{if is_array($errors) && !empty($errors)}
+{foreach from=$errors item=error}
+<div class="error">{$error|__|escape:html}</div>
+{/foreach}{/if}
 <p class="pagetitle">Login</p>
 <form action="{"login"|___}" method="post">
  <fieldset>

@@ -13,7 +13,7 @@ if (!$session->isAllowed("users_show")) {
 
 require_once(VPANEL_CORE . "/user.class.php");
 require_once(VPANEL_CORE . "/role.class.php");
-
+echo $_REQUEST["mode"];
 switch ($_REQUEST["mode"]) {
 case "addrole":
 	if (!$session->isAllowed("users_modify")) {
@@ -58,8 +58,7 @@ case "details":
 			$user->changePassword($password);
 		}
 		$user->save();
-	}
-
+    }
 	$roles = $session->getStorage()->getRoleList();
 
 	$ui->viewUserDetails($user, $roles);
