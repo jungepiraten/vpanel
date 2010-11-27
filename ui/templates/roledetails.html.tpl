@@ -1,4 +1,4 @@
-{include file=header.html.tpl}
+{include file=header.html.tpl ansicht="Rolle bearbeiten"}
 <div>
 <p class="pagetitle">Rolle &quot;{if isset($role)}{$role.label|escape:html}{/if}&quot; bearbeiten</p>
 <div class="mainform">
@@ -22,8 +22,8 @@
  <fieldset>
   <table class="permissionlist">
   {foreach from=$permissions item=permission}
-  <tr>
-   <td><input type="checkbox" name="permissions[]" value="{$permission.permissionid|escape:html}" {if in_array($permission.label, $rolepermissions)}checked="checked"{/if} /></td>
+  <tr class="permissionrow">
+   <td><input type="checkbox" name="permissions[]" value="{$permission.permissionid|escape:html}" {foreach from=$rolepermissions item=rolepermission} {foreach from=$rolepermission item=roleperm}{if $permission.permissionid == $roleperm}checked="checked"{/if}{/foreach}{/foreach} /></td>
    <th>{$permission.label|__|escape:html}</th>
    <td>{$permission.description|escape:html}</td>
   </tr>

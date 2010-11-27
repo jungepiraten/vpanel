@@ -1,4 +1,4 @@
-{include file=header.html.tpl}
+{include file=header.html.tpl ansicht="Mitgliederverwaltung"}
 <p class="pagetitle">Mitgliederverwaltung</p>
 {foreach from=$mitgliedschaften item=mitgliedschaft}
  <a href="{"mitglieder_create"|___:$mitgliedschaft.mitgliedschaftid}" class="neuset">{"%s"|__:$mitgliedschaft.label}</a>

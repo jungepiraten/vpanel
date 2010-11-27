@@ -265,3 +265,41 @@ a:hover {
     border-bottom-right-radius: 3px;
     width:3px;
 }
+
+input[type="submit"]  {
+    border:none;
+    background-color:#404040;
+    color:white;
+    padding:4px;
+    -webkit-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+input[type="submit"]:hover {
+    background-color:#ff8800;
+}
+
+input[type="text"], input[type="password"], textarea {
+    border:1px solid #404040;
+}
+
+input[type="text"]:hover, input[type="password"]:hover, textarea:hover{
+    border:1px solid #000000;
+}
+
+select {
+    border:none;
+    background-color:#404040;
+    color:white;
+    padding:4px;
+    -webkit-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.permissionrow:hover {
+    color:#000000;
+}

@@ -3,7 +3,7 @@
  <table>
      <tr>
          <td>{"Mitgliedsart:"|__}</td>
-         <td><select name="mitgliedschaftid">{foreach from=$mitgliedschaften item=m}<option value="{$m.mitgliedschaftid}" {if isset($mitgliedrevision) and $m.mitgliedschaftid == $mitgliedrevision.mitgliedschaft.mitgliedschaftid or $m.mitgliedschaftid == $mitgliedschaft.mitgliedschaftid}selected="selected"{/if}>{$m.label|escape:html}</option>{/foreach}</select></td>
+        <td><select name="mitgliedschaftid" onChange="toggleMitgliedschaft()">{foreach from=$mitgliedschaften item=m}<option value="{$m.mitgliedschaftid}" {if isset($mitgliedrevision) and $m.mitgliedschaftid == $mitgliedrevision.mitgliedschaft.mitgliedschaftid or $m.mitgliedschaftid == $mitgliedschaft.mitgliedschaftid}selected="selected"{/if}>{$m.label|escape:html}</option>{/foreach}</select></td>
      </tr>
      <tr>
          <td>{"Typ:"|__}</td>
@@ -52,7 +52,7 @@
          <td><label for="email">{"EMail-Adresse:"|__}</label></td>
          <td><input class="email" type="text" name="email" size="40" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.email|escape:html}{/if}" /></td>
      </tr>
-     <tr>
+     <tr id="mitglied_pp">
          <td><label for="mitglied_pp">{"Mitglied PP:"|__}</label></td>
          <td><input class="mitglied_piraten" type="checkbox" name="mitglied_piraten" {if isset($mitgliedrevision) and $mitgliedrevision.mitglied_piraten}checked="checked"{/if}" /></td>
      </tr>
@@ -60,7 +60,7 @@
          <td><label for="verteiler_eingetragen">{"Verteiler Eingetragen:"|__}</label></td>
          <td><input class="verteiler_eingetragen" type="checkbox" name="verteiler_eingetragen" {if isset($mitgliedrevision) and $mitgliedrevision.verteiler_eingetragen}checked="checked"{/if}" /></td>
      </tr>
-     <tr>
+     <tr id="beitrag">
          <td><label for="beitrag">{"Beitrag:"|__}</label></td>
          <td><input class="beitrag" type="text" name="beitrag" size="5" value="{if isset($mitgliedrevision)}{$mitgliedrevision.beitrag|string_format:"%.2f"|escape:html}{else}{$mitgliedschaft.defaultbeitrag|string_format:"%.2f"|escape:html}{/if}" /> EUR</td>
      </tr>
@@ -104,8 +104,39 @@ function showhideNeuerOrt() {
 		document.getElementById('neuerort').style.display = 'table-row';
 	} else {
 		document.getElementById('neuerort').style.display = 'none';
+        document.getElementsByClassName('plz')[0].value = '';
+        document.getElementsByClassName('ort')[0].value = '';
+        document.getElementsByName('stateid')[0].selectedIndex = 0;
 	}
 }
 showhideNeuerOrt();
+
+showhideNeuerOrt();
+function toggleMitgliedschaft() {
+	switch (document.getElementsByName('mitgliedschaftid')[0].options[document.getElementsByName('mitgliedschaftid')[0].selectedIndex].text) {
+	case "Ordentliches Mitglied":
+		document.getElementById('beitrag').style.display = 'none';
+        document.getElementsByName('beitrag')[0].value = "12.00";
+		document.getElementById('mitglied_pp').style.display = 'table-row';
+		break;
+	case "Fördermitglied":
+		document.getElementById('beitrag').style.display = 'table-row';
+        document.getElementsByName('beitrag')[0].value = "12.00";
+		document.getElementById('mitglied_pp').style.display = 'none';
+        document.getElementsByName('mitglied_piraten')[0].checked = false;
+		break;
+	case "Ehrenmitglied":
+		document.getElementById('beitrag').style.display = 'none';
+        document.getElementsByName('beitrag')[0].value = "0";
+		document.getElementById('mitglied_pp').style.display = 'none';
+        document.getElementsByName('mitglied_piraten')[0].checked = false;
+		break;
+	default:
+		document.getElementById('beitrag').style.display = 'table-row';
+        document.getElementsByName('beitrag')[0].value = "12.00";
+		document.getElementById('mitglied_pp').style.display = 'table-row';
+	}
+}
+toggleMitgliedschaft()
 </script>
 {/literal}

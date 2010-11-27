@@ -1,4 +1,4 @@
-{include file=header.html.tpl}
+{include file=header.html.tpl ansicht="Benutzer bearbeiten"}
 <div>
 <p class="pagetitle">Benutzer &quot;{if isset($user)}{$user.username|escape:html}{/if}&quot; bearbeiten</p>
 <div class="mainform">
