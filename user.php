@@ -14,7 +14,7 @@ if (!$session->isAllowed("users_show")) {
 require_once(VPANEL_CORE . "/user.class.php");
 require_once(VPANEL_CORE . "/role.class.php");
 
-switch ($_REQUEST["mode"]) {
+switch (isset($_REQUEST["mode"]) ? stripslashes($_REQUEST["mode"]) : null) {
 case "addrole":
 	if (!$session->isAllowed("users_modify")) {
 		$ui->viewLogin();
@@ -74,7 +74,7 @@ case "create":
 
 		$user = new User($session->getStorage());
 		$user->setUsername($username);
-		$user->setPassword($password);
+		$user->changePassword($password);
 		$user->save();
 
 		$ui->redirect($session->getLink("users_details", $user->getUserID()));

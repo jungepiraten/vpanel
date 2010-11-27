@@ -30,7 +30,8 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 	$telefon = stripslashes($_POST["telefon"]);
 	$handy = stripslashes($_POST["handy"]);
 	$email = stripslashes($_POST["email"]);
-	$gliederungid = intval($_POST["gliederungid"]); $gliederungid = 1;
+	// $gliederungid = intval($_POST["gliederungid"]);
+	$gliederungid = 1;
 	$gliederung = $session->getStorage()->getGliederung($gliederungid);
 	$mitgliedschaftid = intval($_REQUEST["mitgliedschaftid"]);
 	$mitgliedschaft = $session->getStorage()->getMitgliedschaft($mitgliedschaftid);
@@ -77,7 +78,7 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 	$revision->save();
 }
 
-switch ($_REQUEST["mode"]) {
+switch (isset($_REQUEST["mode"]) ? stripslashes($_REQUEST["mode"]) : null) {
 case "details":
 	$mitgliedid = intval($_REQUEST["mitgliedid"]);
 	$mitglied = $session->getStorage()->getMitglied($mitgliedid);

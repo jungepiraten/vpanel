@@ -67,12 +67,12 @@ class Mitgliedschaft extends StorageClass {
 
 	public function setDefaultCreateMail($mailtemplate) {
 		$this->setDefaultCreateMailID($mailtemplate->getMailTemplateID());
-		$this->mailtemplate = $mailtemplate;
+		$this->defaultcreatemail = $mailtemplate;
 	}
 
 	public function setDefaultCreateMailID($mailtemplateid) {
-		if ($this->mailtemplateid != $mailtemplateid) {
-			$this->mailtemplate = null;
+		if ($this->defaultcreatemailid != $mailtemplateid) {
+			$this->defaultcreatemail = null;
 		}
 		$this->defaultcreatemailid = $mailtemplateid;
 	}

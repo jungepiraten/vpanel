@@ -168,7 +168,7 @@ class MitgliedRevision extends GlobalClass {
 	}
 
 	public function setGliederungID($gliederungid) {
-		if ($gliederungid != $this->gliederungsid) {
+		if ($gliederungid != $this->gliederungid) {
 			$this->gliederung = null;
 		}
 		$this->gliederungid = $gliederungid;

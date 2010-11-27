@@ -11,7 +11,7 @@ if (!$session->isAllowed("roles_show")) {
 	exit;
 }
 
-switch ($_REQUEST["mode"]) {
+switch (isset($_REQUEST["mode"]) ? stripslashes($_REQUEST["mode"]) : null) {
 case "details":
 	$roleid = intval($_REQUEST["roleid"]);
 	$role = $session->getStorage()->getRole($roleid);

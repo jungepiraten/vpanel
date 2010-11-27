@@ -30,12 +30,16 @@ abstract class SQLStorage implements Storage {
 			}
 			if ($class !== null) {
 				if (is_array($class)) {
+					$item = array();
 					$values = array();
 					foreach ($row as $col => $val) {
-						list($prefix, $col) = explode("_", $col, 2);
-						$values[$prefix][$col] = $val;
+						if (!strpos($col, "_")) {
+							$item[$col] = $val;
+						} else {
+							list($prefix, $col) = explode("_", $col, 2);
+							$values[$prefix][$col] = $val;
+						}
 					}
-					$item = array();
 					foreach ($class as $l => $c) {
 						$item[$l] = call_user_func(array($c, "factory"), $this, $values[$l]);
 					}
@@ -233,7 +237,7 @@ abstract class SQLStorage implements Storage {
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`email` AS `k_email`,
-				`o`.`ortid` AS `k_ortid`,
+				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
 				`o`.`stateid` AS `o_stateid`
@@ -369,7 +373,7 @@ abstract class SQLStorage implements Storage {
 				`k`.`telefon` AS `k_telefon`,
 				`k`.`handy` AS `k_handy`,
 				`k`.`email` AS `k_email`,
-				`o`.`ortid` AS `k_ortid`,
+				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
 				`o`.`stateid` AS `o_stateid`

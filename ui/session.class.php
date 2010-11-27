@@ -19,13 +19,13 @@ class Session {
 	}
 
 	public function santisize() {
-		if ($this->stor["user"] != null) {
+		if (isset($this->stor["user"]) and $this->stor["user"] != null) {
 			$this->stor["user"]->setStorage($this->getStorage());
 		}
 	}
 
 	public function isSignedIn() {
-		return $this->stor["user"] != null;
+		return isset($this->stor["user"]) and $this->stor["user"] != null;
 	}
 	public function login($username, $password) {
 		$user = $this->getStorage()->getUserByUsername($username);
@@ -58,6 +58,9 @@ class Session {
 	}
 
 	public function getPermissions() {
+		if (!isset($this->stor["permissions"])) {
+			return array();
+		}
 		return $this->stor["permissions"];
 	}
 	public function setPermissions($permissions) {
