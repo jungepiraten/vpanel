@@ -29,6 +29,7 @@ $config->registerPage("roles_adduser", "user.php?mode=addrole&roleid=%d");
 $config->registerPage("roles_deluser", "user.php?mode=delrole&roleid=%d&userid=%d");
 
 $config->registerPage("mitglieder", "mitglieder.php");
+$config->registerPage("mitglieder_page", "mitglieder.php?page=%d");
 $config->registerPage("mitglieder_create", "mitglieder.php?mode=create&mitgliedschaftid=%d");
 $config->registerPage("mitglieder_details", "mitglieder.php?mode=details&mitgliedid=%d");
 $config->registerPage("mitglieder_del", "mitglieder.php?mode=delete&mitgliedid=%d");

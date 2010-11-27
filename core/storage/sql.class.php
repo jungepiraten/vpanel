@@ -203,7 +203,11 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * Mitglieder
 	 **/
-	public function getMitgliederList() {
+	public function getMitgliederCount() {
+		$sql = "SELECT COUNT(*) as `count` FROM `mitglieder`";
+		return reset(reset($this->fetchAsArray($this->query($sql))));
+	}
+	public function getMitgliederList($limit = null, $offset = null) {
 		$sql = "SELECT	`r`.`timestamp` AS `null`,
 				`m`.`mitgliedid` as `m_mitgliedid`,
 				`m`.`globalid` as `m_globalid`,
@@ -251,6 +255,15 @@ abstract class SQLStorage implements Storage {
 			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
 			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
 			ORDER BY `r`.`timestamp`";
+		if ($limit !== null or $offset !== null) {
+			$sql .= " LIMIT ";
+			if ($offset !== null) {
+				$sql .= $offset . ",";
+			}
+			if ($limit !== null) {
+				$sql .= $limit;
+			}
+		}
 		$os = $this->fetchAsArray($this->query($sql), "m_mitgliedid", null, array("r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => 'Ort', "m" => 'Mitglied'));
 		$objs = array();
 		foreach ($os as $o) {

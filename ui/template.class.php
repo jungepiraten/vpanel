@@ -234,7 +234,9 @@ class Template {
 		$this->smarty->display("rolecreate.html.tpl");
 	}
 
-	public function viewMitgliederList($mitglieder, $mitgliedschaften) {
+	public function viewMitgliederList($mitglieder, $mitgliedschaften, $page, $pagecount) {
+		$this->smarty->assign("page", $page);
+		$this->smarty->assign("pagecount", $pagecount);
 		$this->smarty->assign("mitglieder", $this->parseMitglieder($mitglieder));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
 		$this->smarty->display("mitgliederlist.html.tpl");

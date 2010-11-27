@@ -140,9 +140,17 @@ case "delete":
 	$ui->redirect($session->getLink("mitglieder"));
 	exit;
 default:
-	$mitglieder = $session->getStorage()->getMitgliederList();
+	$pagesize = 20;
+	$pagecount = ceil($session->getStorage()->getMitgliederCount() / $pagesize);
+	$page = 0;
+	if (isset($_REQUEST["page"]) and $_REQUEST["page"] >= 0 and $_REQUEST["page"] < $pagecount) {
+		$page = intval($_REQUEST["page"]);
+	}
+	$offset = $page * $pagesize;
+
+	$mitglieder = $session->getStorage()->getMitgliederList($pagesize, $offset);
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
-	$ui->viewMitgliederList($mitglieder, $mitgliedschaften);
+	$ui->viewMitgliederList($mitglieder, $mitgliedschaften, $page, $pagecount);
 	exit;
 }
 
