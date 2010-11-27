@@ -309,7 +309,11 @@ select {
     -webkit-border-radius: 3px;
     -khtml-border-radius: 3px;
     -moz-border-radius: 3px;
-    border-radius: 3px;1
+    border-radius: 3px;
+}
+
+.pages .curpage {
+    background-color:#ff8800;
 }
 
 .pages a:hover {
@@ -323,3 +327,4 @@ select {
 .buttonbox {
     margin-bottom:10px;
 }
+

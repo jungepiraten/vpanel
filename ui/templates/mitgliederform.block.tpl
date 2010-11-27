@@ -113,7 +113,9 @@ showhideNeuerOrt();
 
 showhideNeuerOrt();
 function toggleMitgliedschaft() {
-	switch (document.getElementsByName('mitgliedschaftid')[0].options[document.getElementsByName('mitgliedschaftid')[0].selectedIndex].text) {
+    var art = document.getElementsByName('mitgliedschaftid')[0].options[document.getElementsByName('mitgliedschaftid')[0].selectedIndex].text
+    document.getElementsByName('titleart')[0].innerHTML = art;
+	switch (art) {
 	case "Ordentliches Mitglied":
 		document.getElementById('beitrag').style.display = 'none';
         document.getElementsByName('beitrag')[0].value = "12.00";
