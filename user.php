@@ -58,7 +58,7 @@ case "details":
 			$user->changePassword($password);
 		}
 		$user->save();
-    }
+	}
 	$roles = $session->getStorage()->getRoleList();
 
 	$ui->viewUserDetails($user, $roles);

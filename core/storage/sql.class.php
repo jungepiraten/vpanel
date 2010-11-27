@@ -106,12 +106,17 @@ abstract class SQLStorage implements Storage {
 		return $this->fetchAsArray($this->query($sql), "roleid", null, Role);
 	}
 	public function setUserRoleList($userid, $roleids) {
-		$sql = "INSERT INTO `userroles` (`userid`, `roleid`) VALUES ";
-        foreach ($roleids as $roleid) {
-            $sql .= "(`" . $this->escape($userid) . "`, `" . $roleid->getRoleID() . "`)";
-        }
-        echo $sql;
-        return $this->query($sql);
+		$sql = "DELETE FROM `userroles` WHERE `userid` = " . intval($userid);
+		$this->query($sql);
+		if (count($roleids) > 0) {
+			$rolesql = array();
+			foreach ($roleids as $roleid) {
+				$rolesql[] = "(" . intval($userid) . ", " . intval($roleid) . ")";
+			}
+			$sql = "INSERT INTO `userroles` (`userid`, `roleid`) VALUES " . implode(",", $rolesql);
+			$this->query($sql);
+		}
+		return true;
 	}
 
 	/**
@@ -149,14 +154,34 @@ abstract class SQLStorage implements Storage {
 		return $this->fetchAsArray($this->query($sql), "permissionid", null, Permission);
 	}
 	public function setRolePermissionList($roleid, $permissionids) {
-		// TODO
+		$sql = "DELETE FROM `rolepermissions` WHERE `roleid` = " . intval($roleid);
+		$this->query($sql);
+		if (count($permissionids) > 0) {
+			$permissionssql = array();
+			foreach ($permissionids as $permissionid) {
+				$permissionssql[] = "(" . intval($roleid) . ", " . intval($permissionid) . ")";
+			}
+			$sql = "INSERT INTO `rolepermissions` (`roleid`, `permissionid`) VALUES " . implode(",", $permissionssql);
+			$this->query($sql);
+		}
+		return true;
 	}
 	public function getRoleUserList($roleid) {
 		$sql = "SELECT `userid`, `username` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
 		return $this->fetchAsArray($this->query($sql), "userid", null, User);
 	}
 	public function setRoleUserList($roleid, $userids) {
-		// TODO
+		$sql = "DELETE FROM `userroles` WHERE `roleid` = " . intval($roleid);
+		$this->query($sql);
+		if (count($userids) > 0) {
+			$userssql = array();
+			foreach ($userids as $userid) {
+				$userssql[] = "(" . intval($roleid) . ", " . intval($userid) . ")";
+			}
+			$sql = "INSERT INTO `userroles` (`roleid`, `userid`) VALUES " . implode(",", $userssql);
+			$this->query($sql);
+		}
+		return true;
 	}
 
 	/**

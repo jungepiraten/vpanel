@@ -40,13 +40,13 @@ class Permission extends StorageClass {
 	}
 
 	public function save(Storage $storage = null) {
-		if ($storage == null) {
+		if ($storage === null) {
 			$storage = $this->getStorage();
 		}
-		$storage->setPermission(
+		$this->setPermissionID( $storage->setPermission(
 			$this->getPermissionID(),
 			$this->getLabel(),
-			$this->getDescription() );
+			$this->getDescription() ));
 	}
 }
 

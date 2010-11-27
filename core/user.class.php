@@ -55,10 +55,19 @@ class User extends StorageClass {
 	}
 
 	public function getRoles() {
-		if ($this->roles == null) {
+		if ($this->roles === null) {
 			$this->roles = $this->getStorage()->getUserRoleList($this->getUserID());
 		}
 		return $this->roles;
+	}
+
+	public function getRoleIDs() {
+		return array_keys($this->getRoles());
+	}
+
+	public function addRoleID($roleid) {
+		$this->getRoles();
+		$this->roles[$roleid] = $this->getStorage()->getRole($roleid);
 	}
 
 	public function delRoleID($roleid) {
@@ -66,11 +75,6 @@ class User extends StorageClass {
 		if (isset($this->roles[$roleid])) {
 			unset($this->roles[$roleid]);
 		}
-	}
-
-	public function addRoleID($roleid) {
-		$this->getRoles();
-		$this->roles[$roleid] = $this->getStorage()->getRole($roleid);
 	}
 
 	public function save(Storage $storage = null) {
@@ -84,7 +88,7 @@ class User extends StorageClass {
 		
 		$storage->setUserRoleList(
 			$this->getUserID(),
-			$this->getRoles() );
+			$this->getRoleIDs() );
 	}
 }
 

@@ -43,36 +43,33 @@ class Role extends StorageClass {
 	}
 
 	public function getUsers() {
-		if ($this->users == null) {
-			$this->users = $this->getStorage()->getUserList($this->getRoleID());
+		if ($this->users === null) {
+			$this->users = $this->getStorage()->getRoleUserList($this->getRoleID());
 		}
 		return $this->users;
 	}
 
 	public function getPermissions() {
-		if ($this->permissions == null) {
+		if ($this->permissions === null) {
 			$this->permissions = $this->getStorage()->getRolePermissionList($this->getRoleID());
 		}
 		return $this->permissions;
 	}
 
-	public function load() {
-		if ($this->roleid != null) {
-			$row = $this->getStorage()->getRole($this->getRoleID());
-			$this->setRoleID($row["roleid"]);
-			$this->setLabel($row["label"]);
-			$this->setDescription($row["description"]);
-		}
+	public function getPermissionIDs() {
+		return array_keys($this->getPermissions());
 	}
-	
+
 	public function save(Storage $storage = null) {
-		if ($storage == null) {
+		if ($storage === null) {
 			$storage = $this->getStorage();
 		}
 		$this->setRoleID( $storage->setRole(
 			$this->getRoleID(),
 			$this->getLabel(),
 			$this->getDescription() ));
+
+		$storage->setRolePermissionList($this->getRoleID(), $this->getPermissionIDs());
 	}
 }
 
