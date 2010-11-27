@@ -222,25 +222,14 @@ a:hover {
     margin:0px;
 }
 
-.neubuttons {
-	margin:0px;
-	padding:0px;
-}
-
 .neumitglied  {
 	color:white;
 	background-color:#404040;
 	padding:4px;
 	font-size:70%;
 	font-weight:bold;
-	margin-left:0px;
-	margin-right:0px;
 }
 
-.neumitglied a {
-	margin:0px;
-	padding:0px;
-}
 
 #l {
     -webkit-border-top-left-radius: 3px;
@@ -271,6 +260,8 @@ input[type="submit"]  {
     background-color:#404040;
     color:white;
     padding:4px;
+    font-size:70%;
+	font-weight:bold;
     -webkit-border-radius: 3px;
     -khtml-border-radius: 3px;
     -moz-border-radius: 3px;
@@ -294,6 +285,7 @@ select {
     background-color:#404040;
     color:white;
     padding:4px;
+    font-size:70%;
     -webkit-border-radius: 3px;
     -khtml-border-radius: 3px;
     -moz-border-radius: 3px;
@@ -302,4 +294,32 @@ select {
 
 .permissionrow:hover {
     color:#000000;
+}
+
+.pages {
+    float:right;
+}
+
+.pages a {
+    background-color:#404040;
+    padding:4px;
+    color:white;
+    font-size:70%;
+	font-weight:bold;
+    -webkit-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;1
+}
+
+.pages a:hover {
+    background-color:#ff8800;
+}
+
+.create {
+    float:left;
+}
+
+.buttonbox {
+    margin-bottom:10px;
 }
