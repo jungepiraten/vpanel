@@ -42,7 +42,7 @@ class Template {
 	}
 
 	protected function parseUsers($rows) {
-		return array_map(array($this, parseUser), $rows);
+		return array_map(array($this, 'parseUser'), $rows);
 	}
 
 	protected function parseRole($role) {
@@ -54,7 +54,7 @@ class Template {
 	}
 
 	protected function parseRoles($rows) {
-		return array_map(array($this, parseRole), $rows);
+		return array_map(array($this, 'parseRole'), $rows);
 	}
 
 	protected function parsePermission($permission) {
@@ -66,7 +66,7 @@ class Template {
 	}
 
 	protected function parsePermissions($rows) {
-		return array_map(array($this, parsePermission), $rows);
+		return array_map(array($this, 'parsePermission'), $rows);
 	}
 
 	protected function parseMitglied($mitglied) {
@@ -80,7 +80,7 @@ class Template {
 	}
 
 	protected function parseMitglieder($rows) {
-		return array_map(array($this, parseMitglied), $rows);
+		return array_map(array($this, 'parseMitglied'), $rows);
 	}
 
 	protected function parseMitgliedRevision($revision) {
@@ -105,7 +105,7 @@ class Template {
 	}
 
 	protected function parseMitgliedRevisions($rows) {
-		return array_map(array($this, parseMitgliedRevision), $rows);
+		return array_map(array($this, 'parseMitgliedRevision'), $rows);
 	}
 
 	protected function parseNatPerson($natperson) {
@@ -148,7 +148,7 @@ class Template {
 	}
 
 	protected function parseMitgliedschaften($rows) {
-		return array_map(array($this, parseMitgliedschaft), $rows);
+		return array_map(array($this, 'parseMitgliedschaft'), $rows);
 	}
 
 	protected function parseOrt($ort) {
@@ -161,7 +161,7 @@ class Template {
 	}
 
 	protected function parseOrte($rows) {
-		return array_map(array($this, parseOrt), $rows);
+		return array_map(array($this, 'parseOrt'), $rows);
 	}
 
 	protected function parseState($state) {
@@ -173,7 +173,7 @@ class Template {
 	}
 
 	protected function parseStates($rows) {
-		return array_map(array($this, parseState), $rows);
+		return array_map(array($this, 'parseState'), $rows);
 	}
 
 	protected function parseCountry($country) {
@@ -184,7 +184,7 @@ class Template {
 	}
 
 	protected function parseCountries($rows) {
-		return array_map(array($this, parseCountry), $rows);
+		return array_map(array($this, 'parseCountry'), $rows);
 	}
 
 	public function viewIndex() {

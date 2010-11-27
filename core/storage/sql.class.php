@@ -61,27 +61,27 @@ abstract class SQLStorage implements Storage {
 	 */
 	public function getPermissionList() {
 		$sql = "SELECT `permissionid`, `label`, `description` FROM `permissions`";
-		return $this->fetchAsArray($this->query($sql), "permissionid", null, Permission);
+		return $this->fetchAsArray($this->query($sql), "permissionid", null, 'Permission');
 	}
 	public function getPermission($permissionid) {
 		$sql = "SELECT `permissionid`, `label`, `description` FROM `permissions` WHERE `permissionid` = " . intval($permissionid);
-		return reset($this->fetchAsArray($this->query($sql), "permissionid", null, Permission));
+		return reset($this->fetchAsArray($this->query($sql), "permissionid", null, 'Permission'));
 	}
 
 	/**
 	 * Benutzer
 	 */
 	public function getUserList() {
-		$sql = "SELECT `userid`, `username` FROM `users`";
-		return $this->fetchAsArray($this->query($sql), "userid", null, User);
+		$sql = "SELECT `userid`, `username`, `password` FROM `users`";
+		return $this->fetchAsArray($this->query($sql), "userid", null, 'User');
 	}
 	public function getUser($userid) {
 		$sql = "SELECT `userid`, `username`, `password` FROM `users` WHERE `userid` = " . intval($userid);
-		return reset($this->fetchAsArray($this->query($sql), "userid", null, User));
+		return reset($this->fetchAsArray($this->query($sql), "userid", null, 'User'));
 	}
 	public function getUserByUsername($username) {
 		$sql = "SELECT `userid`, `username`, `password` FROM `users` WHERE `username` = '" . $this->escape($username) . "'";
-		return reset($this->fetchAsArray($this->query($sql), "userid", null, User));
+		return reset($this->fetchAsArray($this->query($sql), "userid", null, 'User'));
 	}
 	public function setUser($userid, $username, $password) {
 		if ($userid == null) {
@@ -103,7 +103,7 @@ abstract class SQLStorage implements Storage {
 	}
 	public function getUserRoleList($userid) {
 		$sql = "SELECT `roleid`, `label`, `description` FROM `roles` LEFT JOIN `userroles` USING (`roleid`) WHERE `userid` = " . intval($userid);
-		return $this->fetchAsArray($this->query($sql), "roleid", null, Role);
+		return $this->fetchAsArray($this->query($sql), "roleid", null, 'Role');
 	}
 	public function setUserRoleList($userid, $roleids) {
 		$sql = "DELETE FROM `userroles` WHERE `userid` = " . intval($userid);
@@ -124,11 +124,11 @@ abstract class SQLStorage implements Storage {
 	 */
 	public function getRoleList() {
 		$sql = "SELECT `roleid`, `label`, `description` FROM `roles`";
-		return $this->fetchAsArray($this->query($sql), "roleid", null, Role);
+		return $this->fetchAsArray($this->query($sql), "roleid", null, 'Role');
 	}
 	public function getRole($roleid) {
 		$sql = "SELECT `roleid`, `label`, `description` FROM `roles` WHERE `roleid` = " . intval($roleid);
-		return reset($this->fetchAsArray($this->query($sql), null, null, Role));
+		return reset($this->fetchAsArray($this->query($sql), null, null, 'Role'));
 	}
 	public function setRole($roleid, $label, $description) {
 		if ($roleid == null) {
@@ -150,8 +150,8 @@ abstract class SQLStorage implements Storage {
 		return $this->query($sql);
 	}
 	public function getRolePermissionList($roleid) {
-		$sql = "SELECT `permissions`.`permissionid` AS 'permissionid', `permissions`.`label`, `permissions`.`description` AS 'permission' FROM `rolepermissions` LEFT JOIN `permissions` USING (`permissionid`) WHERE `rolepermissions`.`roleid` = '" . $this->escape($roleid) . "'";
-		return $this->fetchAsArray($this->query($sql), "permissionid", null, Permission);
+		$sql = "SELECT `permissions`.`permissionid` AS 'permissionid', `permissions`.`label`, `permissions`.`description` AS 'description' FROM `rolepermissions` LEFT JOIN `permissions` USING (`permissionid`) WHERE `rolepermissions`.`roleid` = '" . $this->escape($roleid) . "'";
+		return $this->fetchAsArray($this->query($sql), "permissionid", null, 'Permission');
 	}
 	public function setRolePermissionList($roleid, $permissionids) {
 		$sql = "DELETE FROM `rolepermissions` WHERE `roleid` = " . intval($roleid);
@@ -167,8 +167,8 @@ abstract class SQLStorage implements Storage {
 		return true;
 	}
 	public function getRoleUserList($roleid) {
-		$sql = "SELECT `userid`, `username` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
-		return $this->fetchAsArray($this->query($sql), "userid", null, User);
+		$sql = "SELECT `userid`, `username`, `password` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
+		return $this->fetchAsArray($this->query($sql), "userid", null, 'User');
 	}
 	public function setRoleUserList($roleid, $userids) {
 		$sql = "DELETE FROM `userroles` WHERE `roleid` = " . intval($roleid);
@@ -189,11 +189,11 @@ abstract class SQLStorage implements Storage {
 	 **/
 	public function getGliederungList() {
 		$sql = "SELECT `gliederungsid`, `label` FROM `gliederungen`";
-		return $this->fetchAsArray($this->query($sql), "gliederungsid", null, Gliederung);
+		return $this->fetchAsArray($this->query($sql), "gliederungsid", null, 'Gliederung');
 	}
 	public function getGliederung($gliederungid) {
 		$sql = "SELECT `gliederungsid`, `label` FROM `gliederungen` WHERE `gliederungsid` = " . intval($gliederungid);
-		return reset($this->fetchAsArray($this->query($sql), "gliederungsid", null, Gliederung));
+		return reset($this->fetchAsArray($this->query($sql), "gliederungsid", null, 'Gliederung'));
 	}
 
 	/**
@@ -247,7 +247,7 @@ abstract class SQLStorage implements Storage {
 			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
 			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
 			ORDER BY `r`.`timestamp`";
-		$os = $this->fetchAsArray($this->query($sql), "m_mitgliedid", null, array("r" => MitgliedRevision, "n" => NatPerson, "j" => JurPerson, "k" => Kontakt, "o" => Ort, "m" => Mitglied));
+		$os = $this->fetchAsArray($this->query($sql), "m_mitgliedid", null, array("r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => 'Ort', "m" => 'Mitglied'));
 		$objs = array();
 		foreach ($os as $o) {
 			$o["k"]->setOrt($o["o"]);
@@ -311,7 +311,7 @@ abstract class SQLStorage implements Storage {
 			WHERE	`r`.`mitgliedid` = " . intval($mitgliedid) . "
 			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
 			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)";
-		$o = reset($this->fetchAsArray($this->query($sql), "r_revisionid", null, array("r" => MitgliedRevision, "n" => NatPerson, "j" => JurPerson, "k" => Kontakt, "o" => Ort, "m" => Mitglied)));
+		$o = reset($this->fetchAsArray($this->query($sql), "r_revisionid", null, array("r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => 'Ort', "m" => 'Mitglied')));
 		$o["k"]->setOrt($o["o"]);
 		if ($o["r"]->getNatPersonID() !== null) {
 			$o["r"]->setNatPerson($o["n"]);
@@ -382,7 +382,7 @@ abstract class SQLStorage implements Storage {
 			$sql .= " WHERE `m`.`mitgliedid` = " . intval($mitgliedid);
 		}
 		$sql .= " ORDER BY `r`.`timestamp`";
-		$os = $this->fetchAsArray($this->query($sql), "revisionid", null, array("r" => MitgliederRevision, "n" => NatPerson, "j" => JurPerson, "k" => Kontakt, "u" => User));
+		$os = $this->fetchAsArray($this->query($sql), "revisionid", null, array("r" => 'MitgliederRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "u" => 'User'));
 		$objs = array();
 		foreach ($os as $k => &$o) {
 			$o["k"]->setOrt($o["o"]);
@@ -429,7 +429,7 @@ abstract class SQLStorage implements Storage {
 	 **/
 	public function getKontakt($kontaktid) {
 		$sql = "SELECT `kontaktid`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email` FROM `kontakt` WHERE `kontaktid` = " . intval($kontaktid);
-		return reset($this->fetchAsArray($this->query($sql), "kontaktid", null, Kontakt));
+		return reset($this->fetchAsArray($this->query($sql), "kontaktid", null, 'Kontakt'));
 	}
 	public function setKontakt($kontaktid, $strasse, $hausnummer, $ortid, $telefon, $handy, $email) {
 		if ($kontaktid == null) {
@@ -449,7 +449,7 @@ abstract class SQLStorage implements Storage {
 	}
 	public function searchKontakt($strasse, $hausnummer, $ortid, $telefon, $handy, $email) {
 		$sql = "SELECT `kontaktid`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email` FROM `kontakte` WHERE `strasse` = '" . $this->escape($strasse) . "' AND `hausnummer` = '" . $this->escape($hausnummer) . "' AND `ortid` = " . intval($ortid) . " AND `telefonnummer` = '" . $this->escape($telefon) . "' AND `handynummer` = '" . $this->escape($handy) . "' AND `email` = '" . $this->escape($email) . "'";
-		$array = $this->fetchAsArray($this->query($sql), "kontaktid", null, Kontakt);
+		$array = $this->fetchAsArray($this->query($sql), "kontaktid", null, 'Kontakt');
 		if (count($array) > 0) {
 			return reset($array);
 		}
@@ -469,11 +469,11 @@ abstract class SQLStorage implements Storage {
 	 **/
 	public function getOrtList() {
 		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte`";
-		return $this->fetchAsArray($this->query($sql), "ortid", null, Ort);
+		return $this->fetchAsArray($this->query($sql), "ortid", null, 'Ort');
 	}
 	public function getOrt($ortid) {
 		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte` WHERE `ortid` = " . intval($ortid);
-		return reset($this->fetchAsArray($this->query($sql), "ortid", null, Ort));
+		return reset($this->fetchAsArray($this->query($sql), "ortid", null, 'Ort'));
 	}
 	public function setOrt($ortid, $plz, $label, $stateid) {
 		if ($ortid == null) {
@@ -493,7 +493,7 @@ abstract class SQLStorage implements Storage {
 	}
 	public function searchOrt($plz, $label, $stateid) {
 		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte` WHERE `plz` = '" . $this->escape($plz) . "' AND `label` = '" . $this->escape($label) . "' AND `stateid` = " . intval($stateid);
-		$array = $this->fetchAsArray($this->query($sql), "ortid", null, Ort);
+		$array = $this->fetchAsArray($this->query($sql), "ortid", null, 'Ort');
 		if (count($array) > 0) {
 			return reset($array);
 		}
@@ -510,11 +510,11 @@ abstract class SQLStorage implements Storage {
 	 **/
 	public function getStateList() {
 		$sql = "SELECT `stateid`, `label`, `countryid` FROM `states`";
-		return $this->fetchAsArray($this->query($sql), "stateid", null, State);
+		return $this->fetchAsArray($this->query($sql), "stateid", null, 'State');
 	}
 	public function getState($stateid) {
 		$sql = "SELECT `stateid`, `label`, `countryid` FROM `states` WHERE `stateid` = " . intval($stateid);
-		return reset($this->fetchAsArray($this->query($sql), "stateid", null, State));
+		return reset($this->fetchAsArray($this->query($sql), "stateid", null, 'State'));
 	}
 	public function setState($stateid, $label, $countryid) {
 		if ($stateid == null) {
@@ -538,11 +538,11 @@ abstract class SQLStorage implements Storage {
 	 **/
 	public function getCountryList() {
 		$sql = "SELECT `countryid`, `label` FROM `countries`";
-		return $this->fetchAsArray($this->query($sql), "countryid", null, Country);
+		return $this->fetchAsArray($this->query($sql), "countryid", null, 'Country');
 	}
 	public function getCountry($countryid) {
 		$sql = "SELECT `countryid`, `label` FROM `countries` WHERE `countryid` = " . intval($countryid);
-		return reset($this->fetchAsArray($this->query($sql), "countryid", null, Country));
+		return reset($this->fetchAsArray($this->query($sql), "countryid", null, 'Country'));
 	}
 	public function setCountry($countryid, $label) {
 		if ($countryid == null) {
@@ -566,11 +566,11 @@ abstract class SQLStorage implements Storage {
 	 **/
 	public function getMitgliedschaftList() {
 		$sql = "SELECT `mitgliedschaftid`, `label`, `description`, `defaultbeitrag`, `defaultcreatemail` FROM `mitgliedschaften`";
-		return $this->fetchAsArray($this->query($sql), "mitgliedschaftid", null, Mitgliedschaft);
+		return $this->fetchAsArray($this->query($sql), "mitgliedschaftid", null, 'Mitgliedschaft');
 	}
 	public function getMitgliedschaft($mitgliedschaftid) {
 		$sql = "SELECT `mitgliedschaftid`, `label`, `description`, `defaultbeitrag`, `defaultcreatemail` FROM `mitgliedschaften` WHERE `mitgliedschaftid` = " . intval($mitgliedschaftid);
-		return reset($this->fetchAsArray($this->query($sql), "mitgliedschaftid", null, Mitgliedschaft));
+		return reset($this->fetchAsArray($this->query($sql), "mitgliedschaftid", null, 'Mitgliedschaft'));
 	}
 	public function setMitgliedschaft($mitgliedschaftid, $globaleid, $label, $description, $defaultbeitrag, $defaultcreatemail) {
 		if ($mitgliedschaftid == null) {
@@ -595,7 +595,7 @@ abstract class SQLStorage implements Storage {
 	 **/
 	public function getNatPerson($natpersonid) {
 		$sql = "SELECT `natpersonid`, `name`, `vorname`, `geburtsdatum`, `nationalitaet` FROM `natperson` WHERE `natpersonid` = " . intval($natpersonid);
-		return reset($this->fetchAsArray($this->query($sql), null, null, NatPerson));
+		return reset($this->fetchAsArray($this->query($sql), null, null, 'NatPerson'));
 	}
 	public function setNatPerson($natpersonid, $name, $vorname, $geburtsdatum, $nationalitaet) {
 		if ($natpersonid == null) {
@@ -615,7 +615,7 @@ abstract class SQLStorage implements Storage {
 	}
 	public function searchNatPerson($name, $vorname, $geburtsdatum, $nationalitaet) {
 		$sql = "SELECT `natpersonid`, `name`, `vorname`, `geburtsdatum`, `nationalitaet` FROM `natperson` WHERE `name` = '" . $this->escape($name) . "' AND `vorname` = '" . $this->escape($vorname) . "' AND `geburtsdatum` = '" . date("Y-m-d", $geburtsdatum) . "' AND `nationalitaet` = '" . $this->escape($nationalitaet) . "'";
-		$array = $this->fetchAsArray($this->query($sql), "natpersonid", null, NatPerson);
+		$array = $this->fetchAsArray($this->query($sql), "natpersonid", null, 'NatPerson');
 		if (count($array) > 0) {
 			return reset($array);
 		}
@@ -633,7 +633,7 @@ abstract class SQLStorage implements Storage {
 	 **/
 	public function getJurPerson($jurpersonid) {
 		$sql = "SELECT `jurpersonid`, `label` FROM `jurperson` WHERE `jurpersonid` = " . intval($jurpersonid);
-		return reset($this->fetchAsArray($this->query($sql), null, null, JurPerson));
+		return reset($this->fetchAsArray($this->query($sql), null, null, 'JurPerson'));
 	}
 	public function setJurPerson($jurpersonid, $firma) {
 		if ($jurpersonid == null) {
@@ -653,7 +653,7 @@ abstract class SQLStorage implements Storage {
 	}
 	public function searchJurPerson($firma) {
 		$sql = "SELECT `jurpersonid`, `label` FROM `jurperson` WHERE `label` = '" . $this->escape($firma) . "'";
-		$array = $this->fetchAsArray($this->query($sql), "jurpersonid", null, JurPerson);
+		$array = $this->fetchAsArray($this->query($sql), "jurpersonid", null, 'JurPerson');
 		if (count($array) > 0) {
 			return reset($array);
 		}
@@ -668,11 +668,11 @@ abstract class SQLStorage implements Storage {
 	 **/
 	public function getMailTemplateList() {
 		$sql = "SELECT `templateid`, `body` FROM `mailtemplates`";
-		return $this->fetchAsArray($this->query($sql), "templateid", null, MailTemplate);
+		return $this->fetchAsArray($this->query($sql), "templateid", null, 'MailTemplate');
 	}
 	public function getMailTemplate($mailtemplateid) {
 		$sql = "SELECT `templateid`, `body` FROM `mailtemplates` WHERE `templateid` = " . intval($mailtemplateid);
-		return reset($this->fetchAsArray($this->query($sql), "templateid", null, MailTemplate));
+		return reset($this->fetchAsArray($this->query($sql), "templateid", null, 'MailTemplate'));
 	}
 	public function setMailTemplate($mailtemplateid, $body) {
 		if ($mailtemplateid == null) {
@@ -692,14 +692,14 @@ abstract class SQLStorage implements Storage {
 	}
 	public function getMailTemplateHeaderList($mailtemplateid) {
 		$sql = "SELECT `mailheaders`.`headerid`, `mailheader`.`label`, `mailtemplateheaders`.`value` FROM `mailheaders` LEFT JOIN `mailtemplateheaders` ON (`mailtemplateheaders`.`headerid` = `mailheader`.`headerid`) WHERE `mailtemplateheaders`.`templateid` = " . intval($mailtemplateid);
-		return $this->fetchAsArray($this->query($sql), "headerid", null, MailTemplateHeader);
+		return $this->fetchAsArray($this->query($sql), "headerid", null, 'MailTemplateHeader');
 	}
 	public function setMailTemplateHeaderList($mailtemplateid, $headerids, $values) {
 		// TODO
 	}
 	public function getMailTemplateAttachmentList($mailtemplateid) {
 		$sql = "SELECT `mailattachments.`.`attachmentid`, `mailattachments`.`filename`, `mailattachments`.`mimename`, `mailattachments`.`content` FROM `mailattachments` LEFT JOIN `mailtemplateattachments` ON (`mailtemplateattachments`.`attachmentid` = `mailattachment`.`attachmentid`) WHERE `mailtemplateattachments`.`templateid` = " . intval($mailtemplateid);
-		return $this->fetchAsArray($this->query($sql), "headerid", null, MailTemplateAttachments);
+		return $this->fetchAsArray($this->query($sql), "headerid", null, 'MailTemplateAttachments');
 	}
 	public function setMailTemplateAttachmentList($mailtemplateid, $attachments) {
 		// TODO
@@ -710,11 +710,11 @@ abstract class SQLStorage implements Storage {
 	 **/
 	public function getMailHeaderList() {
 		$sql = "SELECT `headerid`, `label` FROM `mailheaders`";
-		return $this->fetchAsArray($this->query($sql), "headerid", null, MailHeader);
+		return $this->fetchAsArray($this->query($sql), "headerid", null, 'MailHeader');
 	}
 	public function getMailHeader($headerid) {
 		$sql = "SELECT `headerid`, `label` FROM `mailheaders` WHERE `headerid` = " . intval($headerid);
-		return reset($this->fetchAsArray($this->query($sql), "headerid", null, MailHeader));
+		return reset($this->fetchAsArray($this->query($sql), "headerid", null, 'MailHeader'));
 	}
 	public function setMailHeader($headerid, $label) {
 		if ($headerid == null) {
@@ -738,11 +738,11 @@ abstract class SQLStorage implements Storage {
 	 **/
 	public function getMailAttachmentList() {
 		$sql = "SELECT `attachmentid`, `filename`, `mimetype`, `content` FROM `mailattachments`";
-		return $this->fetchAsArray($this->query($sql), "attachmentid", null, MailAttachment);
+		return $this->fetchAsArray($this->query($sql), "attachmentid", null, 'MailAttachment');
 	}
 	public function getMailAttachment($attachmentid) {
 		$sql = "SELECT `attachmentid`, `filename`, `mimetype`, `content` FROM `mailattachments` WHERE `attachmentid` = " . intval($attachmentid);
-		return reset($this->fetchAsArray($this->query($sql), "attachmentid", null, MailAttachment));
+		return reset($this->fetchAsArray($this->query($sql), "attachmentid", null, 'MailAttachment'));
 	}
 	public function setMailAttachment($attachmentid, $filename, $mimetype, $content) {
 		if ($attachmentid == null) {

@@ -35,12 +35,12 @@ case "details":
 			exit;
 		}
 		$permissions = $_REQUEST["permissions"];
-		$rolepermissions = array_keys($role->getPermissions());
+		$rolepermissions = $role->getPermissionIDs();
 		foreach (array_diff($permissions, $rolepermissions) as $perm) {
-			$role->addPermission($perm);
+			$role->addPermissionID($perm);
 		}
 		foreach (array_diff($rolepermissions, $permissions) as $perm) {
-			$role->delPermission($perm);
+			$role->delPermissionID($perm);
 		}
 	}
 

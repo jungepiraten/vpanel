@@ -60,6 +60,28 @@ class Role extends StorageClass {
 		return array_keys($this->getPermissions());
 	}
 
+	public function addPermissionID($permissionid) {
+		$this->addPermission($this->getStorage()->getPermission($permissionid));
+	}
+
+	public function delPermissionID($permissionid) {
+		$this->getPermissions();
+		if (isset($this->permissions[$permissionid])) {
+			unset($this->permissions[$permissionid]);
+		}
+	}
+
+	public function addPermission(Permission $permission) {
+		$this->getPermissions();
+		$this->permissions[$permission->getPermissionID()] = $permission;
+	}
+
+	public function delPermission($permission) {
+		$this->getPermissions();
+		
+		$this->permissions[$permission->getPermissionID()] = $permission;
+	}
+
 	public function save(Storage $storage = null) {
 		if ($storage === null) {
 			$storage = $this->getStorage();
