@@ -207,6 +207,23 @@ abstract class SQLStorage implements Storage {
 		$sql = "SELECT COUNT(*) as `count` FROM `mitglieder`";
 		return reset(reset($this->fetchAsArray($this->query($sql))));
 	}
+    
+	public function getMitgliederCountPerMs() {
+        $mitgliedschaften = $this->getMitgliedschaftList();
+        $mitgliedercountper = array();
+        foreach ($mitgliedschaften as $mitgliedschaft) {
+            $sql = "SELECT COUNT(*) as `count` FROM `mitgliederrevisions` WHERE mitgliedschaftid = " . $mitgliedschaft->getMitgliedschaftID();
+            $result = $this->fetchRow($this->query($sql));
+            $mitgliederpercount[] = array($result["count"], $mitgliedschaft->getLabel());
+        }
+        unset($result);
+        return $mitgliederpercount;
+    }
+    
+    	public function getMitgliederCountPerState() {
+        //TODO
+    }
+    
 	public function getMitgliederList($limit = null, $offset = null) {
 		$sql = "SELECT	`r`.`timestamp` AS `null`,
 				`m`.`mitgliedid` as `m_mitgliedid`,

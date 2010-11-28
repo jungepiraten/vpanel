@@ -34,6 +34,7 @@ $config->registerPage("mitglieder_create", "mitglieder.php?mode=create&mitglieds
 $config->registerPage("mitglieder_details", "mitglieder.php?mode=details&mitgliedid=%d");
 $config->registerPage("mitglieder_del", "mitglieder.php?mode=delete&mitgliedid=%d");
 
+$config->registerPage("statistik", "statistik.php");
 #$config->registerPage("");
 
 ?>

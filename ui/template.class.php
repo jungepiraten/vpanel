@@ -259,6 +259,13 @@ class Template {
 		$this->smarty->display("mitgliedercreate.html.tpl");
 	}
 
+	public function viewStatistik($mitgliedercount, $mitgliedercountperms, $mitgliedercountperstate) {
+        $this->smarty->assign("mitgliedercount", $mitgliedercount);
+        $this->smarty->assign("mitgliedercountperms", $mitgliedercountperms);
+        $this->smarty->assign("mitgliedercountperstate", $mitgliedercountperstate);
+		$this->smarty->display("statistik.html.tpl");
+	}
+
 	public function redirect($url = null) {
 		if ($url === null) {
 			$url = isset($_REQUEST["redirect"]) ? $_REQUEST["redirect"] : $_SERVER["HTTP_REFERER"];

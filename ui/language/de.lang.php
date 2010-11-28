@@ -29,5 +29,6 @@ $lang['mitglieder_show']	= 'Mitglieder anzeigen';
 $lang['mitglieder_modify']	= 'Mitglied bearbeiten';
 $lang['mitglieder_create']	= 'Mitglied anlegen';
 $lang['mitglieder_delete']	= 'Mitglied löschen';
+$lang['statistik_show']     = 'Mitgliederstatistik anzeigen';
 
 ?>

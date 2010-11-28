@@ -300,7 +300,7 @@ select {
     float:right;
 }
 
-.pages a {
+.pages a, .pagingsep {
     background-color:#404040;
     padding:4px;
     color:white;
@@ -325,6 +325,7 @@ select {
 }
 
 .buttonbox {
+    margin-top:-4px;
     margin-bottom:10px;
 }
 
