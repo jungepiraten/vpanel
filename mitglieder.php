@@ -1,5 +1,7 @@
 <?php
 
+$GLOBALS["start"] = microtime(true);
+
 require_once(dirname(__FILE__) . "/config.inc.php");
 
 require_once(VPANEL_UI . "/session.class.php");
@@ -94,8 +96,9 @@ case "details":
 		$ui->redirect($session->getLink("mitglieder_details", $mitglied->getMitgliedID()));
 	}
 
+
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
-	$orte = $session->getStorage()->getOrtList();
+	//$orte = $session->getStorage()->getOrtList();
 	$states = $session->getStorage()->getStateList();
 
 	$ui->viewMitgliedDetails($mitglied, $mitgliedschaften, $orte, $states);

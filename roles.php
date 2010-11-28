@@ -42,6 +42,7 @@ case "details":
 		foreach (array_diff($rolepermissions, $permissions) as $perm) {
 			$role->delPermissionID($perm);
 		}
+		$role->save();
 	}
 
 	$users = $session->getStorage()->getUserList();
