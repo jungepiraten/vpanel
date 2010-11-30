@@ -1,4 +1,4 @@
-{include file=header.html.tpl ansicht="Login"}
+{include file="header.html.tpl" ansicht="Login"}
 {if is_array($errors) && !empty($errors)}
 {foreach from=$errors item=error}
 <div class="error">{$error|__|escape:html}</div>
@@ -22,4 +22,4 @@
  </table>
  </fieldset>
 </form>
-{include file=footer.html.tpl}
+{include file="footer.html.tpl"}

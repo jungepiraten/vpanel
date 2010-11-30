@@ -1,4 +1,4 @@
-{include file=header.html.tpl ansicht="Mitgliederstatistik"}
+{include file="header.html.tpl" ansicht="Mitgliederstatistik"}
 <p class="pagetitle">Mitgliederstatistik</p>
 <p>
 {$mitgliedercount}
@@ -12,4 +12,4 @@
 {$perstatecount[1]} {$perstatecount[0]}
 {/foreach}
 </p>
-{include file=footer.html.tpl}
+{include file="footer.html.tpl"}

@@ -1,4 +1,4 @@
-{include file=header.html.tpl ansicht="Mitgliederverwaltung"}
+{include file="header.html.tpl" ansicht="Mitgliederverwaltung"}
 <p class="pagetitle">Mitgliederverwaltung</p>
 <div class="buttonbox">
 &nbsp;
@@ -47,7 +47,7 @@
 {if $page < $pagecount-2}<a href="{"mitglieder_page"|___:$pagecount-1}">&gt;&gt;</a>{/if}
 </div>
 </div>
-{include file=mitgliederlist.block.tpl showmitglieddel=1 mitglieder=$mitglieder}
+{include file="mitgliederlist.block.tpl" showmitglieddel=1 mitglieder=$mitglieder}
 <div class="buttonbox">
 &nbsp;
 <div class="pages">
@@ -95,4 +95,4 @@
  {/foreach}
 </div>
 </div>
-{include file=footer.html.tpl}
+{include file="footer.html.tpl"}

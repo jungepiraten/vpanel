@@ -1,11 +1,11 @@
-{include file=header.html.tpl ansicht="Rolle bearbeiten"}
+{include file="header.html.tpl" ansicht="Rolle bearbeiten"}
 <div>
 <p class="pagetitle">Rolle &quot;{if isset($role)}{$role.label|escape:html}{/if}&quot; bearbeiten</p>
 <div class="mainform">
-{include file=roleform.block.tpl role=$role}
+{include file="roleform.block.tpl" role=$role}
 <hr>
 <span style="font-weight:bold; font-size:14px;">Mitglieder:</span>
-{include file=userlist.block.tpl roleid=$role.roleid showroledel=1 users=$roleusers}
+{include file="userlist.block.tpl" roleid=$role.roleid showroledel=1 users=$roleusers}
 <form action="{"roles_adduser"|___:$role.roleid}" method="post" class="roleadduser">
  <fieldset>
   <input type="hidden" name="redirect" value="{$smarty.server.REQUEST_URI}" />
@@ -35,4 +35,4 @@
 </div>
 <div style="clear:both;">&nbsp;</div>
 </div>
-{include file=footer.html.tpl}
+{include file="footer.html.tpl"}
