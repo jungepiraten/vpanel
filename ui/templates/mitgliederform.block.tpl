@@ -1,4 +1,3 @@
-<link rel="stylesheet" type="text/css" href="/~prauscher/vpanel/ui/dropdownorte.css" />
 <form action="{if isset($mitglied)}{"mitglieder_details"|___:$mitglied.mitgliedid}{else}{"mitglieder_create"|___:$mitgliedschaft.mitgliedschaftid}{/if}" method="post">
  <fieldset>
  <table>
@@ -234,7 +233,7 @@ VPanel_Dropdownorte.prototype = {
 		this.onChange();
 	},
 	search: function(plzv, ortv) {
-		$.post("/~prauscher/vpanel/json/orte.php",{
+		$.post("{/literal}{"orte_json"|___}{literal}",{
 			plz: plzv,
 			ort: ortv
 		}, this._open.createDelegate(this) ,'json');
