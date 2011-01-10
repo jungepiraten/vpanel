@@ -505,6 +505,22 @@ abstract class SQLStorage implements Storage {
 		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte`";
 		return $this->fetchAsArray($this->query($sql), "ortid", null, 'Ort');
 	}
+	public function getOrtListLimit($plz = null, $label = null, $stateid = null, $count = null) {
+		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte` WHERE 1";
+		if ($plz != null) {
+			$sql .= " and `plz` LIKE '" . $this->escape($plz) . "%'";
+		}
+		if ($label != null) {
+			$sql .= " and `label` LIKE '%" . $this->escape($label) . "%'";
+		}
+		if ($stateid != null) {
+			$sql .= " and `stateid` = " . intval($stateid);
+		}
+		if ($count != null) {
+			$sql .= " LIMIT " . intval($count);
+		}
+		return $this->fetchAsArray($this->query($sql), "ortid", null, 'Ort');
+	}
 	public function getOrt($ortid) {
 		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte` WHERE `ortid` = " . intval($ortid);
 		return reset($this->fetchAsArray($this->query($sql), "ortid", null, 'Ort'));

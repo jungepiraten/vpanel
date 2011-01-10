@@ -242,27 +242,25 @@ class Template {
 		$this->smarty->display("mitgliederlist.html.tpl");
 	}
 
-	public function viewMitgliedDetails($mitglied, $mitgliedschaften, $orte, $states) {
+	public function viewMitgliedDetails($mitglied, $mitgliedschaften, $states) {
 		$this->smarty->assign("mitglied", $this->parseMitglied($mitglied));
 		$this->smarty->assign("mitgliedrevision", $this->parseMitgliedRevision($mitglied->getLatestRevision()));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
-		$this->smarty->assign("orte", $this->parseOrte($orte));
 		$this->smarty->assign("states", $this->parseStates($states));
 		$this->smarty->display("mitgliederdetails.html.tpl");
 	}
 
-	public function viewMitgliedCreate($mitgliedschaft, $mitgliedschaften, $orte, $states) {
+	public function viewMitgliedCreate($mitgliedschaft, $mitgliedschaften, $states) {
 		$this->smarty->assign("mitgliedschaft", $this->parseMitgliedschaft($mitgliedschaft));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
-		$this->smarty->assign("orte", $this->parseOrte($orte));
 		$this->smarty->assign("states", $this->parseStates($states));
 		$this->smarty->display("mitgliedercreate.html.tpl");
 	}
 
 	public function viewStatistik($mitgliedercount, $mitgliedercountperms, $mitgliedercountperstate) {
-        $this->smarty->assign("mitgliedercount", $mitgliedercount);
-        $this->smarty->assign("mitgliedercountperms", $mitgliedercountperms);
-        $this->smarty->assign("mitgliedercountperstate", $mitgliedercountperstate);
+		$this->smarty->assign("mitgliedercount", $mitgliedercount);
+		$this->smarty->assign("mitgliedercountperms", $mitgliedercountperms);
+		$this->smarty->assign("mitgliedercountperstate", $mitgliedercountperstate);
 		$this->smarty->display("statistik.html.tpl");
 	}
 

@@ -1,6 +1,8 @@
 <?php
 
-$GLOBALS["start"] = microtime(true);
+if (isset($_REQUEST["ajax"])) {
+	die(json_encode(array("test" => "du doof")));
+}
 
 require_once(dirname(__FILE__) . "/config.inc.php");
 
@@ -98,10 +100,9 @@ case "details":
 
 
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
-	//$orte = $session->getStorage()->getOrtList();
 	$states = $session->getStorage()->getStateList();
 
-	$ui->viewMitgliedDetails($mitglied, $mitgliedschaften, $orte, $states);
+	$ui->viewMitgliedDetails($mitglied, $mitgliedschaften, $states);
 	exit;
 case "create":
 	$mitgliedschaftid = intval($_REQUEST["mitgliedschaftid"]);
@@ -119,10 +120,9 @@ case "create":
 	}
 
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
-	$orte = $session->getStorage()->getOrtList();
 	$states = $session->getStorage()->getStateList();
 
-	$ui->viewMitgliedCreate($mitgliedschaft, $mitgliedschaften, $orte, $states);
+	$ui->viewMitgliedCreate($mitgliedschaft, $mitgliedschaften, $states);
 	exit;
 case "delete":
 	if (!$session->isAllowed("mitglieder_delete")) {

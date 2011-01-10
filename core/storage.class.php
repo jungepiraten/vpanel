@@ -39,6 +39,7 @@ interface Storage {
 	public function searchKontakt($strasse, $hausnummer, $ortid, $telefon, $handy, $email);
 
 	public function getOrtList();
+	public function getOrtListLimit($plz = null, $label = null, $stateid = null, $count = null);
 	public function getOrt($ortid);
 	public function setOrt($ortid, $plz, $label, $stateid);
 	public function delOrt($ortid);

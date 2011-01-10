@@ -1,3 +1,4 @@
+<link rel="stylesheet" type="text/css" href="/~prauscher/vpanel/ui/dropdownorte.css" />
 <form action="{if isset($mitglied)}{"mitglieder_details"|___:$mitglied.mitgliedid}{else}{"mitglieder_create"|___:$mitgliedschaft.mitgliedschaftid}{/if}" method="post">
  <fieldset>
  <table>
@@ -33,12 +34,25 @@
          <td><input class="strasse" type="text" name="strasse" size="37" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.strasse|escape:html}{/if}" /> <input class="hausnummer" type="text" name="hausnummer" size="3" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.hausnummer|escape:html}{/if}" /></td>
      </tr>
      <tr>
-         <td><label for="ortid">{"Ort:"|__}</label></td>
-         <td><select name="ortid" onChange="showhideNeuerOrt()"><option value="">{"Neu"|__}</option>{foreach from=$orte item=ort}<option value="{$ort.ortid|escape:html}" {if $ort.ortid == $mitgliedrevision.kontakt.ort.ortid}selected="selected"{/if}>{$ort.plz|escape:html} {$ort.label|escape:html}</option>{/foreach}</select></td>
-     </tr>
-     <tr id="neuerort">
-         <td><label for="plz">&nbsp;</label></td>
-         <td><input class="plz" type="text" name="plz" size="5" /> <input class="ort" type="text" name="ort" size="35" /> <select name="stateid">{foreach from=$states item=state}<option value="{$state.stateid|escape:html}">{$state.label|escape:html} ({$state.country.label})</option>{/foreach}</select></td>
+      <td><label for="ortid">{"Ort:"|__}</label></td>
+      <td>
+       <input type="hidden" id="ortid" name="ortid"
+        value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.ortid|escape:html}{/if}" />
+       <input class="plz" type="text" name="plz" id="plz" size="5" autocomplete="off"
+        value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.plz|escape:html}{/if}" />
+       <input class="ort" type="text" name="ort" id="ort" size="35" autocomplete="off"
+        value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.label|escape:html}{/if}" />
+       <select name="stateid" id="state">
+        {foreach from=$states item=state}
+         <option value="{$state.stateid|escape:html}" id="state{$state.stateid|escape:html}"
+          {if isset($mitgliedrevision.kontakt) and
+              $mitgliedrevision.kontakt.ort.state.stateid == $state.stateid}selected="selected"{/if}>
+          {$state.label|escape:html} ({$state.country.label})
+         </option>
+        {/foreach}
+       </select>
+       <div id="dropdownorte"><ul></ul></div>
+      </td>
      </tr>
      <tr>
          <td><label for="telefon">{"Telefonnummer:"|__}</label></td>
@@ -72,6 +86,7 @@
 </form>
 {literal}
 <script type="text/javascript">
+
 function toggleJurNatPerson() {
 	var nat_display = 'none';
 	var jur_display = 'none';
@@ -99,46 +114,185 @@ function toggleJurNatPerson() {
 }
 toggleJurNatPerson();
 
-function showhideNeuerOrt() {
-	if (document.getElementsByName('ortid')[0].value == '') {
-		document.getElementById('neuerort').style.display = 'table-row';
-	} else {
-		document.getElementById('neuerort').style.display = 'none';
-        document.getElementsByClassName('plz')[0].value = '';
-        document.getElementsByClassName('ort')[0].value = '';
-        document.getElementsByName('stateid')[0].selectedIndex = 0;
-	}
-}
-showhideNeuerOrt();
-
-showhideNeuerOrt();
 function toggleMitgliedschaft() {
     var art = document.getElementsByName('mitgliedschaftid')[0].options[document.getElementsByName('mitgliedschaftid')[0].selectedIndex].text
     document.getElementsByName('titleart')[0].innerHTML = art;
 	switch (art) {
 	case "Ordentliches Mitglied":
 		document.getElementById('beitrag').style.display = 'none';
-        document.getElementsByName('beitrag')[0].value = "12.00";
+		document.getElementsByName('beitrag')[0].value = "12.00";
 		document.getElementById('mitglied_pp').style.display = 'table-row';
 		break;
 	case "Fördermitglied":
 		document.getElementById('beitrag').style.display = 'table-row';
-        document.getElementsByName('beitrag')[0].value = "12.00";
+		document.getElementsByName('beitrag')[0].value = "12.00";
 		document.getElementById('mitglied_pp').style.display = 'none';
-        document.getElementsByName('mitglied_piraten')[0].checked = false;
+		document.getElementsByName('mitglied_piraten')[0].checked = false;
 		break;
 	case "Ehrenmitglied":
 		document.getElementById('beitrag').style.display = 'none';
-        document.getElementsByName('beitrag')[0].value = "0";
+		document.getElementsByName('beitrag')[0].value = "0";
 		document.getElementById('mitglied_pp').style.display = 'none';
-        document.getElementsByName('mitglied_piraten')[0].checked = false;
+		document.getElementsByName('mitglied_piraten')[0].checked = false;
 		break;
 	default:
 		document.getElementById('beitrag').style.display = 'table-row';
-        document.getElementsByName('beitrag')[0].value = "12.00";
+		document.getElementsByName('beitrag')[0].value = "12.00";
 		document.getElementById('mitglied_pp').style.display = 'table-row';
 	}
 }
-toggleMitgliedschaft()
+toggleMitgliedschaft();
+
+function VPanel_Dropdownorte() {
+	this.inputortid = $('#ortid');
+	this.inputplz = $('#plz');
+	this.inputort = $('#ort');
+	this.overlay = $('#dropdownorte');
+	this.list = $('#dropdownorte ul');
+	this.data = [];
+	this.current = -1;
+	this.active = false;
+	this.ignoreKey = false;
+	this.interval = null;
+	this.init();
+}
+
+Function.prototype.createDelegate = function(scope) {
+        var fn = this;
+        return function() {
+                return fn.apply(scope, arguments);
+        }
+}
+
+VPanel_Dropdownorte.prototype = {
+	init: function() {
+		this.inputplz.keydown(this.keyDown.createDelegate(this))
+				.blur(this.onBlur.createDelegate(this))
+				.focus(this.onFocus.createDelegate(this))
+				.keyup(this.onChange.createDelegate(this));
+		this.inputort.keydown(this.keyDown.createDelegate(this))
+				.blur(this.onBlur.createDelegate(this))
+				.focus(this.onFocus.createDelegate(this))
+				.keyup(this.onChange.createDelegate(this));
+	},
+	keyDown: function(e) {
+		if(!this.active) return;
+		this.ignoreKey = true;
+		switch(e.keyCode) {
+			case 40: //down
+				e.preventDefault();
+				this._next();
+				break;
+			case 38: //down
+				e.preventDefault();
+				this._prev();
+				break;
+			case 13: //enter
+				if(this.current >= 0 && this.current < this.data.length) {
+					this.inputortid.val(this.data[this.current].ortid);
+					this.inputplz.val(this.data[this.current].plz);
+					this.inputort.val(this.data[this.current].ort);
+					$('#state' + this.data[this.current].stateid).attr('selected', 'selected');
+					this._close();
+					e.preventDefault();
+				}
+				break;
+			case 27: //esc
+				this.inputortid.val('');
+				this.inputplz.blur();
+				this.inputort.blur();
+				break;
+			default:
+				this.ignoreKey = false;
+		}
+	},
+	onBlur: function() {
+		this._close();
+	},
+
+	onChange: function() {
+		if(this.interval != null) {
+			window.clearTimeout(this.interval);
+		}
+		this.interval = window.setTimeout(this.triggerChange.createDelegate(this),300);
+	},
+	triggerChange: function() {
+		if(this.ignoreKey) {
+			this.ignoreKey= false;
+			return;
+		}
+		var plzv = this.inputplz.val();
+		var ortv = this.inputort.val();
+		if(plzv.trim() == "" && ortv.trim() == "") {
+			this._close();
+		} else {
+			this.search(plzv, ortv);
+		}
+	},
+	
+	onFocus: function() {
+		this.onChange();
+	},
+	search: function(plzv, ortv) {
+		$.post("/~prauscher/vpanel/json/orte.php",{
+			plz: plzv,
+			ort: ortv
+		}, this._open.createDelegate(this) ,'json');
+	},
+		
+	_renderData: function(data) {
+		this.list.html("")
+		this.data = data;
+		for(i in data) {
+			$('<li></li>').append(
+				$('<a></a>').text(data[i].plz + ' ' + data[i].ort).attr('href',data[i].ortid)
+			).appendTo( this.list );
+		}
+	},
+
+	_select: function(i) {
+		if(!this.active) return;
+		if(i < 0 || i >= this.data.length) return;
+		var lis = this.list.children("li");
+		lis.removeClass('selected');
+		$(lis[i]).addClass('selected');
+		this.current = i;
+	},
+	_next: function() {
+		this._select(this.current+1);
+	},
+	_prev: function() {
+		this._select(this.current-1);
+	},
+	_open: function(data) {
+		if(data.length == 0) {
+			this._close();
+			return;
+		}
+		this._renderData(data);
+		this._select(0);
+		this.overlay.show();
+		if(!this.active) {
+			this.active = true;
+			//this..focus();
+		}
+	},
+	_close: function() {
+		this.overlay.hide();	
+	}
+}
+
+$(function() {
+	dropdownorte = new VPanel_Dropdownorte();
+});
+
 </script>
+<style type="text/css">
+#dropdownorte ul
+	{list-style:none; padding:0px;}
+#dropdownorte ul li
+	{padding-top:5px; padding-bottom:5px;}
+#dropdownorte ul li.selected
+	{background-color:#cccccc;}
+</style>
 {/literal}

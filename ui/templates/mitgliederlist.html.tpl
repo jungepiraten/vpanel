@@ -7,11 +7,12 @@
   <a href="{"mitglieder_create"|___:$mitgliedschaft.mitgliedschaftid}" class="neuset">{"%s"|__:$mitgliedschaft.label}</a>
  {/foreach}
 </div>
+<div class="search">
+ <input type="text" onKeyUp="{literal}if (this.value.length > 3) {$.getJSON('{/literal}{"mitglieder_ajax"|___}{literal}&search=' + this.value, function(data){alert(data.test);})}{/literal}" name="suche" id="suche" />
+</div>
 <div class="pages">
 {if $page > 1}<a href="{"mitglieder_page"|___:'0'}" class="pagebutton">&lt;&lt;</a>{/if}
-
 {if $page > 0}<a href="{"mitglieder_page"|___:$page-1}">&lt;</a>{/if}
-
 {if $page > 3}
 {section name=pages loop=$pagecount start=0 max=2}
 <a href="{"mitglieder_page"|___:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a>
