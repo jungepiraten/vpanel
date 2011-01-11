@@ -7,7 +7,7 @@ interface Storage {
 	public function getUserList();
 	public function getUser($userid);
 	public function getUserByUsername($username);
-	public function setUser($userid, $username, $password);
+	public function setUser($userid, $username, $password, $passwordsalt);
 	public function delUser($userid);
 	public function getUserRoleList($userid);
 	public function setUserRoleList($userid, $permissions);
@@ -26,6 +26,8 @@ interface Storage {
 
 	public function getMitgliederList($limit = null, $offset = null);
 	public function getMitgliederCount();
+	public function getMitgliederCountByState($stateid);
+	public function getMitgliederCountByMitgliedschaft($mitgliedschaftid);
 	public function getMitglied($mitgliedid);
 	public function setMitglied($mitgliedid, $globalid, $eintritt, $austritt);
 

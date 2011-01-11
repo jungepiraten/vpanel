@@ -66,6 +66,10 @@ class State extends StorageClass {
 			$this->getLabel(),
 			$this->getCountryID() );
 	}
+
+	public function getMitgliederCount() {
+		return $this->getStorage()->getMitgliederCountByState($this->getStateID());
+	}
 }
 
 ?>

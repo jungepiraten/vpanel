@@ -28,6 +28,8 @@ $config->registerPage("roles_del", "roles.php?mode=delete&roleid=%d");
 $config->registerPage("roles_adduser", "user.php?mode=addrole&roleid=%d");
 $config->registerPage("roles_deluser", "user.php?mode=delrole&roleid=%d&userid=%d");
 
+$config->registerPage("orte_json", "json/orte.php");
+
 $config->registerPage("mitglieder", "mitglieder.php");
 $config->registerPage("mitglieder_ajax", "mitglieder.php?ajax");
 $config->registerPage("mitglieder_page", "mitglieder.php?page=%d");

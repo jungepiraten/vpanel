@@ -76,22 +76,22 @@ abstract class SQLStorage implements Storage {
 	 * Benutzer
 	 */
 	public function getUserList() {
-		$sql = "SELECT `userid`, `username`, `password` FROM `users`";
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt` FROM `users`";
 		return $this->fetchAsArray($this->query($sql), "userid", null, 'User');
 	}
 	public function getUser($userid) {
-		$sql = "SELECT `userid`, `username`, `password` FROM `users` WHERE `userid` = " . intval($userid);
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt` FROM `users` WHERE `userid` = " . intval($userid);
 		return reset($this->fetchAsArray($this->query($sql), "userid", null, 'User'));
 	}
 	public function getUserByUsername($username) {
-		$sql = "SELECT `userid`, `username`, `password` FROM `users` WHERE `username` = '" . $this->escape($username) . "'";
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt` FROM `users` WHERE `username` = '" . $this->escape($username) . "'";
 		return reset($this->fetchAsArray($this->query($sql), "userid", null, 'User'));
 	}
-	public function setUser($userid, $username, $password) {
+	public function setUser($userid, $username, $password, $passwordsalt) {
 		if ($userid == null) {
-			$sql = "INSERT INTO `users` (`username`, `password`) VALUES ('" . $this->escape($username) . "', '" . $this->escape($password) . "')";
+			$sql = "INSERT INTO `users` (`username`, `password`, `passwordsalt`) VALUES ('" . $this->escape($username) . "', '" . $this->escape($password) . "', '" . $this->escape($passwordsalt) . "')";
 		} else {
-			$sql = "UPDATE `users` SET `username` = '" . $this->escape($username) . "', `password` = '" . $this->escape($password) . "' WHERE `userid` = " . intval($userid);
+			$sql = "UPDATE `users` SET `username` = '" . $this->escape($username) . "', `password` = '" . $this->escape($password) . "', `passwordsalt` = '" . $this->escape($passwordsalt) . "' WHERE `userid` = " . intval($userid);
 		}
 		$this->query($sql);
 		if ($userid == null) {
@@ -204,25 +204,44 @@ abstract class SQLStorage implements Storage {
 	 * Mitglieder
 	 **/
 	public function getMitgliederCount() {
-		$sql = "SELECT COUNT(*) as `count` FROM `mitglieder`";
+		$sql = "SELECT	`r`.`timestamp` AS `null`,
+				COUNT(`m`.`mitgliedid`) as `count`
+			FROM	`mitglieder` `m`
+			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
+			LEFT JOIN `mitgliederrevisions` `rmax` USING (`mitgliedid`)
+			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
+			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
+			ORDER BY `r`.`timestamp`";
 		return reset(reset($this->fetchAsArray($this->query($sql))));
 	}
-    
-	public function getMitgliederCountPerMs() {
-        $mitgliedschaften = $this->getMitgliedschaftList();
-        $mitgliedercountper = array();
-        foreach ($mitgliedschaften as $mitgliedschaft) {
-            $sql = "SELECT COUNT(*) as `count` FROM `mitgliederrevisions` WHERE mitgliedschaftid = " . $mitgliedschaft->getMitgliedschaftID();
-            $result = $this->fetchRow($this->query($sql));
-            $mitgliederpercount[] = array($result["count"], $mitgliedschaft->getLabel());
-        }
-        unset($result);
-        return $mitgliederpercount;
-    }
-    
-    	public function getMitgliederCountPerState() {
-        //TODO
-    }
+
+	public function getMitgliederCountByMitgliedschaft($mitgliedschaftid) {
+		$sql = "SELECT	`r`.`timestamp` AS `null`,
+				COUNT(`m`.`mitgliedid`) as `count`
+			FROM	`mitglieder` `m`
+			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
+			LEFT JOIN `mitgliederrevisions` `rmax` USING (`mitgliedid`)
+			WHERE	`r`.`mitgliedschaftid` = " . intval($mitgliedschaftid) . "
+			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
+			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
+			ORDER BY `r`.`timestamp`";
+		return reset(reset($this->fetchAsArray($this->query($sql))));
+	}
+
+	public function getMitgliederCountByState($stateid) {
+		$sql = "SELECT	`r`.`timestamp` AS `null`,
+				COUNT(`m`.`mitgliedid`) as `count`
+			FROM	`mitglieder` `m`
+			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
+			LEFT JOIN `mitgliederrevisions` `rmax` USING (`mitgliedid`)
+			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
+			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
+			WHERE	`o`.`stateid` = " . intval($stateid) . "
+			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
+			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
+			ORDER BY `r`.`timestamp`";
+		return reset(reset($this->fetchAsArray($this->query($sql))));
+	}
     
 	public function getMitgliederList($limit = null, $offset = null) {
 		$sql = "SELECT	`r`.`timestamp` AS `null`,

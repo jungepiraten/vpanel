@@ -15,11 +15,22 @@ class User extends StorageClass {
 		$user->setUserID($row["userid"]);
 		$user->setUsername($row["username"]);
 		$user->setPassword($row["password"]);
+		$user->setPasswordSalt($row["passwordsalt"]);
 		return $user;
 	}
 
+	protected function generateSalt() {
+		$str = "";
+		$chrs = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!"§$%&/()=?{[]}\\\'*+~#-.,;:<>|';
+		for ($i=0;$i<=rand(3,7);$i++) {
+			$str .= substr($chrs, rand(0,strlen($chrs)-1), 1);
+		}
+var_dump($str);
+		return $str;
+	}
+
 	protected function hash($str) {
-		return hash('sha256', $str);
+		return hash('sha256', $this->getPasswordSalt() . $str);
 	}
 
 	public function getUserID() {
@@ -42,6 +53,14 @@ class User extends StorageClass {
 		return ($this->hash($password) == $this->getPassword());
 	}
 
+	public function getPasswordSalt() {
+		return $this->passwordsalt;
+	}
+
+	public function setPasswordSalt($salt) {
+		$this->passwordsalt = $salt;
+	}
+
 	public function getPassword() {
 		return $this->password;
 	}
@@ -51,6 +70,8 @@ class User extends StorageClass {
 	}
 
 	public function changePassword($password) {
+		$salt = $this->generateSalt();
+		$this->setPasswordSalt($salt);
 		$this->setPassword($this->hash($password));
 	}
 
@@ -84,7 +105,8 @@ class User extends StorageClass {
 		$this->setUserID( $storage->setUser(
 			$this->getUserID(),
 			$this->getUsername(),
-			$this->getPassword() ));
+			$this->getPassword(),
+			$this->getPasswordSalt() ));
 		
 		$storage->setUserRoleList(
 			$this->getUserID(),

@@ -88,6 +88,10 @@ class Mitgliedschaft extends StorageClass {
 			$this->getDefaultBeitrag(),
 			$this->getDefaultCreateMailID() ));
 	}
+
+	public function getMitgliederCount() {
+		return $this->getStorage()->getMitgliederCountByMitgliedschaft($this->getMitgliedschaftID());
+	}
 }
 
 ?>
