@@ -257,10 +257,24 @@ class Template {
 		$this->smarty->display("mitgliedercreate.html.tpl");
 	}
 
-	public function viewStatistik($mitgliedercount, $mitgliedercountperms, $mitgliedercountperstate) {
+	public function viewStatistik($mitgliedercount, $mitgliedschaften, $states) {
+		$countPerMitgliedschaft = array();
+		foreach ($mitgliedschaften as $mitgliedschaft) {
+			$m = $this->parseMitgliedschaft($mitgliedschaft);
+			$m["count"] = $mitgliedschaft->getMitgliederCount();
+			$countPerMitgliedschaft[] = $m;
+		}
+		
+		$countPerState = array();
+		foreach ($states as $state) {
+			$s = $this->parseState($state);
+			$s["count"] = $state->getMitgliederCount();
+			$countPerState[] = $s;
+		}
+
 		$this->smarty->assign("mitgliedercount", $mitgliedercount);
-		$this->smarty->assign("mitgliedercountperms", $mitgliedercountperms);
-		$this->smarty->assign("mitgliedercountperstate", $mitgliedercountperstate);
+		$this->smarty->assign("mitgliedercountPerMitgliedschaft", $countPerMitgliedschaft);
+		$this->smarty->assign("mitgliedercountPerState", $countPerState);
 		$this->smarty->display("statistik.html.tpl");
 	}
 

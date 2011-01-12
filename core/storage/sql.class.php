@@ -171,7 +171,7 @@ abstract class SQLStorage implements Storage {
 		return true;
 	}
 	public function getRoleUserList($roleid) {
-		$sql = "SELECT `userid`, `username`, `password` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
 		return $this->fetchAsArray($this->query($sql), "userid", null, 'User');
 	}
 	public function setRoleUserList($roleid, $userids) {
@@ -204,7 +204,7 @@ abstract class SQLStorage implements Storage {
 	 * Mitglieder
 	 **/
 	public function getMitgliederCount() {
-		$sql = "SELECT	COUNT(*) as `count`
+		$sql = "SELECT	COUNT(`r`.`revisionid`) as `count`
 			FROM	`mitgliederrevisions` `r`
 			WHERE	`r`.`timestamp` = (
 				SELECT	MAX(`rmax`.`timestamp`)
@@ -214,7 +214,7 @@ abstract class SQLStorage implements Storage {
 	}
 
 	public function getMitgliederCountByMitgliedschaft($mitgliedschaftid) {
-		$sql = "SELECT	COUNT(*) as `count`
+		$sql = "SELECT	COUNT(`r`.`revisionid`) as `count`
 			FROM	`mitgliederrevisions` `r`
 			WHERE	`r`.`timestamp` = (
 				SELECT	MAX(`rmax`.`timestamp`)
@@ -225,7 +225,7 @@ abstract class SQLStorage implements Storage {
 	}
 
 	public function getMitgliederCountByState($stateid) {
-		$sql = "SELECT	COUNT(*) as `count`
+		$sql = "SELECT	COUNT(`r`.`revisionid`) as `count`
 			FROM	`mitgliederrevisions` `r`
 			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
 			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)

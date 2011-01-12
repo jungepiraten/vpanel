@@ -25,7 +25,7 @@ class DefaultConfig {
 
 	/** Mehrsprachen-Support **/
 	private $langs;
-	public function getLang($lang) {
+	public function getLang($lang = null) {
 		if (isset($this->langs[$lang])) {
 			return $this->langs[$lang];
 		}

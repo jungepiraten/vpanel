@@ -82,6 +82,9 @@ class Session {
 		$this->stor["lang"] = $lang;
 	}
 	public function getLang() {
+		if (!isset($this->stor["lang"])) {
+			return $this->config->getLang();
+		}
 		return $this->config->getLang($this->stor["lang"]);
 	}
 

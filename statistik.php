@@ -14,13 +14,8 @@ if (!$session->isAllowed("statistik_show")) {
 $storage = $session->getStorage();
 
 $mitgliedercount = $storage->getMitgliederCount();
-/**
-$mitgliedercountperms =  $storage->getMitgliederCountPerMs();
-$mitgliedercountperstate =  $storage->getMitgliederCountPerState();
-**/
-$mitgliedschaften = $storage->getMitgliedschaften();
-$states = $storage->getStates();
-// $states[$i]->getMitgliederCount();
-$ui->viewStatistik($mitgliedercount, $mitgliedercountperms, $mitgliedercountperstate);
+$mitgliedschaften = $storage->getMitgliedschaftList();
+$states = $storage->getStateList();
+$ui->viewStatistik($mitgliedercount, $mitgliedschaften, $states);
 
 ?>
