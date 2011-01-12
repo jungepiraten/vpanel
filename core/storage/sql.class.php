@@ -204,42 +204,36 @@ abstract class SQLStorage implements Storage {
 	 * Mitglieder
 	 **/
 	public function getMitgliederCount() {
-		$sql = "SELECT	`r`.`timestamp` AS `null`,
-				COUNT(`m`.`mitgliedid`) as `count`
-			FROM	`mitglieder` `m`
-			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
-			LEFT JOIN `mitgliederrevisions` `rmax` USING (`mitgliedid`)
-			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
-			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
-			ORDER BY `r`.`timestamp`";
+		$sql = "SELECT	COUNT(*) as `count`
+			FROM	`mitgliederrevisions` `r`
+			WHERE	`r`.`timestamp` = (
+				SELECT	MAX(`rmax`.`timestamp`)
+				FROM	`mitgliederrevisions` `rmax`
+				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)";
 		return reset(reset($this->fetchAsArray($this->query($sql))));
 	}
 
 	public function getMitgliederCountByMitgliedschaft($mitgliedschaftid) {
-		$sql = "SELECT	`r`.`timestamp` AS `null`,
-				COUNT(`m`.`mitgliedid`) as `count`
-			FROM	`mitglieder` `m`
-			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
-			LEFT JOIN `mitgliederrevisions` `rmax` USING (`mitgliedid`)
-			WHERE	`r`.`mitgliedschaftid` = " . intval($mitgliedschaftid) . "
-			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
-			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
-			ORDER BY `r`.`timestamp`";
+		$sql = "SELECT	COUNT(*) as `count`
+			FROM	`mitgliederrevisions` `r`
+			WHERE	`r`.`timestamp` = (
+				SELECT	MAX(`rmax`.`timestamp`)
+				FROM	`mitgliederrevisions` `rmax`
+				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)
+				AND `r`.`mitgliedschaftid` = " . intval($mitgliedschaftid);
 		return reset(reset($this->fetchAsArray($this->query($sql))));
 	}
 
 	public function getMitgliederCountByState($stateid) {
-		$sql = "SELECT	`r`.`timestamp` AS `null`,
-				COUNT(`m`.`mitgliedid`) as `count`
-			FROM	`mitglieder` `m`
-			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
-			LEFT JOIN `mitgliederrevisions` `rmax` USING (`mitgliedid`)
+		$sql = "SELECT	COUNT(*) as `count`
+			FROM	`mitgliederrevisions` `r`
 			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
 			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
-			WHERE	`o`.`stateid` = " . intval($stateid) . "
-			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
-			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
-			ORDER BY `r`.`timestamp`";
+			WHERE	`r`.`timestamp` = (
+				SELECT	MAX(`rmax`.`timestamp`)
+				FROM	`mitgliederrevisions` `rmax`
+				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)
+				AND `o`.`stateid` = " . intval($stateid);
 		return reset(reset($this->fetchAsArray($this->query($sql))));
 	}
     
