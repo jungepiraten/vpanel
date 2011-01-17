@@ -69,6 +69,17 @@ class Template {
 		return array_map(array($this, 'parsePermission'), $rows);
 	}
 
+	protected function parseMitgliederFilter($filter) {
+		$row = array();
+		$row["filterid"] = $filter->getFilterID();
+		$row["label"] = $filter->getLabel();
+		return $row;
+	}
+
+	protected function parseMitgliederFilters($rows) {
+		return array_map(array($this, 'parseMitgliederFilter'), $rows);
+	}
+
 	protected function parseMitglied($mitglied) {
 		$row = array();
 		$row["mitgliedid"] = $mitglied->getMitgliedID();
@@ -234,11 +245,12 @@ class Template {
 		$this->smarty->display("rolecreate.html.tpl");
 	}
 
-	public function viewMitgliederList($mitglieder, $mitgliedschaften, $page, $pagecount) {
+	public function viewMitgliederList($mitglieder, $mitgliedschaften, $filters, $page, $pagecount) {
 		$this->smarty->assign("page", $page);
 		$this->smarty->assign("pagecount", $pagecount);
 		$this->smarty->assign("mitglieder", $this->parseMitglieder($mitglieder));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
+		$this->smarty->assign("filters", $this->parseMitgliederFilters($filters));
 		$this->smarty->display("mitgliederlist.html.tpl");
 	}
 

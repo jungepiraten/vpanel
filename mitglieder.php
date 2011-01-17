@@ -153,7 +153,8 @@ default:
 
 	$mitglieder = $session->getStorage()->getMitgliederList($pagesize, $offset);
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
-	$ui->viewMitgliederList($mitglieder, $mitgliedschaften, $page, $pagecount);
+	$filters = $session->getStorage()->getMitgliederFilterList();
+	$ui->viewMitgliederList($mitglieder, $mitgliedschaften, $filters, $page, $pagecount);
 	exit;
 }
 

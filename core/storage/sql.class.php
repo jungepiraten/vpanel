@@ -4,6 +4,7 @@ require_once(VPANEL_CORE . "/storage.class.php");
 require_once(VPANEL_CORE . "/user.class.php");
 require_once(VPANEL_CORE . "/role.class.php");
 require_once(VPANEL_CORE . "/permission.class.php");
+require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 require_once(VPANEL_CORE . "/mitglied.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/mitgliedschaft.class.php");
@@ -198,6 +199,36 @@ abstract class SQLStorage implements Storage {
 	public function getGliederung($gliederungid) {
 		$sql = "SELECT `gliederungsid`, `label` FROM `gliederungen` WHERE `gliederungsid` = " . intval($gliederungid);
 		return reset($this->fetchAsArray($this->query($sql), "gliederungsid", null, 'Gliederung'));
+	}
+
+	/**
+	 * MitgliederFilter
+	 **/
+	public function getMitgliederFilterList() {
+		$sql = "SELECT	`mitgliederfilter`.`filterid`, `mitgliederfilter`.`label`
+			FROM	`mitgliederfilter`";
+		return $this->fetchAsArray($this->query($sql), "filterid", null, 'MitgliederFilter');
+	}
+
+	public function getMitgliederFilter($filterid) {
+		$sql = "SELECT	`mitgliederfilter`.`filterid`, `mitgliederfilter`.`label`
+			FROM	`mitgliederfilter`
+			WHERE	`mitgliederfilter`.`filterid` = " . intval($filterid);
+		return reset($this->fetchAsArray($this->query($sql), "filterid", null, 'MitgliederFilter'));
+	}
+
+	public function setMitgliederFilter($filterid, $label) {
+		if ($filterid == null) {
+			$sql = "INSERT INTO `mitgliederfilter` (`label`) VALUES ('" . $this->escape($label) . "')";
+		} else {
+			$sql = "UPDATE `mitgliederfilter` SET `label` = " . intval($filterid) . " WHERE `label` = '" . $this->escape($label) . "'";
+		}
+		$this->query($sql);
+		if ($filterid == null) {
+			return $this->getInsertID();
+		} else {
+			return $filterid;
+		}
 	}
 
 	/**

@@ -127,6 +127,10 @@ a:hover {
     background-color:#ffcb8c;
 }
 
+form.filter, form.filter fieldset {
+	display:inline;
+}
+
 .neuset {
     font-size:70%;
     color:white;
