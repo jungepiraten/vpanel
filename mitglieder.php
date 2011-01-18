@@ -143,17 +143,22 @@ case "delete":
 	$ui->redirect($session->getLink("mitglieder"));
 	exit;
 default:
+	$filter = null;
+	if (isset($_REQUEST["filterid"])) {
+		$filter = $config->getMitgliederFilter($_REQUEST["filterid"]);
+	}
+	
 	$pagesize = 20;
-	$pagecount = ceil($session->getStorage()->getMitgliederCount() / $pagesize);
+	$pagecount = ceil($session->getStorage()->getMitgliederCount($filter) / $pagesize);
 	$page = 0;
 	if (isset($_REQUEST["page"]) and $_REQUEST["page"] >= 0 and $_REQUEST["page"] < $pagecount) {
 		$page = intval($_REQUEST["page"]);
 	}
 	$offset = $page * $pagesize;
 
-	$mitglieder = $session->getStorage()->getMitgliederList($pagesize, $offset);
+	$mitglieder = $session->getStorage()->getMitgliederList($filter, $pagesize, $offset);
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
-	$filters = $session->getStorage()->getMitgliederFilterList();
+	$filters = $config->getMitgliederFilterList();
 	$ui->viewMitgliederList($mitglieder, $mitgliedschaften, $filters, $page, $pagecount);
 	exit;
 }

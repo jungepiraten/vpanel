@@ -24,7 +24,7 @@ class DefaultConfig {
 	}
 
 	/** Mehrsprachen-Support **/
-	private $langs;
+	private $langs = array();
 	public function getLang($lang = null) {
 		if (isset($this->langs[$lang])) {
 			return $this->langs[$lang];
@@ -33,6 +33,18 @@ class DefaultConfig {
 	}
 	public function registerLang($name, Language $lang) {
 		$this->langs[$name] = $lang;
+	}
+
+	/** Filter **/
+	private $mitgliederfilters = array();
+	public function getMitgliederFilterList() {
+		return $this->mitgliederfilters;
+	}
+	public function getMitgliederFilter($filterid) {
+		return $this->mitgliederfilters[$filterid];
+	}
+	public function registerMitgliederFilter($filter) {
+		$this->mitgliederfilters[$filter->getFilterID()] = $filter;
 	}
 
 	private $pages;

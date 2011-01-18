@@ -4,7 +4,6 @@ require_once(VPANEL_CORE . "/storage.class.php");
 require_once(VPANEL_CORE . "/user.class.php");
 require_once(VPANEL_CORE . "/role.class.php");
 require_once(VPANEL_CORE . "/permission.class.php");
-require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 require_once(VPANEL_CORE . "/mitglied.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/mitgliedschaft.class.php");
@@ -202,39 +201,10 @@ abstract class SQLStorage implements Storage {
 	}
 
 	/**
-	 * MitgliederFilter
-	 **/
-	public function getMitgliederFilterList() {
-		$sql = "SELECT	`mitgliederfilter`.`filterid`, `mitgliederfilter`.`label`
-			FROM	`mitgliederfilter`";
-		return $this->fetchAsArray($this->query($sql), "filterid", null, 'MitgliederFilter');
-	}
-
-	public function getMitgliederFilter($filterid) {
-		$sql = "SELECT	`mitgliederfilter`.`filterid`, `mitgliederfilter`.`label`
-			FROM	`mitgliederfilter`
-			WHERE	`mitgliederfilter`.`filterid` = " . intval($filterid);
-		return reset($this->fetchAsArray($this->query($sql), "filterid", null, 'MitgliederFilter'));
-	}
-
-	public function setMitgliederFilter($filterid, $label) {
-		if ($filterid == null) {
-			$sql = "INSERT INTO `mitgliederfilter` (`label`) VALUES ('" . $this->escape($label) . "')";
-		} else {
-			$sql = "UPDATE `mitgliederfilter` SET `label` = " . intval($filterid) . " WHERE `label` = '" . $this->escape($label) . "'";
-		}
-		$this->query($sql);
-		if ($filterid == null) {
-			return $this->getInsertID();
-		} else {
-			return $filterid;
-		}
-	}
-
-	/**
 	 * Mitglieder
 	 **/
-	public function getMitgliederCount() {
+	public function getMitgliederCount($filter = null) {
+		// TODO filter
 		$sql = "SELECT	COUNT(`r`.`revisionid`) as `count`
 			FROM	`mitgliederrevisions` `r`
 			WHERE	`r`.`timestamp` = (
@@ -244,6 +214,7 @@ abstract class SQLStorage implements Storage {
 		return reset(reset($this->fetchAsArray($this->query($sql))));
 	}
 
+	// TODO: depreaced - use filters!
 	public function getMitgliederCountByMitgliedschaft($mitgliedschaftid) {
 		$sql = "SELECT	COUNT(`r`.`revisionid`) as `count`
 			FROM	`mitgliederrevisions` `r`
@@ -268,7 +239,7 @@ abstract class SQLStorage implements Storage {
 		return reset(reset($this->fetchAsArray($this->query($sql))));
 	}
     
-	public function getMitgliederList($limit = null, $offset = null) {
+	public function getMitgliederList($filter = null, $limit = null, $offset = null) {
 		$sql = "SELECT	`r`.`timestamp` AS `null`,
 				`m`.`mitgliedid` as `m_mitgliedid`,
 				`m`.`globalid` as `m_globalid`,

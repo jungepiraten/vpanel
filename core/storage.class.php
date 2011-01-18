@@ -24,12 +24,8 @@ interface Storage {
 	public function getGliederungList();
 	public function getGliederung($gliederungid);
 
-	public function getMitgliederFilterList();
-	public function getMitgliederFilter($filterid);
-	public function setMitgliederFilter($filterid, $label);
-
-	public function getMitgliederList($limit = null, $offset = null);
-	public function getMitgliederCount();
+	public function getMitgliederList($filter = null, $limit = null, $offset = null);
+	public function getMitgliederCount($filter = null);
 	public function getMitgliederCountByState($stateid);
 	public function getMitgliederCountByMitgliedschaft($mitgliedschaftid);
 	public function getMitglied($mitgliedid);
