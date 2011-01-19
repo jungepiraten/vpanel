@@ -205,10 +205,10 @@ abstract class SQLStorage implements Storage {
 	 **/
 	protected function parseMitgliederMatcher($matcher) {
 		if ($matcher instanceof AndMitgliederMatcher) {
-			return "(" . implode(" AND ",array_map(array($this,'parseMitgliederMatcher'), $matcher->getConditions())) . ")"
+			return "(" . implode(" AND ",array_map(array($this,'parseMitgliederMatcher'), $matcher->getConditions())) . ")";
 		}
 		if ($matcher instanceof OrMitgliederMatcher) {
-			return "(" . implode(" OR ",array_map(array($this,'parseMitgliederMatcher'), $matcher->getConditions())) . ")"
+			return "(" . implode(" OR ",array_map(array($this,'parseMitgliederMatcher'), $matcher->getConditions())) . ")";
 		}
 		if ($matcher instanceof NotMitgliederMatcher) {
 			return "NOT " . $this->parseMitgliederMatcher($matcher->getCondition());
