@@ -52,7 +52,6 @@ class Mitglied extends GlobalClass {
 	}
 	
 	public function &getRevision($revisionid) {
-		// TODO getFromStorage
 		if (!isset($this->revisions[$revisionid]) or $this->revisions[$revisionid] == null) {
 			$this->revisions[$revisionid] = $this->getStorage()->getMitgliedRevision($revisionid);
 		}

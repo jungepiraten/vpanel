@@ -40,6 +40,9 @@ class DefaultConfig {
 	public function getMitgliederFilterList() {
 		return $this->mitgliederfilters;
 	}
+	public function hasMitgliederFilter($filterid) {
+		return isset($this->mitgliederfilters[$filterid]);
+	}
 	public function getMitgliederFilter($filterid) {
 		return $this->mitgliederfilters[$filterid];
 	}

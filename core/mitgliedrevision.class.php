@@ -226,6 +226,10 @@ class MitgliedRevision extends GlobalClass {
 		$this->kontaktid = $kontaktid;
 	}
 
+	public function isNatPerson() {
+		return $this->getNatPersonID() != null;
+	}
+
 	public function setNatPerson($natperson) {
 		$this->setNatPersonID($natperson == null ? null : $natperson->getNatPersonID());
 		$this->natperson = $natperson;
@@ -247,6 +251,10 @@ class MitgliedRevision extends GlobalClass {
 
 	public function getNatPersonID() {
 		return $this->natpersonid;
+	}
+
+	public function isJurPerson() {
+		return $this->getJurPersonID() != null;
 	}
 
 	public function setJurPerson($jurperson) {

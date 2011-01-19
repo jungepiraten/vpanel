@@ -144,7 +144,7 @@ case "delete":
 	exit;
 default:
 	$filter = null;
-	if (isset($_REQUEST["filterid"])) {
+	if (isset($_REQUEST["filterid"]) && $config->hasMitgliederFilter($_REQUEST["filterid"])) {
 		$filter = $config->getMitgliederFilter($_REQUEST["filterid"]);
 	}
 	

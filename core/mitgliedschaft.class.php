@@ -2,6 +2,7 @@
 
 require_once(VPANEL_CORE . "/storageobject.class.php");
 require_once(VPANEL_CORE . "/mailtemplate.class.php");
+require_once(VPANEL_CORE . "/mitgliedermatcher/mitgliedschaft.class.php");
 
 class Mitgliedschaft extends StorageClass {
 	private $mitgliedschaftid;
@@ -90,7 +91,7 @@ class Mitgliedschaft extends StorageClass {
 	}
 
 	public function getMitgliederCount() {
-		return $this->getStorage()->getMitgliederCountByMitgliedschaft($this->getMitgliedschaftID());
+		return $this->getStorage()->getMitgliederCount(new MitgliedschaftMitgliederMatcher($this->getMitgliedschaftID()));
 	}
 }
 

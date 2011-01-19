@@ -203,43 +203,54 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * Mitglieder
 	 **/
-	public function getMitgliederCount($filter = null) {
-		// TODO filter
-		$sql = "SELECT	COUNT(`r`.`revisionid`) as `count`
-			FROM	`mitgliederrevisions` `r`
-			WHERE	`r`.`timestamp` = (
-				SELECT	MAX(`rmax`.`timestamp`)
-				FROM	`mitgliederrevisions` `rmax`
-				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)";
-		return reset(reset($this->fetchAsArray($this->query($sql))));
+	protected function parseMitgliederMatcher($matcher) {
+		if ($matcher instanceof AndMitgliederMatcher) {
+			return "(" . implode(" AND ",array_map(array($this,'parseMitgliederMatcher'), $matcher->getConditions())) . ")"
+		}
+		if ($matcher instanceof OrMitgliederMatcher) {
+			return "(" . implode(" OR ",array_map(array($this,'parseMitgliederMatcher'), $matcher->getConditions())) . ")"
+		}
+		if ($matcher instanceof NotMitgliederMatcher) {
+			return "NOT " . $this->parseMitgliederMatcher($matcher->getCondition());
+		}
+		if ($matcher instanceof MitgliedschaftMitgliederMatcher) {
+			return "`r`.`mitgliedschaftid` = " . intval($matcher->getMitgliedschaftID());
+		}
+		if ($matcher instanceof StateMitgliederMatcher) {
+			return "`o`.`stateid` = " . intval($matcher->getStateID());
+		}
+		if ($matcher instanceof NatPersonMitgliederMatcher) {
+			return "`r`.`natpersonid` IS NOT NULL";
+		}
+		if ($matcher instanceof JurPersonMitgliederMatcher) {
+			return "`r`.`jurpersonid` IS NOT NULL";
+		}
+		throw new Exception("Not implemented: ".get_class($matcher));
 	}
 
-	// TODO: depreaced - use filters!
-	public function getMitgliederCountByMitgliedschaft($mitgliedschaftid) {
+	public function getMitgliederCount($matcher = null) {
+		if ($matcher instanceof MitgliederFilter) {
+			$matcher = $matcher->getMatcher();
+		}
 		$sql = "SELECT	COUNT(`r`.`revisionid`) as `count`
 			FROM	`mitgliederrevisions` `r`
-			WHERE	`r`.`timestamp` = (
-				SELECT	MAX(`rmax`.`timestamp`)
-				FROM	`mitgliederrevisions` `rmax`
-				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)
-				AND `r`.`mitgliedschaftid` = " . intval($mitgliedschaftid);
-		return reset(reset($this->fetchAsArray($this->query($sql))));
-	}
-
-	public function getMitgliederCountByState($stateid) {
-		$sql = "SELECT	COUNT(`r`.`revisionid`) as `count`
-			FROM	`mitgliederrevisions` `r`
+			LEFT JOIN `mitglieder` `m` ON (`m`.`mitgliedid` = `r`.`mitgliedid`)
+			LEFT JOIN `natperson` `n` ON (`n`.`natpersonid` = `r`.`natpersonid`)
+			LEFT JOIN `jurperson` `j` ON (`j`.`jurpersonid` = `r`.`jurpersonid`)
 			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
 			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
 			WHERE	`r`.`timestamp` = (
 				SELECT	MAX(`rmax`.`timestamp`)
 				FROM	`mitgliederrevisions` `rmax`
 				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)
-				AND `o`.`stateid` = " . intval($stateid);
+				".($matcher != null ? "AND ".$this->parseMitgliederMatcher($matcher) : "");
 		return reset(reset($this->fetchAsArray($this->query($sql))));
 	}
     
-	public function getMitgliederList($filter = null, $limit = null, $offset = null) {
+	public function getMitgliederList($matcher = null, $limit = null, $offset = null) {
+		if ($matcher instanceof MitgliederFilter) {
+			$matcher = $matcher->getMatcher();
+		}
 		$sql = "SELECT	`r`.`timestamp` AS `null`,
 				`m`.`mitgliedid` as `m_mitgliedid`,
 				`m`.`globalid` as `m_globalid`,
@@ -284,6 +295,7 @@ abstract class SQLStorage implements Storage {
 			LEFT JOIN `jurperson` `j` ON (`j`.`jurpersonid` = `r`.`jurpersonid`)
 			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
 			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
+			".($matcher != null ? "WHERE ".$this->parseMitgliederMatcher($matcher) : "")."
 			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
 			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
 			ORDER BY `r`.`timestamp`";

@@ -26,8 +26,6 @@ interface Storage {
 
 	public function getMitgliederList($filter = null, $limit = null, $offset = null);
 	public function getMitgliederCount($filter = null);
-	public function getMitgliederCountByState($stateid);
-	public function getMitgliederCountByMitgliedschaft($mitgliedschaftid);
 	public function getMitglied($mitgliedid);
 	public function setMitglied($mitgliedid, $globalid, $eintritt, $austritt);
 
