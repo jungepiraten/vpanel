@@ -76,7 +76,7 @@ case "delete":
 	}
 	$roleid = intval($_REQUEST["roleid"]);
 	$session->getStorage()->delRole($roleid);
-	$ui->redirect();
+	$ui->redirect($session->getLink("roles"));
 	exit;
 default:
 	$roles = $session->getStorage()->getRoleList();

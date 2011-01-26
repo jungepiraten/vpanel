@@ -29,6 +29,10 @@ $lang['mitglieder_show']	= 'Mitglieder anzeigen';
 $lang['mitglieder_modify']	= 'Mitglied bearbeiten';
 $lang['mitglieder_create']	= 'Mitglied anlegen';
 $lang['mitglieder_delete']	= 'Mitglied löschen';
+$lang['mailtemplates_show']	= 'Mailvorlagen anzeigen';
+$lang['mailtemplates_modify']	= 'Mailvorlagen bearbeiten';
+$lang['mailtemplates_create']	= 'Mailvorlagen anlegen';
+$lang['mailtemplates_delete']	= 'Mailvorlagen löschen';
 $lang['statistik_show']     = 'Mitgliederstatistik anzeigen';
 
 ?>

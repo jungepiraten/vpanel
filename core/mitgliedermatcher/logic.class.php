@@ -2,6 +2,18 @@
 
 require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 
+class TrueMitgliederMatcher extends MitgliederMatcher {
+	public function match(Mitglied $mitglied) {
+		return true;
+	}
+}
+
+class FalseMitgliederMatcher extends MitgliederMatcher {
+	public function match(Mitglied $mitglied) {
+		return false;
+	}
+}
+
 abstract class LinkedLogicMitgliederMatcher extends MitgliederMatcher {
 	protected $filters;
 
@@ -11,18 +23,6 @@ abstract class LinkedLogicMitgliederMatcher extends MitgliederMatcher {
 
 	public function getConditions() {
 		return $this->filters;
-	}
-}
-
-abstract class SingleLogicMitgliederMatcher extends MitgliederMatcher {
-	protected $filter;
-
-	public function __construct($filter) {
-		$this->filter = $filter;
-	}
-
-	public function getCondition() {
-		return $this->filter;
 	}
 }
 
@@ -43,6 +43,18 @@ class OrMitgliederMatcher extends LinkedLogicMitgliederMatcher {
 			$m = $m || $filter->match($mitglied);
 		}
 		return $m;
+	}
+}
+
+abstract class SingleLogicMitgliederMatcher extends MitgliederMatcher {
+	protected $filter;
+
+	public function __construct($filter) {
+		$this->filter = $filter;
+	}
+
+	public function getCondition() {
+		return $this->filter;
 	}
 }
 

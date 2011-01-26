@@ -34,6 +34,10 @@ class Template {
 		return call_user_func_array(array($this->session, "getLink"), $params);
 	}
 	
+	private function getStorage() {
+		return $this->session->getConfig()->getStorage();
+	}
+	
 	protected function parseUser($user) {
 		$row = array();
 		$row["userid"] = $user->getUserID();
@@ -67,6 +71,22 @@ class Template {
 
 	protected function parsePermissions($rows) {
 		return array_map(array($this, 'parsePermission'), $rows);
+	}
+
+	protected function parseMailTemplate($template) {
+		$row = array();
+		$row["templateid"] = $template->getTemplateID();
+		$row["label"] = $template->getLabel();
+		$row["body"] = $template->getBody();
+		$row["headers"] = array();
+		foreach ($template->getHeaders() as $header) {
+			$row["headers"][$header->getField()] = $header->getValue();
+		}
+		return $row;
+	}
+
+	protected function parseMailTemplates($rows) {
+		return array_map(array($this, 'parseMailTemplate'), $rows);
 	}
 
 	protected function parseMitgliederFilter($filter) {
@@ -245,7 +265,20 @@ class Template {
 		$this->smarty->display("rolecreate.html.tpl");
 	}
 
-	public function viewMitgliederList($mitglieder, $mitgliedschaften, $filters, $page, $pagecount) {
+	public function viewMailTemplateList($mailtemplates) {
+		$this->smarty->assign("mailtemplates", $this->parseMailTemplates($mailtemplates));
+		$this->smarty->display("mailtemplatelist.html.tpl");
+	}
+
+	public function viewMailTemplateDetails($mailtemplate) {
+		$this->smarty->assign("mailtemplate", $this->parseMailTemplate($mailtemplate));
+		$this->smarty->display("mailtemplatedetails.html.tpl");
+	}
+
+	public function viewMitgliederList($mitglieder, $mitgliedschaften, $filters, $filter, $page, $pagecount) {
+		if ($filter != null) {
+			$this->smarty->assign("filter", $this->parseMitgliederFilter($filter));
+		}
 		$this->smarty->assign("page", $page);
 		$this->smarty->assign("pagecount", $pagecount);
 		$this->smarty->assign("mitglieder", $this->parseMitglieder($mitglieder));
@@ -267,6 +300,16 @@ class Template {
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
 		$this->smarty->assign("states", $this->parseStates($states));
 		$this->smarty->display("mitgliedercreate.html.tpl");
+	}
+
+	public function viewMitgliederSendMailForm($filters, $templates) {
+		$this->smarty->assign("filters", $this->parseMitgliederFilters($filters));
+		$this->smarty->assign("mailtemplates", $this->parseMailTemplates($templates));
+		$this->smarty->display("mitgliedersendmailform.html.tpl");
+	}
+
+	public function viewMitgliederSendMailPreview() {
+		$this->smarty->display("mitgliedersendmailpreview.html.tpl");
 	}
 
 	public function viewStatistik($mitgliedercount, $mitgliedschaften, $states) {

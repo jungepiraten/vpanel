@@ -1,9 +1,5 @@
 <?php
 
-if (isset($_REQUEST["ajax"])) {
-	die(json_encode(array("test" => "du doof")));
-}
-
 require_once(dirname(__FILE__) . "/config.inc.php");
 
 require_once(VPANEL_UI . "/session.class.php");
@@ -142,6 +138,41 @@ case "delete":
 
 	$ui->redirect($session->getLink("mitglieder"));
 	exit;
+case "sendmail":
+case "sendmail.select":
+	$filters = $config->getMitgliederFilterList();
+	$templates = $session->getStorage()->getMailTemplateList();
+
+	$ui->viewMitgliederSendMailForm($filters, $templates);
+	exit;
+case "sendmail.preview":
+	$filter = null;
+	if (isset($_REQUEST["filterid"]) && $config->hasMitgliederFilter($_REQUEST["filterid"])) {
+		$filter = $config->getMitgliederFilter($_REQUEST["filterid"]);
+	}
+	$mailtemplate = $session->getStorage()->getMailTemplate($_REQUEST["mailtemplateid"]);
+
+	$mitgliedercount = $session->getStorage()->getMitgliederCount($filter);
+	$mitglied = array_shift($session->getStorage()->getMitgliederList($filter, 1, rand(0,$mitgliedercount-1)));
+
+var_dump($mitglied);
+	$mailtemplate->generateMail($mitglied);
+
+	$ui->viewMitgliederSendMailPreview($filter, $mailtemplate);
+	exit;
+case "sendmail.send":
+	$filter = null;
+	if (isset($_REQUEST["filterid"]) && $config->hasMitgliederFilter($_REQUEST["filterid"])) {
+		$filter = $config->getMitgliederFilter($_REQUEST["filterid"]);
+	}
+	$mailtemplate = $session->getStorage()->getMailTemplate($_REQUEST["mailtemplateid"]);
+
+	$mitglieder = $session->getStorage()->getMitglieder($filter);
+	
+	// TODO zu einem "taskmanager" deligieren?
+	// hier zu arbeiten wäre fies - das werden bis zu 10000 mails auf einmal und bricht auf jeden fall gegen die max_execution_time
+	
+	exit;
 default:
 	$filter = null;
 	if (isset($_REQUEST["filterid"]) && $config->hasMitgliederFilter($_REQUEST["filterid"])) {
@@ -159,7 +190,7 @@ default:
 	$mitglieder = $session->getStorage()->getMitgliederList($filter, $pagesize, $offset);
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
 	$filters = $config->getMitgliederFilterList();
-	$ui->viewMitgliederList($mitglieder, $mitgliedschaften, $filters, $page, $pagecount);
+	$ui->viewMitgliederList($mitglieder, $mitgliedschaften, $filters, $filter, $page, $pagecount);
 	exit;
 }
 

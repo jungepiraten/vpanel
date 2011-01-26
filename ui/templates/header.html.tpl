@@ -28,6 +28,9 @@
 {if $session->isAllowed("mitglieder_show")}
 <li><a href="{"mitglieder"|___}">{"Mitgliederverwaltung"|__}</a></li>
 {/if}
+{if $session->isAllowed("mailtemplates_show")}
+<li><a href="{"mailtemplates"|___}">{"Mailverwaltung"|__}</a></li>
+{/if}
 {if $session->isAllowed("statistik_show")}
 <li><a href="{"statistik"|___}">{"Mitgliederstatistik"|__}</a></li>
 {/if}

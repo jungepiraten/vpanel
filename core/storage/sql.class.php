@@ -10,8 +10,8 @@ require_once(VPANEL_CORE . "/mitgliedschaft.class.php");
 require_once(VPANEL_CORE . "/natperson.class.php");
 require_once(VPANEL_CORE . "/jurperson.class.php");
 require_once(VPANEL_CORE . "/mailtemplate.class.php");
-require_once(VPANEL_CORE . "/mailattachment.class.php");
-require_once(VPANEL_CORE . "/mailheader.class.php");
+require_once(VPANEL_CORE . "/mailtemplateattachment.class.php");
+require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
 
 abstract class SQLStorage implements Storage {
 	public function __construct() {}
@@ -50,7 +50,7 @@ abstract class SQLStorage implements Storage {
 			if ($keyfield === null) {
 				$rows[] = $item;
 			} else {
-				$rows[$row[$keyfield]] = $item;
+				$rows[strtolower($row[$keyfield])] = $item;
 			}
 		}
 		return $rows;
@@ -204,6 +204,12 @@ abstract class SQLStorage implements Storage {
 	 * Mitglieder
 	 **/
 	protected function parseMitgliederMatcher($matcher) {
+		if ($matcher instanceof TrueMitgliederMatcher) {
+			return "1";
+		}
+		if ($matcher instanceof FalseMitgliederMatcher) {
+			return "0";
+		}
 		if ($matcher instanceof AndMitgliederMatcher) {
 			return "(" . implode(" AND ",array_map(array($this,'parseMitgliederMatcher'), $matcher->getConditions())) . ")";
 		}
@@ -744,42 +750,60 @@ abstract class SQLStorage implements Storage {
 	 * MailTemplates
 	 **/
 	public function getMailTemplateList() {
-		$sql = "SELECT `templateid`, `body` FROM `mailtemplates`";
+		$sql = "SELECT `templateid`, `label`, `body` FROM `mailtemplates`";
 		return $this->fetchAsArray($this->query($sql), "templateid", null, 'MailTemplate');
 	}
 	public function getMailTemplate($mailtemplateid) {
-		$sql = "SELECT `templateid`, `body` FROM `mailtemplates` WHERE `templateid` = " . intval($mailtemplateid);
+		$sql = "SELECT `templateid`, `label`, `body` FROM `mailtemplates` WHERE `templateid` = " . intval($mailtemplateid);
 		return reset($this->fetchAsArray($this->query($sql), "templateid", null, 'MailTemplate'));
 	}
-	public function setMailTemplate($mailtemplateid, $body) {
-		if ($mailtemplateid == null) {
-			$sql = "INSERT INTO `mailtemplates` (`body`) VALUES ('" . $this->escape($body) . "')";
+	public function setMailTemplate($templateid, $label, $body) {
+		if ($templateid == null) {
+			$sql = "INSERT INTO `mailtemplates` (`label`, `body`) VALUES ('" . $this->escape($label) . "', '" . $this->escape($body) . "')";
 		} else {
-			$sql = "UPDATE `mailtemplates` SET `body` = '" . $this->escape($body) . "' WHERE `templateid` = " . intval($mailtemplateid);
+			$sql = "UPDATE `mailtemplates` SET `body` = '" . $this->escape($body) . "', `label` = '" . $this->escape($label) . "' WHERE `templateid` = " . intval($templateid);
 		}
 		$this->query($sql);
-		if ($mailtemplateid == null) {
-			$mailtemplateid = $this->getInsertID();
+		if ($templateid == null) {
+			$templateid = $this->getInsertID();
 		}
-		return $mailtemplateid;
+		return $templateid;
 	}
 	public function delMailTemplate($mailtemplateid) {
 		$sql = "DELETE FROM `mailtemplates` WHERE `mailtemplateid` = " . intval($mailtemplateid);
 		return $this->query($sql);
 	}
 	public function getMailTemplateHeaderList($mailtemplateid) {
-		$sql = "SELECT `mailheaders`.`headerid`, `mailheader`.`label`, `mailtemplateheaders`.`value` FROM `mailheaders` LEFT JOIN `mailtemplateheaders` ON (`mailtemplateheaders`.`headerid` = `mailheader`.`headerid`) WHERE `mailtemplateheaders`.`templateid` = " . intval($mailtemplateid);
-		return $this->fetchAsArray($this->query($sql), "headerid", null, 'MailTemplateHeader');
+		$sql = "SELECT `templateid`, `field`, `value` FROM `mailtemplateheaders` WHERE `templateid` = " . intval($mailtemplateid);
+		return $this->fetchAsArray($this->query($sql), "field", null, 'MailTemplateHeader');
 	}
-	public function setMailTemplateHeaderList($mailtemplateid, $headerids, $values) {
-		// TODO
+	public function setMailTemplateHeaderList($templateid, $fields, $values) {
+		$sql = "DELETE FROM `mailtemplateheaders` WHERE `templateid` = " . intval($templateid);
+		$this->query($sql);
+		$sqlinserts = array();
+		while (count($fields) > 0) {
+			$sqlinserts[] = "(" . intval($templateid) . ", '" . $this->escape(array_shift($fields)) . "', '" . $this->escape(array_shift($values)) . "')";
+		}
+		if (count($sqlinserts) > 0) {
+			$sql = "INSERT INTO `mailtemplateheaders` (`templateid`, `field`, `value`) VALUES " . implode(", ", $sqlinserts);
+			$this->query($sql);
+		}
 	}
 	public function getMailTemplateAttachmentList($mailtemplateid) {
-		$sql = "SELECT `mailattachments.`.`attachmentid`, `mailattachments`.`filename`, `mailattachments`.`mimename`, `mailattachments`.`content` FROM `mailattachments` LEFT JOIN `mailtemplateattachments` ON (`mailtemplateattachments`.`attachmentid` = `mailattachment`.`attachmentid`) WHERE `mailtemplateattachments`.`templateid` = " . intval($mailtemplateid);
-		return $this->fetchAsArray($this->query($sql), "headerid", null, 'MailTemplateAttachments');
+		$sql = "SELECT `mailattachments.`.`attachmentid`, `mailattachments`.`filename`, `mailattachments`.`mimename`, `mailattachments`.`content` FROM `mailtemplateattachments` LEFT JOIN `mailattachments` ON (`mailtemplateattachments`.`attachmentid` = `mailattachment`.`attachmentid`) WHERE `mailtemplateattachments`.`templateid` = " . intval($mailtemplateid);
+		return $this->fetchAsArray($this->query($sql), "headerid", null, 'MailTemplateAttachment');
 	}
 	public function setMailTemplateAttachmentList($mailtemplateid, $attachments) {
-		// TODO
+		$sql = "DELETE FROM `mailtemplateattachments` WHERE `templateid` = " . intval($templateid);
+		$this->query($sql);
+		$sqlinserts = array();
+		while (count($attachments) > 0) {
+			$sqlinserts[] = "(" . intval($templateid) . ", '" . $this->escape(array_shift($attachments)) . "')";
+		}
+		if (count($sqlinserts) > 0) {
+			$sql = "INSERT INTO `mailtemplateattachments` (`templateid`, `attachmentid`) VALUES " . implode(", ", $sqlinserts);
+			$this->query($sql);
+		}
 	}
 
 	/**

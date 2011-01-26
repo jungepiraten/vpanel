@@ -72,7 +72,7 @@ interface Storage {
 
 	public function getMailTemplateList();
 	public function getMailTemplate($mailtemplateid);
-	public function setMailTemplate($mailtemplateid, $body);
+	public function setMailTemplate($mailtemplateid, $label, $body);
 	public function delMailTemplate($mailtemplateid);
 	public function getMailTemplateHeaderList($mailtemplateid);
 	public function setMailTemplateHeaderList($mailtemplateid, $headerids, $values);
