@@ -14,7 +14,19 @@ class Mail {
 	}
 
 	private function replaceText($text) {
-		return str_replace($text, $this->replace);
+		return str_replace(array_keys($this->replace), array_values($this->replace), $text);
+	}
+
+	public function getHeaders() {
+		$headers = array();
+		foreach ($this->template->getHeaders() as $header) {
+			$headers[$header->getField()] = $this->replaceText($header->getValue());
+		}
+		return $headers;
+	}
+
+	public function getBody() {
+		return $this->replaceText($this->template->getBody());
 	}
 
 	/**
@@ -25,7 +37,7 @@ class Mail {
 	}
 
 	public function getRawBody() {
-		return $this->replaceText($this->template->getBody());
+		
 	}
 }
 

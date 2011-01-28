@@ -73,6 +73,20 @@ class Template {
 		return array_map(array($this, 'parsePermission'), $rows);
 	}
 
+	protected function parseMail($mail) {
+		$row = array();
+		$row["headers"] = array();
+		foreach ($mail->getHeaders() as $headerfield => $headervalue) {
+			$row["headers"][$headerfield] = $headervalue;
+		}
+		$row["body"] = $mail->getBody();
+		return $row;
+	}
+
+	protected function parseMails($rows) {
+		return array_map(array($this, 'parseMail'), $rows);
+	}
+
 	protected function parseMailTemplate($template) {
 		$row = array();
 		$row["templateid"] = $template->getTemplateID();
@@ -325,7 +339,10 @@ class Template {
 		$this->smarty->display("mitgliedersendmailform.html.tpl");
 	}
 
-	public function viewMitgliederSendMailPreview() {
+	public function viewMitgliederSendMailPreview($mail, $filter, $mailtemplate) {
+		$this->smarty->assign("mail", $this->parseMail($mail));
+		$this->smarty->assign("filter", $this->parseMitgliederFilter($filter));
+		$this->smarty->assign("mailtemplate", $this->parseMailTemplate($mailtemplate));
 		$this->smarty->display("mitgliedersendmailpreview.html.tpl");
 	}
 

@@ -154,12 +154,9 @@ case "sendmail.preview":
 
 	$mitgliedercount = $session->getStorage()->getMitgliederCount($filter);
 	$mitglied = array_shift($session->getStorage()->getMitgliederList($filter, 1, rand(0,$mitgliedercount-1)));
-
-var_dump($mitglied);
 	$mail = $mailtemplate->generateMail($mitglied);
-var_dump($mail);
 
-	$ui->viewMitgliederSendMailPreview($filter, $mailtemplate);
+	$ui->viewMitgliederSendMailPreview($mail, $filter, $mailtemplate);
 	exit;
 case "sendmail.send":
 	$filter = null;
