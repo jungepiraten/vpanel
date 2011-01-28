@@ -7,9 +7,9 @@ $session = $config->getSession();
 $ui = $session->getTemplate();
 
 // Login-Seite
-if (isset($_POST["login"])) {
-	$username = stripslashes($_POST["username"]);
-	$password = stripslashes($_POST["password"]);
+if ($session->getBoolVariable("login")) {
+	$username = $session->getVariable("username");
+	$password = $session->getVariable("password");
 
 	try {
 		$session->login($username, $password);
@@ -20,7 +20,7 @@ if (isset($_POST["login"])) {
 	}
 }
 
-if (isset($_REQUEST["logout"])) {
+if ($session->getBoolVariable("logout")) {
 	$session->logout();
 	$ui->redirect();
 }

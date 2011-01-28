@@ -3,13 +3,13 @@
 require_once(VPANEL_CORE . "/storageobject.class.php");
 require_once(VPANEL_CORE . "/mail.class.php");
 require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
-require_once(VPANEL_CORE . "/mailtemplateattachment.class.php");
 
 class MailTemplate extends StorageClass {
 	private $templateid;
 	private $label;
 	private $body;
 	private $headers;
+	private $attachments;
 
 	public static function factory(Storage $storage, $row) {
 		$kontakt = new MailTemplate($storage);
@@ -61,6 +61,10 @@ class MailTemplate extends StorageClass {
 			}
 			$storage->setMailTemplateHeaderList($this->getTemplateID(), $headerfields, $headervalues);
 		}
+
+		if (isset($this->attachments)) {
+			$storage->setMailTemplateAttachmentList($this->getTemplateID(), array_keys($this->attachments));
+		}
 	}
 
 	public function getHeaders() {
@@ -81,9 +85,24 @@ class MailTemplate extends StorageClass {
 	public function setHeader($field, $value) {
 		$this->headers[strtolower($field)] = new MailTemplateHeader($this->getStorage(), $this->getTemplateID(), $field, $value);
 	}
+
+	public function getAttachments() {
+		if ($this->attachments == null) {
+			$this->attachments = $this->getStorage()->getMailTemplateAttachmentList($this->getTemplateID());
+		}
+		return $this->attachments;
+	}
+
+	public function delAttachment($attachmentid) {
+		unset($this->attachments[$attachmentid]);
+	}
+	
+	public function addAttachment($attachment) {
+		$this->attachments[$attachment->getAttachmentID()] = $attachment;
+	}
 	
 	public function generateMail(Mitglied $mitglied) {
-		$mail = new Mail();
+		$mail = new Mail($this);
 		// TODO viel!
 		return $mail;
 	}

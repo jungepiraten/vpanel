@@ -91,6 +91,27 @@ class Session {
 	public function getEncoding() {
 		return "UTF-8";
 	}
+	public function hasVariable($name) {
+		return isset($_REQUEST[$name]);
+	}
+	public function getVariable($name) {
+		return iconv($this->getEncoding(), "UTF-8", stripslashes($_REQUEST[$name]));
+	}
+	public function getDoubleVariable($name) {
+		return doubleval($_REQUEST[$name]);
+	}
+	public function getIntVariable($name) {
+		return intval($_REQUEST[$name]);
+	}
+	public function getBoolVariable($name) {
+		return isset($_REQUEST[$name]) && $_REQUEST[$name];
+	}
+	public function getListVariable($name) {
+		return $_REQUEST[$name];
+	}
+	public function encodeString($string) {
+		return iconv("UTF-8", $this->getEncoding(), $string);
+	}
 
 	public function getLink() {
 		$params = func_get_args();

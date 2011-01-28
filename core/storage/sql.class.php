@@ -10,13 +10,14 @@ require_once(VPANEL_CORE . "/mitgliedschaft.class.php");
 require_once(VPANEL_CORE . "/natperson.class.php");
 require_once(VPANEL_CORE . "/jurperson.class.php");
 require_once(VPANEL_CORE . "/mailtemplate.class.php");
-require_once(VPANEL_CORE . "/mailtemplateattachment.class.php");
+require_once(VPANEL_CORE . "/mailattachment.class.php");
 require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
 
 abstract class SQLStorage implements Storage {
 	public function __construct() {}
 	
 	abstract protected function query($sql);
+	abstract protected function getEncoding();
 	abstract protected function fetchRow($result);
 	abstract protected function getInsertID();
 
@@ -37,7 +38,7 @@ abstract class SQLStorage implements Storage {
 							$item[$col] = $val;
 						} else {
 							list($prefix, $col) = explode("_", $col, 2);
-							$values[$prefix][$col] = $val;
+							$values[$prefix][$col] = iconv($this->getEncoding(), "UTF-8", $val);
 						}
 					}
 					foreach ($class as $l => $c) {
@@ -770,7 +771,11 @@ abstract class SQLStorage implements Storage {
 		return $templateid;
 	}
 	public function delMailTemplate($mailtemplateid) {
-		$sql = "DELETE FROM `mailtemplates` WHERE `mailtemplateid` = " . intval($mailtemplateid);
+		$sql = "DELETE FROM `mailtemplateheaders` WHERE `templateid` = " . intval($mailtemplateid);
+		$this->query($sql);
+		$sql = "DELETE FROM `mailtemplateattachments` WHERE `templateid` = " . intval($mailtemplateid);
+		$this->query($sql);
+		$sql = "DELETE FROM `mailtemplates` WHERE `templateid` = " . intval($mailtemplateid);
 		return $this->query($sql);
 	}
 	public function getMailTemplateHeaderList($mailtemplateid) {
@@ -790,8 +795,8 @@ abstract class SQLStorage implements Storage {
 		}
 	}
 	public function getMailTemplateAttachmentList($mailtemplateid) {
-		$sql = "SELECT `mailattachments.`.`attachmentid`, `mailattachments`.`filename`, `mailattachments`.`mimename`, `mailattachments`.`content` FROM `mailtemplateattachments` LEFT JOIN `mailattachments` ON (`mailtemplateattachments`.`attachmentid` = `mailattachment`.`attachmentid`) WHERE `mailtemplateattachments`.`templateid` = " . intval($mailtemplateid);
-		return $this->fetchAsArray($this->query($sql), "headerid", null, 'MailTemplateAttachment');
+		$sql = "SELECT `mailattachments`.`attachmentid`, `mailattachments`.`filename`, `mailattachments`.`mimetype`, `mailattachments`.`content` FROM `mailtemplateattachments` LEFT JOIN `mailattachments` ON (`mailtemplateattachments`.`attachmentid` = `mailattachments`.`attachmentid`) WHERE `mailtemplateattachments`.`templateid` = " . intval($mailtemplateid);
+		return $this->fetchAsArray($this->query($sql), "attachmentid", null, 'MailAttachment');
 	}
 	public function setMailTemplateAttachmentList($mailtemplateid, $attachments) {
 		$sql = "DELETE FROM `mailtemplateattachments` WHERE `templateid` = " . intval($templateid);

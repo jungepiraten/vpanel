@@ -15,29 +15,29 @@ require_once(VPANEL_CORE . "/mitglied.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 
 function parseMitgliederFormular($session, &$mitglied = null) {
-	$persontyp = stripslashes($_POST["persontyp"]);
-	$name = stripslashes($_POST["name"]);
-	$vorname = stripslashes($_POST["vorname"]);
-	$geburtsdatum = strtotime($_POST["geburtsdatum"]);
-	$nationalitaet = stripslashes($_POST["nationalitaet"]);
-	$firma = stripslashes($_POST["firma"]);
-	$strasse = stripslashes($_POST["strasse"]);
-	$hausnummer = stripslashes($_POST["hausnummer"]);
+	$persontyp = $session->getVariable("persontyp");
+	$name = $session->getVariable("name");
+	$vorname = $session->getVariable("vorname");
+	$geburtsdatum = strtotime($session->getVariable("geburtsdatum"));
+	$nationalitaet = $session->getVariable("nationalitaet");
+	$firma = $session->getVariable("firma");
+	$strasse = $session->getVariable("strasse");
+	$hausnummer = $session->getVariable("hausnummer");
 	$ortid = is_numeric($_POST["ortid"]) ? $_POST["ortid"] : null;
-	$plz = stripslashes($_POST["plz"]);
-	$ortname = stripslashes($_POST["ort"]);
+	$plz = $session->getVariable("plz");
+	$ortname = $session->getVariable("ort");
 	$stateid = is_numeric($_POST["stateid"]) ? $_POST["stateid"] : null;
-	$telefon = stripslashes($_POST["telefon"]);
-	$handy = stripslashes($_POST["handy"]);
-	$email = stripslashes($_POST["email"]);
+	$telefon = $session->getVariable("telefon");
+	$handy = $session->getVariable("handy");
+	$email = $session->getVariable("email");
 	// $gliederungid = intval($_POST["gliederungid"]);
 	$gliederungid = 1;
 	$gliederung = $session->getStorage()->getGliederung($gliederungid);
-	$mitgliedschaftid = intval($_REQUEST["mitgliedschaftid"]);
+	$mitgliedschaftid = $session->getIntVariable("mitgliedschaftid");
 	$mitgliedschaft = $session->getStorage()->getMitgliedschaft($mitgliedschaftid);
-	$mitgliedpiraten = isset($_POST["mitglied_piraten"]);
-	$verteilereingetragen = isset($_POST["verteiler_eingetragen"]);
-	$beitrag = doubleval($_POST["beitrag"]);
+	$mitgliedpiraten = $session->getVariable("mitglied_piraten");
+	$verteilereingetragen = $session->getVariable("verteiler_eingetragen");
+	$beitrag = $session->getDoubleVariable("beitrag");
 
 	$natperson = null;
 	$jurperson = null;
@@ -78,12 +78,12 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 	$revision->save();
 }
 
-switch (isset($_REQUEST["mode"]) ? stripslashes($_REQUEST["mode"]) : null) {
+switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
 case "details":
-	$mitgliedid = intval($_REQUEST["mitgliedid"]);
+	$mitgliedid = intval($session->getVariable("mitgliedid"));
 	$mitglied = $session->getStorage()->getMitglied($mitgliedid);
 
-	if (isset($_REQUEST["save"])) {
+	if ($session->getBoolVariable("save")) {
 		if (!$session->isAllowed("mitglieder_modify")) {
 			$ui->viewLogin();
 			exit;
@@ -101,10 +101,10 @@ case "details":
 	$ui->viewMitgliedDetails($mitglied, $mitgliedschaften, $states);
 	exit;
 case "create":
-	$mitgliedschaftid = intval($_REQUEST["mitgliedschaftid"]);
+	$mitgliedschaftid = intval($session->getVariable("mitgliedschaftid"));
 	$mitgliedschaft = $session->getStorage()->getMitgliedschaft($mitgliedschaftid);
 
-	if (isset($_REQUEST["save"])) {
+	if ($session->getBoolVariable("save")) {
 		if (!$session->isAllowed("mitglieder_create")) {
 			$ui->viewLogin();
 			exit;
@@ -125,7 +125,7 @@ case "delete":
 		$ui->viewLogin();
 		exit;
 	}
-	$mitgliedid = intval($_REQUEST["mitgliedid"]);
+	$mitgliedid = $session->getIntVariable("mitgliedid");
 	$mitglied = $session->getStorage()->getMitglied($mitgliedid);
 	$mitglied->setAustrittsdatum(time());
 	$mitglied->save();
@@ -147,25 +147,26 @@ case "sendmail.select":
 	exit;
 case "sendmail.preview":
 	$filter = null;
-	if (isset($_REQUEST["filterid"]) && $config->hasMitgliederFilter($_REQUEST["filterid"])) {
-		$filter = $config->getMitgliederFilter($_REQUEST["filterid"]);
+	if ($session->hasVariable("filterid") && $config->hasMitgliederFilter($session->getVariable("filterid"))) {
+		$filter = $config->getMitgliederFilter($session->getVariable("filterid"));
 	}
-	$mailtemplate = $session->getStorage()->getMailTemplate($_REQUEST["mailtemplateid"]);
+	$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("mailtemplateid"));
 
 	$mitgliedercount = $session->getStorage()->getMitgliederCount($filter);
 	$mitglied = array_shift($session->getStorage()->getMitgliederList($filter, 1, rand(0,$mitgliedercount-1)));
 
 var_dump($mitglied);
-	$mailtemplate->generateMail($mitglied);
+	$mail = $mailtemplate->generateMail($mitglied);
+var_dump($mail);
 
 	$ui->viewMitgliederSendMailPreview($filter, $mailtemplate);
 	exit;
 case "sendmail.send":
 	$filter = null;
-	if (isset($_REQUEST["filterid"]) && $config->hasMitgliederFilter($_REQUEST["filterid"])) {
-		$filter = $config->getMitgliederFilter($_REQUEST["filterid"]);
+	if ($session->hasVariable("filterid") && $config->hasMitgliederFilter($session->getVariable("filterid"))) {
+		$filter = $config->getMitgliederFilter($session->getVariable("filterid"));
 	}
-	$mailtemplate = $session->getStorage()->getMailTemplate($_REQUEST["mailtemplateid"]);
+	$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("mailtemplateid"));
 
 	$mitglieder = $session->getStorage()->getMitglieder($filter);
 	
@@ -175,15 +176,15 @@ case "sendmail.send":
 	exit;
 default:
 	$filter = null;
-	if (isset($_REQUEST["filterid"]) && $config->hasMitgliederFilter($_REQUEST["filterid"])) {
-		$filter = $config->getMitgliederFilter($_REQUEST["filterid"]);
+	if ($session->hasVariable("filterid") && $config->hasMitgliederFilter($session->getVariable("filterid"))) {
+		$filter = $config->getMitgliederFilter($session->getVariable("filterid"));
 	}
 	
 	$pagesize = 20;
 	$pagecount = ceil($session->getStorage()->getMitgliederCount($filter) / $pagesize);
 	$page = 0;
-	if (isset($_REQUEST["page"]) and $_REQUEST["page"] >= 0 and $_REQUEST["page"] < $pagecount) {
-		$page = intval($_REQUEST["page"]);
+	if ($session->hasVariable("page") and $session->getVariable("page") >= 0 and $session->getVariable("page") < $pagecount) {
+		$page = intval($session->getVariable("page"));
 	}
 	$offset = $page * $pagesize;
 

@@ -11,6 +11,10 @@ class MySQLStorage extends SQLStorage {
 		$this->mysqli->set_charset("utf8");
 	}
 
+	public function getEncoding() {
+		return $this->mysqli->character_set_name();
+	}
+
 	public function query($sql) {
 		return $this->mysqli->query($sql);
 	}

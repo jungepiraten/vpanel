@@ -24,8 +24,8 @@ function parseMailTemplateFormular($session, &$template = null) {
 	}
 	
 	// Headerfelder
-	$headerfields = array_map('stripslashes', $_POST["headerfields"]);
-	$headervalues = array_map('stripslashes', $_POST["headervalues"]);
+	$headerfields = $session->getListVariable("headerfields");
+	$headervalues = $session->getListVariable("headervalues");
 	$headerfieldsindex = array_map('strtolower', $headerfields);
 	foreach ($template->getHeaders() as $field => $header) {
 		if (empty($field) || !in_array(strtolower($field), $headerfieldsindex)) {
@@ -42,12 +42,12 @@ function parseMailTemplateFormular($session, &$template = null) {
 	$template->save();
 }
 
-switch (isset($_REQUEST["mode"]) ? stripslashes($_REQUEST["mode"]) : null) {
+switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
 case "details":
-	$templateid = intval($_REQUEST["templateid"]);
+	$templateid = $session->getIntVariable("templateid");
 	$template = $session->getStorage()->getMailTemplate($templateid);
 
-	if (isset($_REQUEST["save"])) {
+	if ($session->getBoolVariable("save")) {
 		if (!$session->isAllowed("mailtemplates_modify")) {
 			$ui->viewLogin();
 			exit;
@@ -61,7 +61,7 @@ case "details":
 	$ui->viewMailTemplateDetails($template);
 	exit;
 case "create":
-	if (isset($_REQUEST["save"])) {
+	if ($session->getBoolVariable("save")) {
 		if (!$session->isAllowed("mailtemplates_create")) {
 			$ui->viewLogin();
 			exit;
@@ -79,7 +79,7 @@ case "delete":
 		$ui->viewLogin();
 		exit;
 	}
-	$templateid = intval($_REQUEST["templateid"]);
+	$templateid = $session->getIntVariable("templateid");
 	$session->getStorage()->delMailTemplate($templateid);
 
 	$ui->redirect($session->getLink("mailtemplates"));

@@ -1,5 +1,6 @@
 {include file="header.html.tpl" ansicht="Mailvorlagen verwalten"}
 <p class="pagetitle">{"Mailvorlagen verwalten"|__}</p>
+<a href="{"mailtemplates_create"|___}" class="neuset">{"Neue Mailvorlage"|__}</a>
 <ul class="entrylist">
 {foreach from=$mailtemplates item=template}
 <li class="entry{cycle values="odd,even"}">
@@ -12,4 +13,5 @@
 </li>
 {/foreach}
 </ul>
+<a href="{"mailtemplates_create"|___}" class="neuset">{"Neue Mailvorlage"|__}</a>
 {include file="footer.html.tpl"}

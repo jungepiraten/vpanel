@@ -14,16 +14,30 @@ if (!$session->isAllowed("users_show")) {
 require_once(VPANEL_CORE . "/user.class.php");
 require_once(VPANEL_CORE . "/role.class.php");
 
-switch (isset($_REQUEST["mode"]) ? stripslashes($_REQUEST["mode"]) : null) {
+function parseUserFormular($session, &$user = null) {
+	$username = $session->getVariable("username");
+	$password = $session->getVariable("password");
+
+	if ($user == null) {
+		$user = new User($session->getStorage());
+	}
+
+	$user->setUsername($username);
+	if (!empty($password)) {
+		$user->changePassword($password);
+	}
+	$user->save();
+}
+
+switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
 case "addrole":
 	if (!$session->isAllowed("users_modify")) {
 		$ui->viewLogin();
 		exit;
 	}
-	$userid = intval($_REQUEST["userid"]);
-	$roleid = intval($_REQUEST["roleid"]);
-	$user = $session->getStorage()->getUser($userid);
-	$user->addRoleID($roleid);
+
+	$user = $session->getStorage()->getUser($session->getIntVariable("userid"));
+	$user->addRoleID($session->getIntVariable("roleid"));
 	$user->save();
 	$ui->redirect();
 	exit;
@@ -32,50 +46,36 @@ case "delrole":
 		$ui->viewLogin();
 		exit;
 	}
-	$userid = intval($_REQUEST["userid"]);
-	$roleid = intval($_REQUEST["roleid"]);
-	$user = $session->getStorage()->getUser($userid);
-	$user->delRoleID($roleid);
+
+	$user = $session->getStorage()->getUser($session->getIntVariable("userid"));
+	$user->delRoleID($session->getIntVariable("roleid"));
 	$user->save();
 	$ui->redirect();
 	exit;
 case "details":
-	$userid = intval($_REQUEST["userid"]);
+	$userid = $session->getIntVariable("userid");
 	$user = $session->getStorage()->getUser($userid);
 
-	if (isset($_REQUEST["save"])) {
+	if ($session->getBoolVariable("save")) {
 		if (!$session->isAllowed("users_modify")) {
 			$ui->viewLogin();
 			exit;
 		}
 
-		$username = stripslashes($_REQUEST["username"]);
-		$password = stripslashes($_REQUEST["password"]);
-
-		$user->setUserID($userid);
-		$user->setUsername($username);
-		if (!empty($password)) {
-			$user->changePassword($password);
-		}
-		$user->save();
+		parseUserFormular($session, $user);
 	}
 	$roles = $session->getStorage()->getRoleList();
 
 	$ui->viewUserDetails($user, $roles);
 	exit;
 case "create":
-	if (isset($_REQUEST["save"])) {
+	if ($session->getBoolVariable("save")) {
 		if (!$session->isAllowed("users_create")) {
 			$ui->viewLogin();
 			exit;
 		}
-		$username = stripslashes($_REQUEST["username"]);
-		$password = stripslashes($_REQUEST["password"]);
 
-		$user = new User($session->getStorage());
-		$user->setUsername($username);
-		$user->changePassword($password);
-		$user->save();
+		parseUserFormular($session, $user);
 
 		$ui->redirect($session->getLink("users_details", $user->getUserID()));
 	}
@@ -87,7 +87,7 @@ case "delete":
 		$ui->viewLogin();
 		exit;
 	}
-	$userid = intval($_REQUEST["userid"]);
+	$userid = $session->getIntVariable("userid");
 	$session->getStorage()->delUser($userid);
 	$ui->redirect();
 	exit;

@@ -11,30 +11,38 @@ if (!$session->isAllowed("roles_show")) {
 	exit;
 }
 
-switch (isset($_REQUEST["mode"]) ? stripslashes($_REQUEST["mode"]) : null) {
+function parseRoleFormular($session, &$role = null) {
+	$label = $session->getVariable("label");
+	$description = $session->getVariable("description");
+
+	if ($role == null) {
+		
+	}
+	$role->setLabel($label);
+	$role->setDescription($description);
+	$role->save();
+}
+
+switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
 case "details":
-	$roleid = intval($_REQUEST["roleid"]);
+	$roleid = $session->getIntVariable("roleid");
 	$role = $session->getStorage()->getRole($roleid);
 
-	if (isset($_REQUEST["save"])) {
+	if ($session->getBoolVariable("save")) {
 		if (!$session->isAllowed("roles_modify")) {
 			$ui->viewLogin();
 			exit;
 		}
-		$label = stripslashes($_REQUEST["label"]);
-		$description = stripslashes($_REQUEST["description"]);
-
-		$role->setLabel($label);
-		$role->setDescription($description);
-		$role->save();
+		
+		parseRoleFormular($session, $role);
 	}
 
-	if (isset($_REQUEST["savepermissions"])) {
+	if ($session->getBoolVariable("savepermissions")) {
 		if (!$session->isAllowed("roles_modify")) {
 			$ui->viewLogin();
 			exit;
 		}
-		$permissions = $_REQUEST["permissions"];
+		$permissions = $session->getListVariable("permissions");
 		$rolepermissions = $role->getPermissionIDs();
 		foreach (array_diff($permissions, $rolepermissions) as $perm) {
 			$role->addPermissionID($perm);
@@ -51,19 +59,14 @@ case "details":
 	$ui->viewRoleDetails($role, $users, $permissions);
 	exit;
 case "create":
-	if (isset($_REQUEST["save"])) {
+	if ($session->getBoolVariable("save"))) {
 		if (!$session->isAllowed("roles_create")) {
 			$ui->viewLogin();
 			exit;
 		}
-		$label = stripslashes($_REQUEST["label"]);
-		$description = stripslashes($_REQUEST["description"]);
-
-		$role = new Role($session->getStorage());
-		$role->setLabel($label);
-		$role->setDescription($description);
-		$role->save();
-
+		
+		parseRoleFormular($session, $role);
+		
 		$ui->redirect($session->getLink("roles_details", $role->getRoleID()));
 	}
 
@@ -74,7 +77,7 @@ case "delete":
 		$ui->viewLogin();
 		exit;
 	}
-	$roleid = intval($_REQUEST["roleid"]);
+	$roleid = $session->getIntVariable("roleid");
 	$session->getStorage()->delRole($roleid);
 	$ui->redirect($session->getLink("roles"));
 	exit;

@@ -9,8 +9,8 @@ if (!$session->isAllowed("mitglieder_show")) {
 	exit;
 }
 
-$plz = stripslashes($_REQUEST["plz"]);
-$ort = stripslashes($_REQUEST["ort"]);
+$plz = $session->getVariable("plz");
+$ort = $session->getVariable("ort");
 
 $orte = $session->getStorage()->getOrtListLimit($plz, $ort, null, 5);
 $jsons = array();

@@ -82,11 +82,24 @@ class Template {
 		foreach ($template->getHeaders() as $header) {
 			$row["headers"][$header->getField()] = $header->getValue();
 		}
+		$row["attachments"] = $this->parseMailAttachments($template->getAttachments());
 		return $row;
 	}
 
 	protected function parseMailTemplates($rows) {
 		return array_map(array($this, 'parseMailTemplate'), $rows);
+	}
+
+	protected function parseMailAttachment($attachment) {
+		$row = array();
+		$row["attachmentid"] = $attachment->getAttachmentID();
+		$row["filename"] = $attachment->getFilename();
+		$row["mimetype"] = $attachment->getMimeType();
+		return $row;
+	}
+
+	protected function parseMailAttachments($rows) {
+		return array_map(array($this, 'parseMailAttachment'), $rows);
 	}
 
 	protected function parseMitgliederFilter($filter) {
@@ -275,6 +288,10 @@ class Template {
 		$this->smarty->display("mailtemplatedetails.html.tpl");
 	}
 
+	public function viewMailTemplateCreate() {
+		$this->smarty->display("mailtemplatecreate.html.tpl");
+	}
+
 	public function viewMitgliederList($mitglieder, $mitgliedschaften, $filters, $filter, $page, $pagecount) {
 		if ($filter != null) {
 			$this->smarty->assign("filter", $this->parseMitgliederFilter($filter));
@@ -335,6 +352,7 @@ class Template {
 
 	public function redirect($url = null) {
 		if ($url === null) {
+			// TODO $session->getVariable nutzen
 			$url = isset($_REQUEST["redirect"]) ? $_REQUEST["redirect"] : $_SERVER["HTTP_REFERER"];
 		}
 		header('Location: ' . $url);
