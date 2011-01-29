@@ -59,7 +59,7 @@ case "details":
 	$ui->viewRoleDetails($role, $users, $permissions);
 	exit;
 case "create":
-	if ($session->getBoolVariable("save"))) {
+	if ($session->getBoolVariable("save")) {
 		if (!$session->isAllowed("roles_create")) {
 			$ui->viewLogin();
 			exit;
