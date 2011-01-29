@@ -132,7 +132,9 @@ class Template {
 		$row["mitgliedid"] = $mitglied->getMitgliedID();
 		$row["globalid"] = $mitglied->getGlobalID();
 		$row["eintritt"] = $mitglied->getEintrittsdatum();
-		$row["austritt"] = $mitglied->getAustrittsdatum();
+		if ($mitglied->isAusgetreten()) {
+			$row["austritt"] = $mitglied->getAustrittsdatum();
+		}
 		$row["latest"] = $this->parseMitgliedRevision($mitglied->getLatestRevision());
 		return $row;
 	}

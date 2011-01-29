@@ -218,7 +218,7 @@ abstract class SQLStorage implements Storage {
 			return "(" . implode(" OR ",array_map(array($this,'parseMitgliederMatcher'), $matcher->getConditions())) . ")";
 		}
 		if ($matcher instanceof NotMitgliederMatcher) {
-			return "NOT " . $this->parseMitgliederMatcher($matcher->getCondition());
+			return "NOT (" . $this->parseMitgliederMatcher($matcher->getCondition()) . ")";
 		}
 		if ($matcher instanceof MitgliedschaftMitgliederMatcher) {
 			return "`r`.`mitgliedschaftid` = " . intval($matcher->getMitgliedschaftID());
@@ -231,6 +231,9 @@ abstract class SQLStorage implements Storage {
 		}
 		if ($matcher instanceof JurPersonMitgliederMatcher) {
 			return "`r`.`jurpersonid` IS NOT NULL";
+		}
+		if ($matcher instanceof AusgetretenMitgliederMatcher) {
+			return "`m`.`austritt` IS NOT NULL";
 		}
 		throw new Exception("Not implemented: ".get_class($matcher));
 	}

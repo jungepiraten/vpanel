@@ -25,7 +25,6 @@ class User extends StorageClass {
 		for ($i=0;$i<=rand(3,7);$i++) {
 			$str .= substr($chrs, rand(0,strlen($chrs)-1), 1);
 		}
-var_dump($str);
 		return $str;
 	}
 
