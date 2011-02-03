@@ -342,8 +342,10 @@ class Template {
 	}
 
 	public function viewMitgliederSendMailPreview($mail, $filter, $mailtemplate) {
+		if ($filter != null) {
+			$this->smarty->assign("filter", $this->parseMitgliederFilter($filter));
+		}
 		$this->smarty->assign("mail", $this->parseMail($mail));
-		$this->smarty->assign("filter", $this->parseMitgliederFilter($filter));
 		$this->smarty->assign("mailtemplate", $this->parseMailTemplate($mailtemplate));
 		$this->smarty->display("mitgliedersendmailpreview.html.tpl");
 	}

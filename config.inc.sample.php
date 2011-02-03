@@ -36,6 +36,14 @@ $config->registerPage("mitglieder_page", "mitglieder.php?page=%d");
 $config->registerPage("mitglieder_create", "mitglieder.php?mode=create&mitgliedschaftid=%d");
 $config->registerPage("mitglieder_details", "mitglieder.php?mode=details&mitgliedid=%d");
 $config->registerPage("mitglieder_del", "mitglieder.php?mode=delete&mitgliedid=%d");
+$config->registerPage("mitglieder_sendmail", "mitglieder.php?mode=sendmail.select&filterid=%s");
+$config->registerPage("mitglieder_sendmail.preview", "mitglieder.php?mode=sendmail.preview");
+$config->registerPage("mitglieder_sendmail.send", "mitglieder.php?mode=sendmail.send");
+
+$config->registerPage("mailtemplates", "mailtemplates.php");
+$config->registerPage("mailtemplates_create", "mailtemplates.php?mode=create");
+$config->registerPage("mailtemplates_details", "mailtemplates.php?mode=details&templateid=%d");
+$config->registerPage("mailtemplates_del", "mailtemplates.php?mode=delete&templateid=%d");
 $config->registerPage("mailattachment", "mailattachment.php?attachmentid=%d");
 
 $config->registerPage("statistik", "statistik.php");
