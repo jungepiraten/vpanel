@@ -12,6 +12,7 @@ require_once(VPANEL_CORE . "/jurperson.class.php");
 require_once(VPANEL_CORE . "/mailtemplate.class.php");
 require_once(VPANEL_CORE . "/mailattachment.class.php");
 require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
+require_once(VPANEL_CORE . "/process.class.php");
 
 abstract class SQLStorage implements Storage {
 	public function __construct() {}
@@ -867,6 +868,51 @@ abstract class SQLStorage implements Storage {
 	}
 	public function delMailAttachment($attachmentid) {
 		$sql = "DELETE FROM `mailattachments` WHERE `attachmentid` = " . intval($attachmentid);
+		return $this->query($sql);
+	}
+
+	/**
+	 * Prozesse
+	 **/
+	public function getProcessList() {
+		$sql = "SELECT `processid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished` FROM `processes`";
+		return $this->fetchAsArray($this->query($sql), "processid", null, "Process");
+	}
+
+	public function getProcess($processid, $type = null) {
+		$sql = "SELECT `processid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished` FROM `processes` WHERE `processid` = " . intval($processid);
+		return reset($this->fetchAsArray($this->query($sql), "processid", null, "Process"));
+	}
+
+	public function setProcess($processid, $type, $typedata, $progress, $queued, $started, $finished) {
+		if ($processid == null) {
+			$sql = "INSERT INTO `processes`
+				(`type`, `typedata`, `progress`, `queued`, `started`, `finished`) VALUES
+				('" . $this->escape($type) . "',
+				 '" . $this->escape($typedata) . "',
+				 " . doubleval($progress) . ",
+				 '" . date("Y-m-d H:i:s", $queued) . "',
+				 " . ($started != null ? "'" . date("Y-m-d H:i:s", $started) . "'" : "NULL") . ",
+				 " . ($finished != null ? "'" . date("Y-m-d H:i:s", $finished) . "'" : "NULL") . ")";
+		} else {
+			$sql = "UPDATE	`processes`
+				SET	`type` = '" . $this->escape($type) . "',
+					`typedata` = '" . $this->escape($typedata) . "',
+					`progress` = '" . doubleval($progress) . "',
+					`queued` = '" . date("Y-m-d H:i:s", $queued) . "',
+					`started` = " . ($started != null ? "'" . date("Y-m-d H:i:s", $started) . "'" : "NULL") . ",
+					`finished` = " . ($finished != null ? "'" . date("Y-m-d H:i:s", $finished) . "'" : "NULL") . "
+				WHERE `processid` = " . intval($processid);
+		}
+		$this->query($sql);
+		if ($processid == null) {
+			$processid = $this->getInsertID();
+		}
+		return $processid;
+	}
+
+	public function delProcess($processid) {
+		$sql = "DELETE FROM `processes` WHERE `processid` = " . intval($processid);
 		return $this->query($sql);
 	}
 }

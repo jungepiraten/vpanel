@@ -247,6 +247,24 @@ class Template {
 		return array_map(array($this, 'parseCountry'), $rows);
 	}
 
+	protected function parseProcess($process) {
+		$row = array();
+		$row["processid"] = $process->getProcessID();
+		$row["progress"] = $process->getProgress();
+		$row["queued"] = $process->getQueued();
+		$row["started"] = $process->getStarted();
+		$row["finished"] = $process->getFinished();
+		$row["iswaiting"] = $process->isWaiting();
+		$row["isrunning"] = $process->isRunning();
+		$row["isfinished"] = $process->isFinished();
+		return $row;
+	}
+
+	protected function parseProcesses($rows) {
+		return array_map(array($this, 'parseProcess'), $rows);
+	}
+
+
 	public function viewIndex() {
 		$this->smarty->display("index.html.tpl");
 	}
@@ -343,11 +361,23 @@ class Template {
 
 	public function viewMitgliederSendMailPreview($mail, $filter, $mailtemplate) {
 		if ($filter != null) {
+			$this->smarty->assign("filterid", $filter->getFilterID());
 			$this->smarty->assign("filter", $this->parseMitgliederFilter($filter));
+		} else {
+			$this->smarty->assign("filterid", null);
 		}
 		$this->smarty->assign("mail", $this->parseMail($mail));
 		$this->smarty->assign("mailtemplate", $this->parseMailTemplate($mailtemplate));
 		$this->smarty->display("mitgliedersendmailpreview.html.tpl");
+	}
+
+	public function viewMitgliederSendMailSend($filter, $mailtemplate, $process) {
+		if ($filter != null) {
+			$this->smarty->assign("filter", $this->parseMitgliederFilter($filter));
+		}
+		$this->smarty->assign("mailtemplate", $this->parseMailTemplate($mailtemplate));
+		$this->smarty->assign("process", $this->parseProcess($process));
+		$this->smarty->display("mitgliedersendmailsend.html.tpl");
 	}
 
 	public function viewStatistik($mitgliedercount, $mitgliedschaften, $states) {
@@ -369,6 +399,11 @@ class Template {
 		$this->smarty->assign("mitgliedercountPerMitgliedschaft", $countPerMitgliedschaft);
 		$this->smarty->assign("mitgliedercountPerState", $countPerState);
 		$this->smarty->display("statistik.html.tpl");
+	}
+
+	public function viewProcess($process) {
+		$this->smarty->assign("process", $this->parseProcess($process));
+		$this->smarty->display("process.html.tpl");
 	}
 
 	public function redirect($url = null) {

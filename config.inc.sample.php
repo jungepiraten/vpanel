@@ -47,6 +47,34 @@ $config->registerPage("mailtemplates_del", "mailtemplates.php?mode=delete&templa
 $config->registerPage("mailattachment", "mailattachment.php?attachmentid=%d");
 
 $config->registerPage("statistik", "statistik.php");
+
+$config->registerPage("processes_view", "processes.php?mode=view&processid=%d");
+$config->registerPage("processes_json", "json/processes.php");
 #$config->registerPage("");
+
+$config->registerMitgliederFilter(new MitgliederFilter(1, "Ordentliche Mitglieder",
+	new AndMitgliederMatcher(
+		new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()),
+		new MitgliedschaftMitgliederMatcher(1) ) ));
+$config->registerMitgliederFilter(new MitgliederFilter(2, "Fördermitglieder",
+	new AndMitgliederMatcher(
+		new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()),
+		new MitgliedschaftMitgliederMatcher(2) ) ));
+$config->registerMitgliederFilter(new MitgliederFilter(3, "Ehrenmitglieder",
+	new AndMitgliederMatcher(
+		new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()),
+		new MitgliedschaftMitgliederMatcher(3) ) ));
+$config->registerMitgliederFilter(new MitgliederFilter(4, "Natürliche Personen",
+	new AndMitgliederMatcher(
+		new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()),
+		new NatPersonMitgliederMatcher() ) ));
+$config->registerMitgliederFilter(new MitgliederFilter(5, "Juristische Personen",
+	new AndMitgliederMatcher(
+		new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()),
+		new JurPersonMitgliederMatcher() ) ));
+$config->registerMitgliederFilter(new MitgliederFilter(6, "Momentane Mitglieder",
+	new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()) ));
+$config->registerMitgliederFilter(new MitgliederFilter(7, "Ausgetretene Mitglieder",
+	new AusgetretenMitgliederMatcher() ));
 
 ?>

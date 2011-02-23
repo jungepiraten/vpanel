@@ -88,6 +88,11 @@ interface Storage {
 	public function getMailAttachment($attachmentid);
 	public function setMailAttachment($attachmentid, $filename, $mimetype, $content);
 	public function delMailAttachment($attachmentid);
+
+	public function getProcessList();
+	public function getProcess($processid);
+	public function setProcess($processid, $type, $typedata, $progess, $queued, $started, $finished);
+	public function delProcess($processid);
 }
 
 ?>

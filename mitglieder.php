@@ -13,6 +13,7 @@ if (!$session->isAllowed("mitglieder_show")) {
 
 require_once(VPANEL_CORE . "/mitglied.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
+require_once(VPANEL_CORE . "/processes/mitgliederfiltersendmail.class.php");
 
 function parseMitgliederFormular($session, &$mitglied = null) {
 	$persontyp = $session->getVariable("persontyp");
@@ -163,13 +164,14 @@ case "sendmail.send":
 	if ($session->hasVariable("filterid") && $config->hasMitgliederFilter($session->getVariable("filterid"))) {
 		$filter = $config->getMitgliederFilter($session->getVariable("filterid"));
 	}
-	$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("mailtemplateid"));
+	$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("templateid"));
+	
+	$process = new MitgliederFilterSendMailProcess($session->getStorage());
+	$process->setFilter($filter);
+	$process->setTemplate($mailtemplate);
+	$process->save();
 
-	$mitglieder = $session->getStorage()->getMitglieder($filter);
-	
-	// TODO zu einem "taskmanager" deligieren?
-	// hier zu arbeiten wäre fies - das werden bis zu 10000 mails auf einmal und bricht auf jeden fall gegen die max_execution_time
-	
+	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
 	exit;
 default:
 	$filter = null;
