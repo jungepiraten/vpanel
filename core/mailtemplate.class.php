@@ -103,6 +103,7 @@ class MailTemplate extends StorageClass {
 	
 	public function generateMail(Mitglied $mitglied) {
 		$mail = new Mail($this);
+		$mail->setRecipient($mitglied->getLatestRevision()->getKontakt()->getEMail());
 		// TODO viel!
 		return $mail;
 	}

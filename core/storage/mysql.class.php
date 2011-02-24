@@ -23,6 +23,10 @@ class MySQLStorage extends SQLStorage {
 		return $result->fetch_assoc();
 	}
 
+	public function numRows($result) {
+		return $result->num_rows;
+	}
+
 	public function getInsertID() {
 		return $this->mysqli->insert_id;
 	}

@@ -1,98 +1,156 @@
 <?php
 
-interface Storage {
-	public function getPermissionList();
-	public function getPermission($permissionid);
+abstract class Storage {
+	abstract public function getPermissionResult();
+	public function getPermissionList() {
+		return $this->getPermissionResult()->fetchAll();
+	}
+	abstract public function getPermission($permissionid);
 
-	public function getUserList();
-	public function getUser($userid);
-	public function getUserByUsername($username);
-	public function setUser($userid, $username, $password, $passwordsalt);
-	public function delUser($userid);
-	public function getUserRoleList($userid);
-	public function setUserRoleList($userid, $permissions);
+	abstract public function getUserResult();
+	public function getUserList() {
+		return $this->getUserResult()->fetchAll();
+	}
+	abstract public function getUser($userid);
+	abstract public function getUserByUsername($username);
+	abstract public function setUser($userid, $username, $password, $passwordsalt);
+	abstract public function delUser($userid);
+	abstract public function getUserRoleResult($userid);
+	public function getUserRoleList($userid) {
+		return $this->getUserRoleResult($userid)->fetchAll();
+	}
+	abstract public function setUserRoleList($userid, $roles);
 
-	public function getRoleList();
-	public function getRole($roleid);
-	public function setRole($roleid, $label, $description);
-	public function delRole($roleid);
-	public function getRolePermissionList($roleid);
-	public function setRolePermissionList($roleid, $permissions);
-	public function getRoleUserList($roleid);
-	public function setRoleUserList($roleid, $userids);
+	abstract public function getRoleResult();
+	public function getRoleList() {
+		return $this->getRoleResult()->fetchAll();
+	}
+	abstract public function getRole($roleid);
+	abstract public function setRole($roleid, $label, $description);
+	abstract public function delRole($roleid);
+	abstract public function getRolePermissionResult($roleid);
+	public function getRolePermissionList($roleid) {
+		return $this->getRolePermissionResult($roleid)->fetchAll();
+	}
+	abstract public function setRolePermissionList($roleid, $permissions);
+	abstract public function getRoleUserResult($roleid);
+	public function getRoleUserList($roleid) {
+		return $this->getRoleUserResult($roleid)->fetchAll();
+	}
+	abstract public function setRoleUserList($roleid, $userids);
 
-	public function getGliederungList();
-	public function getGliederung($gliederungid);
+	abstract public function getGliederungResult();
+	public function getGliederungList() {
+		return $this->getGliederungResult()->fetchAll();
+	}
+	abstract public function getGliederung($gliederungid);
 
-	public function getMitgliederList($filter = null, $limit = null, $offset = null);
-	public function getMitgliederCount($filter = null);
-	public function getMitglied($mitgliedid);
-	public function setMitglied($mitgliedid, $globalid, $eintritt, $austritt);
+	abstract public function getMitgliederResult($filter = null, $limit = null, $offset = null);
+	public function getMitgliederList($filter = null, $limit = null, $offset = null) {
+		return $this->getMitgliederResult($filter, $limit, $offset)->fetchAll();
+	}
+	abstract public function getMitgliederCount($filter = null);
+	abstract public function getMitglied($mitgliedid);
+	abstract public function setMitglied($mitgliedid, $globalid, $eintritt, $austritt);
 
-	public function getMitgliederRevisionList($mitgliedid = null);
-	public function getMitgliederRevision($revisionid);
-	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $mitgliedpiraten, $verteilereingetragen, $beitrag, $natpersonid, $jurpersonid, $kontaktid);
+	abstract public function getMitgliederRevisionResult($mitgliedid = null);
+	public function getMitgliederRevisionList($mitgliedid = null) {
+		return $this->getMitgliederRevisionResult($mitgliedid)->fetchAll();
+	}
+	abstract public function getMitgliederRevision($revisionid);
+	abstract public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $mitgliedpiraten, $verteilereingetragen, $beitrag, $natpersonid, $jurpersonid, $kontaktid);
 
-	public function getKontakt($kontaktid);
-	public function setKontakt($kontaktid, $strasse, $hausnummer, $ortid, $telefon, $handy, $email);
-	public function delKontakt($kontaktid);
-	public function searchKontakt($strasse, $hausnummer, $ortid, $telefon, $handy, $email);
+	abstract public function getKontakt($kontaktid);
+	abstract public function setKontakt($kontaktid, $strasse, $hausnummer, $ortid, $telefon, $handy, $email);
+	abstract public function delKontakt($kontaktid);
+	abstract public function searchKontakt($strasse, $hausnummer, $ortid, $telefon, $handy, $email);
 
-	public function getOrtList();
-	public function getOrtListLimit($plz = null, $label = null, $stateid = null, $count = null);
-	public function getOrt($ortid);
-	public function setOrt($ortid, $plz, $label, $stateid);
-	public function delOrt($ortid);
-	public function searchOrt($plz, $label, $stateid);
+	abstract public function getOrtResult();
+	public function getOrtList() {
+		return $this->getOrtResult()->fetchAll();
+	}
+	abstract public function getOrtResultLimit($plz = null, $label = null, $stateid = null, $count = null);
+	public function getOrtListLimit($plz = null, $label = null, $stateid = null, $count = null) {
+		return $this->getOrtResult($plz, $label, $stateid, $count)->fetchAll();
+	}
+	abstract public function getOrt($ortid);
+	abstract public function setOrt($ortid, $plz, $label, $stateid);
+	abstract public function delOrt($ortid);
+	abstract public function searchOrt($plz, $label, $stateid);
 
-	public function getStateList();
-	public function getState($stateid);
-	public function setState($stateid, $label, $countryid);
-	public function delState($stateid);
+	abstract public function getStateResult();
+	public function getStateList() {
+		return $this->getStateResult()->fetchAll();
+	}
+	abstract public function getState($stateid);
+	abstract public function setState($stateid, $label, $countryid);
+	abstract public function delState($stateid);
 
-	public function getCountryList();
-	public function getCountry($countryid);
-	public function setCountry($countryid, $label);
-	public function delCountry($countryid);
+	abstract public function getCountryResult();
+	public function getCountryList() {
+		return $this->getCountryResult()->fetchAll();
+	}
+	abstract public function getCountry($countryid);
+	abstract public function setCountry($countryid, $label);
+	abstract public function delCountry($countryid);
 
-	public function getMitgliedschaftList();
-	public function getMitgliedschaft($mitgliedschaftid);
-	public function setMitgliedschaft($mitgliedschaftid, $globalid, $label, $description, $defaultbeitrag, $defaultcreatemail);
-	public function delMitgliedschaft($mitgliedschaftid);
+	abstract public function getMitgliedschaftResult();
+	public function getMitgliedschaftList() {
+		return $this->getMitgliedschaftResult()->fetchAll();
+	}
+	abstract public function getMitgliedschaft($mitgliedschaftid);
+	abstract public function setMitgliedschaft($mitgliedschaftid, $globalid, $label, $description, $defaultbeitrag, $defaultcreatemail);
+	abstract public function delMitgliedschaft($mitgliedschaftid);
 
-	public function getNatPerson($natpersonid);
-	public function setNatPerson($natpersonid, $name, $vorname, $geburtsdatum, $nationalitaet);
-	public function delNatPerson($natpersonid);
-	public function searchNatPerson($name, $vorname, $geburtsdatum, $nationalitaet);
+	abstract public function getNatPerson($natpersonid);
+	abstract public function setNatPerson($natpersonid, $name, $vorname, $geburtsdatum, $nationalitaet);
+	abstract public function delNatPerson($natpersonid);
+	abstract public function searchNatPerson($name, $vorname, $geburtsdatum, $nationalitaet);
 
-	public function getJurPerson($jurpersonid);
-	public function setJurPerson($jurpersonid, $firma);
-	public function delJurPerson($jurpersonid);
-	public function searchJurPerson($firma);
+	abstract public function getJurPerson($jurpersonid);
+	abstract public function setJurPerson($jurpersonid, $firma);
+	abstract public function delJurPerson($jurpersonid);
+	abstract public function searchJurPerson($firma);
 
-	public function getMailTemplateList();
-	public function getMailTemplate($mailtemplateid);
-	public function setMailTemplate($mailtemplateid, $label, $body);
-	public function delMailTemplate($mailtemplateid);
-	public function getMailTemplateHeaderList($mailtemplateid);
-	public function setMailTemplateHeaderList($mailtemplateid, $headerids, $values);
-	public function getMailTemplateAttachmentList($mailtemplateid);
-	public function setMailTemplateAttachmentList($mailtemplateid, $attachments);
+	abstract public function getMailTemplateResult();
+	public function getMailTemplateList() {
+		return $this->getMailTemplateResult()->fetchAll();
+	}
+	abstract public function getMailTemplate($mailtemplateid);
+	abstract public function setMailTemplate($mailtemplateid, $label, $body);
+	abstract public function delMailTemplate($mailtemplateid);
+	abstract public function getMailTemplateHeaderResult($mailtemplateid);
+	public function getMailTemplateHeaderList($mailtemplateid) {
+		return $this->getMailTemplateHeaderResult($mailtemplateid)->fetchAll();
+	}
+	abstract public function setMailTemplateHeaderList($mailtemplateid, $headerids, $values);
+	abstract public function getMailTemplateAttachmentResult($mailtemplateid);
+	public function getMailTemplateAttachmentList($mailtemplateid) {
+		return $this->getMailTemplateAttachmentResult($mailtemplateid)->fetchAll();
+	}
+	abstract public function setMailTemplateAttachmentList($mailtemplateid, $attachments);
 
-	public function getMailHeaderList();
-	public function getMailHeader($headerid);
-	public function setMailHeader($headerid, $label);
-	public function delMailHeader($headerid);
+	abstract public function getMailAttachmentResult();
+	public function getMailAttachmentList() {
+		return $this->getMailAttachmentResult()->fetchAll();
+	}
+	abstract public function getMailAttachment($attachmentid);
+	abstract public function setMailAttachment($attachmentid, $filename, $mimetype, $content);
+	abstract public function delMailAttachment($attachmentid);
 
-	public function getMailAttachmentList();
-	public function getMailAttachment($attachmentid);
-	public function setMailAttachment($attachmentid, $filename, $mimetype, $content);
-	public function delMailAttachment($attachmentid);
+	abstract public function getProcessResult();
+	public function getProcessList() {
+		return $this->getProcessResult()->fetchAll();
+	}
+	abstract public function getProcess($processid);
+	abstract public function setProcess($processid, $type, $typedata, $progess, $queued, $started, $finished);
+	abstract public function delProcess($processid);
+}
 
-	public function getProcessList();
-	public function getProcess($processid);
-	public function setProcess($processid, $type, $typedata, $progess, $queued, $started, $finished);
-	public function delProcess($processid);
+abstract class StorageResult {
+	abstract public function fetchRow();
+	abstract public function fetchAll();
+	abstract public function getCount();
 }
 
 ?>

@@ -5,14 +5,24 @@ require_once(VPANEL_CORE . "/process.class.php");
 class MitgliederFilterSendMailProcess extends Process {
 	private $templateid;
 
+	private $backend;
 	private $filter;
 	private $template;
 
 	public static function factory(Storage $storage, $row) {
 		$process = new MitgliederFilterSendMailProcess($storage);
+		$process->setBackend($row["backend"]);
 		$process->setFilter($row["filter"]);
 		$process->setTemplateID($row["templateid"]);
 		return $process;
+	}
+
+	public function getBackend() {
+		return $this->backend;
+	}
+
+	public function setBackend($backend) {
+		$this->backend = $backend;
 	}
 
 	public function getFilterID() {
@@ -49,18 +59,27 @@ class MitgliederFilterSendMailProcess extends Process {
 		$this->setTemplateID($template->getTemplateID());
 		$this->template = $template;
 	}
-
+	
 	protected function getData() {
-		return array("filter" => $this->getFilter(), "templateid" => $this->getTemplateID());
+		return array("backend" => $this->getBackend(), "filter" => $this->getFilter(), "templateid" => $this->getTemplateID());
 	}
 
 	public function runProcess() {
-		// TODO TADA!
-		for ($i=0;$i<=1;$i+=0.05) {
-			sleep(3);
-			$this->setProgress($i);
-			$this->save();
+		$result = $this->getStorage()->getMitgliederResult($this->getFilter());
+		$max = $result->getCount();
+		$i = 0;
+		$stepwidth = min(1, ceil(100 / max(1,$max)));
+
+		while ($mitglied = $result->fetchRow()) {
+			$mail = $this->getTemplate()->generateMail($mitglied);
+			$this->getBackend()->send($mail);
+			
+			if ((++$i % $stepwidth) == 0) {
+				$this->setProgress($i / $max);
+				$this->save();
+			}
 		}
+		
 		$this->setProgress(1);
 		$this->save();
 	}

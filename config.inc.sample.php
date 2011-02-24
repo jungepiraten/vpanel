@@ -2,11 +2,20 @@
 
 require_once(dirname(__FILE__) . "/config.default.php");
 require_once(VPANEL_UI . "/language.class.php");
+require_once(VPANEL_STORAGE . "/mysql.class.php");
+require_once(VPANEL_SENDMAILBACKEND . "/sleep.class.php");
+require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/logic.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/mitgliedschaft.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/natperson.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/jurperson.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/ausgetreten.class.php");
 
 class MyConfig extends DefaultConfig {}
 
 $config = new MyConfig;
 $config->setStorage(new MySQLStorage("localhost", "root", "anything92", "vpanel"));
+$config->setSendMailBackend(new SleepSendMailBackend());
 $config->registerLang("de", new PHPLanguage(VPANEL_LANGUAGE . "/de.lang.php"));
 $config->registerLang("dummy", new EmptyLanguage);
 

@@ -167,6 +167,7 @@ case "sendmail.send":
 	$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("templateid"));
 	
 	$process = new MitgliederFilterSendMailProcess($session->getStorage());
+	$process->setBackend($config->getSendMailBackend());
 	$process->setFilter($filter);
 	$process->setTemplate($mailtemplate);
 	$process->save();

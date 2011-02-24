@@ -14,80 +14,83 @@ require_once(VPANEL_CORE . "/mailattachment.class.php");
 require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
 require_once(VPANEL_CORE . "/process.class.php");
 
-abstract class SQLStorage implements Storage {
+abstract class SQLStorage extends Storage {
 	public function __construct() {}
 	
 	abstract protected function query($sql);
 	abstract protected function getEncoding();
-	abstract protected function fetchRow($result);
+	abstract public function fetchRow($result);
+	abstract public function numRows($result);
 	abstract protected function getInsertID();
-
-	protected function fetchAsArray($result, $keyfield = null, $field = null, $class = null) {
-		$rows = array();
-		while ($row = $this->fetchRow($result)) {
-			if ($field === null) {
-				$item = $row;
-			} else {
-				$item = $row[$field];
-			}
-			if ($class !== null) {
-				if (is_array($class)) {
-					$item = array();
-					$values = array();
-					foreach ($row as $col => $val) {
-						if (!strpos($col, "_")) {
-							$item[$col] = $val;
-						} else {
-							list($prefix, $col) = explode("_", $col, 2);
-							$values[$prefix][$col] = iconv($this->getEncoding(), "UTF-8", $val);
-						}
-					}
-					foreach ($class as $l => $c) {
-						$item[$l] = call_user_func(array($c, "factory"), $this, $values[$l]);
-					}
-				} else {
-					$item = call_user_func(array($class, "factory"), $this, $row);
-				}
-			}
-			if ($keyfield === null) {
-				$rows[] = $item;
-			} else {
-				$rows[strtolower($row[$keyfield])] = $item;
-			}
-		}
-		return $rows;
-	}
 
 	protected function escape($str) {
 		return addslashes($str);
 	}
 
+	protected function parseRow($row, $field = null, $class = null) {
+		if ($field === null) {
+			$item = $row;
+		} else {
+			$item = $row[$field];
+		}
+		if ($class !== null) {
+			if (is_array($class)) {
+				$item = array();
+				$values = array();
+				foreach ($row as $col => $val) {
+					if (!strpos($col, "_")) {
+						$item[$col] = $val;
+					} else {
+						list($prefix, $col) = explode("_", $col, 2);
+						$values[$prefix][$col] = iconv($this->getEncoding(), "UTF-8", $val);
+					}
+				}
+				foreach ($class as $l => $c) {
+					$item[$l] = call_user_func(array($c, "factory"), $this, $values[$l]);
+				}
+			} else {
+				$item = call_user_func(array($class, "factory"), $this, $row);
+			}
+		}
+		return $item;
+	}
+
+	protected function getResult($sql, $callback = null) {
+		return new SQLStorageResult($this, $this->query($sql), $callback);
+	}
+
 	/**
 	 * Berechtigungen
 	 */
-	public function getPermissionList() {
+	public function parsePermission($row) {
+		return $this->parseRow($row, null, "Permission");
+	}
+	public function getPermissionResult() {
 		$sql = "SELECT `permissionid`, `label`, `description` FROM `permissions`";
-		return $this->fetchAsArray($this->query($sql), "permissionid", null, 'Permission');
+		return $this->getResult($sql, array($this, "parsePermission"));
 	}
 	public function getPermission($permissionid) {
 		$sql = "SELECT `permissionid`, `label`, `description` FROM `permissions` WHERE `permissionid` = " . intval($permissionid);
-		return reset($this->fetchAsArray($this->query($sql), "permissionid", null, 'Permission'));
+		return $this->getResult($sql, array($this, "parsePermission"))->fetchRow();
 	}
 
 	/**
 	 * Benutzer
 	 */
-	public function getUserList() {
+	public function parseUser($row) {
+		return $this->parseRow($row, null, "User");
+	}
+	public function getUserResult() {
 		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt` FROM `users`";
-		return $this->fetchAsArray($this->query($sql), "userid", null, 'User');
+		return $this->getResult($sql, array($this, "parseUser"));
 	}
 	public function getUser($userid) {
 		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt` FROM `users` WHERE `userid` = " . intval($userid);
-		return reset($this->fetchAsArray($this->query($sql), "userid", null, 'User'));
+		return $this->getResult($sql, array($this, "parseUser"))->fetchRow();
 	}
 	public function getUserByUsername($username) {
 		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt` FROM `users` WHERE `username` = '" . $this->escape($username) . "'";
-		return reset($this->fetchAsArray($this->query($sql), "userid", null, 'User'));
+		return $this->getResult($sql, array($this, "parseUser"))->fetchRow();
 	}
 	public function setUser($userid, $username, $password, $passwordsalt) {
 		if ($userid == null) {
@@ -107,9 +110,10 @@ abstract class SQLStorage implements Storage {
 		$sql = "DELETE FROM `users` WHERE `userid` = " . intval($userid);
 		return $this->query($sql);
 	}
-	public function getUserRoleList($userid) {
+
+	public function getUserRoleResult($userid) {
 		$sql = "SELECT `roleid`, `label`, `description` FROM `roles` LEFT JOIN `userroles` USING (`roleid`) WHERE `userid` = " . intval($userid);
-		return $this->fetchAsArray($this->query($sql), "roleid", null, 'Role');
+		return $this->getResult($sql, array($this, "parseRole"));
 	}
 	public function setUserRoleList($userid, $roleids) {
 		$sql = "DELETE FROM `userroles` WHERE `userid` = " . intval($userid);
@@ -128,13 +132,16 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * Rollen
 	 */
-	public function getRoleList() {
+	public function parseRole($row) {
+		return $this->parseRow($row, null, "Role");
+	}
+	public function getRoleResult() {
 		$sql = "SELECT `roleid`, `label`, `description` FROM `roles`";
-		return $this->fetchAsArray($this->query($sql), "roleid", null, 'Role');
+		return $this->getResult($sql, array($this, "parseRole"));
 	}
 	public function getRole($roleid) {
 		$sql = "SELECT `roleid`, `label`, `description` FROM `roles` WHERE `roleid` = " . intval($roleid);
-		return reset($this->fetchAsArray($this->query($sql), null, null, 'Role'));
+		return $this->getResult($sql, array($this, "parseRole"))->fetchRow();
 	}
 	public function setRole($roleid, $label, $description) {
 		if ($roleid == null) {
@@ -155,9 +162,10 @@ abstract class SQLStorage implements Storage {
 		$sql = "DELETE FROM `roles` WHERE `roleid` = " . intval($roleid);
 		return $this->query($sql);
 	}
-	public function getRolePermissionList($roleid) {
+
+	public function getRolePermissionResult($roleid) {
 		$sql = "SELECT `permissions`.`permissionid` AS 'permissionid', `permissions`.`label`, `permissions`.`description` AS 'description' FROM `rolepermissions` LEFT JOIN `permissions` USING (`permissionid`) WHERE `rolepermissions`.`roleid` = '" . $this->escape($roleid) . "'";
-		return $this->fetchAsArray($this->query($sql), "permissionid", null, 'Permission');
+		return $this->getResult($sql, array($this, "parsePermission"));
 	}
 	public function setRolePermissionList($roleid, $permissionids) {
 		$sql = "DELETE FROM `rolepermissions` WHERE `roleid` = " . intval($roleid);
@@ -172,9 +180,10 @@ abstract class SQLStorage implements Storage {
 		}
 		return true;
 	}
-	public function getRoleUserList($roleid) {
+
+	public function getRoleUserResult($roleid) {
 		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
-		return $this->fetchAsArray($this->query($sql), "userid", null, 'User');
+		return $this->getResult($sql, array($this, "parseUser"));
 	}
 	public function setRoleUserList($roleid, $userids) {
 		$sql = "DELETE FROM `userroles` WHERE `roleid` = " . intval($roleid);
@@ -193,9 +202,12 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * Gliederung
 	 **/
-	public function getGliederungList() {
+	public function parseGliederung($row) {
+		return $this->parseRow($row, null, "Gliederung");
+	}
+	public function getGliederungResult() {
 		$sql = "SELECT `gliederungsid`, `label` FROM `gliederungen`";
-		return $this->fetchAsArray($this->query($sql), "gliederungsid", null, 'Gliederung');
+		return $this->getResult($sql, array($this, "parseGliederung"));
 	}
 	public function getGliederung($gliederungid) {
 		$sql = "SELECT `gliederungsid`, `label` FROM `gliederungen` WHERE `gliederungsid` = " . intval($gliederungid);
@@ -238,7 +250,6 @@ abstract class SQLStorage implements Storage {
 		}
 		throw new Exception("Not implemented: ".get_class($matcher));
 	}
-
 	public function getMitgliederCount($matcher = null) {
 		if ($matcher instanceof MitgliederFilter) {
 			$matcher = $matcher->getMatcher();
@@ -255,10 +266,22 @@ abstract class SQLStorage implements Storage {
 				FROM	`mitgliederrevisions` `rmax`
 				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)
 				".($matcher != null ? "AND ".$this->parseMitgliederMatcher($matcher) : "");
-		return reset(reset($this->fetchAsArray($this->query($sql))));
+		return reset($this->getResult($sql)->fetchRow());
 	}
-    
-	public function getMitgliederList($matcher = null, $limit = null, $offset = null) {
+	public function parseMitglied($row) {
+		$o = $this->parseRow($row, null, array("r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => 'Ort', "m" => 'Mitglied'));
+		$o["k"]->setOrt($o["o"]);
+		if ($o["r"]->getNatPersonID() !== null) {
+			$o["r"]->setNatPerson($o["n"]);
+		}
+		if ($o["r"]->getJurPersonID() !== null) {
+			$o["r"]->setJurPerson($o["j"]);
+		}
+		$o["r"]->setKontakt($o["k"]);
+		$o["m"]->addRevision($o["r"]);
+		return $o["m"];
+	}
+	public function getMitgliederResult($matcher = null, $limit = null, $offset = null) {
 		if ($matcher instanceof MitgliederFilter) {
 			$matcher = $matcher->getMatcher();
 		}
@@ -319,21 +342,7 @@ abstract class SQLStorage implements Storage {
 				$sql .= $limit;
 			}
 		}
-		$os = $this->fetchAsArray($this->query($sql), "m_mitgliedid", null, array("r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => 'Ort', "m" => 'Mitglied'));
-		$objs = array();
-		foreach ($os as $o) {
-			$o["k"]->setOrt($o["o"]);
-			if ($o["r"]->getNatPersonID() !== null) {
-				$o["r"]->setNatPerson($o["n"]);
-			}
-			if ($o["r"]->getJurPersonID() !== null) {
-				$o["r"]->setJurPerson($o["j"]);
-			}
-			$o["r"]->setKontakt($o["k"]);
-			$o["m"]->addRevision($o["r"]);
-			$objs[] = $o["m"];
-		}
-		return $objs;
+		return $this->getResult($sql, array($this, "parseMitglied"));
 	}
 	public function getMitglied($mitgliedid) {
 		$sql = "SELECT	`r`.`timestamp` AS `null`,
@@ -383,17 +392,7 @@ abstract class SQLStorage implements Storage {
 			WHERE	`r`.`mitgliedid` = " . intval($mitgliedid) . "
 			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
 			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)";
-		$o = reset($this->fetchAsArray($this->query($sql), "r_revisionid", null, array("r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => 'Ort', "m" => 'Mitglied')));
-		$o["k"]->setOrt($o["o"]);
-		if ($o["r"]->getNatPersonID() !== null) {
-			$o["r"]->setNatPerson($o["n"]);
-		}
-		if ($o["r"]->getJurPersonID() !== null) {
-			$o["r"]->setJurPerson($o["j"]);
-		}
-		$o["r"]->setKontakt($o["k"]);
-		$o["m"]->addRevision($o["r"]);
-		return $o["m"];
+		return $this->getResult($sql, array($this, "parseMitglied"))->fetchRow();
 	}
 	public function setMitglied($mitgliedid, $globalid, $eintritt, $austritt) {
 		if ($mitgliedid == null) {
@@ -412,7 +411,19 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * MitgliederRevisions
 	 **/
-	public function getMitgliederRevisionList($mitgliedid = null) {
+	public function parseMitgliederRevision($row) {
+		$os = $this->parseRow($row, array("r" => 'MitgliederRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "u" => 'User'));
+		$objs = array();
+		foreach ($os as $k => &$o) {
+			$o["k"]->setOrt($o["o"]);
+			$o["r"]->setNatPerson($o["n"]);
+			$o["r"]->setJurPerson($o["j"]);
+			$o["r"]->setKontakt($o["k"]);
+			$objs[$k] = $o["r"];
+		}
+		return $objs;
+	}
+	public function getMitgliederRevisionResult($mitgliedid = null) {
 		$sql = "SELECT	`r`.`revisionid` AS `r_revisionid`,
 				`r`.`globaleid` AS `r_globaleid`,
 				UNIX_TIMESTAMP(`r`.`timestamp`) AS `r_timestamp`,
@@ -454,34 +465,48 @@ abstract class SQLStorage implements Storage {
 			$sql .= " WHERE `m`.`mitgliedid` = " . intval($mitgliedid);
 		}
 		$sql .= " ORDER BY `r`.`timestamp`";
-		$os = $this->fetchAsArray($this->query($sql), "revisionid", null, array("r" => 'MitgliederRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "u" => 'User'));
-		$objs = array();
-		foreach ($os as $k => &$o) {
-			$o["k"]->setOrt($o["o"]);
-			$o["r"]->setNatPerson($o["n"]);
-			$o["r"]->setJurPerson($o["j"]);
-			$o["r"]->setKontakt($o["k"]);
-			$objs[$k] = $o["r"];
-		}
-		return $objs;
+		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
 	}
 	public function getMitgliederRevision($revisionid) {
-		$sql = "SELECT	`mitgliederrevisions`.`revisionid`,
-				`mitgliederrevisions`.`globaleid`,
-				UNIX_TIMESTAMP(`mitgliederrevisions`.`timestamp`),
-				`mitgliederrevisions`.`userid`,
-				`mitgliederrevisions`.`mitgliedid`,
-				`mitgliederrevisions`.`mitgliedschaftid`,
-				`mitgliederrevisions`.`gliederungsid`,
-				`mitgliederrevisions`.`geloescht`,
-				`mitgliederrevisions`.`mitglied_piraten`,
-				`mitgliederrevisions`.`verteiler_eingetragen`,
-				`mitgliederrevisions`.`beitrag`,
-				`mitgliederrevisions`.`natpersonid`,
-				`mitgliederrevisions`.`jurpersonid`,
-				`mitgliederrevisions`.`kontaktid`
-			FROM	`mitgliederrevisions`
-			WHERE	`revisionid` = " . intval($mitgliedid);
+		$sql = "SELECT	`r`.`revisionid` AS `r_revisionid`,
+				`r`.`globaleid` AS `r_globaleid`,
+				UNIX_TIMESTAMP(`r`.`timestamp`) AS `r_timestamp`,
+				`r`.`userid` AS `r_userid`,
+				`r`.`mitgliedid` AS `r_mitgliedid`,
+				`r`.`mitgliedschaftid` AS `r_mitgliedschaftid`,
+				`r`.`gliederungsid` AS `r_gliederungsid`,
+				`r`.`geloescht` AS `r_geloescht`,
+				`r`.`mitglied_piraten` AS `r_mitglied_piraten`,
+				`r`.`verteiler_eingetragen` AS `r_verteiler_eingetragen`,
+				`r`.`beitrag` AS `r_beitrag`,
+				`r`.`natpersonid` AS `r_natpersonid`,
+				`r`.`jurpersonid` AS `r_jurpersonid`,
+				`r`.`kontaktid` AS `r_kontaktid`,
+				`n`.`natpersonid` AS `n_natpersonid`,
+				`n`.`name` AS `n_name`,
+				`n`.`vorname` AS `n_vorname`,
+				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
+				`n`.`nationalitaet` AS `n_nationalitaet`,
+				`j`.`jurpersonid` AS `j_jurpersonid`,
+				`j`.`firma` AS `j_firma`,
+				`k`.`kontaktid` AS `k_kontaktid`,
+				`k`.`strasse` AS `k_strasse`,
+				`k`.`hausnummer` AS `k_hausnummer`,
+				`k`.`ortid` AS `k_ortid`,
+				`k`.`telefon` AS `k_telefon`,
+				`k`.`handy` AS `k_handy`,
+				`k`.`email` AS `k_email`,
+				`o`.`ortid` AS `o_ortid`,
+				`o`.`plz` AS `o_plz`,
+				`o`.`label` AS `o_label`,
+				`o`.`stateid` AS `o_stateid`
+			FROM	`mitgliederrevisions` `r`
+			LEFT JOIN `natperson` `n` USING (`natpersonid`)
+			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
+			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
+			LEFT JOIN `kontakte` `o` USING (`ortid`)
+			WHERE	`r`.`revisionid` = " . intval($revisionid);
+		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
 	}
 	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $mitgliedpiraten, $verteilereingetragen, $beitrag, $natpersonid, $jurpersonid, $kontaktid) {
 		if ($revisionid == null) {
@@ -539,11 +564,14 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * Ort
 	 **/
-	public function getOrtList() {
-		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte`";
-		return $this->fetchAsArray($this->query($sql), "ortid", null, 'Ort');
+	public function parseOrt($row) {
+		return $this->parseRow($row, null, "Ort");
 	}
-	public function getOrtListLimit($plz = null, $label = null, $stateid = null, $count = null) {
+	public function getOrtResult() {
+		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte`";
+		return $this->getResult($sql, array($this, "parseOrt"));
+	}
+	public function getOrtResultLimit($plz = null, $label = null, $stateid = null, $count = null) {
 		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte` WHERE 1";
 		if ($plz != null) {
 			$sql .= " and `plz` LIKE '" . $this->escape($plz) . "%'";
@@ -557,11 +585,11 @@ abstract class SQLStorage implements Storage {
 		if ($count != null) {
 			$sql .= " LIMIT " . intval($count);
 		}
-		return $this->fetchAsArray($this->query($sql), "ortid", null, 'Ort');
+		return $this->getResult($sql, array($this, "parseOrt"));
 	}
 	public function getOrt($ortid) {
 		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte` WHERE `ortid` = " . intval($ortid);
-		return reset($this->fetchAsArray($this->query($sql), "ortid", null, 'Ort'));
+		return $this->getResult($sql, array($this, "parseOrt"))->fetchRow();
 	}
 	public function setOrt($ortid, $plz, $label, $stateid) {
 		if ($ortid == null) {
@@ -581,7 +609,7 @@ abstract class SQLStorage implements Storage {
 	}
 	public function searchOrt($plz, $label, $stateid) {
 		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte` WHERE `plz` = '" . $this->escape($plz) . "' AND `label` = '" . $this->escape($label) . "' AND `stateid` = " . intval($stateid);
-		$array = $this->fetchAsArray($this->query($sql), "ortid", null, 'Ort');
+		$array = $this->getResult($sql, array($this, "parseOrt"))->fetchRow();
 		if (count($array) > 0) {
 			return reset($array);
 		}
@@ -596,13 +624,16 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * State
 	 **/
-	public function getStateList() {
+	public function parseState($row) {
+		return $this->parseRow($row, null, "State");
+	}
+	public function getStateResult() {
 		$sql = "SELECT `stateid`, `label`, `countryid` FROM `states`";
-		return $this->fetchAsArray($this->query($sql), "stateid", null, 'State');
+		return $this->getResult($sql, array($this, "parseState"));
 	}
 	public function getState($stateid) {
 		$sql = "SELECT `stateid`, `label`, `countryid` FROM `states` WHERE `stateid` = " . intval($stateid);
-		return reset($this->fetchAsArray($this->query($sql), "stateid", null, 'State'));
+		return $this->getResult($sql, array($this, "parseState"))->fetchRow();
 	}
 	public function setState($stateid, $label, $countryid) {
 		if ($stateid == null) {
@@ -624,13 +655,16 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * Country
 	 **/
-	public function getCountryList() {
+	public function parseCountry($row) {
+		return $this->parseRow($row, null, "Country");
+	}
+	public function getCountryResult() {
 		$sql = "SELECT `countryid`, `label` FROM `countries`";
-		return $this->fetchAsArray($this->query($sql), "countryid", null, 'Country');
+		return $this->getResult($sql, array($this, "parseCountry"));
 	}
 	public function getCountry($countryid) {
 		$sql = "SELECT `countryid`, `label` FROM `countries` WHERE `countryid` = " . intval($countryid);
-		return reset($this->fetchAsArray($this->query($sql), "countryid", null, 'Country'));
+		return $this->getResult($sql, array($this, "parseCountry"))->fetchRow();
 	}
 	public function setCountry($countryid, $label) {
 		if ($countryid == null) {
@@ -652,13 +686,16 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * Mitgliedschaften
 	 **/
-	public function getMitgliedschaftList() {
+	public function parseMitgliedschaft($row) {
+		return $this->parseRow($row, null, "Mitgliedschaft");
+	}
+	public function getMitgliedschaftResult() {
 		$sql = "SELECT `mitgliedschaftid`, `label`, `description`, `defaultbeitrag`, `defaultcreatemail` FROM `mitgliedschaften`";
-		return $this->fetchAsArray($this->query($sql), "mitgliedschaftid", null, 'Mitgliedschaft');
+		return $this->getResult($sql, array($this, "parseMitgliedschaft"));
 	}
 	public function getMitgliedschaft($mitgliedschaftid) {
 		$sql = "SELECT `mitgliedschaftid`, `label`, `description`, `defaultbeitrag`, `defaultcreatemail` FROM `mitgliedschaften` WHERE `mitgliedschaftid` = " . intval($mitgliedschaftid);
-		return reset($this->fetchAsArray($this->query($sql), "mitgliedschaftid", null, 'Mitgliedschaft'));
+		return $this->getResult($sql, array($this, "parseMitgliedschaft"))->fetchRow();
 	}
 	public function setMitgliedschaft($mitgliedschaftid, $globaleid, $label, $description, $defaultbeitrag, $defaultcreatemail) {
 		if ($mitgliedschaftid == null) {
@@ -681,9 +718,12 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * NatPerson
 	 **/
+	public function parseNatPerson($row) {
+		return $this->parseRow($row, null, "NatPerson");
+	}
 	public function getNatPerson($natpersonid) {
 		$sql = "SELECT `natpersonid`, `name`, `vorname`, `geburtsdatum`, `nationalitaet` FROM `natperson` WHERE `natpersonid` = " . intval($natpersonid);
-		return reset($this->fetchAsArray($this->query($sql), null, null, 'NatPerson'));
+		return $this->getResult($sql, array($this, "parseNatPerson"))->fetchRow();
 	}
 	public function setNatPerson($natpersonid, $name, $vorname, $geburtsdatum, $nationalitaet) {
 		if ($natpersonid == null) {
@@ -703,7 +743,7 @@ abstract class SQLStorage implements Storage {
 	}
 	public function searchNatPerson($name, $vorname, $geburtsdatum, $nationalitaet) {
 		$sql = "SELECT `natpersonid`, `name`, `vorname`, `geburtsdatum`, `nationalitaet` FROM `natperson` WHERE `name` = '" . $this->escape($name) . "' AND `vorname` = '" . $this->escape($vorname) . "' AND `geburtsdatum` = '" . date("Y-m-d", $geburtsdatum) . "' AND `nationalitaet` = '" . $this->escape($nationalitaet) . "'";
-		$array = $this->fetchAsArray($this->query($sql), "natpersonid", null, 'NatPerson');
+		$array = $this->getResult($sql, array($this, "parseNatPerson"))->fetchRow();
 		if (count($array) > 0) {
 			return reset($array);
 		}
@@ -719,9 +759,12 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * JurPerson
 	 **/
+	public function parseJurPerson($row) {
+		return $this->parseRow($row, null, "JurPerson");
+	}
 	public function getJurPerson($jurpersonid) {
 		$sql = "SELECT `jurpersonid`, `label` FROM `jurperson` WHERE `jurpersonid` = " . intval($jurpersonid);
-		return reset($this->fetchAsArray($this->query($sql), null, null, 'JurPerson'));
+		return $this->getResult($sql, array($this, "parseJurPerson"))->fetchRow();
 	}
 	public function setJurPerson($jurpersonid, $firma) {
 		if ($jurpersonid == null) {
@@ -741,7 +784,7 @@ abstract class SQLStorage implements Storage {
 	}
 	public function searchJurPerson($firma) {
 		$sql = "SELECT `jurpersonid`, `label` FROM `jurperson` WHERE `label` = '" . $this->escape($firma) . "'";
-		$array = $this->fetchAsArray($this->query($sql), "jurpersonid", null, 'JurPerson');
+		$array = $this->getResult($sql, array($this, "parseJurPerson"))->fetchRow();
 		if (count($array) > 0) {
 			return reset($array);
 		}
@@ -754,13 +797,16 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * MailTemplates
 	 **/
-	public function getMailTemplateList() {
+	public function parseMailTemplate($row) {
+		return $this->parseRow($row, null, "MailTemplate");
+	}
+	public function getMailTemplateResult() {
 		$sql = "SELECT `templateid`, `label`, `body` FROM `mailtemplates`";
-		return $this->fetchAsArray($this->query($sql), "templateid", null, 'MailTemplate');
+		return $this->getResult($sql, array($this, "parseMailTemplate"));
 	}
 	public function getMailTemplate($mailtemplateid) {
 		$sql = "SELECT `templateid`, `label`, `body` FROM `mailtemplates` WHERE `templateid` = " . intval($mailtemplateid);
-		return reset($this->fetchAsArray($this->query($sql), "templateid", null, 'MailTemplate'));
+		return $this->getResult($sql, array($this, "parseMailTemplate"))->fetchRow();
 	}
 	public function setMailTemplate($templateid, $label, $body) {
 		if ($templateid == null) {
@@ -782,9 +828,13 @@ abstract class SQLStorage implements Storage {
 		$sql = "DELETE FROM `mailtemplates` WHERE `templateid` = " . intval($mailtemplateid);
 		return $this->query($sql);
 	}
-	public function getMailTemplateHeaderList($mailtemplateid) {
+
+	public function parseMailTemplateHeader($row) {
+		return $this->parseRow($row, null, "MailTemplateHeader");
+	}
+	public function getMailTemplateHeaderResult($mailtemplateid) {
 		$sql = "SELECT `templateid`, `field`, `value` FROM `mailtemplateheaders` WHERE `templateid` = " . intval($mailtemplateid);
-		return $this->fetchAsArray($this->query($sql), "field", null, 'MailTemplateHeader');
+		return $this->getResult($sql, array($this, "parseMailTemplateHeader"));
 	}
 	public function setMailTemplateHeaderList($templateid, $fields, $values) {
 		$sql = "DELETE FROM `mailtemplateheaders` WHERE `templateid` = " . intval($templateid);
@@ -798,9 +848,13 @@ abstract class SQLStorage implements Storage {
 			$this->query($sql);
 		}
 	}
-	public function getMailTemplateAttachmentList($mailtemplateid) {
+
+	public function parseMailTemplateAttachment($row) {
+		return $this->parseRow($row, null, "MailAttachment");
+	}
+	public function getMailTemplateAttachmentResult($mailtemplateid) {
 		$sql = "SELECT `mailattachments`.`attachmentid`, `mailattachments`.`filename`, `mailattachments`.`mimetype`, `mailattachments`.`content` FROM `mailtemplateattachments` LEFT JOIN `mailattachments` ON (`mailtemplateattachments`.`attachmentid` = `mailattachments`.`attachmentid`) WHERE `mailtemplateattachments`.`templateid` = " . intval($mailtemplateid);
-		return $this->fetchAsArray($this->query($sql), "attachmentid", null, 'MailAttachment');
+		return $this->getResult($sql, array($this, "parseMailTemplateAttachment"));
 	}
 	public function setMailTemplateAttachmentList($mailtemplateid, $attachments) {
 		$sql = "DELETE FROM `mailtemplateattachments` WHERE `templateid` = " . intval($templateid);
@@ -818,13 +872,16 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * MailHeader
 	 **/
-	public function getMailHeaderList() {
+	public function parseMailHeader($row) {
+		return $this->parseRow($row, null, "MailHeader");
+	}
+	public function getMailHeaderResult() {
 		$sql = "SELECT `headerid`, `label` FROM `mailheaders`";
-		return $this->fetchAsArray($this->query($sql), "headerid", null, 'MailHeader');
+		return $this->getResult($sql, array($this, "parseMailHeader"));
 	}
 	public function getMailHeader($headerid) {
 		$sql = "SELECT `headerid`, `label` FROM `mailheaders` WHERE `headerid` = " . intval($headerid);
-		return reset($this->fetchAsArray($this->query($sql), "headerid", null, 'MailHeader'));
+		return $this->getResult($sql, array($this, "parseMailHeader"))->fetchRow();
 	}
 	public function setMailHeader($headerid, $label) {
 		if ($headerid == null) {
@@ -846,13 +903,16 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * MailAttachments
 	 **/
-	public function getMailAttachmentList() {
+	public function parseMailAttachment($row) {
+		return $this->parseRow($row, null, "MailAttachment");
+	}
+	public function getMailAttachmentResult() {
 		$sql = "SELECT `attachmentid`, `filename`, `mimetype`, `content` FROM `mailattachments`";
-		return $this->fetchAsArray($this->query($sql), "attachmentid", null, 'MailAttachment');
+		return $this->getResult($sql, array($this, "parseMailAttachment"));
 	}
 	public function getMailAttachment($attachmentid) {
 		$sql = "SELECT `attachmentid`, `filename`, `mimetype`, `content` FROM `mailattachments` WHERE `attachmentid` = " . intval($attachmentid);
-		return reset($this->fetchAsArray($this->query($sql), "attachmentid", null, 'MailAttachment'));
+		return $this->getResult($sql, array($this, "parseMailAttachment"))->fetchRow();
 	}
 	public function setMailAttachment($attachmentid, $filename, $mimetype, $content) {
 		if ($attachmentid == null) {
@@ -874,16 +934,17 @@ abstract class SQLStorage implements Storage {
 	/**
 	 * Prozesse
 	 **/
-	public function getProcessList() {
-		$sql = "SELECT `processid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished` FROM `processes`";
-		return $this->fetchAsArray($this->query($sql), "processid", null, "Process");
+	public function parseProcess($row) {
+		return $this->parseRow($row, null, "Process");
 	}
-
+	public function getProcessResult() {
+		$sql = "SELECT `processid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished` FROM `processes`";
+		return $this->getResult($sql, array($this, "parseProcess"));
+	}
 	public function getProcess($processid, $type = null) {
 		$sql = "SELECT `processid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished` FROM `processes` WHERE `processid` = " . intval($processid);
-		return reset($this->fetchAsArray($this->query($sql), "processid", null, "Process"));
+		return $this->getResult($sql, array($this, "parseProcess"))->fetchRow();
 	}
-
 	public function setProcess($processid, $type, $typedata, $progress, $queued, $started, $finished) {
 		if ($processid == null) {
 			$sql = "INSERT INTO `processes`
@@ -910,10 +971,48 @@ abstract class SQLStorage implements Storage {
 		}
 		return $processid;
 	}
-
 	public function delProcess($processid) {
 		$sql = "DELETE FROM `processes` WHERE `processid` = " . intval($processid);
 		return $this->query($sql);
+	}
+}
+
+class SQLStorageResult extends StorageResult {
+	private $stor;
+	private $rslt;
+	private $callback;
+
+	public function __construct(Storage $stor, $rslt, $callback = null) {
+		$this->stor = $stor;
+		$this->rslt = $rslt;
+		$this->callback = $callback;
+	}
+
+	public function fetchRow() {
+		$row = $this->stor->fetchRow($this->rslt);
+		if ($row == null) {
+			return null;
+		}
+		if ($this->callback != null) {
+			$row = call_user_func($this->callback, $row);
+		}
+		return $row;
+	}
+
+	public function fetchAll($keyfield = null) {
+		$rows = array();
+		while ($row = $this->fetchRow()) {
+			if ($keyfield != null) {
+				$rows[$row[$keyfield]] = $row;
+			} else {
+				$rows[] = $row;
+			}
+		}
+		return $rows;
+	}
+
+	public function getCount() {
+		return $this->stor->numRows($this->rslt);
 	}
 }
 

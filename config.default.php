@@ -1,14 +1,15 @@
 <?php
 
-define("VPANEL_ROOT",		dirname(__FILE__));
-define("VPANEL_CORE",		VPANEL_ROOT . "/core");
-define("VPANEL_STORAGE",	VPANEL_CORE . "/storage");
-define("VPANEL_UI",		VPANEL_ROOT . "/ui");
-define("VPANEL_LANGUAGE",	VPANEL_UI . "/language");
+define("VPANEL_ROOT",			dirname(__FILE__));
+define("VPANEL_CORE",			VPANEL_ROOT . "/core");
+define("VPANEL_STORAGE",		VPANEL_CORE . "/storage");
+define("VPANEL_MITGLIEDERMATCHER",	VPANEL_CORE . "/mitgliedermatcher");
+define("VPANEL_SENDMAILBACKEND",	VPANEL_CORE . "/sendmailbackend");
+define("VPANEL_PROCESSES",		VPANEL_CORE . "/processes");
+define("VPANEL_UI",			VPANEL_ROOT . "/ui");
+define("VPANEL_LANGUAGE",		VPANEL_UI . "/language");
 
 require_once(VPANEL_UI . "/session.class.php");
-require_once(VPANEL_UI . "/language.class.php");
-require_once(VPANEL_STORAGE . "/mysql.class.php");
 
 class DefaultConfig {
 	public function getSession() {
@@ -66,6 +67,14 @@ class DefaultConfig {
 	}
 	public function getStorage() {
 		return $this->storage;
+	}
+
+	private $sendmailbackend;
+	public function setSendMailBackend($sendmailbackend) {
+		$this->sendmailbackend = $sendmailbackend;
+	}
+	public function getSendMailBackend() {
+		return $this->sendmailbackend;
 	}
 }
 
