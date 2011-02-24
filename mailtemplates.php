@@ -19,9 +19,9 @@ function parseMailTemplateFormular($session, &$template = null) {
 
 	if ($template == null) {
 		$template = new MailTemplate($session->getStorage());
-		$template->setLabel($label);
-		$template->setBody($body);
 	}
+	$template->setLabel($label);
+	$template->setBody($body);
 	
 	// Headerfelder
 	$headerfields = $session->getListVariable("headerfields");
@@ -55,7 +55,7 @@ case "details":
 
 		parseMailTemplateFormular($session, $template);
 
-		$ui->redirect($session->getLink("mailtemplates_details", $template->getTemplateID()));
+		//$ui->redirect($session->getLink("mailtemplates_details", $template->getTemplateID()));
 	}
 
 	$ui->viewMailTemplateDetails($template);
