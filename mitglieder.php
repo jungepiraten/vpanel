@@ -57,7 +57,9 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 
 	$kontakt = $session->getStorage()->searchKontakt($strasse, $hausnummer, $ort->getOrtID(), $telefon, $handy, $email);
 
+	$neumitglied = false;
 	if ($mitglied == null) {
+		$neumitglied = true;
 		$mitglied = new Mitglied($session->getStorage());
 		$mitglied->setEintrittsdatum(time());
 		$mitglied->setAustrittsdatum(null);
@@ -77,6 +79,14 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 	$revision->setJurPerson($jurperson);
 	$revision->setKontakt($kontakt);
 	$revision->save();
+
+	if ($neumitglied) {
+		$mailtemplate = $mitgliedschaft->getDefaultCreateMail();
+		if ($mailtemplate != null) {
+			$mail = $mailtemplate->generateMail($mitglied);
+			$config->getSendMailBackend()->send($mail);
+		}
+	}
 }
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
