@@ -380,6 +380,12 @@ class Template {
 		$this->smarty->display("mitgliedersendmailsend.html.tpl");
 	}
 
+	public function viewMitgliederExportOptions($filters, $predefinedfields) {
+		$this->smarty->assign("filters", $this->parseMitgliederFilters($filters));
+		$this->smarty->assign("predefinedfields", $predefinedfields);
+		$this->smarty->display("mitgliederexportform.html.tpl");
+	}
+
 	public function viewStatistik($mitgliedercount, $mitgliedschaften, $states) {
 		$countPerMitgliedschaft = array();
 		foreach ($mitgliedschaften as $mitgliedschaft) {

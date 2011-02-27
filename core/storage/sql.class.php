@@ -13,6 +13,7 @@ require_once(VPANEL_CORE . "/mailtemplate.class.php");
 require_once(VPANEL_CORE . "/mailattachment.class.php");
 require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
 require_once(VPANEL_CORE . "/process.class.php");
+require_once(VPANEL_CORE . "/tempfile.class.php");
 
 abstract class SQLStorage extends Storage {
 	public function __construct() {}
@@ -938,23 +939,24 @@ abstract class SQLStorage extends Storage {
 		return $this->parseRow($row, null, "Process");
 	}
 	public function getProcessResult() {
-		$sql = "SELECT `processid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished` FROM `processes`";
+		$sql = "SELECT `processid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished`, `finishedpage` FROM `processes`";
 		return $this->getResult($sql, array($this, "parseProcess"));
 	}
-	public function getProcess($processid, $type = null) {
-		$sql = "SELECT `processid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished` FROM `processes` WHERE `processid` = " . intval($processid);
+	public function getProcess($processid) {
+		$sql = "SELECT `processid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished`, `finishedpage` FROM `processes` WHERE `processid` = " . intval($processid);
 		return $this->getResult($sql, array($this, "parseProcess"))->fetchRow();
 	}
-	public function setProcess($processid, $type, $typedata, $progress, $queued, $started, $finished) {
+	public function setProcess($processid, $type, $typedata, $progress, $queued, $started, $finished, $finishedpage) {
 		if ($processid == null) {
 			$sql = "INSERT INTO `processes`
-				(`type`, `typedata`, `progress`, `queued`, `started`, `finished`) VALUES
+				(`type`, `typedata`, `progress`, `queued`, `started`, `finished`, `finishedpage`) VALUES
 				('" . $this->escape($type) . "',
 				 '" . $this->escape($typedata) . "',
 				 " . doubleval($progress) . ",
 				 '" . date("Y-m-d H:i:s", $queued) . "',
 				 " . ($started != null ? "'" . date("Y-m-d H:i:s", $started) . "'" : "NULL") . ",
-				 " . ($finished != null ? "'" . date("Y-m-d H:i:s", $finished) . "'" : "NULL") . ")";
+				 " . ($finished != null ? "'" . date("Y-m-d H:i:s", $finished) . "'" : "NULL") . ",
+				 '" . $this->escape($finishedpage) . "')";
 		} else {
 			$sql = "UPDATE	`processes`
 				SET	`type` = '" . $this->escape($type) . "',
@@ -962,7 +964,8 @@ abstract class SQLStorage extends Storage {
 					`progress` = '" . doubleval($progress) . "',
 					`queued` = '" . date("Y-m-d H:i:s", $queued) . "',
 					`started` = " . ($started != null ? "'" . date("Y-m-d H:i:s", $started) . "'" : "NULL") . ",
-					`finished` = " . ($finished != null ? "'" . date("Y-m-d H:i:s", $finished) . "'" : "NULL") . "
+					`finished` = " . ($finished != null ? "'" . date("Y-m-d H:i:s", $finished) . "'" : "NULL") . ",
+					`finishedpage` = '" . $this->escape($finishedpage) . "'
 				WHERE `processid` = " . intval($processid);
 		}
 		$this->query($sql);
@@ -973,6 +976,47 @@ abstract class SQLStorage extends Storage {
 	}
 	public function delProcess($processid) {
 		$sql = "DELETE FROM `processes` WHERE `processid` = " . intval($processid);
+		return $this->query($sql);
+	}
+
+	/**
+	 * File
+	 **/
+	public function parseFile($row) {
+		return $this->parseRow($row, null, "TempFile");
+	}
+	public function getFileResult() {
+		$sql = "SELECT `fileid`, `userid`, `filename`, `exportfilename`, `mimetype` FROM `files`";
+		return $this->getResult($sql, array($this, "parseFile"));
+	}
+	public function getFile($fileid) {
+		$sql = "SELECT `fileid`, `userid`, `filename`, `exportfilename`, `mimetype` FROM `files` WHERE `fileid` = " . intval($fileid);
+		return $this->getResult($sql, array($this, "parseFile"))->fetchRow();
+	}
+	public function setFile($fileid, $userid, $filename, $exportfilename, $mimetype) {
+		if ($fileid == null) {
+			$sql = "INSERT INTO `files`
+				(`userid`, `filename`, `exportfilename`, `mimetype`) VALUES
+				(" . intval($userid) . ",
+				 '" . $this->escape($filename) . "',
+				 '" . $this->escape($exportfilename) . "',
+				 '" . $this->escape($mimetype) . "')";
+		} else {
+			$sql = "UPDATE	`files`
+				SET	`userid` = " . intval($userid) . ",
+					`filename` = '" . $this->escape($filename) . "',
+					`exportfilename` = '" . $this->escape($exportfilename) . "',
+					`mimetype` = '" . $this->escape($mimetype) . "'
+				WHERE `fileid` = " . intval($fileid);
+		}
+		$this->query($sql);
+		if ($fileid == null) {
+			$fileid = $this->getInsertID();
+		}
+		return $fileid;
+	}
+	public function delFile($fileid) {
+		$sql = "DELETE `files` WHERE `fileid` = " . intval($fileid);
 		return $this->query($sql);
 	}
 }

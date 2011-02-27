@@ -1,15 +1,18 @@
 <?php
 
 class Mail {
-	private $template;
-	private $replace;
+	private $headers;
+	private $body;
+	private $attachments;
+
 	private $boundary;
 	private $mailfrom;
 	private $fromlabel;
 
-	public function __construct(MailTemplate $template) {
-		$this->template = $template;
-		$this->replace = array();
+	public function __construct($headers, $body, $attachments) {
+		$this->headers = $headers;
+		$this->body = $body;
+		$this->attachments = $attachments;
 	}
 
 	public function setRecipient($mail, $label = null) {
@@ -26,28 +29,16 @@ class Mail {
 		return $rcpt;
 	}
 
-	public function addReplace($pattern, $text) {
-		$this->replace[$pattern] = $text;
-	}
-
-	private function replaceText($text) {
-		return str_replace(array_keys($this->replace), array_values($this->replace), $text);
-	}
-
 	public function getHeaders() {
-		$headers = array();
-		foreach ($this->template->getHeaders() as $header) {
-			$headers[$header->getField()] = $this->replaceText($header->getValue());
-		}
-		return $headers;
+		return $this->headers;
 	}
 
 	public function getBody() {
-		return $this->replaceText($this->template->getBody());
+		return $this->body;
 	}
 
 	public function getAttachments() {
-		return $this->template->getAttachments();
+		return $this->attachments;
 	}
 
 	public function isMultipart() {

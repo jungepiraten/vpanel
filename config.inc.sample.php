@@ -45,9 +45,12 @@ $config->registerPage("mitglieder_page", "mitglieder.php?page=%d");
 $config->registerPage("mitglieder_create", "mitglieder.php?mode=create&mitgliedschaftid=%d");
 $config->registerPage("mitglieder_details", "mitglieder.php?mode=details&mitgliedid=%d");
 $config->registerPage("mitglieder_del", "mitglieder.php?mode=delete&mitgliedid=%d");
-$config->registerPage("mitglieder_sendmail", "mitglieder.php?mode=sendmail.select&filterid=%s");
+$config->registerPage("mitglieder_sendmail.select", "mitglieder.php?mode=sendmail.select&filterid=%s");
 $config->registerPage("mitglieder_sendmail.preview", "mitglieder.php?mode=sendmail.preview");
 $config->registerPage("mitglieder_sendmail.send", "mitglieder.php?mode=sendmail.send");
+$config->registerPage("mitglieder_sendmail.done", "mitglieder.php?mode=sendmail.done&processid=%d");
+$config->registerPage("mitglieder_export.options", "mitglieder.php?mode=export.options&filterid=%s");
+$config->registerPage("mitglieder_export.export", "mitglieder.php?mode=export.export");
 
 $config->registerPage("mailtemplates", "mailtemplates.php");
 $config->registerPage("mailtemplates_create", "mailtemplates.php?mode=create");
@@ -56,6 +59,8 @@ $config->registerPage("mailtemplates_del", "mailtemplates.php?mode=delete&templa
 $config->registerPage("mailattachment", "mailattachment.php?attachmentid=%d");
 
 $config->registerPage("statistik", "statistik.php");
+
+$config->registerPage("tempfile_get", "tempfile.php?mode=get&fileid=%d");
 
 $config->registerPage("processes_view", "processes.php?mode=view&processid=%d");
 $config->registerPage("processes_json", "json/processes.php");

@@ -68,7 +68,7 @@ class MitgliederFilterSendMailProcess extends Process {
 		$result = $this->getStorage()->getMitgliederResult($this->getFilter());
 		$max = $result->getCount();
 		$i = 0;
-		$stepwidth = min(1, ceil(100 / max(1,$max)));
+		$stepwidth = max(1, ceil($max / 100));
 
 		while ($mitglied = $result->fetchRow()) {
 			$mail = $this->getTemplate()->generateMail($mitglied);

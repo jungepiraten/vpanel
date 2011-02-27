@@ -82,6 +82,78 @@ class Mitglied extends GlobalClass {
 			$this->getAustrittsdatum() ));
 		// TODO revisions speichern
 	}
+	
+	private function getVariableValue($keyword) {
+		$keyword = strtoupper($keyword);
+
+		$revision = $this->getLatestRevision();
+		$kontakt = $revision->getKontakt();
+		switch ($keyword) {
+		case "MITGLIEDID":
+			return $this->getMitgliedID();
+		case "EINTRITT":
+			return date("d.m.Y", $this->getEintrittsdatum());
+		case "AUSTRITT":
+			return date("d.m.Y", $this->getAustrittsdatum());
+		case "STRASSE":
+			return $kontakt->getStrasse();
+		case "HAUSNUMMER":
+			return $kontakt->getHausnummer();
+		case "PLZ":
+			return $kontakt->getOrt()->getPLZ();
+		case "ORT":
+			return $kontakt->getOrt()->getLabel();
+		case "STATE":
+			return $kontakt->getOrt()->getState()->getLabel();
+		case "COUNTRY":
+			return $kontakt->getOrt()->getState()->getCountry()->getLabel();
+		case "TELEFONNUMMER":
+			return $kontakt->getTelefonnummer();
+		case "HANDYNUMMER":
+			return $kontakt->getHandynummer();
+		case "EMAIL":
+			return $kontakt->getEMail();
+		case "MITGLIEDSCHAFT":
+			return $revision->getMitgliedschaft()->getLabel();
+		case "BEITRAG":
+			return $revision->getBeitrag();
+		}
+		if ($revision->isNatPerson()) {
+			$natperson = $revision->getNatPerson();
+			switch ($keyword) {
+			case "BEZEICHNUNG":
+				return $natperson->getVorname() . " " . $natperson->getName();
+			case "NAME":
+				return $natperson->getName();
+			case "VORNAME":
+				return $natperson->getVorname();
+			case "GEBURTSDATUM":
+				return date("d.m.Y", $natperson->getGeburtsdatum());
+			case "NATIONALITAET":
+				return $natperson->getNationalitaet();
+			}
+		}
+		if ($revision->isJurPerson()) {
+			$jurperson = $revision->getJurPerson();
+			switch ($keyword) {
+			case "BEZEICHNUNG":
+				return $jurperson->getLabel();
+			case "FIRMA":
+				return $natperson->getLabel();
+			}
+		}
+		return "";
+	}
+
+	public function replaceText($text) {
+		// Suche alle vorkommenden Variablen ab
+		preg_match_all('/\\{(.*?)\\}/', $text, $matches);
+		$keywords = array_unique($matches[1]);
+		foreach ($keywords as $keyword) {
+			$text = str_replace("{" . $keyword . "}", $this->getVariableValue($keyword), $text);
+		}
+		return $text;
+	}
 }
 
 ?>

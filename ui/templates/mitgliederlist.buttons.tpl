@@ -9,7 +9,8 @@
    </select>
   </fieldset>
  </form>
- <a href="{"mitglieder_sendmail"|___:$filter.filterid}">{"Mails verschicken"|__}</a>
+ <a href="{"mitglieder_sendmail.select"|___:$filter.filterid}">{"Mails verschicken"|__}</a>
+ <a href="{"mitglieder_export.options"|___:$filter.filterid}">{"Exportieren"|__}</a>
  {foreach from=$mitgliedschaften item=mitgliedschaft}
   <a href="{"mitglieder_create"|___:$mitgliedschaft.mitgliedschaftid}" class="neuset">{"%s"|__:$mitgliedschaft.label}</a>
  {/foreach}

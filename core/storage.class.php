@@ -143,8 +143,16 @@ abstract class Storage {
 		return $this->getProcessResult()->fetchAll();
 	}
 	abstract public function getProcess($processid);
-	abstract public function setProcess($processid, $type, $typedata, $progess, $queued, $started, $finished);
+	abstract public function setProcess($processid, $type, $typedata, $progess, $queued, $started, $finished, $finishedpage);
 	abstract public function delProcess($processid);
+
+	abstract public function getFileResult();
+	public function getFileList() {
+		return $this->getFileResult()->fetchAll();
+	}
+	abstract public function getFile($fileid);
+	abstract public function setFile($fileid, $userid, $filename, $exportfilename, $mimetype);
+	abstract public function delFile($fileid);
 }
 
 abstract class StorageResult {

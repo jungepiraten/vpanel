@@ -101,80 +101,20 @@ class MailTemplate extends StorageClass {
 		$this->attachments[$attachment->getAttachmentID()] = $attachment;
 	}
 	
-	private function getVariableValue(Mitglied $mitglied, $keyword) {
-		$keyword = strtoupper($keyword);
-
-		$revision = $mitglied->getLatestRevision();
-		$kontakt = $revision->getKontakt();
-		switch ($keyword) {
-		case "MITGLIEDID":
-			return $mitglied->getMitgliedID();
-		case "EINTRITT":
-			return date("d.m.Y", $mitglied->getEintrittsdatum());
-		case "AUSTRITT":
-			return date("d.m.Y", $mitglied->getAustrittsdatum());
-		case "STRASSE":
-			return $kontakt->getStrasse();
-		case "HAUSNUMMER":
-			return $kontakt->getHausnummer();
-		case "PLZ":
-			return $kontakt->getOrt()->getPLZ();
-		case "ORT":
-			return $kontakt->getOrt()->getLabel();
-		case "STATE":
-			return $kontakt->getOrt()->getState()->getLabel();
-		case "COUNTRY":
-			return $kontakt->getOrt()->getState()->getCountry()->getLabel();
-		case "TELEFONNUMMER":
-			return $kontakt->getTelefonnummer();
-		case "HANDYNUMMER":
-			return $kontakt->getHandynummer();
-		case "EMAIL":
-			return $kontakt->getEMail();
-		case "MITGLIEDSCHAFT":
-			return $revision->getMitgliedschaft()->getLabel();
-		case "BEITRAG":
-			return $revision->getBeitrag();
-		}
-		if ($revision->isNatPerson()) {
-			$natperson = $revision->getNatPerson();
-			switch ($keyword) {
-			case "BEZEICHNUNG":
-				return $natperson->getVorname() . " " . $natperson->getName();
-			case "NAME":
-				return $natperson->getName();
-			case "VORNAME":
-				return $natperson->getVorname();
-			case "GEBURTSDATUM":
-				return date("d.m.Y", $natperson->getGeburtsdatum());
-			case "NATIONALITAET":
-				return $natperson->getNationalitaet();
-			}
-		}
-		if ($revision->isJurPerson()) {
-			$jurperson = $revision->getJurPerson();
-			switch ($keyword) {
-			case "BEZEICHNUNG":
-				return $jurperson->getLabel();
-			case "FIRMA":
-				return $natperson->getLabel();
-			}
-		}
-		return "%" . $keyword . "%";
-	}
-	
 	public function generateMail(Mitglied $mitglied) {
-		$mail = new Mail($this);
+		$headers = array();
+		foreach ($this->getHeaders() as $header) {
+			$headers[$header->getField()] = $mitglied->replaceText($header->getValue());
+		}
+
+		$body = $this->getBody();
+		$body = $mitglied->replaceText($body);
+
+		$attachments = $this->getAttachments();
+
+		$mail = new Mail($headers, $body, $attachments);
 		$mail->setRecipient($mitglied->getLatestRevision()->getKontakt()->getEMail());
 		
-		// Suche alle vorkommenden Variablen ab
-		$headervalues = array_map(create_function('$a','return $a->getValue();'), $this->getHeaders());
-		preg_match_all('/\\{(.*?)\\}/', implode('', $headervalues) . $this->getBody(), $matches);
-		$keywords = array_unique($matches[1]);
-
-		foreach ($keywords as $keyword) {
-			$mail->addReplace("{" . $keyword . "}", $this->getVariableValue($mitglied, $keyword));
-		}
 		return $mail;
 	}
 }

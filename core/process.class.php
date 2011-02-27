@@ -2,6 +2,7 @@
 
 require_once(VPANEL_CORE . "/storageobject.class.php");
 require_once(VPANEL_CORE . "/processes/mitgliederfiltersendmail.class.php");
+require_once(VPANEL_CORE . "/processes/mitgliederfilterexport.class.php");
 
 abstract class Process extends StorageClass {
 	private $processid;
@@ -17,6 +18,7 @@ abstract class Process extends StorageClass {
 		$process->setQueued($row["queued"]);
 		$process->setStarted($row["started"]);
 		$process->setFinished($row["finished"]);
+		$process->setFinishedPage($row["finishedpage"]);
 		return $process;
 	}
 
@@ -65,6 +67,14 @@ abstract class Process extends StorageClass {
 		$this->finished = $finished;
 	}
 
+	public function getFinishedPage() {
+		return $this->finishedpage;
+	}
+
+	public function setFinishedPage($finishedpage) {
+		$this->finishedpage = $finishedpage;
+	}
+
 	public function isWaiting() {
 		return $this->getQueued() != null && $this->getStarted() == null;
 	}
@@ -88,7 +98,8 @@ abstract class Process extends StorageClass {
 			$this->getProgress(),
 			$this->getQueued(),
 			$this->getStarted(),
-			$this->getFinished() ));
+			$this->getFinished(),
+			$this->getFinishedPage() ));
 	}
 
 	public function run() {

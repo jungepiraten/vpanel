@@ -13,7 +13,14 @@ if (!$session->isAllowed("mitglieder_show")) {
 
 require_once(VPANEL_CORE . "/mitglied.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
-require_once(VPANEL_CORE . "/processes/mitgliederfiltersendmail.class.php");
+require_once(VPANEL_CORE . "/tempfile.class.php");
+require_once(VPANEL_PROCESSES . "/mitgliederfiltersendmail.class.php");
+require_once(VPANEL_PROCESSES . "/mitgliederfilterexport.class.php");
+
+$predefinedfields = array(
+	array("label" => "Bezeichnung",		"template" => "{BEZEICHNUNG}"),
+	array("label" => "Bezeichnung",		"template" => "{BEZEICHNUNG}")
+	);
 
 function parseMitgliederFormular($session, &$mitglied = null) {
 	$persontyp = $session->getVariable("persontyp");
@@ -180,6 +187,50 @@ case "sendmail.send":
 	$process->setBackend($config->getSendMailBackend());
 	$process->setFilter($filter);
 	$process->setTemplate($mailtemplate);
+	// Muss den Prozess erst mal speichern, damit er eine ID zugewiesen bekommt
+	$process->save();
+	$process->setFinishedPage($session->getLink("mitglieder_sendmail.done", $process->getProcessID()));
+	$process->save();
+
+	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
+	exit;
+case "sendmail.done":
+	// TODO :3
+	echo "Dinge getan.";
+	exit;
+case "export.options":
+	$filters = $config->getMitgliederFilterList();
+	
+	$ui->viewMitgliederExportOptions($filters);
+	exit;
+case "export.export":
+	$filter = null;
+	if ($session->hasVariable("filterid") && $config->hasMitgliederFilter($session->getVariable("filterid"))) {
+		$filter = $config->getMitgliederFilter($session->getVariable("filterid"));
+	}
+
+	// Headerfelder
+	$exportfields = array();
+	foreach ($session->getListVariable("simpleexportfields") as $fieldid) {
+		$predefinedfield = $predefinedfields[$fieldid];
+		$exportfields[$predefinedfield["label"]] = $predefinedfield["template"];
+	}
+
+	$exportfieldfields = $session->getListVariable("exportfields");
+	$exportfieldvalues = $session->getListVariable("exportvalues");
+	$exportfields = array_merge($exportfields, array_combine($exportfields, $exportvalues));
+	unset($exportfields[""]);
+
+	$tempfile = new TempFile($session->getStorage());
+	$tempfile->setUser($session->getUser());
+	$tempfile->setExportFilename("vpanel-export-" . date("Y-m-d"));
+	$tempfile->save();
+
+	$process = new MitgliederFilterExportCSVProcess($session->getStorage());
+	$process->setFilter($filter);
+	$process->setFile($tempfile);
+	$process->setFields($exportfields);
+	$process->setFinishedPage($session->getLink("tempfile_get", $tempfile->getFileID()));
 	$process->save();
 
 	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
