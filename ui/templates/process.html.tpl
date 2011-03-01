@@ -6,6 +6,8 @@ $(document).ready(function () {
 	$("#progressbar").progressBar({ barImage: "ui/images/progressbg.gif", boxImage: "ui/images/progressbar.gif", width: 300, height:30 });
 });
 
+var finished = false;
+
 function formatNumber(num) {
 	num = Math.floor(num);
 	if (num < 10) {
@@ -35,6 +37,7 @@ function updateBar(data) {
 	if (data["isfinished"] && data["finishedpage"]) {
 		$("#progresstest").html("Fertiggestellt");
 		location.href = data["finishedpage"];
+		finished = true;
 	}
 	if (data["isrunning"]) {
 		$("#progresstest").html("Prozess läuft");
@@ -51,9 +54,11 @@ function updateBar(data) {
 }
 
 function queryProgress() {
-	$.post("{/literal}{"processes_json"|___}{literal}",{
-				processid: {/literal}{$process.processid}{literal}
-			}, updateBar,'json');
+	if (finished != true) {
+		$.post("{/literal}{"processes_json"|___}{literal}",{
+					processid: {/literal}{$process.processid}{literal}
+				}, updateBar,'json');
+	}
 }
 
 setTimeout(queryProgress, 100);

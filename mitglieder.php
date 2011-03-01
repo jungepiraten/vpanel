@@ -19,7 +19,15 @@ require_once(VPANEL_PROCESSES . "/mitgliederfilterexport.class.php");
 
 $predefinedfields = array(
 	array("label" => "Bezeichnung",		"template" => "{BEZEICHNUNG}"),
-	array("label" => "Bezeichnung",		"template" => "{BEZEICHNUNG}")
+	array("label" => "Anschrift",		"template" => "{STRASSE} {HAUSNUMMER}"),
+	array("label" => "PLZ",			"template" => "{PLZ}"),
+	array("label" => "Ort",			"template" => "{ORT}"),
+	array("label" => "Bundesland",		"template" => "{STATE}"),
+	array("label" => "Telefonnummer",	"template" => "{TELEFONNUMMER}"),
+	array("label" => "Handynummer",		"template" => "{HANDYNUMMER}"),
+	array("label" => "E-Mail",		"template" => "{EMAIL}"),
+	array("label" => "Beitrag",		"template" => "{BEITRAG}"),
+	array("label" => "Mitgliedschaft",	"template" => "{MITGLIEDSCHAFT}")
 	);
 
 function parseMitgliederFormular($session, &$mitglied = null) {
@@ -43,8 +51,8 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 	$gliederung = $session->getStorage()->getGliederung($gliederungid);
 	$mitgliedschaftid = $session->getIntVariable("mitgliedschaftid");
 	$mitgliedschaft = $session->getStorage()->getMitgliedschaft($mitgliedschaftid);
-	$mitgliedpiraten = $session->getVariable("mitglied_piraten");
-	$verteilereingetragen = $session->getVariable("verteiler_eingetragen");
+	$mitgliedpiraten = $session->getBoolVariable("mitglied_piraten");
+	$verteilereingetragen = $session->getBoolVariable("verteiler_eingetragen");
 	$beitrag = $session->getDoubleVariable("beitrag");
 
 	$natperson = null;
@@ -98,8 +106,17 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
 case "details":
-	$mitgliedid = intval($session->getVariable("mitgliedid"));
-	$mitglied = $session->getStorage()->getMitglied($mitgliedid);
+	if ($session->hasVariable("revisionid")) {
+		$revisionid = intval($session->getVariable("revisionid"));
+		$revision = $session->getStorage()->getMitgliederRevision($revisionid);
+		$mitglied = $revision->getMitglied();
+	} else if ($session->hasVariable("mitgliedid")) {
+		$mitgliedid = intval($session->getVariable("mitgliedid"));
+		$mitglied = $session->getStorage()->getMitglied($mitgliedid);
+		$revision = $mitglied->getLatestRevision();
+	}
+
+	$revisions = $mitglied->getRevisionList();
 
 	if ($session->getBoolVariable("save")) {
 		if (!$session->isAllowed("mitglieder_modify")) {
@@ -116,7 +133,7 @@ case "details":
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
 	$states = $session->getStorage()->getStateList();
 
-	$ui->viewMitgliedDetails($mitglied, $mitgliedschaften, $states);
+	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $mitgliedschaften, $states);
 	exit;
 case "create":
 	$mitgliedschaftid = intval($session->getVariable("mitgliedschaftid"));
@@ -201,7 +218,7 @@ case "sendmail.done":
 case "export.options":
 	$filters = $config->getMitgliederFilterList();
 	
-	$ui->viewMitgliederExportOptions($filters);
+	$ui->viewMitgliederExportOptions($filters, $predefinedfields);
 	exit;
 case "export.export":
 	$filter = null;
@@ -218,7 +235,7 @@ case "export.export":
 
 	$exportfieldfields = $session->getListVariable("exportfields");
 	$exportfieldvalues = $session->getListVariable("exportvalues");
-	$exportfields = array_merge($exportfields, array_combine($exportfields, $exportvalues));
+	$exportfields = array_merge($exportfields, array_combine($exportfieldfields, $exportfieldvalues));
 	unset($exportfields[""]);
 
 	$tempfile = new TempFile($session->getStorage());

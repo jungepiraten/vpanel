@@ -113,31 +113,19 @@ function toggleJurNatPerson() {
 }
 toggleJurNatPerson();
 
+// TODO: ekelhaft!
 function toggleMitgliedschaft() {
-    var art = document.getElementsByName('mitgliedschaftid')[0].options[document.getElementsByName('mitgliedschaftid')[0].selectedIndex].text
-    document.getElementsByName('titleart')[0].innerHTML = art;
-	switch (art) {
-	case "Ordentliches Mitglied":
-		document.getElementById('beitrag').style.display = 'none';
-		document.getElementsByName('beitrag')[0].value = "12.00";
-		document.getElementById('mitglied_pp').style.display = 'table-row';
+	var feld = document.getElementsByName('mitgliedschaftid')[0];
+	var index = feld.selectedIndex;
+	var id = feld.options[index].value;
+	var name = feld.options[index].text;
+	document.getElementsByName('titleart')[0].innerHTML = name;
+	switch (id) {
+	{/literal}{foreach from=$mitgliedschaften item=m}
+	case {$m.mitgliedschaftid}:
+		document.getElementsByName('beitrag')[0].value = "{$m.defaultbeitrag}";
 		break;
-	case "Fördermitglied":
-		document.getElementById('beitrag').style.display = 'table-row';
-		document.getElementsByName('beitrag')[0].value = "12.00";
-		document.getElementById('mitglied_pp').style.display = 'none';
-		document.getElementsByName('mitglied_piraten')[0].checked = false;
-		break;
-	case "Ehrenmitglied":
-		document.getElementById('beitrag').style.display = 'none';
-		document.getElementsByName('beitrag')[0].value = "0";
-		document.getElementById('mitglied_pp').style.display = 'none';
-		document.getElementsByName('mitglied_piraten')[0].checked = false;
-		break;
-	default:
-		document.getElementById('beitrag').style.display = 'table-row';
-		document.getElementsByName('beitrag')[0].value = "12.00";
-		document.getElementById('mitglied_pp').style.display = 'table-row';
+	{/foreach}{literal}
 	}
 }
 toggleMitgliedschaft();

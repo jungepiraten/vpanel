@@ -40,7 +40,7 @@ $config->registerPage("roles_deluser", "user.php?mode=delrole&roleid=%d&userid=%
 $config->registerPage("orte_json", "json/orte.php");
 
 $config->registerPage("mitglieder", "mitglieder.php");
-$config->registerPage("mitglieder_ajax", "mitglieder.php?ajax");
+$config->registerPage("mitglieder_json", "json/mitglieder.php");
 $config->registerPage("mitglieder_page", "mitglieder.php?page=%d");
 $config->registerPage("mitglieder_create", "mitglieder.php?mode=create&mitgliedschaftid=%d");
 $config->registerPage("mitglieder_details", "mitglieder.php?mode=details&mitgliedid=%d");

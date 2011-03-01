@@ -338,9 +338,10 @@ class Template {
 		$this->smarty->display("mitgliederlist.html.tpl");
 	}
 
-	public function viewMitgliedDetails($mitglied, $mitgliedschaften, $states) {
+	public function viewMitgliedDetails($mitglied, $revisions, $revision, $mitgliedschaften, $states) {
 		$this->smarty->assign("mitglied", $this->parseMitglied($mitglied));
-		$this->smarty->assign("mitgliedrevision", $this->parseMitgliedRevision($mitglied->getLatestRevision()));
+		$this->smarty->assign("mitgliedrevisions", $this->parseMitgliedRevisions($revisions));
+		$this->smarty->assign("mitgliedrevision", $this->parseMitgliedRevision($revision));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
 		$this->smarty->assign("states", $this->parseStates($states));
 		$this->smarty->display("mitgliederdetails.html.tpl");

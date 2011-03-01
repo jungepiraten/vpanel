@@ -9,6 +9,7 @@ class Mitglied extends GlobalClass {
 	private $austrittsdatum;
 	
 	private $revisions = array();
+	private $loadedRevisions = false;
 	
 	public static function factory(Storage $storage, $row) {
 		$mitglied = new Mitglied($storage);
@@ -50,25 +51,32 @@ class Mitglied extends GlobalClass {
 	public function isMitglied() {
 		return !$this->isAusgetreten();
 	}
-	
-	public function addRevision($revision) {
-		$this->revisions[$revision->getRevisionID()] = $revision;
+
+	public function getRevisionList() {
+		if (!$this->loadedRevisions) {
+			$this->revisions = $this->getStorage()->getMitgliederRevisionsByMitgliedIDList($this->getMitgliedID());
+			$this->loadedRevisions = true;
+		}
+		return $this->revisions;
 	}
 	
 	public function &getRevision($revisionid) {
 		if (!isset($this->revisions[$revisionid]) or $this->revisions[$revisionid] == null) {
-			$this->revisions[$revisionid] = $this->getStorage()->getMitgliedRevision($revisionid);
+			$this->revisions[$revisionid] = $this->getStorage()->getMitgliederRevision($revisionid);
 		}
 		return $this->revisions[$revisionid];
 	}
 
+	public function setRevision($revision) {
+		$this->revisions[$revision->getRevisionID()] = $revision;
+	}
+
 	public function getLatestRevision() {
-		// TODO ...
 		return $this->getRevision(reset($this->getRevisionIDs()));
 	}
 	
 	public function getRevisionIDs() {
-		return array_keys($this->revisions);
+		return array_map(create_function('$a', 'return $a->getRevisionID();'), $this->revisions);
 	}
 
 	public function save(Storage $storage = null) {
@@ -80,7 +88,7 @@ class Mitglied extends GlobalClass {
 			$this->getGlobalID(),
 			$this->getEintrittsdatum(),
 			$this->getAustrittsdatum() ));
-		// TODO revisions speichern
+		// TODO revisions speichern ?
 	}
 	
 	private function getVariableValue($keyword) {

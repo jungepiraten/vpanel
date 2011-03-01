@@ -107,7 +107,7 @@ class MitgliedRevision extends GlobalClass {
 
 	public function getMitglied() {
 		if ($this->mitglied == null) {
-			$this->mitglied = Mitglied::factoryByMitgliedID($this->getStorage(), $this->getMitgliedID());
+			$this->mitglied = $this->getStorage()->getMitglied($this->getMitgliedID());
 		}
 		return $this->mitglied;
 	}

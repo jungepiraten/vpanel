@@ -14,8 +14,9 @@ require_once(VPANEL_CORE . "/mailattachment.class.php");
 require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
 require_once(VPANEL_CORE . "/process.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/mitglied.class.php");
 
-abstract class SQLStorage extends Storage {
+abstract class SQLStorage extends AbstractStorage {
 	public function __construct() {}
 	
 	abstract protected function query($sql);
@@ -212,7 +213,7 @@ abstract class SQLStorage extends Storage {
 	}
 	public function getGliederung($gliederungid) {
 		$sql = "SELECT `gliederungsid`, `label` FROM `gliederungen` WHERE `gliederungsid` = " . intval($gliederungid);
-		return reset($this->fetchAsArray($this->query($sql), "gliederungsid", null, 'Gliederung'));
+		return $this->getResult($sql, array($this, "parseGliederung"))->fetchRow();
 	}
 
 	/**
@@ -249,6 +250,21 @@ abstract class SQLStorage extends Storage {
 		if ($matcher instanceof AusgetretenMitgliederMatcher) {
 			return "`m`.`austritt` IS NOT NULL";
 		}
+		if ($matcher instanceof MitgliedMitgliederMatcher) {
+			return "`m`.`mitgliedid` = " . intval($matcher->getMitgliedID());
+		}
+		if ($matcher instanceof SearchMitgliederMatcher) {
+			$fields = array("`m`.`mitgliedid`", "`m`.`globalid`", "`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`k`.`email`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
+			$wordclauses = array();
+			foreach ($matcher->getWords() as $word) {
+				$clauses = array();
+				foreach ($fields as $field) {
+					$clauses[] = $field . " LIKE '%" . $this->escape($word) . "%'";
+				}
+				$wordclauses[] = implode(" OR ", $clauses);
+			}
+			return "(" . implode(") AND (", $wordclauses) . ")";
+		}
 		throw new Exception("Not implemented: ".get_class($matcher));
 	}
 	public function getMitgliederCount($matcher = null) {
@@ -279,7 +295,7 @@ abstract class SQLStorage extends Storage {
 			$o["r"]->setJurPerson($o["j"]);
 		}
 		$o["r"]->setKontakt($o["k"]);
-		$o["m"]->addRevision($o["r"]);
+		$o["m"]->setRevision($o["r"]);
 		return $o["m"];
 	}
 	public function getMitgliederResult($matcher = null, $limit = null, $offset = null) {
@@ -345,13 +361,36 @@ abstract class SQLStorage extends Storage {
 		}
 		return $this->getResult($sql, array($this, "parseMitglied"));
 	}
-	public function getMitglied($mitgliedid) {
-		$sql = "SELECT	`r`.`timestamp` AS `null`,
-				`m`.`mitgliedid` as `m_mitgliedid`,
-				`m`.`globalid` as `m_globalid`,
-				UNIX_TIMESTAMP(`m`.`eintritt`) as `m_eintritt`,
-				UNIX_TIMESTAMP(`m`.`austritt`) as `m_austritt`,
-				`r`.`revisionid` AS `r_revisionid`,
+	public function getMitglied($mitgliedid) {		
+		return $this->getMitgliederResult(new MitgliedMitgliederMatcher($mitgliedid))->fetchRow();
+	}
+	public function setMitglied($mitgliedid, $globalid, $eintritt, $austritt) {
+		if ($mitgliedid == null) {
+			$sql = "INSERT INTO `mitglieder` (`globalid`, `eintritt`, `austritt`) VALUES ('" . $this->escape($globalid) . "', '" . date("Y-m-d", $eintritt) . "', " . ($austritt == null ? "NULL" : "'" . date("Y-m-d", $austritt) . "'") . ")";
+		} else {
+			$sql = "UPDATE `mitglieder` SET `globalid` = '" . $this->escape($globalid) . "', `eintritt` = '" . date("Y-m-d", $eintritt) . "', `austritt` = " . ($austritt == null ? "NULL" : "'" . date("Y-m-d", $austritt) . "'") . " WHERE `mitgliedid` = " . intval($mitgliedid);
+		}
+		$this->query($sql);
+		if ($mitgliedid == null) {
+			return $this->getInsertID();
+		} else {
+			return $mitgliedid;
+		}
+	}
+
+	/**
+	 * MitgliederRevisions
+	 **/
+	public function parseMitgliederRevision($row) {
+		$o = $this->parseRow($row, null, array("r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => "Ort"));
+		$o["k"]->setOrt($o["o"]);
+		$o["r"]->setNatPerson($o["n"]);
+		$o["r"]->setJurPerson($o["j"]);
+		$o["r"]->setKontakt($o["k"]);
+		return $o["r"];
+	}
+	public function getMitgliederRevisionResult() {
+		$sql = "SELECT	`r`.`revisionid` AS `r_revisionid`,
 				`r`.`globaleid` AS `r_globaleid`,
 				UNIX_TIMESTAMP(`r`.`timestamp`) AS `r_timestamp`,
 				`r`.`userid` AS `r_userid`,
@@ -383,48 +422,15 @@ abstract class SQLStorage extends Storage {
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
 				`o`.`stateid` AS `o_stateid`
-			FROM	`mitglieder` `m`
-			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
-			LEFT JOIN `mitgliederrevisions` `rmax` USING (`mitgliedid`)
-			LEFT JOIN `natperson` `n` ON (`n`.`natpersonid` = `r`.`natpersonid`)
-			LEFT JOIN `jurperson` `j` ON (`j`.`jurpersonid` = `r`.`jurpersonid`)
-			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
-			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
-			WHERE	`r`.`mitgliedid` = " . intval($mitgliedid) . "
-			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
-			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)";
-		return $this->getResult($sql, array($this, "parseMitglied"))->fetchRow();
+			FROM	`mitgliederrevisions` `r`
+			LEFT JOIN `natperson` `n` USING (`natpersonid`)
+			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
+			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
+			LEFT JOIN `orte` `o` USING (`ortid`)
+			ORDER BY `r`.`timestamp`";
+		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
 	}
-	public function setMitglied($mitgliedid, $globalid, $eintritt, $austritt) {
-		if ($mitgliedid == null) {
-			$sql = "INSERT INTO `mitglieder` (`globalid`, `eintritt`, `austritt`) VALUES ('" . $this->escape($globalid) . "', '" . date("Y-m-d", $eintritt) . "', " . ($austritt == null ? "NULL" : "'" . date("Y-m-d", $austritt) . "'") . ")";
-		} else {
-			$sql = "UPDATE `mitglieder` SET `globalid` = '" . $this->escape($globalid) . "', `eintritt` = '" . date("Y-m-d", $eintritt) . "', `austritt` = " . ($austritt == null ? "NULL" : "'" . date("Y-m-d", $austritt) . "'") . " WHERE `mitgliedid` = " . intval($mitgliedid);
-		}
-		$this->query($sql);
-		if ($mitgliedid == null) {
-			return $this->getInsertID();
-		} else {
-			return $mitgliedid;
-		}
-	}
-
-	/**
-	 * MitgliederRevisions
-	 **/
-	public function parseMitgliederRevision($row) {
-		$os = $this->parseRow($row, array("r" => 'MitgliederRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "u" => 'User'));
-		$objs = array();
-		foreach ($os as $k => &$o) {
-			$o["k"]->setOrt($o["o"]);
-			$o["r"]->setNatPerson($o["n"]);
-			$o["r"]->setJurPerson($o["j"]);
-			$o["r"]->setKontakt($o["k"]);
-			$objs[$k] = $o["r"];
-		}
-		return $objs;
-	}
-	public function getMitgliederRevisionResult($mitgliedid = null) {
+	public function getMitgliederRevisionsByMitgliedIDResult($mitgliedid) {
 		$sql = "SELECT	`r`.`revisionid` AS `r_revisionid`,
 				`r`.`globaleid` AS `r_globaleid`,
 				UNIX_TIMESTAMP(`r`.`timestamp`) AS `r_timestamp`,
@@ -445,13 +451,13 @@ abstract class SQLStorage extends Storage {
 				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
 				`n`.`nationalitaet` AS `n_nationalitaet`,
 				`j`.`jurpersonid` AS `j_jurpersonid`,
-				`j`.`firma` AS `j_firma`,
+				`j`.`label` AS `j_label`,
 				`k`.`kontaktid` AS `k_kontaktid`,
 				`k`.`strasse` AS `k_strasse`,
 				`k`.`hausnummer` AS `k_hausnummer`,
 				`k`.`ortid` AS `k_ortid`,
-				`k`.`telefon` AS `k_telefon`,
-				`k`.`handy` AS `k_handy`,
+				`k`.`telefonnummer` AS `k_telefonnummer`,
+				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`email` AS `k_email`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
@@ -461,11 +467,9 @@ abstract class SQLStorage extends Storage {
 			LEFT JOIN `natperson` `n` USING (`natpersonid`)
 			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
 			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
-			LEFT JOIN `kontakte` `o` USING (`ortid`)";
-		if ($mitgliedid != null) {
-			$sql .= " WHERE `m`.`mitgliedid` = " . intval($mitgliedid);
-		}
-		$sql .= " ORDER BY `r`.`timestamp`";
+			LEFT JOIN `orte` `o` USING (`ortid`)
+			WHERE `r`.`mitgliedid` = " . intval($mitgliedid) . "
+			ORDER BY `r`.`timestamp`";
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
 	}
 	public function getMitgliederRevision($revisionid) {
@@ -489,13 +493,13 @@ abstract class SQLStorage extends Storage {
 				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
 				`n`.`nationalitaet` AS `n_nationalitaet`,
 				`j`.`jurpersonid` AS `j_jurpersonid`,
-				`j`.`firma` AS `j_firma`,
+				`j`.`label` AS `j_label`,
 				`k`.`kontaktid` AS `k_kontaktid`,
 				`k`.`strasse` AS `k_strasse`,
 				`k`.`hausnummer` AS `k_hausnummer`,
 				`k`.`ortid` AS `k_ortid`,
-				`k`.`telefon` AS `k_telefon`,
-				`k`.`handy` AS `k_handy`,
+				`k`.`telefonnummer` AS `k_telefonnummer`,
+				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`email` AS `k_email`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
@@ -505,9 +509,9 @@ abstract class SQLStorage extends Storage {
 			LEFT JOIN `natperson` `n` USING (`natpersonid`)
 			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
 			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
-			LEFT JOIN `kontakte` `o` USING (`ortid`)
+			LEFT JOIN `orte` `o` USING (`ortid`)
 			WHERE	`r`.`revisionid` = " . intval($revisionid);
-		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
+		return $this->getResult($sql, array($this, "parseMitgliederRevision"))->fetchRow();
 	}
 	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $mitgliedpiraten, $verteilereingetragen, $beitrag, $natpersonid, $jurpersonid, $kontaktid) {
 		if ($revisionid == null) {
@@ -525,9 +529,12 @@ abstract class SQLStorage extends Storage {
 	/**
 	 * Kontakt
 	 **/
+	public function parseKontakt($row) {
+		return $this->parseRow($row, null, "Kontakt");
+	}
 	public function getKontakt($kontaktid) {
 		$sql = "SELECT `kontaktid`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email` FROM `kontakt` WHERE `kontaktid` = " . intval($kontaktid);
-		return reset($this->fetchAsArray($this->query($sql), "kontaktid", null, 'Kontakt'));
+		return $this->getResult($sql, array($this, "parseKontakt"))->fetchRow();
 	}
 	public function setKontakt($kontaktid, $strasse, $hausnummer, $ortid, $telefon, $handy, $email) {
 		if ($kontaktid == null) {
@@ -547,9 +554,9 @@ abstract class SQLStorage extends Storage {
 	}
 	public function searchKontakt($strasse, $hausnummer, $ortid, $telefon, $handy, $email) {
 		$sql = "SELECT `kontaktid`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email` FROM `kontakte` WHERE `strasse` = '" . $this->escape($strasse) . "' AND `hausnummer` = '" . $this->escape($hausnummer) . "' AND `ortid` = " . intval($ortid) . " AND `telefonnummer` = '" . $this->escape($telefon) . "' AND `handynummer` = '" . $this->escape($handy) . "' AND `email` = '" . $this->escape($email) . "'";
-		$array = $this->fetchAsArray($this->query($sql), "kontaktid", null, 'Kontakt');
-		if (count($array) > 0) {
-			return reset($array);
+		$result = $this->getResult($sql, array($this, "parseKontakt"));
+		if ($result->getCount() > 0) {
+			return $result->fetchRow();
 		}
 		$kontakt = new Kontakt($this);
 		$kontakt->setStrasse($strasse);
@@ -744,9 +751,9 @@ abstract class SQLStorage extends Storage {
 	}
 	public function searchNatPerson($name, $vorname, $geburtsdatum, $nationalitaet) {
 		$sql = "SELECT `natpersonid`, `name`, `vorname`, `geburtsdatum`, `nationalitaet` FROM `natperson` WHERE `name` = '" . $this->escape($name) . "' AND `vorname` = '" . $this->escape($vorname) . "' AND `geburtsdatum` = '" . date("Y-m-d", $geburtsdatum) . "' AND `nationalitaet` = '" . $this->escape($nationalitaet) . "'";
-		$array = $this->getResult($sql, array($this, "parseNatPerson"))->fetchRow();
-		if (count($array) > 0) {
-			return reset($array);
+		$result = $this->getResult($sql, array($this, "parseNatPerson"));
+		if ($result->getCount() > 0) {
+			return $result->fetchRow();
 		}
 		$natperson = new NatPerson($this);
 		$natperson->setName($name);
@@ -785,9 +792,9 @@ abstract class SQLStorage extends Storage {
 	}
 	public function searchJurPerson($firma) {
 		$sql = "SELECT `jurpersonid`, `label` FROM `jurperson` WHERE `label` = '" . $this->escape($firma) . "'";
-		$array = $this->getResult($sql, array($this, "parseJurPerson"))->fetchRow();
-		if (count($array) > 0) {
-			return reset($array);
+		$result = $this->getResult($sql, array($this, "parseJurPerson"));
+		if ($result->getCount() > 0) {
+			return $result->fetchRow();
 		}
 		$jurperson = new JurPerson($this);
 		$jurperson->setLabel($firma);
@@ -1021,7 +1028,7 @@ abstract class SQLStorage extends Storage {
 	}
 }
 
-class SQLStorageResult extends StorageResult {
+class SQLStorageResult extends AbstractStorageResult {
 	private $stor;
 	private $rslt;
 	private $callback;
