@@ -75,7 +75,7 @@
      </tr>
      <tr id="beitrag">
          <th><label for="beitrag">{"Beitrag:"|__}</label></th>
-         <td><input class="beitrag" type="text" name="beitrag" size="5" value="{if isset($mitgliedrevision)}{$mitgliedrevision.beitrag|string_format:"%.2f"|escape:html}{else}{$mitgliedschaft.defaultbeitrag|string_format:"%.2f"|escape:html}{/if}" /> EUR</td>
+         <td><input class="beitrag" type="text" name="beitrag" size="5" onChange="beitragEdited=true;" value="{if isset($mitgliedrevision)}{$mitgliedrevision.beitrag|string_format:"%.2f"|escape:html}{else}{$mitgliedschaft.defaultbeitrag|string_format:"%.2f"|escape:html}{/if}" /> EUR</td>
      </tr>
      <tr>
          <th colspan="2"><input class="submit" type="submit" name="save" value="{"Speichern"|__}" /></th>
@@ -113,17 +113,18 @@ function toggleJurNatPerson() {
 }
 toggleJurNatPerson();
 
-// TODO: ekelhaft!
+var beitragEdited = {/literal}{if isset($mitglied)}true{else}false{/if}{literal};
 function toggleMitgliedschaft() {
 	var feld = document.getElementsByName('mitgliedschaftid')[0];
 	var index = feld.selectedIndex;
 	var id = feld.options[index].value;
 	var name = feld.options[index].text;
-	document.getElementsByName('titleart')[0].innerHTML = name;
 	switch (id) {
 	{/literal}{foreach from=$mitgliedschaften item=m}
-	case {$m.mitgliedschaftid}:
-		document.getElementsByName('beitrag')[0].value = "{$m.defaultbeitrag}";
+	case "{$m.mitgliedschaftid}":
+		{literal}if (!beitragEdited) {{/literal}
+			document.getElementsByName('beitrag')[0].value = "{$m.defaultbeitrag}";
+		{literal}}{/literal}
 		break;
 	{/foreach}{literal}
 	}

@@ -129,7 +129,6 @@ case "details":
 		$ui->redirect($session->getLink("mitglieder_details", $mitglied->getMitgliedID()));
 	}
 
-
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
 	$states = $session->getStorage()->getStateList();
 
