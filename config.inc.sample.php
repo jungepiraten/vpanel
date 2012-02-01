@@ -21,7 +21,7 @@ $config->registerLang("dummy", new EmptyLanguage);
 
 $config->registerPage("index", "index.php");
 $config->registerPage("login", "login.php");
-$config->registerPage("logout", "login.php?logout");
+$config->registerPage("logout", "login.php?logout=1");
 
 $config->registerPage("users", "user.php");
 $config->registerPage("users_create", "user.php?mode=create");
