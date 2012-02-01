@@ -22,8 +22,8 @@ class DokumentNotiz extends StorageClass {
 		$dokumentnotiz->setDokumentID($row["dokumentid"]);
 		$dokumentnotiz->setAuthorID($row["author"]);
 		$dokumentnotiz->setTimestamp($row["timestamp"]);
-		$dokumentnotiz->setDokumentKategorieID($row["dokumentkategorieid"]);
-		$dokumentnotiz->setDokumentStatusID($row["dokumentstatusid"]);
+		$dokumentnotiz->setNextKategorieID($row["nextKategorie"]);
+		$dokumentnotiz->setNextStatusID($row["nextState"]);
 		$dokumentnotiz->setKommentar($row["kommentar"]);
 		return $dokumentnotiz;
 	}
@@ -34,6 +34,29 @@ class DokumentNotiz extends StorageClass {
 
 	public function setDokumentNotizID($dokumentnotizid) {
 		$this->dokumentnotizid = $dokumentnotizid;
+	}
+
+	public function getDokumentID() {
+		return $this->dokumentid;
+	}
+
+	public function setDokumentID($dokumentid) {
+		if ($dokumentid != $this->dokumentid) {
+			$this->dokument = null;
+		}
+		$this->dokumentid = $dokumentid;
+	}
+
+	public function getDokument() {
+		if ($this->dokument == null) {
+			$this->dokument = $this->getStorage()->getDokument($this->dokumentid);
+		}
+		return $this->dokument;
+	}
+
+	public function setDokument($dokument) {
+		$this->setDokumentID($dokument->getDokumentID());
+		$this->dokument = $dokument;
 	}
 
 	public function getAuthorID() {
@@ -49,8 +72,9 @@ class DokumentNotiz extends StorageClass {
 
 	public function getAuthor() {
 		if ($this->author == null) {
-			$this->author = $this->getSession()->getUser($this->authorid);
+			$this->author = $this->getStorage()->getUser($this->authorid);
 		}
+		return $this->author;
 	}
 
 	public function setAuthor($author) {

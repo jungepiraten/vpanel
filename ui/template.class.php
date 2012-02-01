@@ -269,6 +269,8 @@ class Template {
 		$row["dokumentid"] = $dokument->getDokumentID();
 		$row["dokumentkategorie"] = $this->parseDokumentKategorie($dokument->getDokumentKategorie());
 		$row["dokumentstatus"] = $this->parseDokumentStatus($dokument->getDokumentStatus());
+		$row["identifier"] = $dokument->getIdentifier();
+		$row["label"] = $dokument->getLabel();
 		$row["content"] = $dokument->getContent();
 		$row["file"] = $this->parseFile($dokument->getFile());
 		return $row;
@@ -298,6 +300,37 @@ class Template {
 
 	protected function parseDokumentStatusList($rows) {
 		return array_map(array($this, 'parseDokumentStatus'), $rows);
+	}
+
+	protected function parseDokumentNotiz($notiz) {
+		$row = array();
+		$row["dokumentnotizid"] = $notiz->getDokumentNotizID();
+		$row["author"] = $this->parseUser($notiz->getAuthor());
+		$row["timestamp"] = $notiz->getTimestamp();
+		if ($notiz->getNextKategorieID() != null) {
+			$row["nextkategorie"] = $this->parseDokumentKategorie($notiz->getNextKategorie());
+		}
+		if ($notiz->getNextStatusID() != null) {
+			$row["nextstatus"] = $this->parseDokumentStatus($notiz->getNextStatus());
+		}
+		$row["kommentar"] = $notiz->getKommentar();
+		return $row;
+	}
+
+	protected function parseDokumentNotizen($rows) {
+		return array_map(array($this, 'parseDokumentNotiz'), $rows);
+	}
+
+	protected function parseFile($file) {
+		$row = array();
+		$row["fileid"] = $file->getFileID();
+		$row["exportfilename"] = $file->getExportFilename();
+		$row["mimetype"] = $file->getMimeType();
+		return $row;
+	}
+
+	protected function parseFiles($rows) {
+		return array_map(array($this, 'parseFile'), $rows);
 	}
 
 
@@ -462,6 +495,26 @@ class Template {
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
 		$this->smarty->display("dokumentlist.html.tpl");
+	}
+
+	public function viewDokumentCreate($dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus) {
+		if ($dokumentkategorie != null) {
+			$this->smarty->assign("dokumentkategorie", $this->parseDokumentKategorie($dokumentkategorie));
+		}
+		if ($dokumentstatus != null) {
+			$this->smarty->assign("dokumentstatus", $this->parseDokumentStatus($dokumentstatus));
+		}
+		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
+		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
+		$this->smarty->display("dokumentcreate.html.tpl");
+	}
+
+	public function viewDokumentDetails($dokument, $dokumentnotizen, $dokumentkategorien, $dokumentstatuslist) {
+		$this->smarty->assign("dokument", $this->parseDokument($dokument));
+		$this->smarty->assign("dokumentnotizen", $this->parseDokumentNotizen($dokumentnotizen));
+		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
+		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
+		$this->smarty->display("dokumentdetails.html.tpl");
 	}
 
 	public function redirect($url = null) {

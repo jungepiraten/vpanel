@@ -1020,7 +1020,7 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($dokumentstatusid instanceof DokumentStatus) {
 			$dokumentstatusid = $dokumentstatusid->getDokumentStatusID();
 		}
-		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `content`, `fileid` FROM `dokument` WHERE 1=1";
+		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `fileid` FROM `dokument` WHERE 1=1";
 		if ($dokumentkategorieid != null) {
 			$sql .= " AND `dokumentkategorieid` = " . intval($dokumentkategorieid);
 		}
@@ -1039,21 +1039,25 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parseDokument"));
 	}
 	public function getDokument($dokumentid) {
-		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `content`, `fileid` FROM `dokument` WHERE `dokumentid` = " . intval($dokumentid);
+		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `fileid` FROM `dokument` WHERE `dokumentid` = " . intval($dokumentid);
 		return $this->getResult($sql, array($this, "parseDokument"))->fetchRow();
 	}
-	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatusid, $content, $fileid) {
+	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatusid, $identifier, $label, $content, $fileid) {
 		if ($dokumentid == null) {
 			$sql = "INSERT INTO `dokument`
-				(`dokumentkategorieid`, `dokumentstatusid`, `content`, `fileid`) VALUES
+				(`dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `fileid`) VALUES
 				(" . intval($dokumentkategorieid) . ",
 				 " . intval($dokumentstatusid) . ",
+				 '" . $this->escape($identifier) . "',
+				 '" . $this->escape($label) . "',
 				 '" . $this->escape($content) . "',
 				 " . intval($fileid) . ")";
 		} else {
 			$sql = "UPDATE `dokument`
 				SET	`dokumentkategorieid` = " . intval($dokumentkategorieid) . ",
 					`dokumentstatusid` = " . intval($dokumentstatusid) . ",
+					`identifier` = '" . $this->escape($identifier) . "',
+					`label` = '" . $this->escape($label) . "',
 					`content` = '" . $this->escape($content) . "',
 					`fileid` = " . intval($fileid) . "
 				WHERE `dokumentid` = " . intval($dokumentid);
@@ -1152,22 +1156,23 @@ abstract class SQLStorage extends AbstractStorage {
 		$sql = "SELECT `dokumentnotizid`, `dokumentid`, `author`, `timestamp`, `nextState`, `nextKategorie`, `kommentar` FROM `dokumentnotizen` WHERE `dokumentnotizid` = " . intval($dokumentnotizid);
 		return $this->getResult($sql, array($this, "parseDokumentNotiz"))->fetchRow();
 	}
-	public function setDokumentNotiz($dokumentnotizid, $dokumentid, $author, $timestamp, $nextState, $nextKategorie, $kommentar) {
+	public function setDokumentNotiz($dokumentnotizid, $dokumentid, $author, $timestamp, $nextKategorie, $nextState, $kommentar) {
 		if ($dokumentnotizid == null) {
 			$sql = "INSERT INTO `dokumentnotizen`
 				(`dokumentid`, `author`, `timestamp`, `nextState`, `nextKategorie`, `kommentar`) VALUES
 				(" . intval($dokumentid) . ",
 				 " . intval($author) . ",
+				 '" . date("Y-m-d H:i:s", $timestamp) . "',
 				 " . ($nextState == null ? "NULL" : intval($nextState)) . ",
 				 " . ($nextKategorie == null ? "NULL" : intval($nextKategorie)) . ",
 				 '" . $this->escape($kommentar) . "')";
 		} else {
 			$sql = "UPDATE	`dokumentnotizen`
-				SET	`dokumentid` = " . intval($dokumentid) . "
-					`author` = " . intval($author) . "
-					`timestamp` = " . date("Y-m-d H:i:s", $timestamp) . "
-					`nextState` = " . ($nextState == null ? "NULL" : intval($nextState)) . "
-					`nextKategorie` = " . ($nextKategorie == null ? "NULL" : intval($nextKategorie)) . "
+				SET	`dokumentid` = " . intval($dokumentid) . ",
+					`author` = " . intval($author) . ",
+					`timestamp` = " . date("Y-m-d H:i:s", $timestamp) . ",
+					`nextState` = '" . ($nextState == null ? "NULL" : intval($nextState)) . "',
+					`nextKategorie` = " . ($nextKategorie == null ? "NULL" : intval($nextKategorie)) . ",
 					`kommentar` = '" . $this->escape($kommentar) . "'
 				WHERE `dokumentnotizid` = " . intval($dokumentnotizid);
 		}

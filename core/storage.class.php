@@ -114,7 +114,7 @@ interface Storage {
 	public function getDokumentList($dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
 	public function getDokumentCount($dokumentkategorieid = null, $dokumentstatus = null);
 	public function getDokument($dokumentid);
-	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatus, $content, $fileid);
+	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatus, $identifier, $label, $content, $fileid);
 
 	public function getDokumentKategorieResult();
 	public function getDokumentKategorieList();

@@ -6,6 +6,8 @@ class Dokument extends StorageClass {
 	private $dokumentid;
 	private $dokumentkategorieid;
 	private $dokumentstatusid;
+	private $identifier;
+	private $label;
 	private $content;
 	private $fileid;
 
@@ -18,6 +20,8 @@ class Dokument extends StorageClass {
 		$dokument->setDokumentID($row["dokumentid"]);
 		$dokument->setDokumentKategorieID($row["dokumentkategorieid"]);
 		$dokument->setDokumentStatusID($row["dokumentstatusid"]);
+		$dokument->setIdentifier($row["identifier"]);
+		$dokument->setLabel($row["label"]);
 		$dokument->setContent($row["content"]);
 		$dokument->setFileID($row["fileid"]);
 		return $dokument;
@@ -77,6 +81,22 @@ class Dokument extends StorageClass {
 		$this->dokumentstatus = $dokumentstatus;
 	}
 
+	public function getIdentifier() {
+		return $this->identifier;
+	}
+
+	public function setIdentifier($identifier) {
+		$this->identifier = $identifier;
+	}
+
+	public function getLabel() {
+		return $this->label;
+	}
+
+	public function setLabel($label) {
+		$this->label = $label;
+	}
+
 	public function getContent() {
 		return $this->content;
 	}
@@ -116,6 +136,8 @@ class Dokument extends StorageClass {
 			$this->getDokumentID(),
 			$this->getDokumentKategorieID(),
 			$this->getDokumentStatusID(),
+			$this->getIdentifier(),
+			$this->getLabel(),
 			$this->getContent(),
 			$this->getFileID() ));
 	}

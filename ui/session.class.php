@@ -109,6 +109,24 @@ class Session {
 	public function getListVariable($name) {
 		return $_REQUEST[$name];
 	}
+	public function getFileVariable($name) {
+		if (!isset($_FILES[$name])) {
+			return null;
+		}
+		if ($_FILES[$name]["error"] != 0) {
+			return null;
+		}
+		$filename = substr(md5(microtime(true) . $_FILES[$name]["tmp_name"]), 0, 12) . "." . array_pop(explode(".", $_FILES[$name]["name"]));
+		if (!move_uploaded_file($_FILES[$name]["tmp_name"], VPANEL_FILES . "/" . $filename)) {
+			return null;
+		}
+		$file = new File($this->getStorage());
+		$file->setFilename($filename);
+		$file->setExportFilename($_FILES[$name]["name"]);
+		$file->setMimeType($_FILES[$name]["type"]);
+		$file->save();
+		return $file;
+	}
 	public function encodeString($string) {
 		return iconv("UTF-8", $this->getEncoding(), $string);
 	}

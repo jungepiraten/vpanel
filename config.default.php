@@ -8,6 +8,7 @@ define("VPANEL_SENDMAILBACKEND",	VPANEL_CORE . "/sendmailbackend");
 define("VPANEL_PROCESSES",		VPANEL_CORE . "/processes");
 define("VPANEL_UI",			VPANEL_ROOT . "/ui");
 define("VPANEL_LANGUAGE",		VPANEL_UI . "/language");
+define("VPANEL_FILES",			VPANEL_ROOT . "/files");
 
 require_once(VPANEL_UI . "/session.class.php");
 

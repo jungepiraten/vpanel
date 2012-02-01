@@ -38,8 +38,10 @@ $config->registerPage("roles_adduser", "user.php?mode=addrole&roleid=%d");
 $config->registerPage("roles_deluser", "user.php?mode=delrole&roleid=%d&userid=%d");
 
 $config->registerPage("dokumente", "dokumente.php");
-$config->registerPage("dokumente_create", "dokumente.php?mode=create&kategorieid=%s&statusid=%s");
+$config->registerPage("dokumente_create", "dokumente.php?mode=create");
+$config->registerPage("dokumente_create_kategoriestatus", "dokumente.php?mode=create&kategorieid=%s&statusid=%s");
 $config->registerPage("dokumente_details", "dokumente.php?mode=details&dokumentid=%d");
+$config->registerPage("dokumente_get", "file.php?mode=get&dokumentid=%d");
 
 $config->registerPage("orte_json", "json/orte.php");
 

@@ -19,7 +19,7 @@
    </select>
   </fieldset>
  </form>
- <a href="{"dokumente_create"|___:$dokumentkategorie.dokumentkategorieid:$dokumentstatus.dokumentstatusid}">{"Neu"|__}</a>
+ <a href="{"dokumente_create_kategoriestatus"|___:$dokumentkategorie.dokumentkategorieid:$dokumentstatus.dokumentstatusid}">{"Neu"|__}</a>
 </div>
 <div class="pages">
 {if $page > 1} <a href="{"mitglieder_page"|___:$filter.filterid:'0'}" class="pagebutton">&lt;&lt;</a>{/if}
