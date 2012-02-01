@@ -14,7 +14,7 @@ if (!$session->isAllowed("mitglieder_show")) {
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
 case "get":
 	if ($session->hasVariable("tempfileid")) {
-		$tempfileid = $session->getVariable("tempfileid");
+		$tempfileid = $session->getIntVariable("tempfileid");
 		$tempfile = $session->getStorage()->getTempFile($tempfileid);
 
 		if (!$tempfile->isAllowed($session->getUser())) {
@@ -22,12 +22,21 @@ case "get":
 		}
 
 		$file = $tempfile->getFile();
+	} elseif ($session->hasVariable("dokumentid")) {
+		$dokumentid = $session->getIntVariable("dokumentid");
+		$dokument = $session->getStorage()->getDokument($dokumentid);
+
+		if (!$session->isAllowed("dokumente_show")) {
+			die("<h1>403 Forbidden</h1>");
+		}
+
+		$file = $dokument->getFile();
 	}
 
 	header("Content-Type: " . $file->getMimeType());
 	header("Content-Disposition: attachment; filename=\"" . addcslashes($file->getExportFilename(), '"') . "\"");
 
-	readfile($file->getFileName());
+	readfile($file->getAbsoluteFilename());
 	exit;
 }
 

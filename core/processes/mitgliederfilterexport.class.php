@@ -115,7 +115,7 @@ class MitgliederFilterExportCSVProcess extends MitgliederFilterExportProcess {
 		$file->setMimeType("text/csv");
 		$file->setExportFilename($file->getExportFilename() . ".csv");
 		$file->save();
-		$this->handler = fopen($file->getFileName(), "w");
+		$this->handler = fopen($file->getAbsoluteFileName(), "w");
 		fputcsv($this->handler, $this->getTableHeading());
 	}
 

@@ -31,9 +31,13 @@ class File extends StorageClass {
 
 	public function getFilename() {
 		if ($this->filename == null) {
-			$this->filename = tempnam(sys_get_temp_dir(), "vpanel");
+			$this->filename = substr(md5(microtime(true) . "-" . rand(100,999)), 0, 12) . "." . array_pop(explode(".", $this->getExportFilename()));
 		}
 		return $this->filename;
+	}
+
+	public function getAbsoluteFilename() {
+		return VPANEL_FILES . "/" . $this->getFilename();
 	}
 
 	public function setExportFilename($exportfilename) {

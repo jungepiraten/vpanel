@@ -116,14 +116,12 @@ class Session {
 		if (!$this->hasFileVariable($name)) {
 			return null;
 		}
-		$filename = substr(md5(microtime(true) . $_FILES[$name]["tmp_name"]), 0, 12) . "." . array_pop(explode(".", $_FILES[$name]["name"]));
-		if (!move_uploaded_file($_FILES[$name]["tmp_name"], VPANEL_FILES . "/" . $filename)) {
-			return null;
-		}
 		$file = new File($this->getStorage());
-		$file->setFilename($filename);
 		$file->setExportFilename($_FILES[$name]["name"]);
 		$file->setMimeType($_FILES[$name]["type"]);
+		if (!move_uploaded_file($_FILES[$name]["tmp_name"], $file->getAbsoluteFilename())) {
+			return null;
+		}
 		$file->save();
 		return $file;
 	}
