@@ -177,6 +177,9 @@ $(function() {
 {if $session->isAllowed("roles_show")}
 <li><a href="{"roles"|___}">{"Rollenverwaltung"|__}</a></li>
 {/if}
+{if $session->isAllowed("dokumente_show")}
+<li><a href="{"dokumente"|___}">{"Dokumentenverwaltung"|__}</a></li>
+{/if}
 {if $session->isAllowed("mitglieder_show")}
 <li><a href="{"mitglieder"|___}">{"Mitgliederverwaltung"|__}</a></li>
 {/if}

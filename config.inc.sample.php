@@ -37,6 +37,10 @@ $config->registerPage("roles_del", "roles.php?mode=delete&roleid=%d");
 $config->registerPage("roles_adduser", "user.php?mode=addrole&roleid=%d");
 $config->registerPage("roles_deluser", "user.php?mode=delrole&roleid=%d&userid=%d");
 
+$config->registerPage("dokumente", "dokumente.php");
+$config->registerPage("dokumente_create", "dokumente.php?mode=create&kategorieid=%s&statusid=%s");
+$config->registerPage("dokumente_details", "dokumente.php?mode=details&dokumentid=%d");
+
 $config->registerPage("orte_json", "json/orte.php");
 
 $config->registerPage("mitglieder", "mitglieder.php");
@@ -60,7 +64,7 @@ $config->registerPage("mailattachment", "mailattachment.php?attachmentid=%d");
 
 $config->registerPage("statistik", "statistik.php");
 
-$config->registerPage("tempfile_get", "tempfile.php?mode=get&fileid=%d");
+$config->registerPage("tempfile_get", "file.php?mode=get&tempfileid=%d");
 
 $config->registerPage("processes_view", "processes.php?mode=view&processid=%d");
 $config->registerPage("processes_json", "json/processes.php");

@@ -110,11 +110,41 @@ interface Storage {
 	public function setProcess($processid, $type, $typedata, $progess, $queued, $started, $finished, $finishedpage);
 	public function delProcess($processid);
 
+	public function getDokumentResult($dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
+	public function getDokumentList($dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
+	public function getDokumentCount($dokumentkategorieid = null, $dokumentstatus = null);
+	public function getDokument($dokumentid);
+	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatus, $content, $fileid);
+
+	public function getDokumentKategorieResult();
+	public function getDokumentKategorieList();
+	public function getDokumentKategorie($dokumentkategorieid);
+	public function setDokumentKategorie($dokumentkategorieid, $label);
+	public function delDokumentKategorie($dokumentkategorieid);
+
+	public function getDokumentStatusResult();
+	public function getDokumentStatusList();
+	public function getDokumentStatus($dokumentstatusid);
+	public function setDokumentStatus($dokumentstatusid, $label);
+	public function delDokumentStatus($dokumentstatusid);
+
+	public function getDokumentNotizResult($dokumentid = null);
+	public function getDokumentNotizList($dokumentid = null);
+	public function getDokumentNotiz($dokumentnotizid);
+	public function setDokumentNotiz($dokumentnotizid, $dokumentid, $author, $timestamp, $nextState, $nextKategorie, $kommentar);
+	public function delDokumentNotiz($dokumentnotizid);
+
 	public function getFileResult();
 	public function getFileList();
 	public function getFile($fileid);
-	public function setFile($fileid, $userid, $filename, $exportfilename, $mimetype);
+	public function setFile($fileid, $filename, $exportfilename, $mimetype);
 	public function delFile($fileid);
+
+	public function getTempFileResult();
+	public function getTempFileList();
+	public function getTempFile($tempfileid);
+	public function setTempFile($tempfileid, $userid, $fileid);
+	public function delTempFile($tempfileid);
 }
 
 abstract class AbstractStorage implements Storage {
@@ -198,8 +228,28 @@ abstract class AbstractStorage implements Storage {
 		return $this->getProcessResult()->fetchAll();
 	}
 
+	public function getDokumentList($dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
+		return $this->getDokumentResult($dokumentkategorieid, $dokumentstatusid, $limit = null, $offset = null)->fetchAll();
+	}
+
+	public function getDokumentKategorieList() {
+		return $this->getDokumentKategorieResult()->fetchAll();
+	}
+
+	public function getDokumentStatusList() {
+		return $this->getDokumentStatusResult()->fetchAll();
+	}
+
+	public function getDokumentNotizList($dokumentid = null) {
+		return $this->getDokumentNotizResult($dokumentid)->fetchAll();
+	}
+
 	public function getFileList() {
 		return $this->getFileResult()->fetchAll();
+	}
+
+	public function getTempFileList() {
+		return $this->getTempFileResult()->fetchAll();
 	}
 }
 

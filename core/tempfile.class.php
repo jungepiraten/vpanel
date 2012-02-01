@@ -3,29 +3,50 @@
 require_once(VPANEL_CORE . "/storageobject.class.php");
 
 class TempFile extends StorageClass {
-	private $fileid;
+	private $tempfileid;
 	private $userid;
-	private $filename;
-	private $mimetype;
+	private $fileid;
 
-	private $allowed;
+	private $user;
+	private $file;
 	
 	public static function factory(Storage $storage, $row) {
 		$tempfile = new TempFile($storage);
-		$tempfile->setFileID($row["fileid"]);
+		$tempfile->setTempFileID($row["tempfileid"]);
 		$tempfile->setUserID($row["userid"]);
-		$tempfile->setFilename($row["filename"]);
-		$tempfile->setExportFilename($row["exportfilename"]);
-		$tempfile->setMimeType($row["mimetype"]);
+		$tempfile->setFileID($row["fileid"]);
 		return $tempfile;
 	}
 
+	public function setTempFileID($tempfileid) {
+		$this->tempfileid = $tempfileid;
+	}
+
+	public function getTempFileID() {
+		return $this->tempfileid;
+	}
+
 	public function setFileID($fileid) {
+		if ($fileid != $this->fileid) {
+			$this->file = null;
+		}
 		$this->fileid = $fileid;
 	}
 
 	public function getFileID() {
 		return $this->fileid;
+	}
+
+	public function setFile($file) {
+		$this->setFileID($file->getFileID());
+		$this->file = $file;
+	}
+
+	public function getFile() {
+		if ($this->file == null) {
+			$this->file = $this->getStorage()->getFile($this->getFileID());
+		}
+		return $this->file;
 	}
 
 	public function setUserID($userid) {
@@ -46,36 +67,9 @@ class TempFile extends StorageClass {
 
 	public function getUser() {
 		if ($this->user == null) {
-			$this->user = $this->getSession()->getUser($this->getUserID());
+			$this->user = $this->getStorage()->getUser($this->getUserID());
 		}
 		return $this->user;
-	}
-
-	public function setFilename($filename) {
-		$this->filename = $filename;
-	}
-	
-	public function getFilename() {
-		if ($this->filename == null) {
-			$this->filename = tempnam(sys_get_temp_dir(), "vpanel");
-		}
-		return $this->filename;
-	}
-
-	public function setExportFilename($exportfilename) {
-		$this->exportfilename = $exportfilename;
-	}
-	
-	public function getExportFilename() {
-		return $this->exportfilename;
-	}
-
-	public function setMimeType($mimetype) {
-		$this->mimetype = $mimetype;
-	}
-
-	public function getMimeType() {
-		return $this->mimetype;
 	}
 
 	public function isAllowed($user) {
@@ -86,12 +80,10 @@ class TempFile extends StorageClass {
 		if ($storage == null) {
 			$storage = $this->getStorage();
 		}
-		$this->setFileID($storage->setFile(
-			$this->getFileID(),
+		$this->setTempFileID($storage->setTempFile(
+			$this->getTempFileID(),
 			$this->getUserID(),
-			$this->getFileName(),
-			$this->getExportFilename(),
-			$this->getMimeType()));
+			$this->getFileID()));
 	}
 }
 

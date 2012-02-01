@@ -239,14 +239,17 @@ case "export.export":
 
 	$tempfile = new TempFile($session->getStorage());
 	$tempfile->setUser($session->getUser());
-	$tempfile->setExportFilename("vpanel-export-" . date("Y-m-d"));
+	$file = new File($session->getStorage());
+	$file->setExportFilename("vpanel-export-" . date("Y-m-d"));
+	$file->save();
+	$tempfile->setFile($file);
 	$tempfile->save();
 
 	$process = new MitgliederFilterExportCSVProcess($session->getStorage());
 	$process->setFilter($filter);
 	$process->setFile($tempfile);
 	$process->setFields($exportfields);
-	$process->setFinishedPage($session->getLink("tempfile_get", $tempfile->getFileID()));
+	$process->setFinishedPage($session->getLink("tempfile_get", $tempfile->getTempFileID()));
 	$process->save();
 
 	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));

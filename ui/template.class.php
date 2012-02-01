@@ -264,6 +264,42 @@ class Template {
 		return array_map(array($this, 'parseProcess'), $rows);
 	}
 
+	protected function parseDokument($dokument) {
+		$row = array();
+		$row["dokumentid"] = $dokument->getDokumentID();
+		$row["dokumentkategorie"] = $this->parseDokumentKategorie($dokument->getDokumentKategorie());
+		$row["dokumentstatus"] = $this->parseDokumentStatus($dokument->getDokumentStatus());
+		$row["content"] = $dokument->getContent();
+		$row["file"] = $this->parseFile($dokument->getFile());
+		return $row;
+	}
+
+	protected function parseDokumente($rows) {
+		return array_map(array($this, 'parseDokument'), $rows);
+	}
+
+	protected function parseDokumentKategorie($kategorie) {
+		$row = array();
+		$row["dokumentkategorieid"] = $kategorie->getDokumentKategorieID();
+		$row["label"] = $kategorie->getLabel();
+		return $row;
+	}
+
+	protected function parseDokumentKategorien($rows) {
+		return array_map(array($this, 'parseDokumentKategorie'), $rows);
+	}
+
+	protected function parseDokumentStatus($status) {
+		$row = array();
+		$row["dokumentstatusid"] = $status->getDokumentStatusID();
+		$row["label"] = $status->getLabel();
+		return $row;
+	}
+
+	protected function parseDokumentStatusList($rows) {
+		return array_map(array($this, 'parseDokumentStatus'), $rows);
+	}
+
 
 	public function viewIndex() {
 		$this->smarty->display("index.html.tpl");
@@ -411,6 +447,21 @@ class Template {
 	public function viewProcess($process) {
 		$this->smarty->assign("process", $this->parseProcess($process));
 		$this->smarty->display("process.html.tpl");
+	}
+
+	public function viewDokumentList($dokumente, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount) {
+		if ($dokumentkategorie != null) {
+			$this->smarty->assign("dokumentkategorie", $this->parseDokumentKategorie($dokumentkategorie));
+		}
+		if ($dokumentstatus != null) {
+			$this->smarty->assign("dokumentstatus", $this->parseDokumentStatus($dokumentstatus));
+		}
+		$this->smarty->assign("page", $page);
+		$this->smarty->assign("pagecount", $pagecount);
+		$this->smarty->assign("dokumente", $this->parseDokumente($dokumente));
+		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
+		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
+		$this->smarty->display("dokumentlist.html.tpl");
 	}
 
 	public function redirect($url = null) {

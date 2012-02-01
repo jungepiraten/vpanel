@@ -13,6 +13,11 @@ require_once(VPANEL_CORE . "/mailtemplate.class.php");
 require_once(VPANEL_CORE . "/mailattachment.class.php");
 require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
 require_once(VPANEL_CORE . "/process.class.php");
+require_once(VPANEL_CORE . "/dokument.class.php");
+require_once(VPANEL_CORE . "/dokumentkategorie.class.php");
+require_once(VPANEL_CORE . "/dokumentstatus.class.php");
+require_once(VPANEL_CORE . "/dokumentnotiz.class.php");
+require_once(VPANEL_CORE . "/file.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/mitglied.class.php");
 
@@ -987,31 +992,220 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 
 	/**
+	 * Dokument
+	 **/
+	public function parseDokument($row) {
+		return $this->parseRow($row, null, "Dokument");
+	}
+	public function getDokumentCount($dokumentkategorieid = null, $dokumentstatusid = null) {
+		if ($dokumentkategorieid instanceof DokumentKategorie) {
+			$dokumentkategorieid = $dokumentkategorieid->getDokumentKategorieID();
+		}
+		if ($dokumentstatusid instanceof DokumentStatus) {
+			$dokumentstatusid = $dokumentstatusid->getDokumentStatusID();
+		}
+		$sql = "SELECT COUNT(`dokumentid`) FROM `dokument` WHERE 1=1";
+		if ($dokumentkategorieid != null) {
+			$sql .= " AND `dokumentkategorieid` = " . intval($dokumentkategorieid);
+		}
+		if ($dokumentstatusid != null) {
+			$sql .= " AND `dokumentstatusid` = " . intval($dokumentstatusid);
+		}
+		return reset($this->getResult($sql)->fetchRow());
+	}
+	public function getDokumentResult($dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
+		if ($dokumentkategorieid instanceof DokumentKategorie) {
+			$dokumentkategorieid = $dokumentkategorieid->getDokumentKategorieID();
+		}
+		if ($dokumentstatusid instanceof DokumentStatus) {
+			$dokumentstatusid = $dokumentstatusid->getDokumentStatusID();
+		}
+		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `content`, `fileid` FROM `dokument` WHERE 1=1";
+		if ($dokumentkategorieid != null) {
+			$sql .= " AND `dokumentkategorieid` = " . intval($dokumentkategorieid);
+		}
+		if ($dokumentstatusid != null) {
+			$sql .= " AND `dokumentstatusid` = " . intval($dokumentstatusid);
+		}
+		if ($limit !== null or $offset !== null) {
+			$sql .= " LIMIT ";
+			if ($offset !== null) {
+				$sql .= $offset . ",";
+			}
+			if ($limit !== null) {
+				$sql .= $limit;
+			}
+		}
+		return $this->getResult($sql, array($this, "parseDokument"));
+	}
+	public function getDokument($dokumentid) {
+		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `content`, `fileid` FROM `dokument` WHERE `dokumentid` = " . intval($dokumentid);
+		return $this->getResult($sql, array($this, "parseDokument"))->fetchRow();
+	}
+	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatusid, $content, $fileid) {
+		if ($dokumentid == null) {
+			$sql = "INSERT INTO `dokument`
+				(`dokumentkategorieid`, `dokumentstatusid`, `content`, `fileid`) VALUES
+				(" . intval($dokumentkategorieid) . ",
+				 " . intval($dokumentstatusid) . ",
+				 '" . $this->escape($content) . "',
+				 " . intval($fileid) . ")";
+		} else {
+			$sql = "UPDATE `dokument`
+				SET	`dokumentkategorieid` = " . intval($dokumentkategorieid) . ",
+					`dokumentstatusid` = " . intval($dokumentstatusid) . ",
+					`content` = '" . $this->escape($content) . "',
+					`fileid` = " . intval($fileid) . "
+				WHERE `dokumentid` = " . intval($dokumentid);
+		}
+		$this->query($sql);
+		if ($dokumentid == null) {
+			$dokumentid = $this->getInsertID();
+		}
+		return $dokumentid;
+	}
+
+	/**
+	 * DokumentKategorie
+	 **/
+	public function parseDokumentKategorie($row) {
+		return $this->parseRow($row, null, "DokumentKategorie");
+	}
+	public function getDokumentKategorieResult() {
+		$sql = "SELECT `dokumentkategorieid`, `label` FROM `dokumentkategorien`";
+		return $this->getResult($sql, array($this, "parseDokumentKategorie"));
+	}
+	public function getDokumentKategorie($dokumentkategorieid) {
+		$sql = "SELECT `dokumentkategorieid`, `label` FROM `dokumentkategorien` WHERE `dokumentkategorieid` = " . intval($dokumentkategorieid);
+		return $this->getResult($sql, array($this, "parseDokumentKategorie"))->fetchRow();
+	}
+	public function setDokumentKategorie($dokumentkategorieid, $label) {
+		if ($dokumentkategorieid == null) {
+			$sql = "INSERT INTO `dokumentkategorien`
+				(`label`) VALUES
+				('" . $this->escape($label) . "')";
+		} else {
+			$sql = "UPDATE	`dokumentkategorien`
+				SET	`label` = '" . $this->escape($label) . "'
+				WHERE `dokumentkategorieid` = " . intval($dokumentkategorieid);
+		}
+		$this->query($sql);
+		if ($dokumentkategorieid == null) {
+			$dokumentkategorieid = $this->getInsertID();
+		}
+		return $dokumentkategorieid;
+	}
+	public function delDokumentKategorie($dokumentkategorieid) {
+		$sql = "DELETE FROM `dokumentkategorie` WHERE `dokumentkategorieid` = " . intval($dokumentkategorieid);
+		return $this->query($sql);
+	}
+
+	/**
+	 * DokumentStatus
+	 **/
+	public function parseDokumentStatus($row) {
+		return $this->parseRow($row, null, "DokumentStatus");
+	}
+	public function getDokumentStatusResult() {
+		$sql = "SELECT `dokumentstatusid`, `label` FROM `dokumentstatus`";
+		return $this->getResult($sql, array($this, "parseDokumentStatus"));
+	}
+	public function getDokumentStatus($dokumentstatusid) {
+		$sql = "SELECT `dokumentstatusid`, `label` FROM `dokumentstatus` WHERE `dokumentstatusid` = " . intval($dokumentstatusid);
+		return $this->getResult($sql, array($this, "parseDokumentStatus"))->fetchRow();
+	}
+	public function setDokumentStatus($dokumentstatusid, $label) {
+		if ($dokumentstatusid == null) {
+			$sql = "INSERT INTO `dokumentstatus`
+				(`label`) VALUES
+				('" . $this->escape($label) . "')";
+		} else {
+			$sql = "UPDATE	`dokumentstatus`
+				SET	`label` = '" . $this->escape($label) . "'
+				WHERE `dokumentstatusid` = " . intval($dokumentstatusid);
+		}
+		$this->query($sql);
+		if ($dokumentstatusid == null) {
+			$dokumentstatusid = $this->getInsertID();
+		}
+		return $dokumentstatusid;
+	}
+	public function delDokumentStatus($dokumentstatusid) {
+		$sql = "DELETE FROM `dokumentstatus` WHERE `dokumentstatusid` = " . intval($dokumentstatusid);
+		return $this->query($sql);
+	}
+
+	/**
+	 * DokumentNotiz
+	 **/
+	public function parseDokumentNotiz($row) {
+		return $this->parseRow($row, null, "DokumentNotiz");
+	}
+	public function getDokumentNotizResult($dokumentid = null) {
+		$sql = "SELECT `dokumentnotizid`, `dokumentid`, `author`, `timestamp`, `nextState`, `nextKategorie`, `kommentar` FROM `dokumentnotizen` WHERE 1=1";
+		if ($dokumentid != null) {
+			$sql .= " AND `dokumentid` = " . intval($dokumentid);
+		}
+		return $this->getResult($sql, array($this, "parseDokumentNotiz"));
+	}
+	public function getDokumentNotiz($dokumentnotizid) {
+		$sql = "SELECT `dokumentnotizid`, `dokumentid`, `author`, `timestamp`, `nextState`, `nextKategorie`, `kommentar` FROM `dokumentnotizen` WHERE `dokumentnotizid` = " . intval($dokumentnotizid);
+		return $this->getResult($sql, array($this, "parseDokumentNotiz"))->fetchRow();
+	}
+	public function setDokumentNotiz($dokumentnotizid, $dokumentid, $author, $timestamp, $nextState, $nextKategorie, $kommentar) {
+		if ($dokumentnotizid == null) {
+			$sql = "INSERT INTO `dokumentnotizen`
+				(`dokumentid`, `author`, `timestamp`, `nextState`, `nextKategorie`, `kommentar`) VALUES
+				(" . intval($dokumentid) . ",
+				 " . intval($author) . ",
+				 " . ($nextState == null ? "NULL" : intval($nextState)) . ",
+				 " . ($nextKategorie == null ? "NULL" : intval($nextKategorie)) . ",
+				 '" . $this->escape($kommentar) . "')";
+		} else {
+			$sql = "UPDATE	`dokumentnotizen`
+				SET	`dokumentid` = " . intval($dokumentid) . "
+					`author` = " . intval($author) . "
+					`timestamp` = " . date("Y-m-d H:i:s", $timestamp) . "
+					`nextState` = " . ($nextState == null ? "NULL" : intval($nextState)) . "
+					`nextKategorie` = " . ($nextKategorie == null ? "NULL" : intval($nextKategorie)) . "
+					`kommentar` = '" . $this->escape($kommentar) . "'
+				WHERE `dokumentnotizid` = " . intval($dokumentnotizid);
+		}
+		$this->query($sql);
+		if ($dokumentnotizid == null) {
+			$dokumentnotizid = $this->getInsertID();
+		}
+		return $dokumentnotizid;
+	}
+	public function delDokumentNotiz($dokumentnotizid) {
+		$sql = "DELETE FROM `dokumentnotizen` WHERE `dokumentnotizid` = " . intval($dokumentnotizid);
+		return $this->query($sql);
+	}
+
+	/**
 	 * File
 	 **/
 	public function parseFile($row) {
-		return $this->parseRow($row, null, "TempFile");
+		return $this->parseRow($row, null, "File");
 	}
 	public function getFileResult() {
-		$sql = "SELECT `fileid`, `userid`, `filename`, `exportfilename`, `mimetype` FROM `files`";
+		$sql = "SELECT `fileid`, `filename`, `exportfilename`, `mimetype` FROM `files`";
 		return $this->getResult($sql, array($this, "parseFile"));
 	}
 	public function getFile($fileid) {
-		$sql = "SELECT `fileid`, `userid`, `filename`, `exportfilename`, `mimetype` FROM `files` WHERE `fileid` = " . intval($fileid);
+		$sql = "SELECT `fileid`, `filename`, `exportfilename`, `mimetype` FROM `files` WHERE `fileid` = " . intval($fileid);
 		return $this->getResult($sql, array($this, "parseFile"))->fetchRow();
 	}
-	public function setFile($fileid, $userid, $filename, $exportfilename, $mimetype) {
+	public function setFile($fileid, $filename, $exportfilename, $mimetype) {
 		if ($fileid == null) {
 			$sql = "INSERT INTO `files`
-				(`userid`, `filename`, `exportfilename`, `mimetype`) VALUES
-				(" . intval($userid) . ",
-				 '" . $this->escape($filename) . "',
+				(`filename`, `exportfilename`, `mimetype`) VALUES
+				('" . $this->escape($filename) . "',
 				 '" . $this->escape($exportfilename) . "',
 				 '" . $this->escape($mimetype) . "')";
 		} else {
 			$sql = "UPDATE	`files`
-				SET	`userid` = " . intval($userid) . ",
-					`filename` = '" . $this->escape($filename) . "',
+				SET	`filename` = '" . $this->escape($filename) . "',
 					`exportfilename` = '" . $this->escape($exportfilename) . "',
 					`mimetype` = '" . $this->escape($mimetype) . "'
 				WHERE `fileid` = " . intval($fileid);
@@ -1024,6 +1218,43 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 	public function delFile($fileid) {
 		$sql = "DELETE `files` WHERE `fileid` = " . intval($fileid);
+		return $this->query($sql);
+	}
+
+	/**
+	 * TempFile
+	 **/
+	public function parseTempFile($row) {
+		return $this->parseRow($row, null, "TempFile");
+	}
+	public function getTempFileResult() {
+		$sql = "SELECT `tempfileid`, `userid`, `fileid` FROM `tempfiles`";
+		return $this->getResult($sql, array($this, "parseTempFile"));
+	}
+	public function getTempFile($tempfileid) {
+		$sql = "SELECT `tempfileid`, `userid`, `fileid` FROM `tempfiles` WHERE `tempfileid` = " . intval($tempfileid);
+		return $this->getResult($sql, array($this, "parseTempFile"))->fetchRow();
+	}
+	public function setTempFile($tempfileid, $userid, $fileid) {
+		if ($tempfileid == null) {
+			$sql = "INSERT INTO `tempfiles`
+				(`userid`, `fileid`) VALUES
+				(" . $this->escape($userid) . ",
+				 " . $this->escape($fileid) . ")";
+		} else {
+			$sql = "UPDATE	`tempfiles`
+				SET	`userid` = " . intval($userid) . ",
+					`fileid` = " . intval($fileid) . "
+				WHERE `tempfileid` = " . intval($tempfileid);
+		}
+		$this->query($sql);
+		if ($tempfileid == null) {
+			$tempfileid = $this->getInsertID();
+		}
+		return $tempfileid;
+	}
+	public function delTempFile($tempfileid) {
+		$sql = "DELETE `tempfiles` WHERE `tempfileid` = " . intval($tempfileid);
 		return $this->query($sql);
 	}
 }

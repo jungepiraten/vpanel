@@ -33,6 +33,9 @@ $lang['mailtemplates_show']	= 'Mailvorlagen anzeigen';
 $lang['mailtemplates_modify']	= 'Mailvorlagen bearbeiten';
 $lang['mailtemplates_create']	= 'Mailvorlagen anlegen';
 $lang['mailtemplates_delete']	= 'Mailvorlagen löschen';
-$lang['statistik_show']     = 'Mitgliederstatistik anzeigen';
+$lang['statistik_show']		= 'Mitgliederstatistik anzeigen';
+$lang['dokumente_show']		= 'Dokumente anzeigen';
+$lang['dokumente_create']	= 'Dokumente anlegen';
+$lang['dokumente_modify']	= 'Dokumente bearbeiten';
 
 ?>

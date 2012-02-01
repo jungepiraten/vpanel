@@ -4,7 +4,7 @@ require_once(VPANEL_STORAGE . "/sql.class.php");
 
 class MySQLStorage extends SQLStorage {
 	private $mysqli;
-	
+
 	public function __construct($host, $user, $pass, $db) {
 		parent::__construct();
 		$this->mysqli = new MySQLi($host, $user, $pass, $db);
