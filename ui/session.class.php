@@ -95,7 +95,7 @@ class Session {
 		return isset($_REQUEST[$name]);
 	}
 	public function hasFileVariable($name) {
-		return isset($_FILES[$name] && $_FILES[$name]["error"] == 0;
+		return isset($_FILES[$name]) && $_FILES[$name]["error"] == 0;
 	}
 	public function getVariable($name) {
 		return iconv($this->getEncoding(), "UTF-8", stripslashes($_REQUEST[$name]));
