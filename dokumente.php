@@ -16,7 +16,7 @@ require_once(VPANEL_CORE . "/dokument.class.php");
 function parseDokumentFormular($session, &$dokument = null) {
 	$kategorieid = $session->getIntVariable("kategorieid");
 	$statusid = $session->getIntVariable("statusid");
-	if ($session->hasVariable("file")) {
+	if ($session->hasFileVariable("file")) {
 		$file = $session->getFileVariable("file");
 	}
 	if ($session->hasVariable("idkey")) {

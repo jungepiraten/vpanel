@@ -94,6 +94,9 @@ class Session {
 	public function hasVariable($name) {
 		return isset($_REQUEST[$name]);
 	}
+	public function hasFileVariable($name) {
+		return isset($_FILES[$name] && $_FILES[$name]["error"] == 0;
+	}
 	public function getVariable($name) {
 		return iconv($this->getEncoding(), "UTF-8", stripslashes($_REQUEST[$name]));
 	}
@@ -110,10 +113,7 @@ class Session {
 		return $_REQUEST[$name];
 	}
 	public function getFileVariable($name) {
-		if (!isset($_FILES[$name])) {
-			return null;
-		}
-		if ($_FILES[$name]["error"] != 0) {
+		if (!$this->hasFileVariable($name)) {
 			return null;
 		}
 		$filename = substr(md5(microtime(true) . $_FILES[$name]["tmp_name"]), 0, 12) . "." . array_pop(explode(".", $_FILES[$name]["name"]));
