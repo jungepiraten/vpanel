@@ -76,7 +76,11 @@ class User extends StorageClass {
 
 	public function getRoles() {
 		if ($this->roles === null) {
-			$this->roles = $this->getStorage()->getUserRoleList($this->getUserID());
+			$roles = $this->getStorage()->getUserRoleList($this->getUserID());
+			$this->roles = array();
+			foreach ($roles as $role) {
+				$this->roles[$role->getRoleID()] = $role;
+			}
 		}
 		return $this->roles;
 	}
