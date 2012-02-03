@@ -622,9 +622,9 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 	public function searchOrt($plz, $label, $stateid) {
 		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte` WHERE `plz` = '" . $this->escape($plz) . "' AND `label` = '" . $this->escape($label) . "' AND `stateid` = " . intval($stateid);
-		$array = $this->getResult($sql, array($this, "parseOrt"))->fetchRow();
-		if (count($array) > 0) {
-			return reset($array);
+		$result = $this->getResult($sql, array($this, "parseOrt"));
+		if ($result->getCount() > 0) {
+			return $result->fetchRow();
 		}
 		$ort = new Ort($this);
 		$ort->setPLZ($plz);
