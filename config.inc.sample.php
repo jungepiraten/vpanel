@@ -45,6 +45,7 @@ $config->registerPage("dokumente_details", "dokumente.php?mode=details&dokumenti
 $config->registerPage("dokumente_mitglied", "mitglieddokument.php?mode=add&dokumentid=%d");
 $config->registerPage("dokumente_mitglied_create", "mitglieder.php?mode=create&dokumentid=%d");
 $config->registerPage("dokumente_get", "file.php?mode=get&dokumentid=%d");
+$config->registerPage("dokumente_view", "file.php?mode=view&dokumentid=%d");
 
 $config->registerPage("mitglieddokument", "mitglieddokument.php");
 $config->registerPage("mitglieddokument_delete", "mitglieddokument.php?mode=delete&mitgliedid=%d&dokumentid=%d")
@@ -72,6 +73,9 @@ $config->registerPage("mailtemplates_del", "mailtemplates.php?mode=delete&templa
 $config->registerPage("mailattachment", "mailattachment.php?attachmentid=%d");
 
 $config->registerPage("statistik", "statistik.php");
+
+$config->registerPage("file_tokenget", "file.php?mode=get&fileid=%d&token=%s");
+$config->registerPage("file_tokenget_part", "file.php?mode=getpart&fileid=%d&token=%s&part=%d");
 
 $config->registerPage("tempfile_get", "file.php?mode=get&tempfileid=%d");
 

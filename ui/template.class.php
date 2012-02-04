@@ -553,6 +553,19 @@ class Template {
 		$this->smarty->display("mitglieddokument.html.tpl");
 	}
 
+	public function viewFileImagePreview($file, $token) {
+		$this->smarty->assign("file", $this->parseFile($file));
+		$this->smarty->assign("token", $token);
+		$this->smarty->display("fileimagepreview.html.tpl");
+	}
+
+	public function viewFilePDFPreview($file, $token, $parts) {
+		$this->smarty->assign("file", $this->parseFile($file));
+		$this->smarty->assign("token", $token);
+		$this->smarty->assign("parts", $parts);
+		$this->smarty->display("filepdfpreview.html.tpl");
+	}
+
 	public function redirect($url = null) {
 		if ($url === null) {
 			// TODO $session->getVariable nutzen

@@ -1,5 +1,6 @@
 {include file="header.html.tpl" ansicht="Dokument anzeigen"}
 <p class="pagetitle">Dokument {$dokument.label}</p>
+<iframe src="{"dokumente_view"|___:$dokument.dokumentid}" width="650px" height="300px"></iframe>
 {include file="dokumentform.block.tpl" dokument=$dokument dokumentkategorien=$dokumentkategorien dokumentstatuslist=$dokumentstatuslist}
 {include file="mitgliederlist.block.tpl" mitglieder=$mitglieder}
 <a href="{"dokumente_mitglied"|___:$dokument.dokumentid}">Mitglied verlinken</a>

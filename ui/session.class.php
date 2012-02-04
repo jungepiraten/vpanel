@@ -24,6 +24,18 @@ class Session {
 		}
 	}
 
+	public function generateToken($key) {
+		if (!isset($this->stor["tokens"])) {
+			$this->stor["tokens"] = array();
+		}
+		$token = md5($key . "-" . microtime(true) . "-" . rand(1000,9999));
+		$this->stor["tokens"][$key] = $token;
+		return $token;
+	}
+	public function validToken($key, $token) {
+		return (isset($this->stor["tokens"][$key]) && $this->stor["tokens"][$key] == $token);
+	}
+
 	public function isSignedIn() {
 		return isset($this->stor["user"]) and $this->stor["user"] != null;
 	}
