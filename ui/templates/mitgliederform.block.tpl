@@ -1,5 +1,6 @@
 <form action="{if isset($mitglied)}{"mitglieder_details"|___:$mitglied.mitgliedid}{else}{"mitglieder_create"|___:$mitgliedschaft.mitgliedschaftid}{/if}" method="post">
  <fieldset>
+ {if isset($dokument)}<input type="hidden" name="dokumentid" value="{$dokument.dokumentid}" />{/if}
  <table>
      <tr>
         <th>{"Mitgliedsart:"|__}</th>
@@ -35,8 +36,6 @@
      <tr>
       <th><label for="ortid">{"Ort:"|__}</label></th>
       <td>
-       <input type="hidden" id="ortid" name="ortid"
-        value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.ortid|escape:html}{/if}" />
        <input class="plz" type="text" name="plz" id="plz" size="5" autocomplete="off"
         value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.plz|escape:html}{/if}" />
        <input class="ort" type="text" name="ort" id="ort" size="35" autocomplete="off"
@@ -132,7 +131,6 @@ function toggleMitgliedschaft() {
 toggleMitgliedschaft();
 
 function VPanel_Dropdownorte() {
-	this.inputortid = $('#ortid');
 	this.inputplz = $('#plz');
 	this.inputort = $('#ort');
 	this.overlay = $('#dropdownorte');
@@ -171,13 +169,12 @@ VPanel_Dropdownorte.prototype = {
 				e.preventDefault();
 				this._next();
 				break;
-			case 38: //down
+			case 38: //up
 				e.preventDefault();
 				this._prev();
 				break;
 			case 13: //enter
 				if(this.current >= 0 && this.current < this.data.length) {
-					this.inputortid.val(this.data[this.current].ortid);
 					this.inputplz.val(this.data[this.current].plz);
 					this.inputort.val(this.data[this.current].ort);
 					$('#state' + this.data[this.current].stateid).attr('selected', 'selected');
@@ -186,7 +183,6 @@ VPanel_Dropdownorte.prototype = {
 				}
 				break;
 			case 27: //esc
-				this.inputortid.val('');
 				this.inputplz.blur();
 				this.inputort.blur();
 				break;
@@ -233,7 +229,7 @@ VPanel_Dropdownorte.prototype = {
 		this.data = data;
 		for(i in data) {
 			$('<li></li>').append(
-				$('<a></a>').text(data[i].plz + ' ' + data[i].ort).attr('href',data[i].ortid)
+				$('<a></a>').text(data[i].plz + ' ' + data[i].ort).attr('href','#')
 			).appendTo( this.list );
 		}
 	},

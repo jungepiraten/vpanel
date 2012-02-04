@@ -12,7 +12,7 @@
 <div style="width: 2px; height: 30px; background-color: #8f8f8f; float:left; margin-left:10px;"></div>
 <div style="float:left; margin-left:10px;"><a href="{"roles_details"|___:$role.roleid}" class="label">{$role.label}</a><br>
 <span class="description">{$role.description}</span></div>
-<div style="clear:both;"></div>
+<div style="clear:left;"></div>
 </li>
 {/foreach}
 </ul>

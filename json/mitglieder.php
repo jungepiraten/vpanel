@@ -17,8 +17,17 @@ $mitglieder = $session->getStorage()->getMitgliederList($matcher, 5);
 $jsons = array();
 
 foreach ($mitglieder as $mitglied) {
+	$revision = $mitglied->getLatestRevision();
+
 	$row = array();
-	$row["label"] = rand(100,666);
+	$row["mitgliedid"] = $mitglied->getMitgliedID();
+	$row["location"] = $session->getLink("mitglieder_details", $mitglied->getMitgliedID());
+	if ($revision->isJurPerson()) {
+		$row["label"] = $revision->getJurPerson()->getLabel();
+	} else if ($revision->isNatPerson()) {
+		$row["label"] = $revision->getNatPerson()->getVorname() . " " . $revision->getNatPerson()->getName();
+	}
+	
 	$jsons[] = $row;
 }
 

@@ -97,9 +97,11 @@ case "details":
 	}
 	
 	$dokumentnotizen = $session->getStorage()->getDokumentNotizList($dokument->getDokumentID());
+	$mitglieder = $session->getStorage()->getMitgliederByDokumentList($dokument->getDokumentID());
+
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
-	$ui->viewDokumentDetails($dokument, $dokumentnotizen, $dokumentkategorien, $dokumentstatuslist);
+	$ui->viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $dokumentkategorien, $dokumentstatuslist);
 	exit;
 default:
 	$dokumentkategorie = null;

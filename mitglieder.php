@@ -12,6 +12,7 @@ if (!$session->isAllowed("mitglieder_show")) {
 }
 
 require_once(VPANEL_CORE . "/mitglied.class.php");
+require_once(VPANEL_CORE . "/mitgliednotiz.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfiltersendmail.class.php");
@@ -30,7 +31,9 @@ $predefinedfields = array(
 	array("label" => "Mitgliedschaft",	"template" => "{MITGLIEDSCHAFT}")
 	);
 
-function parseMitgliederFormular($session, &$mitglied = null) {
+function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) {
+	global $config;
+
 	$persontyp = $session->getVariable("persontyp");
 	$name = $session->getVariable("name");
 	$vorname = $session->getVariable("vorname");
@@ -39,7 +42,6 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 	$firma = $session->getVariable("firma");
 	$strasse = $session->getVariable("strasse");
 	$hausnummer = $session->getVariable("hausnummer");
-	$ortid = is_numeric($_POST["ortid"]) ? $_POST["ortid"] : null;
 	$plz = $session->getVariable("plz");
 	$ortname = $session->getVariable("ort");
 	$stateid = is_numeric($_POST["stateid"]) ? $_POST["stateid"] : null;
@@ -62,14 +64,8 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 	} else {
 		$jurperson = $session->getStorage()->searchJurPerson($firma);
 	}
-	if (is_numeric($ortid)) {
-		$ort = $session->getStorage()->getOrt($ortid);
-	}
 
-	if ($ort == null) {
-		$ort = $session->getStorage()->searchOrt($plz, $ortname, $stateid);
-	}
-
+	$ort = $session->getStorage()->searchOrt($plz, $ortname, $stateid);
 	$kontakt = $session->getStorage()->searchKontakt($strasse, $hausnummer, $ort->getOrtID(), $telefon, $handy, $email);
 
 	$neumitglied = false;
@@ -95,6 +91,10 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 	$revision->setKontakt($kontakt);
 	$revision->save();
 
+	if ($dokument != null) {
+		$session->getStorage()->addMitgliedDokument($mitglied->getMitgliedID(), $dokument->getDokumentID());
+	}
+
 	if ($neumitglied) {
 		$mailtemplate = $mitgliedschaft->getDefaultCreateMail();
 		if ($mailtemplate != null) {
@@ -102,6 +102,19 @@ function parseMitgliederFormular($session, &$mitglied = null) {
 			$config->getSendMailBackend()->send($mail);
 		}
 	}
+}
+
+function parseAddMitgliederNotizFormular($session, $mitglied, &$notiz) {
+	$kommentar = $session->getVariable("kommentar");
+
+	if ($notiz == null) {
+		$notiz = new MitgliedNotiz($session->getStorage());
+	}
+	$notiz->setMitglied($mitglied);
+	$notiz->setAuthor($session->getUser());
+	$notiz->setTimestamp(time());
+	$notiz->setKommentar($kommentar);
+	$notiz->save();
 }
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
@@ -129,14 +142,32 @@ case "details":
 		$ui->redirect($session->getLink("mitglieder_details", $mitglied->getMitgliedID()));
 	}
 
+	if ($session->getBoolVariable("addnotiz")) {
+		if (!$session->isAllowed("mitglieder_modify")) {
+			$ui->viewLogin();
+			exit;
+		}
+		
+		parseAddMitgliederNotizFormular($session, $mitglied, $notiz);
+	}
+	
+	$notizen = $session->getStorage()->getMitgliedNotizList($mitglied->getMitgliedID());
+	$dokumente = $session->getStorage()->getDokumentByMitgliedList($mitglied->getMitgliedID());
+
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
 	$states = $session->getStorage()->getStateList();
-
-	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $mitgliedschaften, $states);
+	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $mitgliedschaften, $states);
 	exit;
 case "create":
-	$mitgliedschaftid = intval($session->getVariable("mitgliedschaftid"));
-	$mitgliedschaft = $session->getStorage()->getMitgliedschaft($mitgliedschaftid);
+	$mitgliedschaft = null;
+	if ($session->hasVariable("mitgliedschaftid")) {
+		$mitgliedschaft = $session->getStorage()->getMitgliedschaft($session->getVariable("mitgliedschaftid"));
+	}
+
+	$dokument = null;
+	if ($session->hasVariable("dokumentid")) {
+		$dokument = $session->getStorage()->getDokument($session->getVariable("dokumentid"));
+	}
 
 	if ($session->getBoolVariable("save")) {
 		if (!$session->isAllowed("mitglieder_create")) {
@@ -144,7 +175,7 @@ case "create":
 			exit;
 		}
 
-		parseMitgliederFormular($session, &$mitglied);
+		parseMitgliederFormular($session, &$mitglied, $dokument);
 
 		$ui->redirect($session->getLink("mitglieder_details", $mitglied->getMitgliedID()));
 	}
@@ -152,7 +183,7 @@ case "create":
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
 	$states = $session->getStorage()->getStateList();
 
-	$ui->viewMitgliedCreate($mitgliedschaft, $mitgliedschaften, $states);
+	$ui->viewMitgliedCreate($mitgliedschaft, $dokument, $mitgliedschaften, $states);
 	exit;
 case "delete":
 	if (!$session->isAllowed("mitglieder_delete")) {

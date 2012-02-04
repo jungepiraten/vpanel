@@ -1,6 +1,9 @@
 {include file="header.html.tpl" ansicht="Dokument anzeigen"}
 <p class="pagetitle">Dokument {$dokument.label}</p>
 {include file="dokumentform.block.tpl" dokument=$dokument dokumentkategorien=$dokumentkategorien dokumentstatuslist=$dokumentstatuslist}
+{include file="mitgliederlist.block.tpl" mitglieder=$mitglieder}
+<a href="{"dokumente_mitglied"|___:$dokument.dokumentid}">Mitglied verlinken</a>
+<a href="{"dokumente_mitglied_create"|___:$dokument.dokumentid}">Mitglied anlegen</a>
 {foreach from=$dokumentnotizen item=notiz}
 <div class="notiz">
  <span class="meta">{"Von %s"|__:$notiz.author.username}</span>

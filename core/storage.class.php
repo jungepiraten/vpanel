@@ -31,11 +31,22 @@ interface Storage {
 	public function getGliederungList();
 	public function getGliederung($gliederungid);
 
+	public function addMitgliedDokument($mitgliedid, $dokumentid);
+	public function delMitgliedDokument($mitgliedid, $dokumentid);
+
 	public function getMitgliederResult($filter = null, $limit = null, $offset = null);
 	public function getMitgliederList($filter = null, $limit = null, $offset = null);
+	public function getMitgliederByDokumentResult($dokumentid);
+	public function getMitgliederByDokumentList($dokumentid);
 	public function getMitglied($mitgliedid);
 	public function getMitgliederCount($filter = null);
 	public function setMitglied($mitgliedid, $globalid, $eintritt, $austritt);
+
+	public function getMitgliedNotizResult($mitgliedid = null);
+	public function getMitgliedNotizList($mitgliedid = null);
+	public function getMitgliedNotiz($mitgliednotizid);
+	public function setMitgliedNotiz($mitgliednotizid, $mitgliedid, $author, $timestamp, $kommentar);
+	public function delMitgliedNotiz($mitgliednotizid);
 
 	public function getMitgliederRevisionResult();
 	public function getMitgliederRevisionList();
@@ -96,13 +107,7 @@ interface Storage {
 	public function setMailTemplateHeaderList($mailtemplateid, $headerids, $values);
 	public function getMailTemplateAttachmentResult($mailtemplateid);
 	public function getMailTemplateAttachmentList($mailtemplateid);
-	public function setMailTemplateAttachmentList($mailtemplateid, $attachments);
-
-	public function getMailAttachmentResult();
-	public function getMailAttachmentList();
-	public function getMailAttachment($attachmentid);
-	public function setMailAttachment($attachmentid, $filename, $mimetype, $content);
-	public function delMailAttachment($attachmentid);
+	public function setMailTemplateAttachmentList($mailtemplateid, $files);
 
 	public function getProcessResult();
 	public function getProcessList();
@@ -112,6 +117,10 @@ interface Storage {
 
 	public function getDokumentResult($dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
 	public function getDokumentList($dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
+	public function getDokumentByMitgliedResult($mitgliedid);
+	public function getDokumentByMitgliedList($mitgliedid);
+	public function getDokumentSearchResult($query, $limit = null, $offset = null);
+	public function getDokumentSearchList($query, $limit = null, $offset = null);
 	public function getDokumentCount($dokumentkategorieid = null, $dokumentstatus = null);
 	public function getDokument($dokumentid);
 	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatus, $identifier, $label, $content, $fileid);
@@ -180,6 +189,14 @@ abstract class AbstractStorage implements Storage {
 		return $this->getMitgliederResult($filter, $limit, $offset)->fetchAll();
 	}
 
+	public function getMitgliederByDokumentList($dokumentid) {
+		return $this->getMitgliederByDokumentResult($dokumentid)->fetchAll();
+	}
+
+	public function getMitgliedNotizList($mitgliedid = null) {
+		return $this->getMitgliedNotizResult($mitgliedid)->fetchAll();
+	}
+
 	public function getMitgliederRevisionList() {
 		return $this->getMitgliederRevisionResult()->fetchAll();
 	}
@@ -193,7 +210,7 @@ abstract class AbstractStorage implements Storage {
 	}
 
 	public function getOrtListLimit($plz = null, $label = null, $stateid = null, $count = null) {
-		return $this->getOrtResult($plz, $label, $stateid, $count)->fetchAll();
+		return $this->getOrtResultLimit($plz, $label, $stateid, $count)->fetchAll();
 	}
 
 	public function getStateList() {
@@ -220,16 +237,20 @@ abstract class AbstractStorage implements Storage {
 		return $this->getMailTemplateAttachmentResult($mailtemplateid)->fetchAll();
 	}
 
-	public function getMailAttachmentList() {
-		return $this->getMailAttachmentResult()->fetchAll();
-	}
-
 	public function getProcessList() {
 		return $this->getProcessResult()->fetchAll();
 	}
 
 	public function getDokumentList($dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
 		return $this->getDokumentResult($dokumentkategorieid, $dokumentstatusid, $limit = null, $offset = null)->fetchAll();
+	}
+
+	public function getDokumentByMitgliedList($mitgliedid) {
+		return $this->getDokumentByMitgliedResult($mitgliedid)->fetchAll();
+	}
+
+	public function getDokumentSearchList($query, $limit = null, $offset = null) {
+		return $this->getDokumentSearchResult($query, $limit = null, $offset = null)->fetchAll();
 	}
 
 	public function getDokumentKategorieList() {

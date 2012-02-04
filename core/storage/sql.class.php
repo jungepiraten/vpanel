@@ -5,12 +5,12 @@ require_once(VPANEL_CORE . "/user.class.php");
 require_once(VPANEL_CORE . "/role.class.php");
 require_once(VPANEL_CORE . "/permission.class.php");
 require_once(VPANEL_CORE . "/mitglied.class.php");
+require_once(VPANEL_CORE . "/mitgliednotiz.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/mitgliedschaft.class.php");
 require_once(VPANEL_CORE . "/natperson.class.php");
 require_once(VPANEL_CORE . "/jurperson.class.php");
 require_once(VPANEL_CORE . "/mailtemplate.class.php");
-require_once(VPANEL_CORE . "/mailattachment.class.php");
 require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
 require_once(VPANEL_CORE . "/process.class.php");
 require_once(VPANEL_CORE . "/dokument.class.php");
@@ -222,6 +222,18 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 
 	/**
+	 * MitgliedDokument
+	 **/
+	public function addMitgliedDokument($mitgliedid, $dokumentid) {
+		$sql = "INSERT INTO `mitglieddokument` (`mitgliedid`, `dokumentid`) VALUES (" . intval($mitgliedid) . ", " . intval($dokumentid) . ")";
+		return $this->query($sql);
+	}
+	public function delMitgliedDokument($mitgliedid, $dokumentid) {
+		$sql = "DELETE FROM `mitglieddokument` WHERE `mitgliedid` = " . intval($mitgliedid) . " AND `dokumentid` = " . intval($dokumentid);
+		return $this->query($sql);
+	}
+
+	/**
 	 * Mitglieder
 	 **/
 	protected function parseMitgliederMatcher($matcher) {
@@ -366,6 +378,58 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		return $this->getResult($sql, array($this, "parseMitglied"));
 	}
+	public function getMitgliederByDokumentResult($dokumentid) {
+		$sql = "SELECT	`r`.`timestamp` AS `null`,
+				`m`.`mitgliedid` as `m_mitgliedid`,
+				`m`.`globalid` as `m_globalid`,
+				UNIX_TIMESTAMP(`m`.`eintritt`) as `m_eintritt`,
+				UNIX_TIMESTAMP(`m`.`austritt`) as `m_austritt`,
+				`r`.`revisionid` AS `r_revisionid`,
+				`r`.`globaleid` AS `r_globaleid`,
+				UNIX_TIMESTAMP(`r`.`timestamp`) AS `r_timestamp`,
+				`r`.`userid` AS `r_userid`,
+				`r`.`mitgliedid` AS `r_mitgliedid`,
+				`r`.`mitgliedschaftid` AS `r_mitgliedschaftid`,
+				`r`.`gliederungsid` AS `r_gliederungsid`,
+				`r`.`geloescht` AS `r_geloescht`,
+				`r`.`mitglied_piraten` AS `r_mitglied_piraten`,
+				`r`.`verteiler_eingetragen` AS `r_verteiler_eingetragen`,
+				`r`.`beitrag` AS `r_beitrag`,
+				`r`.`natpersonid` AS `r_natpersonid`,
+				`r`.`jurpersonid` AS `r_jurpersonid`,
+				`r`.`kontaktid` AS `r_kontaktid`,
+				`n`.`natpersonid` AS `n_natpersonid`,
+				`n`.`name` AS `n_name`,
+				`n`.`vorname` AS `n_vorname`,
+				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
+				`n`.`nationalitaet` AS `n_nationalitaet`,
+				`j`.`jurpersonid` AS `j_jurpersonid`,
+				`j`.`label` AS `j_label`,
+				`k`.`kontaktid` AS `k_kontaktid`,
+				`k`.`strasse` AS `k_strasse`,
+				`k`.`hausnummer` AS `k_hausnummer`,
+				`k`.`ortid` AS `k_ortid`,
+				`k`.`telefonnummer` AS `k_telefonnummer`,
+				`k`.`handynummer` AS `k_handynummer`,
+				`k`.`email` AS `k_email`,
+				`o`.`ortid` AS `o_ortid`,
+				`o`.`plz` AS `o_plz`,
+				`o`.`label` AS `o_label`,
+				`o`.`stateid` AS `o_stateid`
+			FROM	`mitglieddokument`
+			LEFT JOIN `mitglieder` `m` USING (`mitgliedid`)
+			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
+			LEFT JOIN `mitgliederrevisions` `rmax` USING (`mitgliedid`)
+			LEFT JOIN `natperson` `n` ON (`n`.`natpersonid` = `r`.`natpersonid`)
+			LEFT JOIN `jurperson` `j` ON (`j`.`jurpersonid` = `r`.`jurpersonid`)
+			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
+			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
+			WHERE	`dokumentid` = " . intval($dokumentid) . "
+			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
+			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
+			ORDER BY `r`.`timestamp`";
+		return $this->getResult($sql, array($this, "parseMitglied"));
+	}
 	public function getMitglied($mitgliedid) {		
 		return $this->getMitgliederResult(new MitgliedMitgliederMatcher($mitgliedid))->fetchRow();
 	}
@@ -381,6 +445,50 @@ abstract class SQLStorage extends AbstractStorage {
 		} else {
 			return $mitgliedid;
 		}
+	}
+
+	/**
+	 * MitgliedNotiz
+	 **/
+	public function parseMitgliedNotiz($row) {
+		return $this->parseRow($row, null, "MitgliedNotiz");
+	}
+	public function getMitgliedNotizResult($mitgliedid = null) {
+		$sql = "SELECT `mitgliednotizid`, `mitgliedid`, `author`, `timestamp`, `kommentar` FROM `mitgliedernotizen` WHERE 1=1";
+		if ($mitgliedid != null) {
+			$sql .= " AND `mitgliedid` = " . intval($mitgliedid);
+		}
+		return $this->getResult($sql, array($this, "parseMitgliedNotiz"));
+	}
+	public function getMitgliedNotiz($mitgliednotizid) {
+		$sql = "SELECT `mitgliednotizid`, `mitgliedid`, `author`, `timestamp`, `kommentar` FROM `mitgliedernotizen` WHERE `mitgliednotizid` = " . intval($mitgliednotizid);
+		return $this->getResult($sql, array($this, "parseMitgliedNotiz"))->fetchRow();
+	}
+	public function setMitgliedNotiz($mitgliednotizid, $mitgliedid, $author, $timestamp, $kommentar) {
+		if ($mitgliednotizid == null) {
+			$sql = "INSERT INTO `mitgliedernotizen`
+				(`mitgliedid`, `author`, `timestamp`, `kommentar`) VALUES
+				(" . intval($mitgliedid) . ",
+				 " . intval($author) . ",
+				 '" . date("Y-m-d H:i:s", $timestamp) . "',
+				 '" . $this->escape($kommentar) . "')";
+		} else {
+			$sql = "UPDATE	`mitgliedernotizen`
+				SET	`mitgliedid` = " . intval($mitgliedid) . ",
+					`author` = " . intval($author) . ",
+					`timestamp` = " . date("Y-m-d H:i:s", $timestamp) . ",
+					`kommentar` = '" . $this->escape($kommentar) . "'
+				WHERE `mitgliednotizid` = " . intval($mitgliednotizid);
+		}
+		$this->query($sql);
+		if ($mitgliednotizid == null) {
+			$mitgliednotizid = $this->getInsertID();
+		}
+		return $mitgliednotizid;
+	}
+	public function delMitgliedNotiz($mitgliednotizid) {
+		$sql = "DELETE FROM `mitgliedernotizen` WHERE `mitgliednotizid` = " . intval($mitgliednotizid);
+		return $this->query($sql);
 	}
 
 	/**
@@ -862,22 +970,19 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 	}
 
-	public function parseMailTemplateAttachment($row) {
-		return $this->parseRow($row, null, "MailAttachment");
-	}
 	public function getMailTemplateAttachmentResult($mailtemplateid) {
-		$sql = "SELECT `mailattachments`.`attachmentid`, `mailattachments`.`filename`, `mailattachments`.`mimetype`, `mailattachments`.`content` FROM `mailtemplateattachments` LEFT JOIN `mailattachments` ON (`mailtemplateattachments`.`attachmentid` = `mailattachments`.`attachmentid`) WHERE `mailtemplateattachments`.`templateid` = " . intval($mailtemplateid);
-		return $this->getResult($sql, array($this, "parseMailTemplateAttachment"));
+		$sql = "SELECT `files`.`fileid`, `files`.`filename`, `files`.`exportfilename`, `files`.`mimetype` FROM `mailtemplateattachments` LEFT JOIN `files` ON (`mailtemplateattachments`.`fileid` = `files`.`fileid`) WHERE `mailtemplateattachments`.`templateid` = " . intval($mailtemplateid);
+		return $this->getResult($sql, array($this, "parseFile"));
 	}
-	public function setMailTemplateAttachmentList($mailtemplateid, $attachments) {
+	public function setMailTemplateAttachmentList($mailtemplateid, $files) {
 		$sql = "DELETE FROM `mailtemplateattachments` WHERE `templateid` = " . intval($templateid);
 		$this->query($sql);
 		$sqlinserts = array();
-		while (count($attachments) > 0) {
-			$sqlinserts[] = "(" . intval($templateid) . ", '" . $this->escape(array_shift($attachments)) . "')";
+		while (count($files) > 0) {
+			$sqlinserts[] = "(" . intval($templateid) . ", '" . $this->escape(array_shift($files)) . "')";
 		}
 		if (count($sqlinserts) > 0) {
-			$sql = "INSERT INTO `mailtemplateattachments` (`templateid`, `attachmentid`) VALUES " . implode(", ", $sqlinserts);
+			$sql = "INSERT INTO `mailtemplateattachments` (`templateid`, `fileid`) VALUES " . implode(", ", $sqlinserts);
 			$this->query($sql);
 		}
 	}
@@ -910,37 +1015,6 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 	public function delMailHeader($headerid) {
 		$sql = "DELETE FROM `mailheaders` WHERE `headerid` = " . intval($headerid);
-		return $this->query($sql);
-	}
-
-	/**
-	 * MailAttachments
-	 **/
-	public function parseMailAttachment($row) {
-		return $this->parseRow($row, null, "MailAttachment");
-	}
-	public function getMailAttachmentResult() {
-		$sql = "SELECT `attachmentid`, `filename`, `mimetype`, `content` FROM `mailattachments`";
-		return $this->getResult($sql, array($this, "parseMailAttachment"));
-	}
-	public function getMailAttachment($attachmentid) {
-		$sql = "SELECT `attachmentid`, `filename`, `mimetype`, `content` FROM `mailattachments` WHERE `attachmentid` = " . intval($attachmentid);
-		return $this->getResult($sql, array($this, "parseMailAttachment"))->fetchRow();
-	}
-	public function setMailAttachment($attachmentid, $filename, $mimetype, $content) {
-		if ($attachmentid == null) {
-			$sql = "INSERT INTO `mailattachments` (`filename`, `mimetype`, `content`) VALUES ('" . $this->escape($filename) . "', '" . $this->escape($mimetype) . "', '" . $this->escape($content) . "')";
-		} else {
-			$sql = "UPDATE `mailattachments` SET `filename` = '" . $this->escape($filename) . "', `mimetype` = '" . $this->escape($mimetype) . "', `content` = '" . $this->escape($content) . "' WHERE `attachmentid` = " . intval($attachmentid);
-		}
-		$this->query($sql);
-		if ($attachmentid == null) {
-			$attachmentid = $this->getInsertID();
-		}
-		return $attachmentid;
-	}
-	public function delMailAttachment($attachmentid) {
-		$sql = "DELETE FROM `mailattachments` WHERE `attachmentid` = " . intval($attachmentid);
 		return $this->query($sql);
 	}
 
@@ -1027,6 +1101,35 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($dokumentstatusid != null) {
 			$sql .= " AND `dokumentstatusid` = " . intval($dokumentstatusid);
 		}
+		if ($limit !== null or $offset !== null) {
+			$sql .= " LIMIT ";
+			if ($offset !== null) {
+				$sql .= $offset . ",";
+			}
+			if ($limit !== null) {
+				$sql .= $limit;
+			}
+		}
+		return $this->getResult($sql, array($this, "parseDokument"));
+	}
+	public function getDokumentByMitgliedResult($mitgliedid) {
+		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `fileid` FROM `dokument` LEFT JOIN `mitglieddokument` USING (`dokumentid`) WHERE `mitgliedid` = " . intval($mitgliedid);
+		return $this->getResult($sql, array($this, "parseDokument"));
+	}
+	public function getDokumentSearchResult($querys, $limit = null, $offset = null) {
+		if (!is_array($querys)) {
+			$querys = array($querys);
+		}
+		$fields = array("`identifier`", "`label`", "`content`");
+		$wordclauses = array();
+		foreach ($querys as $word) {
+			$clauses = array();
+			foreach ($fields as $field) {
+				$clauses[] = $field . " LIKE '%" . $this->escape($word) . "%'";
+			}
+			$wordclauses[] = implode(" OR ", $clauses);
+		}
+		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `fileid` FROM `dokument` WHERE (" . implode(") AND (", $wordclauses) . ")";
 		if ($limit !== null or $offset !== null) {
 			$sql .= " LIMIT ";
 			if ($offset !== null) {

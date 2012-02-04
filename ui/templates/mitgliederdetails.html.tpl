@@ -14,5 +14,25 @@
 <div>
 {include file="mitgliederform.block.tpl" mitglied=$mitglied}
 </div>
+{include file=dokumentlist.block.tpl dokumente=$dokumente}
+<a href="{"mitglieder_dokument"|___:$mitglied.mitgliedid}">Dokument verlinken</a>
+{foreach from=$mitgliednotizen item=notiz}
+<div class="notiz">
+ <span class="meta">{"Von %s"|__:$notiz.author.username}</span>
+ <div class="kommentar">{$notiz.kommentar}</div>
+</div>
+{/foreach}
+<form action="{"mitglieder_details"|___:$mitglied.mitgliedid}" method="post">
+ <fieldset>
+  <table>
+  <tr>
+   <td colspan="2"><textarea rows="6" cols="25" name="kommentar"></textarea></td>
+  </tr>
+  <tr>
+   <th colspan="2"><input type="submit" name="addnotiz" value="{"Notiz speichern"|__}" /></th>
+  </tr>
+  </table>
+ </fieldset>
+</form>
 <div style="clear:both;">&nbsp;</div>
 {include file="footer.html.tpl"}

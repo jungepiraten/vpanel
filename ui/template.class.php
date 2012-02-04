@@ -17,6 +17,7 @@ class Template {
 
 		$this->smarty->assign("session", $this->session);
 		$this->smarty->assign("charset", $this->session->getEncoding());
+		$this->smarty->assign("sidebars", array());
 	}
 
 	public function translate() {
@@ -143,6 +144,20 @@ class Template {
 		return array_map(array($this, 'parseMitglied'), $rows);
 	}
 
+	protected function parseMitgliedNotiz($notiz) {
+		$row = array();
+		$row["mitgliednotizid"] = $notiz->getMitgliedNotizID();
+		$row["mitgliedid"] = $notiz->getMitgliedID();
+		$row["author"] = $this->parseUser($notiz->getAuthor());
+		$row["timestamp"] = $notiz->getTimestamp();
+		$row["kommentar"] = $notiz->getKommentar();
+		return $row;
+	}
+
+	protected function parseMitgliedNotizen($rows) {
+		return array_map(array($this, 'parseMitgliedNotiz'), $rows);
+	}
+
 	protected function parseMitgliedRevision($revision) {
 		$row = array();
 		$row["revisionid"] = $revision->getRevisionID();
@@ -151,9 +166,11 @@ class Template {
 		$row["user"] = $this->parseUser($revision->getUser());
 		$row["mitgliedschaft"] = $this->parseMitgliedschaft($revision->getMitgliedschaft());
 		if ($revision->getNatPersonID() != null) {
+			$row["bezeichnung"] = $revision->getNatPerson()->getVorname() . " " . $revision->getNatPerson()->getName();
 			$row["natperson"] = $this->parseNatPerson($revision->getNatPerson());
 		}
 		if ($revision->getJurPersonID() != null) {
+			$row["bezeichnung"] = $revision->getJurPerson()->getLabel();
 			$row["jurperson"] = $this->parseJurPerson($revision->getJurPerson());
 		}
 		$row["kontakt"] = $this->parseKontakt($revision->getKontakt());
@@ -407,17 +424,24 @@ class Template {
 		$this->smarty->display("mitgliederlist.html.tpl");
 	}
 
-	public function viewMitgliedDetails($mitglied, $revisions, $revision, $mitgliedschaften, $states) {
+	public function viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $mitgliedschaften, $states) {
 		$this->smarty->assign("mitglied", $this->parseMitglied($mitglied));
 		$this->smarty->assign("mitgliedrevisions", $this->parseMitgliedRevisions($revisions));
 		$this->smarty->assign("mitgliedrevision", $this->parseMitgliedRevision($revision));
+		$this->smarty->assign("mitgliednotizen", $this->parseMitgliedNotizen($notizen));
+		$this->smarty->assign("dokumente", $this->parseDokumente($dokumente));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
 		$this->smarty->assign("states", $this->parseStates($states));
 		$this->smarty->display("mitgliederdetails.html.tpl");
 	}
 
-	public function viewMitgliedCreate($mitgliedschaft, $mitgliedschaften, $states) {
-		$this->smarty->assign("mitgliedschaft", $this->parseMitgliedschaft($mitgliedschaft));
+	public function viewMitgliedCreate($mitgliedschaft, $dokument, $mitgliedschaften, $states) {
+		if ($dokument != null) {
+			$this->smarty->assign("dokument", $this->parseDokument($dokument));
+		}
+		if ($mitgliedschaft != null) {
+			$this->smarty->assign("mitgliedschaft", $this->parseMitgliedschaft($mitgliedschaft));
+		}
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
 		$this->smarty->assign("states", $this->parseStates($states));
 		$this->smarty->display("mitgliedercreate.html.tpl");
@@ -509,12 +533,24 @@ class Template {
 		$this->smarty->display("dokumentcreate.html.tpl");
 	}
 
-	public function viewDokumentDetails($dokument, $dokumentnotizen, $dokumentkategorien, $dokumentstatuslist) {
+	public function viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $dokumentkategorien, $dokumentstatuslist) {
 		$this->smarty->assign("dokument", $this->parseDokument($dokument));
 		$this->smarty->assign("dokumentnotizen", $this->parseDokumentNotizen($dokumentnotizen));
+		$this->smarty->assign("mitglieder", $this->parseMitglieder($mitglieder));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
 		$this->smarty->display("dokumentdetails.html.tpl");
+	}
+
+	public function viewMitgliedDokumentForm($mitglied, $dokument) {
+		if ($mitglied != null) {
+			$this->smarty->assign("mitglied", $this->parseMitglied($mitglied));
+		}
+		if ($dokument != null) {
+			$this->smarty->assign("dokument", $this->parseDokument($dokument));
+		}
+		$this->smarty->assign("mode", $_REQUEST["mode"]);
+		$this->smarty->display("mitglieddokument.html.tpl");
 	}
 
 	public function redirect($url = null) {

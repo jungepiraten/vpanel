@@ -54,7 +54,10 @@ class Mitglied extends GlobalClass {
 
 	public function getRevisionList() {
 		if (!$this->loadedRevisions) {
-			$this->revisions = $this->getStorage()->getMitgliederRevisionsByMitgliedIDList($this->getMitgliedID());
+			$this->revisions = array();
+			foreach ($this->getStorage()->getMitgliederRevisionsByMitgliedIDList($this->getMitgliedID()) as $revision) {
+				$this->setRevision($revision);
+			}
 			$this->loadedRevisions = true;
 		}
 		return $this->revisions;
@@ -76,7 +79,7 @@ class Mitglied extends GlobalClass {
 	}
 	
 	public function getRevisionIDs() {
-		return array_map(create_function('$a', 'return $a->getRevisionID();'), $this->revisions);
+		return array_map(create_function('$a', 'return $a->getRevisionID();'), $this->getRevisionList());
 	}
 
 	public function save(Storage $storage = null) {
