@@ -50,11 +50,11 @@ case "view":
 		$fileparts = explode(".", $file->getAbsoluteFilename());
 		array_pop($fileparts);
 		$fileprefix = implode(".", $fileparts);
-		$parts = glob($fileprefix . "-*.png");
+		$parts = glob($fileprefix . "*.png");
 		if (count($parts) == 0) {
 			exec("convert " . escapeshellarg($file->getAbsoluteFilename()) . " " . escapeshellarg($fileprefix . ".png"));
 		}
-		$parts = glob($fileprefix . "-*.png");
+		$parts = glob($fileprefix . "*.png");
 		$ui->viewFilePDFPreview($file, $token, count($parts));
 		exit;
 	}
@@ -63,9 +63,10 @@ case "getpart":
 		$fileparts = explode(".", $file->getAbsoluteFilename());
 		array_pop($fileparts);
 		$fileprefix = implode(".", $fileparts);
+		$files = glob($fileprefix . "*.png");
 
 		header("Content-Type: image/png");
-		readfile($fileprefix . "-" . $session->getVariable("part") . ".png");
+		readfile($files[$session->getVariable("part")]);
 		exit;
 	}
 case "get":
