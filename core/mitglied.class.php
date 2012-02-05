@@ -56,7 +56,7 @@ class Mitglied extends GlobalClass {
 		if (!$this->loadedRevisions) {
 			$this->revisions = array();
 			foreach ($this->getStorage()->getMitgliederRevisionsByMitgliedIDList($this->getMitgliedID()) as $revision) {
-				$this->setRevision($revision);
+				$this->addRevision($revision);
 			}
 			$this->loadedRevisions = true;
 		}
@@ -70,12 +70,18 @@ class Mitglied extends GlobalClass {
 		return $this->revisions[$revisionid];
 	}
 
-	public function setRevision($revision) {
+	public function addRevision($revision) {
 		$this->revisions[$revision->getRevisionID()] = $revision;
+		if ($revision->getTimestamp() > $this->latestRevision->getTimestamp()) {
+			$this->latestRevision = $revision;
+		}
 	}
 
 	public function getLatestRevision() {
-		return $this->getRevision(reset($this->getRevisionIDs()));
+		if (!isset($this->latestRevision)) {
+			$this->latestRevision = $this->getRevision(end($this->getRevisionIDs()));
+		}
+		return $this->latestRevision;
 	}
 	
 	public function getRevisionIDs() {

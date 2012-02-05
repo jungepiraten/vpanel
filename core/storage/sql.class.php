@@ -312,7 +312,7 @@ abstract class SQLStorage extends AbstractStorage {
 			$o["r"]->setJurPerson($o["j"]);
 		}
 		$o["r"]->setKontakt($o["k"]);
-		$o["m"]->setRevision($o["r"]);
+		$o["m"]->addRevision($o["r"]);
 		return $o["m"];
 	}
 	public function getMitgliederResult($matcher = null, $limit = null, $offset = null) {
