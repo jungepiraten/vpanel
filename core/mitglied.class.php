@@ -9,6 +9,7 @@ class Mitglied extends GlobalClass {
 	private $austrittsdatum;
 	
 	private $revisions = array();
+	private $latestRevision;
 	private $loadedRevisions = false;
 	
 	public static function factory(Storage $storage, $row) {
@@ -72,7 +73,7 @@ class Mitglied extends GlobalClass {
 
 	public function addRevision($revision) {
 		$this->revisions[$revision->getRevisionID()] = $revision;
-		if ($revision->getTimestamp() > $this->latestRevision->getTimestamp()) {
+		if (!isset($this->latestRevision) || $revision->getTimestamp() > $this->latestRevision->getTimestamp()) {
 			$this->latestRevision = $revision;
 		}
 	}
