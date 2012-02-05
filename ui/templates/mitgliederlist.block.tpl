@@ -2,9 +2,11 @@
 {foreach from=$mitglieder item=mitglied}
 <li class="entry{cycle values="odd,even"}" {if isset($mitglied.austritt)}id="ex"{/if}>
 {if $showmitglieddel and ! isset($mitglied.austritt)}
-<div style="float:right; margin-top:7px;margin-right:7px;">
- <a href="{"mitglieder_del"|___:$mitglied.mitgliedid}" class="delimg" title="{"Mitglied entfernen"|__}" onClick="return confirm('{"Mitglied wirklich löschen?"|__}');">&nbsp;</a>
-</div>{/if}
+<a style="float:right; margin-top:7px;margin-right:7px;"href="{"mitglieder_del"|___:$mitglied.mitgliedid}" class="delimg" title="{"Mitglied entfernen"|__}" onClick="return confirm('{"Mitglied wirklich löschen?"|__}');">&nbsp;</a>
+{/if}
+{if $showmitglieddokumentdel and isset($dokument)}
+<a style="float:right; margin-top:7px;margin-right:7px;"href="{"mitglieddokument_delete"|___:$mitglied.mitgliedid:$dokument.dokumentid}" class="delimg" title="{"Zuordnung entfernen"|__}">&nbsp;</a>
+{/if}
 <div style="float:left; margin-left:10px;"><a href="{"mitglieder_details"|___:$mitglied.mitgliedid}">
 {if isset($mitglied.latest.natperson)}{$mitglied.latest.natperson.name|escape:html}, {$mitglied.latest.natperson.vorname|escape:html}{/if}
 {if isset($mitglied.latest.jurperson)}{$mitglied.latest.jurperson.label|escape:html}{/if}

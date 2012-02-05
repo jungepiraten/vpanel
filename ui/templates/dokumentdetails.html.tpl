@@ -10,7 +10,7 @@
  <a href="{"dokumente_mitglied_create"|___:$dokument.dokumentid}">Mitglied anlegen</a>
 </div>
 {if count($mitglieder) > 0}
-{include file="mitgliederlist.block.tpl" mitglieder=$mitglieder}
+{include file="mitgliederlist.block.tpl" mitglieder=$mitglieder showmitglieddokumentdel=1}
 <div class="buttonbox">
  <a href="{"dokumente_mitglied"|___:$dokument.dokumentid}">Mitglied verlinken</a>
  <a href="{"dokumente_mitglied_create"|___:$dokument.dokumentid}">Mitglied anlegen</a>

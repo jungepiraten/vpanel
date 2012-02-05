@@ -21,7 +21,7 @@
  <a href="{"mitglieder_dokument"|___:$mitglied.mitgliedid}">Dokument verlinken</a>
 </div>
 {if count($dokumente) > 0}
-{include file=dokumentlist.block.tpl dokumente=$dokumente}
+{include file=dokumentlist.block.tpl dokumente=$dokumente showmitglieddokumentdel=1}
 <div class="buttonbox">
  <a href="{"mitglieder_dokument"|___:$mitglied.mitgliedid}">Dokument verlinken</a>
 </div>

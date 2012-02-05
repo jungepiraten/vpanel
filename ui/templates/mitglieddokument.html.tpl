@@ -2,7 +2,7 @@
 <form action="{"mitglieddokument"|___}" method="post" id="mitglieddokumentform">
  <fieldset>
   <input type="hidden" name="mode" value="{$mode}" />
-  <input type="hidden" name="redirect" value="{if isset($smarty.post.redirect)}{$smarty.post.redirect|stripslashes|escape:html}{else}{$smarty.server.REQUEST_URI|escape:html}{/if}" />
+  <input type="hidden" name="redirect" value="{if isset($smarty.post.redirect)}{$smarty.post.redirect|stripslashes|escape:html}{else}{$smarty.server.HTTP_REFERER|escape:html}{/if}" />
   <table>
   <tr>
    <th>Mitglied:</th>
