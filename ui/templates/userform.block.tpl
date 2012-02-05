@@ -9,8 +9,24 @@
         <td><label for="password">{"Passwort:"|__}</label></td>
         <td><input class="password" type="password" name="password" /></td>
     <tr>
+    <tr>
+        <td><label for="defaultdokumentkategorieid">{"Standard-Dokumentenkategorie:"|__}</label></td>
+        <td>{if isset($user)}
+         {include file=dokumentkategoriedropdown.block.tpl fieldname=defaultdokumentkategorieid defaulttext="(Übersicht)" selecteddokumentkategorieid=$user.defaultdokumentkategorieid}
+         {else}
+         {include file=dokumentkategoriedropdown.block.tpl fieldname=defaultdokumentkategorieid defaulttext="(Übersicht)"}
+         {/if}</td>
     </tr>
-        <td><input class="submit" type="submit" name="save" value="{"Speichern"|__}" /></td>
+    <tr>
+        <td><label for="defaultdokumentstatusid">{"Standard-Dokumentenstatus:"|__}</label></td>
+        <td>{if isset($user)}
+         {include file=dokumentstatusdropdown.block.tpl fieldname=defaultdokumentstatusid defaulttext="(Übersicht)" selecteddokumentstatusid=$user.defaultdokumentstatusid}
+         {else}
+         {include file=dokumentstatusdropdown.block.tpl fieldname=defaultdokumentstatusid defaulttext="(Übersicht)"}
+         {/if}</td>
+    </tr>
+    </tr>
+        <td colspan="2"><input class="submit" type="submit" name="save" value="{"Speichern"|__}" /></td>
     </tr>
  </table>
  </fieldset>

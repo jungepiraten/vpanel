@@ -17,6 +17,8 @@ require_once(VPANEL_CORE . "/role.class.php");
 function parseUserFormular($session, &$user = null) {
 	$username = $session->getVariable("username");
 	$password = $session->getVariable("password");
+	$defaultdokumentkategorieid = $session->getVariable("defaultdokumentkategorieid");
+	$defaultdokumentstatusid = $session->getVariable("defaultdokumentstatusid");
 
 	if ($user == null) {
 		$user = new User($session->getStorage());
@@ -26,6 +28,8 @@ function parseUserFormular($session, &$user = null) {
 	if (!empty($password)) {
 		$user->changePassword($password);
 	}
+	$user->setDefaultDokumentKategorieID($defaultdokumentkategorieid);
+	$user->setDefaultDokumentStatusID($defaultdokumentstatusid);
 	$user->save();
 }
 
@@ -65,8 +69,10 @@ case "details":
 		parseUserFormular($session, $user);
 	}
 	$roles = $session->getStorage()->getRoleList();
+	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
+	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
 
-	$ui->viewUserDetails($user, $roles);
+	$ui->viewUserDetails($user, $roles, $dokumentkategorien, $dokumentstatuslist);
 	exit;
 case "create":
 	if ($session->getBoolVariable("save")) {
@@ -79,8 +85,10 @@ case "create":
 
 		$ui->redirect($session->getLink("users_details", $user->getUserID()));
 	}
+	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
+	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
 
-	$ui->viewUserCreate();
+	$ui->viewUserCreate($dokumentkategorien, $dokumentstatuslist);
 	exit;
 case "delete":
 	if (!$session->isAllowed("users_delete")) {

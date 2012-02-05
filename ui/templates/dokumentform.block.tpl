@@ -34,7 +34,7 @@
    <td><textarea name="kommentar" cols="40" rows="10"></textarea></td>
   </tr>
   <tr>
-   <th colspan="2"><input type="submit" class="submit" name="save" value="{"Speichern"|__}" /></th>
+   <td colspan="2"><input type="submit" class="submit" name="save" value="{"Speichern"|__}" /></td>
   </tr>
   </table>
  </fieldset>

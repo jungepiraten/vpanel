@@ -109,9 +109,10 @@ default:
 		$dokumentkategorie = $session->getStorage()->getDokumentKategorie($session->getVariable("kategorieid"));
 	}
 
-	$dokumentstatus = null;
 	if ($session->hasVariable("statusid")) {
 		$dokumentstatus = $session->getStorage()->getDokumentStatus($session->getVariable("statusid"));
+	} else {
+		$dokumentstatus = $session->getStorage()->getDokumentStatus($session->getDefaultDokumentStatusID());
 	}
 
 	$pagesize = 20;

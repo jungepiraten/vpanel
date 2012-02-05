@@ -16,6 +16,8 @@ class User extends StorageClass {
 		$user->setUsername($row["username"]);
 		$user->setPassword($row["password"]);
 		$user->setPasswordSalt($row["passwordsalt"]);
+		$user->setDefaultDokumentKategorieID($row["defaultdokumentkategorieid"]);
+		$user->setDefaultDokumentStatusID($row["defaultdokumentstatusid"]);
 		return $user;
 	}
 
@@ -101,6 +103,22 @@ class User extends StorageClass {
 		}
 	}
 
+	public function getDefaultDokumentKategorieID() {
+		return $this->defaultdokumentkategorieid;
+	}
+
+	public function setDefaultDokumentKategorieID($id) {
+		$this->defaultdokumentkategorieid = $id;
+	}
+
+	public function getDefaultDokumentStatusID() {
+		return $this->defaultdokumentstatusid;
+	}
+
+	public function setDefaultDokumentStatusID($id) {
+		$this->defaultdokumentstatusid = $id;
+	}
+
 	public function save(Storage $storage = null) {
 		if ($storage === null) {
 			$storage = $this->getStorage();
@@ -109,7 +127,9 @@ class User extends StorageClass {
 			$this->getUserID(),
 			$this->getUsername(),
 			$this->getPassword(),
-			$this->getPasswordSalt() ));
+			$this->getPasswordSalt(),
+			$this->getDefaultDokumentKategorieID(),
+			$this->getDefaultDokumentStatusID() ));
 		
 		$storage->setUserRoleList(
 			$this->getUserID(),

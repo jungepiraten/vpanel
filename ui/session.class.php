@@ -53,6 +53,8 @@ class Session {
 		}
 		$this->setUser($user);
 		$this->setPermissions($permissions);
+		$this->setDefaultDokumentKategorieID($user->getDefaultDokumentKategorieID());
+		$this->setDefaultDokumentStatusID($user->getDefaultDokumentStatusID());
 	}
 	public function logout() {
 		$this->setUser(null);
@@ -98,6 +100,19 @@ class Session {
 			return $this->config->getLang();
 		}
 		return $this->config->getLang($this->stor["lang"]);
+	}
+
+	public function setDefaultDokumentKategorieID($kategorieid) {
+		$this->stor["defaultdokumentkategorieid"] = $kategorieid;
+	}
+	public function getDefaultDokumentKategorieID() {
+		return $this->stor["defaultdokumentkategorieid"];
+	}
+	public function setDefaultDokumentStatusID($statusid) {
+		$this->stor["defaultdokumentstatusid"] = $statusid;
+	}
+	public function getDefaultDokumentStatusID() {
+		return $this->stor["defaultdokumentstatusid"];
 	}
 
 	public function getEncoding() {

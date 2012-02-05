@@ -14,8 +14,21 @@
 <div>
 {include file="mitgliederform.block.tpl" mitglied=$mitglied}
 </div>
+
+<div style="position:relative;">
+<div style="float:left; width:400px;">
+<div class="buttonbox">
+ <a href="{"mitglieder_dokument"|___:$mitglied.mitgliedid}">Dokument verlinken</a>
+</div>
+{if count($dokumente) > 0}
 {include file=dokumentlist.block.tpl dokumente=$dokumente}
-<a href="{"mitglieder_dokument"|___:$mitglied.mitgliedid}">Dokument verlinken</a>
+<div class="buttonbox">
+ <a href="{"mitglieder_dokument"|___:$mitglied.mitgliedid}">Dokument verlinken</a>
+</div>
+{/if}
+</div>
+
+<div style="float:left; margin-left:50px; width:400px;">
 {foreach from=$mitgliednotizen item=notiz}
 <div class="notiz">
  <span class="meta">{"Von %s"|__:$notiz.author.username}</span>
@@ -26,7 +39,7 @@
  <fieldset>
   <table>
   <tr>
-   <td colspan="2"><textarea rows="6" cols="25" name="kommentar"></textarea></td>
+   <td colspan="2"><textarea cols="35" rows="5" name="kommentar"></textarea></td>
   </tr>
   <tr>
    <th colspan="2"><input type="submit" name="addnotiz" value="{"Notiz speichern"|__}" /></th>
@@ -34,5 +47,8 @@
   </table>
  </fieldset>
 </form>
-<div style="clear:both;">&nbsp;</div>
+</div>
+
+<div style="clear:left;">&nbsp;</div>
+</div>
 {include file="footer.html.tpl"}

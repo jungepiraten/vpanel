@@ -77,7 +77,7 @@
          <td><input class="beitrag" type="text" name="beitrag" size="5" onChange="beitragEdited=true;" value="{if isset($mitgliedrevision)}{$mitgliedrevision.beitrag|string_format:"%.2f"|escape:html}{else}{$mitgliedschaft.defaultbeitrag|string_format:"%.2f"|escape:html}{/if}" /> EUR</td>
      </tr>
      <tr>
-         <th colspan="2"><input class="submit" type="submit" name="save" value="{"Speichern"|__}" /></th>
+         <td colspan="2"><input class="submit" type="submit" name="save" value="{"Speichern"|__}" /></td>
      </tr>
  </table>
  </fieldset>

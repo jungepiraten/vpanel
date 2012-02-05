@@ -117,6 +117,7 @@ a:hover {
 }
 
 .entryodd {
+    background-color:#ffffff;
 }
 
 .entryeven {
@@ -132,11 +133,24 @@ a:hover {
     background-color:#ffcb8c;
 }
 
+.notiz {
+    margin:5px;
+    padding:2px;
+    background-color:#FACB11;
+    -webkit-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+.notiz .kommentar {
+    font-weight:bold;
+}
+
 form.filter, form.filter fieldset {
 	display:inline;
 }
 
-.neuset {
+.buttonbox a {
     font-size:70%;
     color:white;
     background-color:#404040;
@@ -147,7 +161,7 @@ form.filter, form.filter fieldset {
     border-radius: 3px;
 }
 
-.neuset:hover {
+.buttonbox a:hover {
 	color:white;
 	background-color:#ff8800;
 

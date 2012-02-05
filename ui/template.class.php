@@ -43,6 +43,8 @@ class Template {
 		$row = array();
 		$row["userid"] = $user->getUserID();
 		$row["username"] = $user->getUsername();
+		$row["defaultdokumentkategorieid"] = $user->getDefaultDokumentKategorieID();
+		$row["defaultdokumentstatusid"] = $user->getDefaultDokumentStatusID();
 		return $row;
 	}
 
@@ -369,14 +371,18 @@ class Template {
 		$this->smarty->display("userlist.html.tpl");
 	}
 
-	public function viewUserDetails($user, $roles) {
+	public function viewUserDetails($user, $roles, $dokumentkategorien, $dokumentstatuslist) {
 		$this->smarty->assign("user", $this->parseUser($user));
 		$this->smarty->assign("userroles", $this->parseRoles($user->getRoles()));
+		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
+		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
 		$this->smarty->assign("roles", $this->parseRoles($roles));
 		$this->smarty->display("userdetails.html.tpl");
 	}
 
-	public function viewUserCreate() {
+	public function viewUserCreate($dokumentkategorien, $dokumentstatuslist) {
+		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
+		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
 		$this->smarty->display("usercreate.html.tpl");
 	}
 
