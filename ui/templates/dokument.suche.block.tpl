@@ -143,8 +143,8 @@ $(function() {
 	{background-color:#cccccc;}
 </style>
 {/literal}
-<form action="" class="suche">
- <fieldset>
+<form action="">
+ <fieldset class="suche">
   <input type="text" id="dokumentsuche" name="dokumentsuche" autocomplete="off" />
   <div id="dropdowndokumentsuche"><ul></ul></div>
  </fieldset>
