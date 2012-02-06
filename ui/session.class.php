@@ -137,6 +137,9 @@ class Session {
 		return isset($_REQUEST[$name]) && $_REQUEST[$name];
 	}
 	public function getListVariable($name) {
+		if (!$this->hasVariable($name)) {
+			return array();
+		}
 		return $_REQUEST[$name];
 	}
 	public function getFileVariable($name) {

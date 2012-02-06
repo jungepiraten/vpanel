@@ -53,9 +53,9 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 	$gliederung = $session->getStorage()->getGliederung($gliederungid);
 	$mitgliedschaftid = $session->getIntVariable("mitgliedschaftid");
 	$mitgliedschaft = $session->getStorage()->getMitgliedschaft($mitgliedschaftid);
-	$mitgliedpiraten = $session->getBoolVariable("mitglied_piraten");
-	$verteilereingetragen = $session->getBoolVariable("verteiler_eingetragen");
 	$beitrag = $session->getDoubleVariable("beitrag");
+	$flags = $session->getListVariable("flags");
+	$textfields = $session->getListVariable("textfields");
 
 	$natperson = null;
 	$jurperson = null;
@@ -83,12 +83,16 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 	$revision->setMitglied($mitglied);
 	$revision->setMitgliedschaft($mitgliedschaft);
 	$revision->setGliederung($gliederung);
-	$revision->isMitgliedPiraten($mitgliedpiraten);
-	$revision->isVerteilerEingetragen($verteilereingetragen);
 	$revision->setBeitrag($beitrag);
 	$revision->setNatPerson($natperson);
 	$revision->setJurPerson($jurperson);
 	$revision->setKontakt($kontakt);
+	foreach ($flags as $flagid => $selected) {
+		$revision->setFlag($session->getStorage()->getMitgliedFlag($flagid));
+	}
+	foreach ($textfields as $textfieldid => $value) {
+		$revision->setTextField($session->getStorage()->getMitgliedTextField($textfieldid), $value);
+	}
 	$revision->save();
 
 	if ($dokument != null) {
@@ -155,8 +159,11 @@ case "details":
 	$dokumente = $session->getStorage()->getDokumentByMitgliedList($mitglied->getMitgliedID());
 
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
+	$mitgliederflags = $session->getStorage()->getMitgliedFlagList();
+	$mitgliedertextfields = $session->getStorage()->getMitgliedTextFieldList();
 	$states = $session->getStorage()->getStateList();
-	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $mitgliedschaften, $states);
+
+	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields);
 	exit;
 case "create":
 	$mitgliedschaft = null;
@@ -181,9 +188,11 @@ case "create":
 	}
 
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
+	$mitgliederflags = $session->getStorage()->getMitgliedFlagList();
+	$mitgliedertextfields = $session->getStorage()->getMitgliedTextFieldList();
 	$states = $session->getStorage()->getStateList();
 
-	$ui->viewMitgliedCreate($mitgliedschaft, $dokument, $mitgliedschaften, $states);
+	$ui->viewMitgliedCreate($mitgliedschaft, $dokument, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields);
 	exit;
 case "delete":
 	if (!$session->isAllowed("mitglieder_delete")) {

@@ -10,21 +10,21 @@
  <tr class="header" id="headerrowtemplate" style="display:none;">
   <th><input type="text" name="headerfields[]" {literal}onKeyUp="if(this.value!=''){var l=document.getElementsByName('headerfields[]');for (var i=0;i<l.length;i++) {if (i>0 && l[i].value == '') {return;}} $(this.parentNode.parentNode).after($('<tr class=\'header\'>').append($('#headerrowtemplate').html()));}"{/literal} value="" />
   <td><input type="text" name="headervalues[]" value="" />
-  <td>[<a href="javascript:void()" onClick="this.parentNode.parentNode.getElementsByTagName('input')[0].value='';this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)">x</a>]</td>
+  <td><a href="javascript:void()" onClick="this.parentNode.parentNode.getElementsByTagName('input')[0].value='';this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)" class="delimg">&nbsp;</a></td>
  </tr>
  {if isset($mailtemplate)}
  {foreach from=$mailtemplate.headers key=headerfield item=headervalue}
  <tr class="header">
   <th><input type="text" name="headerfields[]" {literal}onKeyUp="if(this.value!=''){var l=document.getElementsByName('headerfields[]');for (var i=0;i<l.length;i++) {if (i>0 && l[i].value == '') {return;}} $(this.parentNode.parentNode).after($('<tr class=\'header\'>').append($('#headerrowtemplate').html()));}"{/literal} value="{$headerfield|escape:html}" /></th>
   <td><input type="text" name="headervalues[]" value="{$headervalue|escape:html}" /></td>
-  <td>[<a href="javascript:void()" onClick="this.parentNode.parentNode.getElementsByTagName('input')[0].value='';this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)">x</a>]</td>
+  <td><a href="javascript:void()" onClick="this.parentNode.parentNode.getElementsByTagName('input')[0].value='';this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)" class="delimg">&nbsp;</a></td>
  </tr>
  {/foreach}
  {/if}
  <tr class="header">
   <th><input type="text" name="headerfields[]" value="" {literal}onKeyUp="if(this.value!=''){var l=document.getElementsByName('headerfields[]');for (var i=0;i<l.length;i++) {if (i>0 && l[i].value == '') {return;}} $(this.parentNode.parentNode).after($('<tr class=\'header\'>').append($('#headerrowtemplate').html()));}"{/literal} />
   <td><input type="text" name="headervalues[]" value="" />
-  <td>[<a href="javascript:void()" onClick="this.parentNode.parentNode.getElementsByTagName('input')[0].value='';this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)">x</a>]</td>
+  <td><a href="javascript:void()" onClick="this.parentNode.parentNode.getElementsByTagName('input')[0].value='';this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)" class="delimg">&nbsp;</a></td>
  </tr>
  <tr class="attachments">
   <td colspan="3">{if isset($mailtemplate)}{foreach from=$mailtemplate.attachments item=attachment}

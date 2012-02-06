@@ -134,6 +134,41 @@ class Template {
 		return array_map(array($this, 'parseMitglied'), $rows);
 	}
 
+	protected function parseMitgliederFlag($flag) {
+		$row = array();
+		$row["flagid"] = $flag->getFlagID();
+		$row["label"] = $flag->getLabel();
+		return $row;
+	}
+
+	protected function parseMitgliederFlags($rows) {
+		return array_map(array($this, 'parseMitgliederFlag'), $rows);
+	}
+
+	protected function parseMitgliederTextField($textfield) {
+		$row = array();
+		$row["textfieldid"] = $textfield->getTextFieldID();
+		$row["label"] = $textfield->getLabel();
+		return $row;
+	}
+
+	protected function parseMitgliederTextFields($rows) {
+		return array_map(array($this, 'parseMitgliederTextField'), $rows);
+	}
+
+	protected function parseMitgliederRevisionTextField($revisiontextfield) {
+		$row = array();
+		$row["textfield"] = $this->parseMitgliederTextField($revisiontextfield->getTextField());
+		// Infinite Loop else
+		// $row["revision"] = $this->parseMitgliederRevision($revisiontextfield->getRevision());
+		$row["value"] = $revisiontextfield->getValue();
+		return $row;
+	}
+
+	protected function parseMitgliederRevisionTextFields($rows) {
+		return array_map(array($this, 'parseMitgliederRevisionTextField'), $rows);
+	}
+
 	protected function parseMitgliedNotiz($notiz) {
 		$row = array();
 		$row["mitgliednotizid"] = $notiz->getMitgliedNotizID();
@@ -165,8 +200,8 @@ class Template {
 		}
 		$row["kontakt"] = $this->parseKontakt($revision->getKontakt());
 		$row["beitrag"] = $revision->getBeitrag();
-		$row["mitglied_piraten"] = $revision->isMitgliedPiraten();
-		$row["verteiler_eingetragen"] = $revision->isVerteilerEingetragen();
+		$row["flags"] = $this->parseMitgliederFlags($revision->getFlags());
+		$row["textfields"] = $this->parseMitgliederRevisionTextFields($revision->getTextFields());
 		$row["geloescht"] = $revision->isGeloescht();
 		return $row;
 	}
@@ -423,7 +458,7 @@ class Template {
 		$this->smarty->display("mitgliederlist.html.tpl");
 	}
 
-	public function viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $mitgliedschaften, $states) {
+	public function viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields) {
 		$this->smarty->assign("mitglied", $this->parseMitglied($mitglied));
 		$this->smarty->assign("mitgliedrevisions", $this->parseMitgliedRevisions($revisions));
 		$this->smarty->assign("mitgliedrevision", $this->parseMitgliedRevision($revision));
@@ -431,10 +466,12 @@ class Template {
 		$this->smarty->assign("dokumente", $this->parseDokumente($dokumente));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
 		$this->smarty->assign("states", $this->parseStates($states));
+		$this->smarty->assign("flags", $this->parseMitgliederFlags($mitgliederflags));
+		$this->smarty->assign("textfields", $this->parseMitgliederTextFields($mitgliedertextfields));
 		$this->smarty->display("mitgliederdetails.html.tpl");
 	}
 
-	public function viewMitgliedCreate($mitgliedschaft, $dokument, $mitgliedschaften, $states) {
+	public function viewMitgliedCreate($mitgliedschaft, $dokument, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields) {
 		if ($dokument != null) {
 			$this->smarty->assign("dokument", $this->parseDokument($dokument));
 		}
@@ -443,6 +480,8 @@ class Template {
 		}
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
 		$this->smarty->assign("states", $this->parseStates($states));
+		$this->smarty->assign("flags", $this->parseMitgliederFlags($mitgliederflags));
+		$this->smarty->assign("textfields", $this->parseMitgliederTextFields($mitgliedertextfields));
 		$this->smarty->display("mitgliedercreate.html.tpl");
 	}
 

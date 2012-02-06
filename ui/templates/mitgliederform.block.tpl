@@ -64,18 +64,25 @@
          <th><label for="email">{"EMail-Adresse:"|__}</label></th>
          <td><input class="email" type="text" name="email" size="40" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.email|escape:html}{/if}" /></td>
      </tr>
-     <tr id="mitglied_pp">
-         <th><label for="mitglied_pp">{"Mitglied PP:"|__}</label></th>
-         <td><input class="mitglied_piraten" type="checkbox" name="mitglied_piraten" {if isset($mitgliedrevision) and $mitgliedrevision.mitglied_piraten}checked="checked"{/if}" /></td>
-     </tr>
-     <tr>
-         <th><label for="verteiler_eingetragen">{"Verteiler Eingetragen:"|__}</label></th>
-         <td><input class="verteiler_eingetragen" type="checkbox" name="verteiler_eingetragen" {if isset($mitgliedrevision) and $mitgliedrevision.verteiler_eingetragen}checked="checked"{/if}" /></td>
-     </tr>
      <tr id="beitrag">
          <th><label for="beitrag">{"Beitrag:"|__}</label></th>
          <td><input class="beitrag" type="text" name="beitrag" size="5" onChange="beitragEdited=true;" value="{if isset($mitgliedrevision)}{$mitgliedrevision.beitrag|string_format:"%.2f"|escape:html}{else}{$mitgliedschaft.defaultbeitrag|string_format:"%.2f"|escape:html}{/if}" /> EUR</td>
      </tr>
+     {foreach from=$flags item=flag}
+     {assign var=flagid value=$flag.flagid}
+     <tr>
+         <th><label for="flags[{$flag.flagid}]">{$flag.label|escape:html}</label></th>
+         <td><input type="checkbox" name="flags[{$flag.flagid}]" {if isset($mitgliedrevision.flags.$flagid)}checked="checked"{/if} /></td>
+     </tr>
+     {/foreach}
+     {foreach from=$textfields item=textfield}
+     {assign var=textfieldid value=$textfield.textfieldid}
+     {assign var=revisiontextfield value=$mitgliedrevision.textfields.$textfieldid}
+     <tr>
+         <th><label for="textfields[{$textfield.textfieldid}]">{$textfield.label|escape:html}</label></th>
+         <td><input type="text" name="textfields[{$textfield.textfieldid}]" value="{if isset($mitgliedrevision.textfields.$textfieldid)}{$revisiontextfield.value|escape:html}{/if}" /></td>
+     </tr>
+     {/foreach}
      <tr>
          <td colspan="2"><input class="submit" type="submit" name="save" value="{"Speichern"|__}" /></td>
      </tr>

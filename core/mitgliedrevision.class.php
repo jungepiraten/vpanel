@@ -8,6 +8,7 @@ require_once(VPANEL_CORE . "/gliederung.class.php");
 require_once(VPANEL_CORE . "/natperson.class.php");
 require_once(VPANEL_CORE . "/jurperson.class.php");
 require_once(VPANEL_CORE . "/kontakt.class.php");
+require_once(VPANEL_CORE . "/mitgliedrevisiontextfield.class.php");
 
 class MitgliedRevision extends GlobalClass {
 	private $revid;
@@ -17,8 +18,6 @@ class MitgliedRevision extends GlobalClass {
 	private $mitgliedschaftid;
 	private $gliederungid;
 	private $geloescht;
-	private $mitglied_piraten;
-	private $verteiler_eingetragen;
 	private $beitrag;
 	private $natpersonid;
 	private $jurpersonid;
@@ -31,6 +30,8 @@ class MitgliedRevision extends GlobalClass {
 	private $natperson;
 	private $jurperson;
 	private $kontakt;
+	private $flags;
+	private $textfields;
 
 	public static function factory(Storage $storage, $row) {
 		$revision = new MitgliedRevision($storage);
@@ -42,8 +43,6 @@ class MitgliedRevision extends GlobalClass {
 		$revision->setMitgliedschaftID($row["mitgliedschaftid"]);
 		$revision->setGliederungID($row["gliederungsid"]);
 		$revision->isGeloescht($row["geloescht"]);
-		$revision->isMitgliedPiraten($row["mitglied_piraten"]);
-		$revision->isVerteilerEingetragen($row["verteiler_eingetragen"]);
 		$revision->setBeitrag($row["beitrag"]);
 		$revision->setNatPersonID($row["natpersonid"]);
 		$revision->setJurPersonID($row["jurpersonid"]);
@@ -181,20 +180,6 @@ class MitgliedRevision extends GlobalClass {
 		return $this->geloescht;
 	}
 
-	public function isMitgliedPiraten($mitgliedpiraten = null) {
-		if ($mitgliedpiraten !== null) {
-			$this->mitglied_piraten = $mitgliedpiraten == true;
-		}
-		return $this->mitglied_piraten;
-	}
-
-	public function isVerteilerEingetragen($verteilereingetragen = null) {
-		if ($verteilereingetragen !== null) {
-			$this->verteiler_eingetragen = $verteilereingetragen == true;
-		}
-		return $this->verteiler_eingetragen;
-	}
-
 	public function getBeitrag() {
 		return $this->beitrag;
 	}
@@ -280,6 +265,82 @@ class MitgliedRevision extends GlobalClass {
 		return $this->jurpersonid;
 	}
 
+	public function getFlags() {
+		if ($this->flags === null) {
+			$flags = $this->getStorage()->getMitgliederRevisionFlagList($this->getRevisionID());
+			$this->flags = array();
+			foreach ($flags as $flag) {
+				$this->setFlag($flag);
+			}
+		}
+		return $this->flags;
+	}
+
+	public function getFlagIDs() {
+		$this->getFlags();
+		return array_keys($this->flags);
+	}
+
+	public function getFlag($flagid) {
+		$this->getFlags();
+		return $this->flags[$flagid];
+	}
+
+	public function setFlag($flag) {
+		$this->getFlags();
+		$this->flags[$flag->getFlagID()] = $flag;
+	}
+
+	public function delFlag($flagid) {
+		$this->getFlags();
+		unset($this->flags[$flagid]);
+	}
+
+	public function getTextFields() {
+		if ($this->textfields === null) {
+			$textfields = $this->getStorage()->getMitgliederRevisionTextFieldList($this->getRevisionID());
+			$this->textfields = array();
+			foreach ($textfields as $textfield) {
+				$this->setTextField($textfield);
+			}
+		}
+		return $this->textfields;
+	}
+
+	public function getTextFieldIDs() {
+		return array_keys($this->getTextFields());
+	}
+
+	public function getTextFieldValues() {
+		$values = array();
+		foreach ($this->getTextFields() as $textfield) {
+			$values[] = $textfield->getValue();
+		}
+		return $values;
+	}
+
+	public function getTextField($textfieldid) {
+		$this->getTextFields();
+		return $this->textfields[$textfieldid];
+	}
+
+	public function setTextField($textfield, $value = null) {
+		$this->getTextFields();
+		if ($textfield instanceof MitgliedTextField) {
+			$revisiontextfield = new MitgliedRevisionTextField($this->getStorage());
+			$revisiontextfield->setTextField($textfield);
+			$revisiontextfield->setRevision($this);
+			$revisiontextfield->setValue($value);
+			$textfield = $revisiontextfield;
+		}
+		$this->textfields[$textfield->getTextFieldID()] = $textfield;
+	}
+
+	public function delTextField($textfieldid) {
+		$this->getTextFields();
+		unset($this->textfields[$textfieldid]);
+	}
+
 	public function save(Storage $storage = null) {
 		if ($storage == null) {
 			$storage = $this->getStorage();
@@ -293,12 +354,18 @@ class MitgliedRevision extends GlobalClass {
 			$this->getMitgliedschaftID(),
 			$this->getGliederungID(),
 			$this->isGeloescht(),
-			$this->isMitgliedPiraten(),
-			$this->isVerteilerEingetragen(),
 			$this->getBeitrag(),
 			$this->getNatPersonID(),
 			$this->getJurPersonID(),
 			$this->getKontaktID() ));
+
+		if ($this->flags != null) {
+			$storage->setMitgliederRevisionFlagList($this->getRevisionID(), $this->getFlagIDs());
+		}
+
+		if ($this->textfields != null) {
+			$storage->setMitgliederRevisionTextFieldList($this->getRevisionID(), $this->getTextFieldIDs(), $this->getTextFieldValues());
+		}
 	}
 }
 

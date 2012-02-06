@@ -5,6 +5,9 @@ require_once(VPANEL_CORE . "/user.class.php");
 require_once(VPANEL_CORE . "/role.class.php");
 require_once(VPANEL_CORE . "/permission.class.php");
 require_once(VPANEL_CORE . "/mitglied.class.php");
+require_once(VPANEL_CORE . "/mitgliedflag.class.php");
+require_once(VPANEL_CORE . "/mitgliedtextfield.class.php");
+require_once(VPANEL_CORE . "/mitgliedrevisiontextfield.class.php");
 require_once(VPANEL_CORE . "/mitgliednotiz.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/mitgliedschaft.class.php");
@@ -332,8 +335,6 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`mitgliedschaftid` AS `r_mitgliedschaftid`,
 				`r`.`gliederungsid` AS `r_gliederungsid`,
 				`r`.`geloescht` AS `r_geloescht`,
-				`r`.`mitglied_piraten` AS `r_mitglied_piraten`,
-				`r`.`verteiler_eingetragen` AS `r_verteiler_eingetragen`,
 				`r`.`beitrag` AS `r_beitrag`,
 				`r`.`natpersonid` AS `r_natpersonid`,
 				`r`.`jurpersonid` AS `r_jurpersonid`,
@@ -392,8 +393,6 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`mitgliedschaftid` AS `r_mitgliedschaftid`,
 				`r`.`gliederungsid` AS `r_gliederungsid`,
 				`r`.`geloescht` AS `r_geloescht`,
-				`r`.`mitglied_piraten` AS `r_mitglied_piraten`,
-				`r`.`verteiler_eingetragen` AS `r_verteiler_eingetragen`,
 				`r`.`beitrag` AS `r_beitrag`,
 				`r`.`natpersonid` AS `r_natpersonid`,
 				`r`.`jurpersonid` AS `r_jurpersonid`,
@@ -444,6 +443,111 @@ abstract class SQLStorage extends AbstractStorage {
 			return $this->getInsertID();
 		} else {
 			return $mitgliedid;
+		}
+	}
+
+	/**
+	 * MitgliedFlag
+	 **/
+	public function parseMitgliedFlag($row) {
+		return $this->parseRow($row, null, "MitgliedFlag");
+	}
+	public function getMitgliedFlagResult() {
+		$sql = "SELECT `flagid`, `label` FROM `mitgliederflags`";
+		return $this->getResult($sql, array($this, "parseMitgliedFlag"));
+	}
+	public function getMitgliedFlag($flagid) {
+		$sql = "SELECT `flagid`, `label` FROM `mitgliederflags` WHERE `flagid` = " . intval($flagid);
+		return $this->getResult($sql, array($this, "parseMitgliedFlag"))->fetchRow();
+	}
+	public function setMitgliedFlag($flagid, $label) {
+		if ($flagid == null) {
+			$sql = "INSERT INTO `mitgliederflags`
+				(`label`) VALUES
+				('" . $this->escape($label) . "')";
+		} else {
+			$sql = "UPDATE	`mitgliederflags`
+				SET	`label` = '" . $this->escape($label) . "'
+				WHERE `flagid` = " . intval($flagid);
+		}
+		$this->query($sql);
+		if ($flagid == null) {
+			$flagid = $this->getInsertID();
+		}
+		return $flagid;
+	}
+	public function delMitgliedFlag($flagid) {
+		$sql = "DELETE FROM `mitgliederflags` WHERE `flagid` = " . intval($flagid);
+		return $this->query($sql);
+	}
+	public function getMitgliederRevisionFlagResult($revisionid) {
+		$sql = "SELECT `flagid`, `label` FROM `mitgliederrevisionflags` LEFT JOIN `mitgliederflags` USING (`flagid`) WHERE `revisionid` = " . intval($revisionid);
+		return $this->getResult($sql, array($this, "parseMitgliedFlag"));
+	}
+	public function setMitgliederRevisionFlagList($revisionid, $flags) {
+		$sql = "DELETE FROM `mitgliederrevisionflags` WHERE `revisionid` = " . intval($revisionid);
+		$this->query($sql);
+		$sqlinserts = array();
+		while (count($flags) > 0) {
+			$sqlinserts[] = "(" . intval($revisionid) . ", " . intval(array_shift($flags)) . ")";
+		}
+		if (count($sqlinserts) > 0) {
+			$sql = "INSERT INTO `mitgliederrevisionflags` (`revisionid`, `flagid`) VALUES " . implode(", ", $sqlinserts);
+			$this->query($sql);
+		}
+	}
+
+	/**
+	 * MitgliedTextField
+	 **/
+	public function parseMitgliedTextField($row) {
+		return $this->parseRow($row, null, "MitgliedTextField");
+	}
+	public function getMitgliedTextFieldResult() {
+		$sql = "SELECT `textfieldid`, `label` FROM `mitgliedertextfields`";
+		return $this->getResult($sql, array($this, "parseMitgliedTextField"));
+	}
+	public function getMitgliedTextField($textfieldid) {
+		$sql = "SELECT `textfieldid`, `label` FROM `mitgliedertextfields` WHERE `textfieldid` = " . intval($textfieldid);
+		return $this->getResult($sql, array($this, "parseMitgliedTextField"))->fetchRow();
+	}
+	public function setMitgliedTextField($textfieldid, $label) {
+		if ($textfieldid == null) {
+			$sql = "INSERT INTO `mitgliedertextfields`
+				(`label`) VALUES
+				('" . $this->escape($label) . "')";
+		} else {
+			$sql = "UPDATE	`mitgliedertextfields`
+				SET	`label` = '" . $this->escape($label) . "'
+				WHERE `textfieldid` = " . intval($textfieldid);
+		}
+		$this->query($sql);
+		if ($textfieldid == null) {
+			$textfieldid = $this->getInsertID();
+		}
+		return $textfieldid;
+	}
+	public function delMitgliedTextField($textfieldid) {
+		$sql = "DELETE FROM `mitgliedertextfields` WHERE `textfieldid` = " . intval($textfieldid);
+		return $this->query($sql);
+	}
+	public function parseMitgliedRevisionTextField($row) {
+		return $this->parseRow($row, null, "MitgliedRevisionTextField");
+	}
+	public function getMitgliederRevisionTextFieldResult($revisionid) {
+		$sql = "SELECT `textfieldid`, `revisionid`, `value` FROM `mitgliederrevisiontextfields` LEFT JOIN `mitgliedertextfields` USING (`textfieldid`) WHERE `revisionid` = " . intval($revisionid);
+		return $this->getResult($sql, array($this, "parseMitgliedRevisionTextField"));
+	}
+	public function setMitgliederRevisionTextFieldList($revisionid, $textfieldids, $textfieldvalues) {
+		$sql = "DELETE FROM `mitgliederrevisiontextfields` WHERE `revisionid` = " . intval($revisionid);
+		$this->query($sql);
+		$sqlinserts = array();
+		while (count($textfieldids) > 0) {
+			$sqlinserts[] = "(" . intval($revisionid) . ", " . intval(array_shift($textfieldids)) . ", '" . $this->escape(array_shift($textfieldvalues)) . "')";
+		}
+		if (count($sqlinserts) > 0) {
+			$sql = "INSERT INTO `mitgliederrevisiontextfields` (`revisionid`, `textfieldid`, `value`) VALUES " . implode(", ", $sqlinserts);
+			$this->query($sql);
 		}
 	}
 
@@ -511,8 +615,6 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`mitgliedschaftid` AS `r_mitgliedschaftid`,
 				`r`.`gliederungsid` AS `r_gliederungsid`,
 				`r`.`geloescht` AS `r_geloescht`,
-				`r`.`mitglied_piraten` AS `r_mitglied_piraten`,
-				`r`.`verteiler_eingetragen` AS `r_verteiler_eingetragen`,
 				`r`.`beitrag` AS `r_beitrag`,
 				`r`.`natpersonid` AS `r_natpersonid`,
 				`r`.`jurpersonid` AS `r_jurpersonid`,
@@ -552,8 +654,6 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`mitgliedschaftid` AS `r_mitgliedschaftid`,
 				`r`.`gliederungsid` AS `r_gliederungsid`,
 				`r`.`geloescht` AS `r_geloescht`,
-				`r`.`mitglied_piraten` AS `r_mitglied_piraten`,
-				`r`.`verteiler_eingetragen` AS `r_verteiler_eingetragen`,
 				`r`.`beitrag` AS `r_beitrag`,
 				`r`.`natpersonid` AS `r_natpersonid`,
 				`r`.`jurpersonid` AS `r_jurpersonid`,
@@ -594,8 +694,6 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`mitgliedschaftid` AS `r_mitgliedschaftid`,
 				`r`.`gliederungsid` AS `r_gliederungsid`,
 				`r`.`geloescht` AS `r_geloescht`,
-				`r`.`mitglied_piraten` AS `r_mitglied_piraten`,
-				`r`.`verteiler_eingetragen` AS `r_verteiler_eingetragen`,
 				`r`.`beitrag` AS `r_beitrag`,
 				`r`.`natpersonid` AS `r_natpersonid`,
 				`r`.`jurpersonid` AS `r_jurpersonid`,
@@ -626,11 +724,11 @@ abstract class SQLStorage extends AbstractStorage {
 			WHERE	`r`.`revisionid` = " . intval($revisionid);
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"))->fetchRow();
 	}
-	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $mitgliedpiraten, $verteilereingetragen, $beitrag, $natpersonid, $jurpersonid, $kontaktid) {
+	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $beitrag, $natpersonid, $jurpersonid, $kontaktid) {
 		if ($revisionid == null) {
-			$sql = "INSERT INTO `mitgliederrevisions` (`globaleid`, `timestamp`, `userid`, `mitgliedid`, `mitgliedschaftid`, `gliederungsid`, `geloescht`, `mitglied_piraten`, `verteiler_eingetragen`, `beitrag`, `natpersonid`, `jurpersonid`, `kontaktid`) VALUES ('" . $this->escape($globalid) . "', '" . date("Y-m-d H:i:s", $timestamp) . "', " . intval($userid) . ", " . intval($mitgliedid) . ", " . intval($mitgliedschaftid) . ", " . intval($gliederungid) . ", " . ($geloescht ? 1 : 0) . ", " . ($mitgliedpiraten ? 1 : 0) . ", " . ($verteilereingetragen ? 1 : 0) . ", " . doubleval($beitrag) . ", " . ($natpersonid == null ? "NULL" : intval($natpersonid)) . ", " . ($jurpersonid == null ? "NULL" : intval($jurpersonid)) . ", " . intval($kontaktid) . ")";
+			$sql = "INSERT INTO `mitgliederrevisions` (`globaleid`, `timestamp`, `userid`, `mitgliedid`, `mitgliedschaftid`, `gliederungsid`, `geloescht`, `beitrag`, `natpersonid`, `jurpersonid`, `kontaktid`) VALUES ('" . $this->escape($globalid) . "', '" . date("Y-m-d H:i:s", $timestamp) . "', " . intval($userid) . ", " . intval($mitgliedid) . ", " . intval($mitgliedschaftid) . ", " . intval($gliederungid) . ", " . ($geloescht ? 1 : 0) . ", " . doubleval($beitrag) . ", " . ($natpersonid == null ? "NULL" : intval($natpersonid)) . ", " . ($jurpersonid == null ? "NULL" : intval($jurpersonid)) . ", " . intval($kontaktid) . ")";
 		} else {
-			$sql = "UPDATE `mitgliederrevisions` SET `globaleid` = '" . $this->escape($globalid) . "', `timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "', `userid` = " . intval($userid) . ", `mitgliedid` = " . intval($mitgliedid) . ", `mitgliedschaftid` = " . intval($mitgliedschaftid) . ", `gliederungsid` = " . intval($gliederungid) . ", `geloescht` = " . ($geloescht ? 1 : 0) . ", `mitglied_piraten` = " . ($mitgliedpiraten ? 1 : 0) . ", `verteiler_eingetragen` = " . ($verteilereingetragen ? 1 : 0) . ", " . doubleval($beitrag) . ", `natpersonid` = " . ($natpersonid == null ? "NULL" : intval($natpersonid)) . ",`jurpersonid` = " . ($jurpersonid == null ? "NULL" : intval($jurpersonid)) . ", `kontaktid` = " . intval($kontaktid) . " WHERE `revisionid` = " . intval($revisionid);
+			$sql = "UPDATE `mitgliederrevisions` SET `globaleid` = '" . $this->escape($globalid) . "', `timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "', `userid` = " . intval($userid) . ", `mitgliedid` = " . intval($mitgliedid) . ", `mitgliedschaftid` = " . intval($mitgliedschaftid) . ", `gliederungsid` = " . intval($gliederungid) . ", `geloescht` = " . ($geloescht ? 1 : 0) . ", " . doubleval($beitrag) . ", `natpersonid` = " . ($natpersonid == null ? "NULL" : intval($natpersonid)) . ",`jurpersonid` = " . ($jurpersonid == null ? "NULL" : intval($jurpersonid)) . ", `kontaktid` = " . intval($kontaktid) . " WHERE `revisionid` = " . intval($revisionid);
 		}
 		$this->query($sql);
 		if ($revisionid == null) {

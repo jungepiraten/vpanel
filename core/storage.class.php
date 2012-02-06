@@ -42,6 +42,16 @@ interface Storage {
 	public function getMitgliederCount($filter = null);
 	public function setMitglied($mitgliedid, $globalid, $eintritt, $austritt);
 
+	public function getMitgliedFlagResult();
+	public function getMitgliedFlagList();
+	public function getMitgliedFlag($flagid);
+	public function setMitgliedFlag($flagid, $label);
+
+	public function getMitgliedTextFieldResult();
+	public function getMitgliedTextFieldList();
+	public function getMitgliedTextField($flagid);
+	public function setMitgliedTextField($flagid, $label);
+
 	public function getMitgliedNotizResult($mitgliedid = null);
 	public function getMitgliedNotizList($mitgliedid = null);
 	public function getMitgliedNotiz($mitgliednotizid);
@@ -53,7 +63,15 @@ interface Storage {
 	public function getMitgliederRevisionsByMitgliedIDResult($mitgliedid);
 	public function getMitgliederRevisionsByMitgliedIDList($mitgliedid);
 	public function getMitgliederRevision($revisionid);
-	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $mitgliedpiraten, $verteilereingetragen, $beitrag, $natpersonid, $jurpersonid, $kontaktid);
+	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $beitrag, $natpersonid, $jurpersonid, $kontaktid);
+
+	public function getMitgliederRevisionFlagResult($revisionid);
+	public function getMitgliederRevisionFlagList($revisionid);
+	public function setMitgliederRevisionFlagList($revisionid, $flags);
+
+	public function getMitgliederRevisionTextFieldResult($revisionid);
+	public function getMitgliederRevisionTextFieldList($revisionid);
+	public function setMitgliederRevisionTextFieldList($revisionid, $textfieldids, $textfieldvalues);
 
 	public function getKontakt($kontaktid);
 	public function setKontakt($kontaktid, $strasse, $hausnummer, $ortid, $telefon, $handy, $email);
@@ -193,6 +211,14 @@ abstract class AbstractStorage implements Storage {
 		return $this->getMitgliederByDokumentResult($dokumentid)->fetchAll();
 	}
 
+	public function getMitgliedFlagList() {
+		return $this->getMitgliedFlagResult()->fetchAll();
+	}
+
+	public function getMitgliedTextFieldList() {
+		return $this->getMitgliedTextFieldResult()->fetchAll();
+	}
+
 	public function getMitgliedNotizList($mitgliedid = null) {
 		return $this->getMitgliedNotizResult($mitgliedid)->fetchAll();
 	}
@@ -203,6 +229,14 @@ abstract class AbstractStorage implements Storage {
 
 	public function getMitgliederRevisionsByMitgliedIDList($mitgliedid) {
 		return $this->getMitgliederRevisionsByMitgliedIDResult($mitgliedid)->fetchAll();
+	}
+
+	public function getMitgliederRevisionFlagList($revisionid) {
+		return $this->getMitgliederRevisionFlagResult($revisionid)->fetchAll();
+	}
+
+	public function getMitgliederRevisionTextFieldList($revisionid) {
+		return $this->getMitgliederRevisionTextFieldResult($revisionid)->fetchAll();
 	}
 
 	public function getOrtList() {

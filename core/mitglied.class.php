@@ -8,6 +8,9 @@ class Mitglied extends GlobalClass {
 	private $eintrittsdatum;
 	private $austrittsdatum;
 	
+	private $flags;
+	private $textfields;
+	
 	private $revisions = array();
 	private $latestRevision;
 	private $loadedRevisions = false;
