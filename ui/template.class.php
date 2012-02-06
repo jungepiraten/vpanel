@@ -99,24 +99,12 @@ class Template {
 		foreach ($template->getHeaders() as $header) {
 			$row["headers"][$header->getField()] = $header->getValue();
 		}
-		$row["attachments"] = $this->parseMailAttachments($template->getAttachments());
+		$row["attachments"] = $this->parseFiles($template->getAttachments());
 		return $row;
 	}
 
 	protected function parseMailTemplates($rows) {
 		return array_map(array($this, 'parseMailTemplate'), $rows);
-	}
-
-	protected function parseMailAttachment($attachment) {
-		$row = array();
-		$row["attachmentid"] = $attachment->getAttachmentID();
-		$row["filename"] = $attachment->getFilename();
-		$row["mimetype"] = $attachment->getMimeType();
-		return $row;
-	}
-
-	protected function parseMailAttachments($rows) {
-		return array_map(array($this, 'parseMailAttachment'), $rows);
 	}
 
 	protected function parseMitgliederFilter($filter) {
@@ -416,6 +404,11 @@ class Template {
 
 	public function viewMailTemplateCreate() {
 		$this->smarty->display("mailtemplatecreate.html.tpl");
+	}
+
+	public function viewMailTemplateCreateAttachment($mailtemplate) {
+		$this->smarty->assign("mailtemplate", $this->parseMailTemplate($mailtemplate));
+		$this->smarty->display("mailtemplatecreateattachment.html.tpl");
 	}
 
 	public function viewMitgliederList($mitglieder, $mitgliedschaften, $filters, $filter, $page, $pagecount) {

@@ -27,7 +27,10 @@
   <td>[<a href="javascript:void()" onClick="this.parentNode.parentNode.getElementsByTagName('input')[0].value='';this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)">x</a>]</td>
  </tr>
  <tr class="attachments">
-  <td colspan="3">{if isset($mailtemplate)}{foreach from=$mailtemplate.attachments item=attachment}{$attachment.filename}{/foreach}{/if}</td>
+  <td colspan="3">{if isset($mailtemplate)}{foreach from=$mailtemplate.attachments item=attachment}
+   <a href="{"mailtemplateattachment_get"|___:$mailtemplate.templateid:$attachment.fileid}">{$attachment.exportfilename}</a>
+   <a href="{"mailtemplateattachment_delete"|___:$mailtemplate.templateid:$attachment.fileid}" class="delimg">&nbsp;</a>
+  {/foreach} <span class="buttonbox"><a href="{"mailtemplateattachment_create"|___:$mailtemplate.templateid}">{"Hinzufügen"|__}</a></span>{/if}</td>
  </tr>
  <tr class="body">
   <td colspan="3"><textarea name="body" rows="10" cols="70">{if isset($mailtemplate)}{$mailtemplate.body|escape:html}{/if}</textarea></td>

@@ -8,6 +8,7 @@ class MailTemplate extends StorageClass {
 	private $templateid;
 	private $label;
 	private $body;
+
 	private $headers;
 	private $attachments;
 
@@ -87,18 +88,29 @@ class MailTemplate extends StorageClass {
 	}
 
 	public function getAttachments() {
-		if ($this->attachments == null) {
-			$this->attachments = $this->getStorage()->getMailTemplateAttachmentList($this->getTemplateID());
+		if ($this->attachments === null) {
+			$attachments = $this->getStorage()->getMailTemplateAttachmentList($this->getTemplateID());
+			$this->attachments = array();
+			foreach ($attachments as $attachment) {
+				$this->addAttachment($attachment);
+			}
 		}
 		return $this->attachments;
 	}
 
+	public function getAttachment($attachmentid) {
+		$this->getAttachments();
+		return $this->attachments[$attachmentid];
+	}
+
 	public function delAttachment($attachmentid) {
+		$this->getAttachments();
 		unset($this->attachments[$attachmentid]);
 	}
 	
 	public function addAttachment($attachment) {
-		$this->attachments[$attachment->getAttachmentID()] = $attachment;
+		$this->getAttachments();
+		$this->attachments[$attachment->getFileID()] = $attachment;
 	}
 	
 	public function generateMail(Mitglied $mitglied) {

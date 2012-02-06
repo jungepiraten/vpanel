@@ -29,6 +29,12 @@ if ($session->hasVariable("tempfileid")) {
 	}
 
 	$file = $dokument->getFile();
+} elseif ($session->hasVariable("mailtemplateid") && $session->hasVariable("fileid")) {
+	$file = $session->getStorage()->getMailTemplate($session->getVariable("mailtemplateid"))->getAttachment($session->getVariable("fileid"));
+	
+	if (!$session->isAllowed("mailtemplates_show")) {
+		die("<h1>403 Forbidden</h1>");
+	}
 } elseif ($session->hasVariable("fileid") && $session->hasVariable("token")) {
 	$file = $session->getStorage()->getFile($session->getVariable("fileid"));
 	$token = $session->getVariable("token");

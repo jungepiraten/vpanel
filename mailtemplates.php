@@ -43,6 +43,33 @@ function parseMailTemplateFormular($session, &$template = null) {
 }
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
+case "createattachment":
+	if (!$session->isAllowed("mailtemplates_modify")) {
+		$ui->viewLogin();
+		exit;
+	}
+	$template = $session->getStorage()->getMailTemplate($session->getIntVariable("templateid"));
+
+	if ($session->getBoolVariable("save")) {
+		$file = $session->getFileVariable("attachment");
+		if ($file != null) {
+			$template->addAttachment($file);
+			$template->save();
+		}
+		
+		$ui->redirect();
+	}
+	
+	$ui->viewMailTemplateCreateAttachment($template);
+	exit;
+case "deleteattachment":
+	$template = $session->getStorage()->getMailTemplate($session->getIntVariable("templateid"));
+	
+	$template->delAttachment($session->getIntVariable("fileid"));
+	$template->save();
+	
+	$ui->redirect();
+	exit;
 case "details":
 	$templateid = $session->getIntVariable("templateid");
 	$template = $session->getStorage()->getMailTemplate($templateid);

@@ -975,11 +975,11 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parseFile"));
 	}
 	public function setMailTemplateAttachmentList($mailtemplateid, $files) {
-		$sql = "DELETE FROM `mailtemplateattachments` WHERE `templateid` = " . intval($templateid);
+		$sql = "DELETE FROM `mailtemplateattachments` WHERE `templateid` = " . intval($mailtemplateid);
 		$this->query($sql);
 		$sqlinserts = array();
 		while (count($files) > 0) {
-			$sqlinserts[] = "(" . intval($templateid) . ", '" . $this->escape(array_shift($files)) . "')";
+			$sqlinserts[] = "(" . intval($mailtemplateid) . ", '" . $this->escape(array_shift($files)) . "')";
 		}
 		if (count($sqlinserts) > 0) {
 			$sql = "INSERT INTO `mailtemplateattachments` (`templateid`, `fileid`) VALUES " . implode(", ", $sqlinserts);

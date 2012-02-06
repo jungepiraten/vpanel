@@ -70,7 +70,10 @@ $config->registerPage("mailtemplates", "mailtemplates.php");
 $config->registerPage("mailtemplates_create", "mailtemplates.php?mode=create");
 $config->registerPage("mailtemplates_details", "mailtemplates.php?mode=details&templateid=%d");
 $config->registerPage("mailtemplates_del", "mailtemplates.php?mode=delete&templateid=%d");
-$config->registerPage("mailattachment", "mailattachment.php?attachmentid=%d");
+
+$config->registerPage("mailtemplateattachment_create", "mailtemplates.php?mode=createattachment&templateid=%d");
+$config->registerPage("mailtemplateattachment_delete", "mailtemplates.php?mode=deleteattachment&templateid=%d&fileid=%d");
+$config->registerPage("mailtemplateattachment_get", "file.php?mode=get&mailtemplateid?%d&fileid=%d");
 
 $config->registerPage("statistik", "statistik.php");
 
