@@ -5,6 +5,7 @@ require_once(VPANEL_CORE . "/ort.class.php");
 
 class NatPerson extends Person {
 	private $natpersonid;
+	private $anrede;
 	private $vorname;
 	private $name;
 	private $geburtsdatum;
@@ -13,6 +14,7 @@ class NatPerson extends Person {
 	public static function factory(Storage $storage, $row) {
 		$natperson = new NatPerson($storage);
 		$natperson->setNatPersonID($row["natpersonid"]);
+		$natperson->setAnrede($row["anrede"]);
 		$natperson->setVorname($row["vorname"]);
 		$natperson->setName($row["name"]);
 		$natperson->setGeburtsdatum($row["geburtsdatum"]);
@@ -28,6 +30,14 @@ class NatPerson extends Person {
 		$this->natpersonid = $natpersonid;
 	}
 	
+	public function getAnrede() {
+		return $this->anrede;
+	}
+
+	public function setAnrede($anrede) {
+		$this->anrede = $anrede;
+	}
+
 	public function getVorname() {
 		return $this->vorname;
 	}
@@ -66,6 +76,7 @@ class NatPerson extends Person {
 		}
 		$this->setNatPersonID( $storage->setNatPerson(
 			$this->getNatPersonID(),
+			$this->getAnrede(),
 			$this->getName(),
 			$this->getVorname(),
 			$this->getGeburtsdatum(),

@@ -74,9 +74,9 @@ interface Storage {
 	public function setMitgliederRevisionTextFieldList($revisionid, $textfieldids, $textfieldvalues);
 
 	public function getKontakt($kontaktid);
-	public function setKontakt($kontaktid, $strasse, $hausnummer, $ortid, $telefon, $handy, $email);
+	public function setKontakt($kontaktid, $adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $email);
 	public function delKontakt($kontaktid);
-	public function searchKontakt($strasse, $hausnummer, $ortid, $telefon, $handy, $email);
+	public function searchKontakt($strasse, $adresszusatz, $hausnummer, $ortid, $telefon, $handy, $email);
 
 	public function getOrtResult();
 	public function getOrtList();
@@ -106,9 +106,9 @@ interface Storage {
 	public function delMitgliedschaft($mitgliedschaftid);
 
 	public function getNatPerson($natpersonid);
-	public function setNatPerson($natpersonid, $name, $vorname, $geburtsdatum, $nationalitaet);
+	public function setNatPerson($natpersonid, $anrede, $name, $vorname, $geburtsdatum, $nationalitaet);
 	public function delNatPerson($natpersonid);
-	public function searchNatPerson($name, $vorname, $geburtsdatum, $nationalitaet);
+	public function searchNatPerson($anrede, $name, $vorname, $geburtsdatum, $nationalitaet);
 
 	public function getJurPerson($jurpersonid);
 	public function setJurPerson($jurpersonid, $firma);

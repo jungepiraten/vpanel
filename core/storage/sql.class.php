@@ -340,6 +340,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`jurpersonid` AS `r_jurpersonid`,
 				`r`.`kontaktid` AS `r_kontaktid`,
 				`n`.`natpersonid` AS `n_natpersonid`,
+				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
 				`n`.`vorname` AS `n_vorname`,
 				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
@@ -347,6 +348,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`j`.`jurpersonid` AS `j_jurpersonid`,
 				`j`.`label` AS `j_label`,
 				`k`.`kontaktid` AS `k_kontaktid`,
+				`k`.`adresszusatz` AS `k_adresszusatz`,
 				`k`.`strasse` AS `k_strasse`,
 				`k`.`hausnummer` AS `k_hausnummer`,
 				`k`.`ortid` AS `k_ortid`,
@@ -398,6 +400,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`jurpersonid` AS `r_jurpersonid`,
 				`r`.`kontaktid` AS `r_kontaktid`,
 				`n`.`natpersonid` AS `n_natpersonid`,
+				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
 				`n`.`vorname` AS `n_vorname`,
 				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
@@ -405,6 +408,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`j`.`jurpersonid` AS `j_jurpersonid`,
 				`j`.`label` AS `j_label`,
 				`k`.`kontaktid` AS `k_kontaktid`,
+				`k`.`adresszusatz` AS `k_adresszusatz`,
 				`k`.`strasse` AS `k_strasse`,
 				`k`.`hausnummer` AS `k_hausnummer`,
 				`k`.`ortid` AS `k_ortid`,
@@ -620,6 +624,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`jurpersonid` AS `r_jurpersonid`,
 				`r`.`kontaktid` AS `r_kontaktid`,
 				`n`.`natpersonid` AS `n_natpersonid`,
+				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
 				`n`.`vorname` AS `n_vorname`,
 				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
@@ -627,6 +632,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`j`.`jurpersonid` AS `j_jurpersonid`,
 				`j`.`label` AS `j_label`,
 				`k`.`kontaktid` AS `k_kontaktid`,
+				`k`.`adresszusatz` AS `k_adresszusatz`,
 				`k`.`strasse` AS `k_strasse`,
 				`k`.`hausnummer` AS `k_hausnummer`,
 				`k`.`ortid` AS `k_ortid`,
@@ -659,6 +665,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`jurpersonid` AS `r_jurpersonid`,
 				`r`.`kontaktid` AS `r_kontaktid`,
 				`n`.`natpersonid` AS `n_natpersonid`,
+				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
 				`n`.`vorname` AS `n_vorname`,
 				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
@@ -666,6 +673,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`j`.`jurpersonid` AS `j_jurpersonid`,
 				`j`.`label` AS `j_label`,
 				`k`.`kontaktid` AS `k_kontaktid`,
+				`k`.`adresszusatz` AS `k_adresszusatz`,
 				`k`.`strasse` AS `k_strasse`,
 				`k`.`hausnummer` AS `k_hausnummer`,
 				`k`.`ortid` AS `k_ortid`,
@@ -699,6 +707,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`jurpersonid` AS `r_jurpersonid`,
 				`r`.`kontaktid` AS `r_kontaktid`,
 				`n`.`natpersonid` AS `n_natpersonid`,
+				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
 				`n`.`vorname` AS `n_vorname`,
 				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
@@ -706,6 +715,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`j`.`jurpersonid` AS `j_jurpersonid`,
 				`j`.`label` AS `j_label`,
 				`k`.`kontaktid` AS `k_kontaktid`,
+				`k`.`adresszusatz` AS `k_adresszusatz`,
 				`k`.`strasse` AS `k_strasse`,
 				`k`.`hausnummer` AS `k_hausnummer`,
 				`k`.`ortid` AS `k_ortid`,
@@ -744,14 +754,14 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "Kontakt");
 	}
 	public function getKontakt($kontaktid) {
-		$sql = "SELECT `kontaktid`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email` FROM `kontakt` WHERE `kontaktid` = " . intval($kontaktid);
+		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email` FROM `kontakt` WHERE `kontaktid` = " . intval($kontaktid);
 		return $this->getResult($sql, array($this, "parseKontakt"))->fetchRow();
 	}
-	public function setKontakt($kontaktid, $strasse, $hausnummer, $ortid, $telefon, $handy, $email) {
+	public function setKontakt($kontaktid, $adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $email) {
 		if ($kontaktid == null) {
-			$sql = "INSERT INTO `kontakte` (`strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email`) VALUES ('" . $this->escape($strasse) . "', '" . $this->escape($hausnummer) . "', " . intval($ortid) . ", '" . $this->escape($telefon) . "', '" . $this->escape($handy) . "', '" . $this->escape($email) . "')";
+			$sql = "INSERT INTO `kontakte` (`adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email`) VALUES ('" . $this->escape($adresszusatz) . "', '" . $this->escape($strasse) . "', '" . $this->escape($hausnummer) . "', " . intval($ortid) . ", '" . $this->escape($telefon) . "', '" . $this->escape($handy) . "', '" . $this->escape($email) . "')";
 		} else {
-			$sql = "UPDATE `kontakte` SET `strasse` = '" . $this->escape($strasse) . "', `hausnummer` = '" . $this->escape($hausnummer) . "', `ortid` = " . intval($ortid) . ", `telefonnummer` = '" . $this->escape($telefon) . "', `handynummer` = '" . $this->escape($handy) . "', `email` = '" . $this->escape($email) . "' WHERE `kontaktid` = " . intval($kontaktid);
+			$sql = "UPDATE `kontakte` SET `adresszusatz` = '" . $this->escape($adresszusatz) . "', `strasse` = '" . $this->escape($strasse) . "', `hausnummer` = '" . $this->escape($hausnummer) . "', `ortid` = " . intval($ortid) . ", `telefonnummer` = '" . $this->escape($telefon) . "', `handynummer` = '" . $this->escape($handy) . "', `email` = '" . $this->escape($email) . "' WHERE `kontaktid` = " . intval($kontaktid);
 		}
 		$this->query($sql);
 		if ($kontaktid == null) {
@@ -763,13 +773,14 @@ abstract class SQLStorage extends AbstractStorage {
 		$sql = "DELETE FROM `kontakte` WHERE `kontaktid` = " . intval($kontaktid);
 		return $this->query($sql);
 	}
-	public function searchKontakt($strasse, $hausnummer, $ortid, $telefon, $handy, $email) {
-		$sql = "SELECT `kontaktid`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email` FROM `kontakte` WHERE `strasse` = '" . $this->escape($strasse) . "' AND `hausnummer` = '" . $this->escape($hausnummer) . "' AND `ortid` = " . intval($ortid) . " AND `telefonnummer` = '" . $this->escape($telefon) . "' AND `handynummer` = '" . $this->escape($handy) . "' AND `email` = '" . $this->escape($email) . "'";
+	public function searchKontakt($adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $email) {
+		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email` FROM `kontakte` WHERE `adresszusatz` = '" . $this->escape($adresszusatz) . "' AND `strasse` = '" . $this->escape($strasse) . "' AND `hausnummer` = '" . $this->escape($hausnummer) . "' AND `ortid` = " . intval($ortid) . " AND `telefonnummer` = '" . $this->escape($telefon) . "' AND `handynummer` = '" . $this->escape($handy) . "' AND `email` = '" . $this->escape($email) . "'";
 		$result = $this->getResult($sql, array($this, "parseKontakt"));
 		if ($result->getCount() > 0) {
 			return $result->fetchRow();
 		}
 		$kontakt = new Kontakt($this);
+		$kontakt->setAdresszusatz($adresszusatz);
 		$kontakt->setStrasse($strasse);
 		$kontakt->setHausnummer($hausnummer);
 		$kontakt->setOrtID($ortid);
@@ -941,14 +952,14 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "NatPerson");
 	}
 	public function getNatPerson($natpersonid) {
-		$sql = "SELECT `natpersonid`, `name`, `vorname`, `geburtsdatum`, `nationalitaet` FROM `natperson` WHERE `natpersonid` = " . intval($natpersonid);
+		$sql = "SELECT `natpersonid`, `anrede`, `name`, `vorname`, `geburtsdatum`, `nationalitaet` FROM `natperson` WHERE `natpersonid` = " . intval($natpersonid);
 		return $this->getResult($sql, array($this, "parseNatPerson"))->fetchRow();
 	}
-	public function setNatPerson($natpersonid, $name, $vorname, $geburtsdatum, $nationalitaet) {
+	public function setNatPerson($natpersonid, $anrede, $name, $vorname, $geburtsdatum, $nationalitaet) {
 		if ($natpersonid == null) {
-			$sql = "INSERT INTO `natperson` (`name`, `vorname`, `geburtsdatum`, `nationalitaet`) VALUES ('" . $this->escape($name) . "', '" . $this->escape($vorname) . "', '" . date("Y-m-d", $geburtsdatum) . "', '" . $this->escape($nationalitaet) . "')";
+			$sql = "INSERT INTO `natperson` (`anrede`, `name`, `vorname`, `geburtsdatum`, `nationalitaet`) VALUES ('" . $this->escape($anrede) . "', '" . $this->escape($name) . "', '" . $this->escape($vorname) . "', '" . date("Y-m-d", $geburtsdatum) . "', '" . $this->escape($nationalitaet) . "')";
 		} else {
-			$sql = "UPDATE `natperson` SET `name` = '" . $this->escape($name) . "', `vorname` = '" . $this->escape($vorname) . "', `geburtsdatum` = '" . date("Y-m-d", $geburtsdatum) . "', `nationalitaet` = '" . $this->escape($nationalitaet) . "' WHERE `natpersonid` = " . intval($natpersonid);
+			$sql = "UPDATE `natperson` SET `anrede` = '" . $this->escape($anrede) . "', `name` = '" . $this->escape($name) . "', `vorname` = '" . $this->escape($vorname) . "', `geburtsdatum` = '" . date("Y-m-d", $geburtsdatum) . "', `nationalitaet` = '" . $this->escape($nationalitaet) . "' WHERE `natpersonid` = " . intval($natpersonid);
 		}
 		$this->query($sql);
 		if ($natpersonid == null) {
@@ -960,13 +971,14 @@ abstract class SQLStorage extends AbstractStorage {
 		$sql = "DELETE FROM `natperson` WHERE `natpersonid` = " . intval($natpersonid);
 		return $this->query($sql);
 	}
-	public function searchNatPerson($name, $vorname, $geburtsdatum, $nationalitaet) {
-		$sql = "SELECT `natpersonid`, `name`, `vorname`, `geburtsdatum`, `nationalitaet` FROM `natperson` WHERE `name` = '" . $this->escape($name) . "' AND `vorname` = '" . $this->escape($vorname) . "' AND `geburtsdatum` = '" . date("Y-m-d", $geburtsdatum) . "' AND `nationalitaet` = '" . $this->escape($nationalitaet) . "'";
+	public function searchNatPerson($anrede, $name, $vorname, $geburtsdatum, $nationalitaet) {
+		$sql = "SELECT `natpersonid`, `anrede`, `name`, `vorname`, `geburtsdatum`, `nationalitaet` FROM `natperson` WHERE `anrede` = '" . $this->escape($anrede) . "' AND `name` = '" . $this->escape($name) . "' AND `vorname` = '" . $this->escape($vorname) . "' AND `geburtsdatum` = '" . date("Y-m-d", $geburtsdatum) . "' AND `nationalitaet` = '" . $this->escape($nationalitaet) . "'";
 		$result = $this->getResult($sql, array($this, "parseNatPerson"));
 		if ($result->getCount() > 0) {
 			return $result->fetchRow();
 		}
 		$natperson = new NatPerson($this);
+		$natperson->setAnrede($anrede);
 		$natperson->setName($name);
 		$natperson->setVorname($vorname);
 		$natperson->setGeburtsdatum($geburtsdatum);

@@ -35,11 +35,13 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 	global $config;
 
 	$persontyp = $session->getVariable("persontyp");
+	$anrede = $session->getVariable("anrede");
 	$name = $session->getVariable("name");
 	$vorname = $session->getVariable("vorname");
 	$geburtsdatum = strtotime($session->getVariable("geburtsdatum"));
 	$nationalitaet = $session->getVariable("nationalitaet");
 	$firma = $session->getVariable("firma");
+	$adresszusatz = $session->getVariable("adresszusatz");
 	$strasse = $session->getVariable("strasse");
 	$hausnummer = $session->getVariable("hausnummer");
 	$plz = $session->getVariable("plz");
@@ -60,13 +62,13 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 	$natperson = null;
 	$jurperson = null;
 	if ($persontyp == "nat") {
-		$natperson = $session->getStorage()->searchNatPerson($name, $vorname, $geburtsdatum, $nationalitaet);
+		$natperson = $session->getStorage()->searchNatPerson($anrede, $name, $vorname, $geburtsdatum, $nationalitaet);
 	} else {
 		$jurperson = $session->getStorage()->searchJurPerson($firma);
 	}
 
 	$ort = $session->getStorage()->searchOrt($plz, $ortname, $stateid);
-	$kontakt = $session->getStorage()->searchKontakt($strasse, $hausnummer, $ort->getOrtID(), $telefon, $handy, $email);
+	$kontakt = $session->getStorage()->searchKontakt($adresszusatz, $strasse, $hausnummer, $ort->getOrtID(), $telefon, $handy, $email);
 
 	$neumitglied = false;
 	if ($mitglied == null) {

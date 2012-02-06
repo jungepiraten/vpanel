@@ -5,6 +5,7 @@ require_once(VPANEL_CORE . "/ort.class.php");
 
 class Kontakt extends GlobalClass {
 	private $kontaktid;
+	private $adresszusatz;
 	private $strasse;
 	private $hausnummer;
 	private $ortid;
@@ -17,6 +18,7 @@ class Kontakt extends GlobalClass {
 	public static function factory(Storage $storage, $row) {
 		$kontakt = new Kontakt($storage);
 		$kontakt->setKontaktID($row["kontaktid"]);
+		$kontakt->setAdresszusatz($row["adresszusatz"]);
 		$kontakt->setStrasse($row["strasse"]);
 		$kontakt->setHausnummer($row["hausnummer"]);
 		$kontakt->setOrtID($row["ortid"]);
@@ -32,6 +34,14 @@ class Kontakt extends GlobalClass {
 
 	public function setKontaktID($kontaktid) {
 		$this->kontaktid = $kontaktid;
+	}
+
+	public function getAdresszusatz() {
+		return $this->adresszusatz;
+	}
+
+	public function setAdresszusatz($adresszusatz) {
+		$this->adresszusatz = $adresszusatz;
 	}
 
 	public function getStrasse() {
@@ -103,6 +113,7 @@ class Kontakt extends GlobalClass {
 		}
 		$this->setKontaktID( $storage->setKontakt(
 			$this->getKontaktID(),
+			$this->getAdresszusatz(),
 			$this->getStrasse(),
 			$this->getHausnummer(),
 			$this->getOrtID(),

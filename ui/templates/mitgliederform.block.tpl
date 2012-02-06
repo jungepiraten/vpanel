@@ -14,20 +14,28 @@
          </td>
      </tr>
      <tr id="nat_0">
+         <th><label for="anrede">{"Anrede:"|__}</label></th>
+         <td><input class="anrede" type="text" name="anrede" size="10" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.anrede|escape:html}{/if}" /></td>
+     </tr>
+     <tr id="nat_1">
          <th><label for="name">{"Name:"|__}</label></th>
          <td><input class="vorname" type="text" name="vorname" size="20" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.vorname|escape:html}{/if}" /> <input class="name" type="text" name="name" size="20" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.name|escape:html}{/if}" /></td>
      </tr>
-     <tr id="nat_1">
+     <tr id="nat_2">
          <th><label for="geburtsdatum">{"Geboren:"|__}</label></th>
          <td><input class="geburtsdatum" type="text" name="geburtsdatum" size="20" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.geburtsdatum|date_format:"%d.%m.%Y"}{/if}" /></td>
      </tr>
-     <tr id="nat_2">
+     <tr id="nat_3">
          <th><label for="nationalitaet">{"Nationalität:"|__}</label></th>
          <td><input class="nationalitaet" type="text" name="nationalitaet" size="20" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.nationalitaet|escape:html}{/if}" /></td>
      </tr>
      <tr id="jur_0">
          <th><label for="firma">{"Firma:"|__}</label></th>
          <td><input class="firma" type="text" name="firma" size="40" value="{if isset($mitgliedrevision.jurperson)}{$mitgliedrevision.jurperson.label|escape:html}{/if}" /></td>
+     </tr>
+     <tr>
+         <th><label for="adresszusatz">{"Adresszusatz:"|__}</label></th>
+         <td><input class="adresszusatz" type="text" name="adresszusatz" size="40" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.adresszusatz|escape:html}{/if}" /></td>
      </tr>
      <tr>
          <th><label for="strasse">{"Adresse:"|__}</label></th>

@@ -213,6 +213,7 @@ class Template {
 	protected function parseNatPerson($natperson) {
 		$row = array();
 		$row["natpersonid"] = $natperson->getNatPersonID();
+		$row["anrede"] = $natperson->getAnrede();
 		$row["vorname"] = $natperson->getVorname();
 		$row["name"] = $natperson->getName();
 		$row["geburtsdatum"] = $natperson->getGeburtsdatum();
@@ -230,6 +231,7 @@ class Template {
 	protected function parseKontakt($kontakt) {
 		$row = array();
 		$row["kontaktid"] = $kontakt->getKontaktID();
+		$row["adresszusatz"] = $kontakt->getAdresszusatz();
 		$row["strasse"] = $kontakt->getStrasse();
 		$row["hausnummer"] = $kontakt->getHausnummer();
 		$row["ort"] = $this->parseOrt($kontakt->getOrt());
