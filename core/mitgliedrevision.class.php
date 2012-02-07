@@ -281,6 +281,11 @@ class MitgliedRevision extends GlobalClass {
 		return array_keys($this->flags);
 	}
 
+	public function hasFlag($flagid) {
+		$this->getFlags();
+		return isset($this->flags[$flagid]);
+	}
+
 	public function getFlag($flagid) {
 		$this->getFlags();
 		return $this->flags[$flagid];

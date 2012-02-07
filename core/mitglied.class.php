@@ -116,6 +116,8 @@ class Mitglied extends GlobalClass {
 			return date("d.m.Y", $this->getEintrittsdatum());
 		case "AUSTRITT":
 			return date("d.m.Y", $this->getAustrittsdatum());
+		case "ADRESSZUSATZ":
+			return $kontakt->getAdresszusatz();
 		case "STRASSE":
 			return $kontakt->getStrasse();
 		case "HAUSNUMMER":
@@ -143,7 +145,9 @@ class Mitglied extends GlobalClass {
 			$natperson = $revision->getNatPerson();
 			switch ($keyword) {
 			case "BEZEICHNUNG":
-				return $natperson->getVorname() . " " . $natperson->getName();
+				return $natperson->getAnrede() . " " . $natperson->getVorname() . " " . $natperson->getName();
+			case "ANREDE":
+				return $natperson->getAnrede();
 			case "NAME":
 				return $natperson->getName();
 			case "VORNAME":
