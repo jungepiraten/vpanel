@@ -1,6 +1,7 @@
 {include file="header.html.tpl" ansicht="Dokument anzeigen"}
 <p class="pagetitle">Dokument {$dokument.label}</p>
 <iframe src="{"dokumente_view"|___:$dokument.dokumentid}" width="650px" height="300px"></iframe>
+<div style="clear:both;">&nbsp;</div>
 {include file="dokumentform.block.tpl" dokument=$dokument dokumentkategorien=$dokumentkategorien dokumentstatuslist=$dokumentstatuslist}
 
 <div style="position:relative;">
