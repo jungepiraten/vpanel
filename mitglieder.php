@@ -21,6 +21,7 @@ require_once(VPANEL_PROCESSES . "/mitgliederfilterexport.class.php");
 $predefinedfields = array(
 	array("label" => "Bezeichnung",		"template" => "{BEZEICHNUNG}"),
 	array("label" => "Anschrift",		"template" => "{STRASSE} {HAUSNUMMER}"),
+	array("label" => "Adresszusatz",	"template" => "{ADRESSZUSATZ}"),
 	array("label" => "PLZ",			"template" => "{PLZ}"),
 	array("label" => "Ort",			"template" => "{ORT}"),
 	array("label" => "Bundesland",		"template" => "{STATE}"),
@@ -77,6 +78,13 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 		$mitglied->setEintrittsdatum(time());
 		$mitglied->setAustrittsdatum(null);
 		$mitglied->save();
+
+		$mitgliedbeitrag = new MitgliedBeitrag($session->getStorage());
+		$mitgliedbeitrag->setMitglied($mitglied);
+		$mitgliedbeitrag->setBeitrag($session->getStorage()->searchBeitrag(date("Y"), null));
+		$mitgliedbeitrag->setHoehe($beitrag);
+		$mitglied->setBeitrag($mitgliedbeitrag);
+		$mitglied->save();
 	}
 
 	$revision = new MitgliedRevision($session->getStorage());
@@ -123,7 +131,58 @@ function parseAddMitgliederNotizFormular($session, $mitglied, &$notiz) {
 	$notiz->save();
 }
 
+function parseMitgliederBeitraegeFormular($session, &$mitglied) {
+	$beitraege_hoehe = $session->getListVariable("beitraege_hoehe");
+	$beitraege_bezahlt = $session->getListVariable("beitraege_bezahlt");
+	$beitraege_neu_beitragid = $session->getVariable("beitrag_neu_beitragid");
+	$beitraege_neu_hoehe = $session->getDoubleVariable("beitrag_neu_hoehe");
+	$beitraege_neu_bezahlt = $session->getDoubleVariable("beitrag_neu_bezahlt");
+
+	foreach ($beitraege_hoehe as $beitragid => $hoehe) {
+		$beitrag = $session->getStorage()->getBeitrag($beitragid);
+		$bezahlt = $beitraege_bezahlt[$beitragid];
+		$mitglied->setBeitrag($beitrag, $hoehe, $bezahlt);
+	}
+
+	if (is_numeric($beitraege_neu_beitragid)) {
+		$beitrag = $session->getStorage()->getBeitrag($beitraege_neu_beitragid);
+		if ($beitraege_neu_hoehe == null) {
+			$beitraege_neu_hoehe = $beitrag->getHoehe();
+		}
+		if ($beitraege_neu_hoehe == null) {
+			$beitraege_neu_hoehe = $mitglied->getLatestRevision()->getBeitrag();
+		}
+		$mitglied->setBeitrag($beitrag, $beitraege_neu_hoehe, $beitraege_neu_bezahlt);
+	}
+
+	$mitglied->save();
+}
+
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
+case "beitraege":
+	$mitgliedid = intval($session->getVariable("mitgliedid"));
+	$mitglied = $session->getStorage()->getMitglied($mitgliedid);
+
+	if (!$session->isAllowed("mitglieder_modify")) {
+		$ui->viewLogin();
+		exit;
+	}
+
+	if ($session->getBoolVariable("save")) {
+		parseMitgliederBeitraegeFormular($session, $mitglied);
+		$ui->redirect();
+	}
+
+	break;
+case "beitragdelete":
+	$mitglied = $session->getStorage()->getMitglied($session->getIntVariable("mitgliedid"));
+	$beitrag = $session->getStorage()->getBeitrag($session->getIntVariable("beitragid"));
+	
+	$mitglied->delBeitrag($beitrag->getBeitragID());
+	$mitglied->save();
+	
+	$ui->redirect();
+	break;
 case "details":
 	if ($session->hasVariable("revisionid")) {
 		$revisionid = intval($session->getVariable("revisionid"));
@@ -164,8 +223,9 @@ case "details":
 	$mitgliederflags = $session->getStorage()->getMitgliedFlagList();
 	$mitgliedertextfields = $session->getStorage()->getMitgliedTextFieldList();
 	$states = $session->getStorage()->getStateList();
+	$beitraege = $session->getStorage()->getBeitragList();
 
-	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields);
+	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields, $beitraege);
 	exit;
 case "create":
 	$mitgliedschaft = null;

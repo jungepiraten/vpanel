@@ -59,6 +59,8 @@ $config->registerPage("mitglieder_create", "mitglieder.php?mode=create&mitglieds
 $config->registerPage("mitglieder_details", "mitglieder.php?mode=details&mitgliedid=%d");
 $config->registerPage("mitglieder_dokument", "mitglieddokument.php?mode=add&mitgliedid=%d");
 $config->registerPage("mitglieder_del", "mitglieder.php?mode=delete&mitgliedid=%d");
+$config->registerPage("mitglieder_beitraege", "mitglieder.php?mode=beitraege&mitgliedid=%d");
+$config->registerPage("mitglieder_beitraege_del", "mitglieder.php?mode=beitragdelete&mitgliedid=%d&beitragid=%d");
 $config->registerPage("mitglieder_sendmail.select", "mitglieder.php?mode=sendmail.select&filterid=%s");
 $config->registerPage("mitglieder_sendmail.preview", "mitglieder.php?mode=sendmail.preview");
 $config->registerPage("mitglieder_sendmail.send", "mitglieder.php?mode=sendmail.send");

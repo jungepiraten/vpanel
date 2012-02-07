@@ -31,6 +31,23 @@ interface Storage {
 	public function getGliederungList();
 	public function getGliederung($gliederungid);
 
+	public function getBeitragResult();
+	public function getBeitragList();
+	public function getBeitrag($beitragid);
+	public function setBeitrag($beitragid, $label, $hoehe);
+	public function searchBeitrag($label, $hoehe);
+	public function delBeitrag($beitragid);
+
+	public function getMitgliederBeitragByMitgliedResult($mitgliedid);
+	public function getMitgliederBeitragByMitgliedList($mitgliedid);
+	public function setMitgliederBeitragByMitgliedList($mitgliedid, $beitragid, $hoehelist, $bezahltlist);
+	public function delMitgliederBeitragByMitglied($mitgliedid);
+	public function getMitgliederBeitragByBeitragResult($beitragid);
+	public function getMitgliederBeitragByBeitragList($beitragid);
+	public function setMitgliederBeitragByBeitragList($beitragid, $mitgliedids, $hoehelist, $bezahltlist);
+	public function delMitgliederBeitragByBeitrag($beitragid);
+	public function getMitgliederBeitrag($mitgliedid, $beitragid);
+
 	public function addMitgliedDokument($mitgliedid, $dokumentid);
 	public function delMitgliedDokument($mitgliedid, $dokumentid);
 
@@ -201,6 +218,18 @@ abstract class AbstractStorage implements Storage {
 
 	public function getGliederungList() {
 		return $this->getGliederungResult()->fetchAll();
+	}
+
+	public function getBeitragList() {
+		return $this->getBeitragResult()->fetchAll();
+	}
+
+	public function getMitgliederBeitragByMitgliedList($mitgliedid) {
+		return $this->getMitgliederBeitragByMitgliedResult($mitgliedid)->fetchAll();
+	}
+
+	public function getMitgliederBeitragByBeitragList($beitragid) {
+		return $this->getMitgliederBeitragByBeitragResult($beitragid)->fetchAll();
 	}
 
 	public function getMitgliederList($filter = null, $limit = null, $offset = null) {

@@ -125,12 +125,21 @@ class Session {
 		return isset($_FILES[$name]) && $_FILES[$name]["error"] == 0;
 	}
 	public function getVariable($name) {
+		if (!$this->hasVariable($name)) {
+			return null;
+		}
 		return iconv($this->getEncoding(), "UTF-8", stripslashes($_REQUEST[$name]));
 	}
 	public function getDoubleVariable($name) {
+		if (!$this->hasVariable($name)) {
+			return null;
+		}
 		return doubleval($_REQUEST[$name]);
 	}
 	public function getIntVariable($name) {
+		if (!$this->hasVariable($name)) {
+			return null;
+		}
 		return intval($_REQUEST[$name]);
 	}
 	public function getBoolVariable($name) {

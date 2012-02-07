@@ -17,18 +17,6 @@
 
 <div style="position:relative;">
 <div style="float:left; width:400px;">
-<div class="buttonbox">
- <a href="{"mitglieder_dokument"|___:$mitglied.mitgliedid}">Dokument verlinken</a>
-</div>
-{if count($dokumente) > 0}
-{include file=dokumentlist.block.tpl dokumente=$dokumente showmitglieddokumentdel=1}
-<div class="buttonbox">
- <a href="{"mitglieder_dokument"|___:$mitglied.mitgliedid}">Dokument verlinken</a>
-</div>
-{/if}
-</div>
-
-<div style="float:left; margin-left:50px; width:400px;">
 {foreach from=$mitgliednotizen item=notiz}
 <div class="notiz">
  <span class="meta">{"Von %s"|__:$notiz.author.username}</span>
@@ -47,6 +35,81 @@
   </table>
  </fieldset>
 </form>
+</div>
+
+<div style="float:left; width:400px; margin-left:50px;">
+<script type="text/javascript">
+
+var beitragHoehe = new Array();
+{foreach from=$beitraege item=beitrag}
+beitragHoehe[{$beitrag.beitragid}] = "{if $beitrag.hoehe != null}{$beitrag.hoehe}{else}{$mitglied.latest.beitrag}{/if}";
+{/foreach}
+
+{literal}
+function changeBeitragNeuHoehe(beitragID) {
+	document.getElementById("beitrag_neu_hoehe").value = beitragHoehe[beitragID];
+}
+{/literal}
+
+</script>
+<form action="{"mitglieder_beitraege"|___:$mitglied.mitgliedid}" method="post">
+ <fieldset>
+<table>
+<tr>
+ <th>&nbsp;</th>
+ <th>Beitrag</th>
+ <th>Bezahlt</th>
+ <th>Ausstehend</th>
+</tr>
+{foreach from=$mitglied.beitraege item=beitrag}
+<tr>
+ <th>{$beitrag.beitrag.label|escape:html}</th>
+ <td><input type="text" size="5" name="beitraege_hoehe[{$beitrag.beitrag.beitragid}]" value="{$beitrag.hoehe|string_format:"%.2f"}" /></td>
+ <td><input type="text" size="5" name="beitraege_bezahlt[{$beitrag.beitrag.beitragid}]" value="{$beitrag.bezahlt|string_format:"%.2f"}" /></td>
+ <td>{$beitrag.hoehe-$beitrag.bezahlt|string_format:"%.2f"}</td>
+ <td><a href="{"mitglieder_beitraege_del"|___:$mitglied.mitgliedid:$beitrag.beitrag.beitragid}" class="delimg">&nbsp;</a></td>
+</tr>
+{/foreach}
+{if count($beitraege) > count($mitglied.beitraege)}
+<tr>
+ <th><select name="beitrag_neu_beitragid" onchange="changeBeitragNeuHoehe(this.value);">
+   <option value="">{"(nichts hinzufügen)"|__}</option>
+{foreach from=$beitraege item=beitrag}{assign var=beitragid value=$beitrag.beitragid}{if !isset($mitglied.beitraege.$beitragid)}
+   <option value="{$beitrag.beitragid|escape:html}">{$beitrag.label|escape:html}</option>
+{/if}{/foreach}
+  </select></th>
+ <td><input type="text" size="5" name="beitrag_neu_hoehe" id="beitrag_neu_hoehe" /></td>
+ <td><input type="text" size="5" name="beitrag_neu_bezahlt" /></td>
+ <td>&nbsp;</td>
+ <td>&nbsp;</td>
+</tr>
+{/if}
+<tr>
+ <th>Summe</th>
+ <th>{$mitglied.beitraege_hoehe|string_format:"%.2f"}</th>
+ <th>{$mitglied.beitraege_bezahlt|string_format:"%.2f"}</th>
+ <th>{$mitglied.beitraege_hoehe-$mitglied.beitraege_bezahlt|string_format:"%.2f"}</th>
+ <th>&nbsp;</th>
+</tr>
+<tr>
+ <td colspan="5"><input type="submit" name="save" value="Speichern" /></td>
+</tr>
+</table>
+ </fieldset>
+</form>
+</div>
+
+<div style="float:left; width:400px; margin-left:50px;">
+<div class="buttonbox">
+ <a href="{"mitglieder_dokument"|___:$mitglied.mitgliedid}">Dokument verlinken</a>
+</div>
+{if count($dokumente) > 0}
+{include file=dokumentlist.block.tpl dokumente=$dokumente showmitglieddokumentdel=1}
+<div class="buttonbox">
+ <a href="{"mitglieder_dokument"|___:$mitglied.mitgliedid}">Dokument verlinken</a>
+</div>
+{/if}
+</div>
 </div>
 
 <div style="clear:left;">&nbsp;</div>

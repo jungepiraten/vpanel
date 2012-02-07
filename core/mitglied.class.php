@@ -7,13 +7,11 @@ class Mitglied extends GlobalClass {
 	private $mitgliedid;
 	private $eintrittsdatum;
 	private $austrittsdatum;
-	
-	private $flags;
-	private $textfields;
-	
-	private $revisions = array();
+
+	private $beitraglist;
+
+	private $revisions;
 	private $latestRevision;
-	private $loadedRevisions = false;
 	
 	public static function factory(Storage $storage, $row) {
 		$mitglied = new Mitglied($storage);
@@ -57,17 +55,17 @@ class Mitglied extends GlobalClass {
 	}
 
 	public function getRevisionList() {
-		if (!$this->loadedRevisions) {
+		if ($this->revisions === null) {
 			$this->revisions = array();
 			foreach ($this->getStorage()->getMitgliederRevisionsByMitgliedIDList($this->getMitgliedID()) as $revision) {
 				$this->addRevision($revision);
 			}
-			$this->loadedRevisions = true;
 		}
 		return $this->revisions;
 	}
 	
 	public function &getRevision($revisionid) {
+		$this->getRevisionList();
 		if (!isset($this->revisions[$revisionid]) or $this->revisions[$revisionid] == null) {
 			$this->revisions[$revisionid] = $this->getStorage()->getMitgliederRevision($revisionid);
 		}
@@ -75,6 +73,7 @@ class Mitglied extends GlobalClass {
 	}
 
 	public function addRevision($revision) {
+		$this->getRevisionList();
 		$this->revisions[$revision->getRevisionID()] = $revision;
 		if (!isset($this->latestRevision) || $revision->getTimestamp() > $this->latestRevision->getTimestamp()) {
 			$this->latestRevision = $revision;
@@ -92,6 +91,39 @@ class Mitglied extends GlobalClass {
 		return array_map(create_function('$a', 'return $a->getRevisionID();'), $this->getRevisionList());
 	}
 
+	public function getBeitragList() {
+		if ($this->beitraglist === null) {
+			$beitraglist = $this->getStorage()->getMitgliederBeitragByMitgliedList($this->getMitgliedID());
+			$this->beitraglist = array();
+			foreach ($beitraglist as $beitrag) {
+				$this->setBeitrag($beitrag);
+			}
+		}
+		return $this->beitraglist;
+	}
+
+	public function getBeitrag($beitragid) {
+		$this->getBeitragList();
+		return $this->beitraglist[$beitragid];
+	}
+
+	public function setBeitrag($beitrag, $hoehe = null, $bezahlt = null) {
+		if ($beitrag instanceof Beitrag) {
+			$mitgliedbeitrag = new MitgliedBeitrag($this->getStorage());
+			$mitgliedbeitrag->setBeitrag($beitrag);
+			$mitgliedbeitrag->setHoehe($hoehe);
+			$mitgliedbeitrag->setBezahlt($bezahlt);
+			$beitrag = $mitgliedbeitrag;
+		}
+		$this->getBeitragList();
+		$this->beitraglist[$beitrag->getBeitragID()] = $beitrag;
+	}
+
+	public function delBeitrag($beitragid) {
+		$this->getBeitragList();
+		unset($this->beitraglist[$beitragid]);
+	}
+
 	public function save(Storage $storage = null) {
 		if ($storage === null) {
 			$storage = $this->getStorage();
@@ -102,6 +134,15 @@ class Mitglied extends GlobalClass {
 			$this->getEintrittsdatum(),
 			$this->getAustrittsdatum() ));
 		// TODO revisions speichern ?
+
+		if ($this->beitraglist != null) {
+			foreach ($this->getBeitragList() as $mitgliedbeitrag) {
+				$beitragids[] = $mitgliedbeitrag->getBeitragID();
+				$hoehelist[] = $mitgliedbeitrag->getHoehe();
+				$bezahltlist[] = $mitgliedbeitrag->getBezahlt();
+			}
+			$storage->setMitgliederBeitragByMitgliedList($this->getMitgliedID(), $beitragids, $hoehelist, $bezahltlist);
+		}
 	}
 	
 	private function getVariableValue($keyword) {

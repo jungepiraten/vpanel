@@ -9,6 +9,8 @@ require_once(VPANEL_CORE . "/mitgliedflag.class.php");
 require_once(VPANEL_CORE . "/mitgliedtextfield.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevisiontextfield.class.php");
 require_once(VPANEL_CORE . "/mitgliednotiz.class.php");
+require_once(VPANEL_CORE . "/beitrag.class.php");
+require_once(VPANEL_CORE . "/mitgliedbeitrag.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/mitgliedschaft.class.php");
 require_once(VPANEL_CORE . "/natperson.class.php");
@@ -225,6 +227,108 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 
 	/**
+	 * Beitrag
+	 **/
+	public function parseBeitrag($row) {
+		return $this->parseRow($row, null, "Beitrag");
+	}
+	public function getBeitragResult() {
+		$sql = "SELECT `beitragid`, `label`, `hoehe` FROM `beitraege`";
+		return $this->getResult($sql, array($this, "parseBeitrag"));
+	}
+	public function getBeitrag($beitragid) {
+		$sql = "SELECT `beitragid`, `label`, `hoehe` FROM `beitraege` WHERE `beitragid` = " . intval($beitragid);
+		return $this->getResult($sql, array($this, "parseBeitrag"))->fetchRow();
+	}
+	public function setBeitrag($beitragid, $label, $hoehe) {
+		if ($beitragid == null) {
+			$sql = "INSERT INTO `beitraege` (`label`, `hoehe`) VALUES ('" . $this->escape($label) . "', " . ($hoehe == null ? "NULL" : floatval($hoehe)) . ")";
+		} else {
+			$sql = "UPDATE `beitraege` SET `label` = '" . $this->escape($label) . "', `hoehe` = " . ($hoehe == null ? "NULL" : doubleval($hoehe)) . " WHERE `beitragid` = " . intval($beitragid);
+		}
+		$this->query($sql);
+		if ($beitragid == null) {
+			$beitragid = $this->getInsertID();
+		}
+		return $beitragid;
+	}
+	public function searchBeitrag($label, $hoehe) {
+		$sql = "SELECT `beitragid`, `label`, `hoehe` FROM `beitraege` WHERE `label` = '" . $this->escape($label) . "' AND `hoehe` = " . floatval($hoehe);
+		$result = $this->getResult($sql, array($this, "parseBeitrag"));
+		if ($result->getCount() > 0) {
+			return $result->fetchRow();
+		}
+		$beitrag = new Beitrag($this);
+		$beitrag->setLabel($label);
+		$beitrag->setHoehe($hoehe);
+		$beitrag->save();
+		return $beitrag;
+	}
+	public function delBeitrag($beitragid) {
+		$sql = "DELETE FROM `beitrag` WHERE `beitragid` = " . intval($beitragid);
+		return $this->query($sql);
+	}
+
+	/**
+	 * MitgliederBeitrag
+	 **/
+	public function parseMitgliedBeitrag($row) {
+		$o = $this->parseRow($row, null, array("mb" => 'MitgliedBeitrag', "b" => 'Beitrag'));
+		$o["mb"]->setBeitrag($o["b"]);
+		return $o["mb"];
+	}
+	public function getMitgliederBeitragByMitgliedResult($mitgliedid) {
+		$sql = "SELECT `mb`.`mitgliedid` AS `mb_mitgliedid`, `mb`.`beitragid` AS `mb_beitragid`, `mb`.`hoehe` AS `mb_hoehe`, `mb`.`bezahlt` AS `mb_bezahlt`, `b`.`beitragid` as `b_beitragid`, `b`.`label` AS `b_label`, `b`.`hoehe` AS `b_hoehe` FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`mitgliedid` = " . intval($mitgliedid);
+		return $this->getResult($sql, array($this, "parseMitgliedBeitrag"));
+	}
+	public function getMitgliederBeitragByBeitragResult($beitragid) {
+		$sql = "SELECT `mb`.`mitgliedid` AS `mb_mitgliedid`, `mb`.`beitragid` AS `mb_beitragid`, `mb`.`hoehe` AS `mb_hoehe`, `mb`.`bezahlt` AS `mb_bezahlt`, `b`.`beitragid` as `b_beitragid`, `b`.`label` AS `b_label`, `b`.`hoehe` AS `b_hoehe` FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`beitragid` = " . intval($beitragid);
+		return $this->getResult($sql, array($this, "parseMitgliedBeitrag"));
+	}
+	public function setMitgliederBeitragByMitgliedList($mitgliedid, $beitragids, $hoehelist, $bezahltlist) {
+		$this->delMitgliederBeitragByMitglied($mitgliedid);
+		$insertsql = array();
+		while (count($beitragids) > 0) {
+			$beitragid = array_shift($beitragids);
+			$hoehe = array_shift($hoehelist);
+			$bezahlt = array_shift($bezahltlist);
+			$insertsql[] = "(" . intval($mitgliedid) . ", " . intval($beitragid) . ", " . floatval($hoehe) . ", " . floatval($bezahlt) . ")";
+		}
+		if (count($insertsql) > 0) {
+			$sql = "INSERT INTO `mitgliederbeitrag` (`mitgliedid`, `beitragid`, `hoehe`, `bezahlt`) VALUES " . implode(",", $insertsql);
+			$this->query($sql);
+		}
+		return true;
+	}
+	public function setMitgliederBeitragByBeitragList($beitragid, $mitgliedids, $hoehelist, $bezahltlist) {
+		$this->delMitgliederBeitragByBeitrag($beitragid);
+		$insertsql = array();
+		while (count($mitgliedids) > 0) {
+			$mitgliedid = array_shift($mitgliedids);
+			$hoehe = array_shift($hoehelist);
+			$bezahlt = array_shift($bezahltlist);
+			$insertsql[] = "(" . intval($mitgliedid) . ", " . intval($beitragid) . ", " . floatval($hoehe) . ", " . floatval($bezahlt) . ")";
+		}
+		if (count($insertsql) > 0) {
+			$sql = "INSERT INTO `mitgliederbeitrag` (`mitgliedid`, `beitragid`, `hoehe`, `bezahlt`) VALUES " . implode(",", $insertsql);
+			$this->query($sql);
+		}
+		return true;
+	}
+	public function delMitgliederBeitragByMitglied($mitgliedid) {
+		$sql = "DELETE FROM `mitgliederbeitrag` WHERE `mitgliedid` = " . intval($mitgliedid);
+		return $this->query($sql);
+	}
+	public function delMitgliederBeitragByBeitrag($beitragid) {
+		$sql = "DELETE FROM `mitgliederbeitrag` WHERE `beitragid` = " . intval($beitragid);
+		return $this->query($sql);
+	}
+	public function getMitgliederBeitrag($mitgliedid, $beitagid) {
+		$sql = "SELECT `mb`.`mitgliedid` AS `mb_mitgliedid`, `mb`.`beitragid` AS `mb_beitragid`, `mb`.`hoehe` AS `mb_hoehe`, `mb`.`bezahlt` AS `mb_bezahlt`, `b`.`beitragid`, `b`.`label` AS `b_label`, `b`.`hoehe` AS `b_hoehe` FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`mitgliedid` = " . intval($mitgliedid) . " AND `mb`.`beitragid` = " . intval($beitragid);
+		return $this->getResult($sql, array($this, "parseMitgliedBeitrag"))->fetchRow();
+	}
+
+	/**
 	 * MitgliedDokument
 	 **/
 	public function addMitgliedDokument($mitgliedid, $dokumentid) {
@@ -278,6 +382,12 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		if ($matcher instanceof RevisionTextFieldMitgliederMatcher) {
 			return "`r`.`revisionid` IN (SELECT `revisionid` FROM `mitgliederrevisiontextfields` WHERE `textfieldid` = " . intval($matcher->getTextFieldID()) . " AND `value` = '" . $this->escape($matcher->getValue()) . "')";
+		}
+		if ($matcher instanceof BeitragMissingBelowMitgliederMatcher) {
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` HAVING SUM(`hoehe` - `bezahlt`) <= " . floatval($matcher->getBeitragMark()) . ")";
+		}
+		if ($matcher instanceof BeitragMissingAboveMitgliederMatcher) {
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` HAVING SUM(`hoehe` - `bezahlt`) > " . floatval($matcher->getBeitragMark()) . ")";
 		}
 		if ($matcher instanceof SearchMitgliederMatcher) {
 			$fields = array("`m`.`mitgliedid`", "`m`.`globalid`", "`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`n`.`anrede`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`adresszusatz`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`k`.`email`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
@@ -541,11 +651,14 @@ abstract class SQLStorage extends AbstractStorage {
 		$sql = "DELETE FROM `mitgliedertextfields` WHERE `textfieldid` = " . intval($textfieldid);
 		return $this->query($sql);
 	}
+
 	public function parseMitgliedRevisionTextField($row) {
-		return $this->parseRow($row, null, "MitgliedRevisionTextField");
+		$o = $this->parseRow($row, null, array("rtx" => "MitgliedRevisionTextField", "tx" => "MitgliedTextField"));
+		$o["rtx"]->setTextField($o["tx"]);
+		return $o["rtx"];
 	}
 	public function getMitgliederRevisionTextFieldResult($revisionid) {
-		$sql = "SELECT `textfieldid`, `revisionid`, `value` FROM `mitgliederrevisiontextfields` LEFT JOIN `mitgliedertextfields` USING (`textfieldid`) WHERE `revisionid` = " . intval($revisionid);
+		$sql = "SELECT `textfieldid` AS `rtx_textfieldid`, `revisionid` as `rtx_revisionid`, `value` as `rtx_value`, `textfieldid` as `tx_textfieldid`, `label` as `tx_label` FROM `mitgliederrevisiontextfields` LEFT JOIN `mitgliedertextfields` USING (`textfieldid`) WHERE `revisionid` = " . intval($revisionid);
 		return $this->getResult($sql, array($this, "parseMitgliedRevisionTextField"));
 	}
 	public function setMitgliederRevisionTextFieldList($revisionid, $textfieldids, $textfieldvalues) {
