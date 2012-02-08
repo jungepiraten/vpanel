@@ -2,6 +2,7 @@
 <p class="pagetitle">{"Beitrag setzen"|__}</p>
 <form action="{"mitglieder_setbeitrag.start"|___}" method="post">
  <fieldset>
+  <input type="hidden" name="redirect" value="{if isset($smarty.post.redirect)}{$smarty.post.redirect|stripslashes|escape:html}{else}{$smarty.server.HTTP_REFERER|escape:html}{/if}" />
   <table>
   <tr>
    <th>{"Filter:"|__}</th>

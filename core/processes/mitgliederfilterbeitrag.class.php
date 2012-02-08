@@ -68,7 +68,7 @@ class MitgliederFilterBeitragProcess extends Process {
 		$stepwidth = max(1, ceil($max / 100));
 
 		while ($mitglied = $result->fetchRow()) {
-			if ($mitglied->getBeitrag($this->getBeitragID()) != null) {
+			if ($mitglied->getBeitrag($this->getBeitragID()) == null) {
 				$mitglied->setBeitrag($this->getBeitrag(), $this->getBeitragHoehe($mitglied), 0);
 			}
 			
