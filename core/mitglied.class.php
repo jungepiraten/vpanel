@@ -86,7 +86,11 @@ class Mitglied extends GlobalClass {
 		}
 		return $this->latestRevision;
 	}
-	
+
+	public function setLatestRevision($revision) {
+		$this->latestRevision = $revision;
+	}
+
 	public function getRevisionIDs() {
 		return array_map(create_function('$a', 'return $a->getRevisionID();'), $this->getRevisionList());
 	}
@@ -104,6 +108,9 @@ class Mitglied extends GlobalClass {
 
 	public function getBeitrag($beitragid) {
 		$this->getBeitragList();
+		if (!isset($this->beitraglist[$beitragid])) {
+			return null;
+		}
 		return $this->beitraglist[$beitragid];
 	}
 

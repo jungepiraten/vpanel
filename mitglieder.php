@@ -17,6 +17,7 @@ require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfiltersendmail.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterexport.class.php");
+require_once(VPANEL_PROCESSES . "/mitgliederfilterbeitrag.class.php");
 
 $predefinedfields = array(
 	array("label" => "Bezeichnung",		"template" => "{BEZEICHNUNG}"),
@@ -354,6 +355,23 @@ case "export.export":
 	$process->setFinishedPage($session->getLink("tempfile_get", $tempfile->getTempFileID()));
 	$process->save();
 
+	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
+	exit;
+case "setbeitrag.selectbeitrag":
+	$filters = $config->getMitgliederFilterList();
+	$beitraglist = $session->getStorage()->getBeitragList();
+
+	$ui->viewMitgliederSetBeitragSelect($filters, $beitraglist);
+	exit;
+case "setbeitrag.start":
+	$filter = $config->getMitgliederFilter($session->getVariable("filterid"));
+	$beitrag = $session->getStorage()->getBeitrag($session->getIntVariable("beitragid"));
+
+	$process = new MitgliederFilterBeitragProcess($session->getStorage());
+	$process->setFilter($filter);
+	$process->setBeitrag($beitrag);
+	$process->setFinishedPage($ui->getRedirectURL());
+	$process->save();
 	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
 	exit;
 default:

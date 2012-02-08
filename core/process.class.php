@@ -3,6 +3,7 @@
 require_once(VPANEL_CORE . "/storageobject.class.php");
 require_once(VPANEL_CORE . "/processes/mitgliederfiltersendmail.class.php");
 require_once(VPANEL_CORE . "/processes/mitgliederfilterexport.class.php");
+require_once(VPANEL_CORE . "/processes/mitgliederfilterbeitrag.class.php");
 
 abstract class Process extends StorageClass {
 	private $processid;

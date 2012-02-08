@@ -573,6 +573,12 @@ class Template {
 		$this->smarty->display("mitgliederexportform.html.tpl");
 	}
 
+	public function viewMitgliederSetBeitragSelect($filters, $beitraglist) {
+		$this->smarty->assign("filters", $this->parseMitgliederFilters($filters));
+		$this->smarty->assign("beitraglist", $this->parseBeitragList($beitraglist));
+		$this->smarty->display("mitgliedersetbeitragselect.html.tpl");
+	}
+
 	public function viewStatistik($mitgliedercount, $mitgliedschaften, $states) {
 		$countPerMitgliedschaft = array();
 		foreach ($mitgliedschaften as $mitgliedschaft) {
@@ -659,10 +665,14 @@ class Template {
 		$this->smarty->display("filepdfpreview.html.tpl");
 	}
 
+	public function getRedirectURL() {
+		return isset($_REQUEST["redirect"]) ? $_REQUEST["redirect"] : $_SERVER["HTTP_REFERER"];
+	}
+
 	public function redirect($url = null) {
 		if ($url === null) {
 			// TODO $session->getVariable nutzen
-			$url = isset($_REQUEST["redirect"]) ? $_REQUEST["redirect"] : $_SERVER["HTTP_REFERER"];
+			$url = $this->getRedirectURL();
 		}
 		header('Location: ' . $url);
 		echo 'Sie werden weitergeleitet: <a href="'.$url.'">'.$url.'</a>';
