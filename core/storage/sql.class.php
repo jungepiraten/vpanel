@@ -86,6 +86,24 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parsePermission"))->fetchRow();
 	}
 
+	public function getRolePermissionResult($roleid) {
+		$sql = "SELECT `permissions`.`permissionid` AS 'permissionid', `permissions`.`label`, `permissions`.`description` AS 'description' FROM `rolepermissions` LEFT JOIN `permissions` USING (`permissionid`) WHERE `rolepermissions`.`roleid` = '" . $this->escape($roleid) . "'";
+		return $this->getResult($sql, array($this, "parsePermission"));
+	}
+	public function setRolePermissionList($roleid, $permissionids) {
+		$sql = "DELETE FROM `rolepermissions` WHERE `roleid` = " . intval($roleid);
+		$this->query($sql);
+		if (count($permissionids) > 0) {
+			$permissionssql = array();
+			foreach ($permissionids as $permissionid) {
+				$permissionssql[] = "(" . intval($roleid) . ", " . intval($permissionid) . ")";
+			}
+			$sql = "INSERT INTO `rolepermissions` (`roleid`, `permissionid`) VALUES " . implode(",", $permissionssql);
+			$this->query($sql);
+		}
+		return true;
+	}
+
 	/**
 	 * Benutzer
 	 */
@@ -123,19 +141,19 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->query($sql);
 	}
 
-	public function getUserRoleResult($userid) {
-		$sql = "SELECT `roleid`, `label`, `description` FROM `roles` LEFT JOIN `userroles` USING (`roleid`) WHERE `userid` = " . intval($userid);
-		return $this->getResult($sql, array($this, "parseRole"));
+	public function getRoleUserResult($roleid) {
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
+		return $this->getResult($sql, array($this, "parseUser"));
 	}
-	public function setUserRoleList($userid, $roleids) {
-		$sql = "DELETE FROM `userroles` WHERE `userid` = " . intval($userid);
+	public function setRoleUserList($roleid, $userids) {
+		$sql = "DELETE FROM `userroles` WHERE `roleid` = " . intval($roleid);
 		$this->query($sql);
-		if (count($roleids) > 0) {
-			$rolesql = array();
-			foreach ($roleids as $roleid) {
-				$rolesql[] = "(" . intval($userid) . ", " . intval($roleid) . ")";
+		if (count($userids) > 0) {
+			$userssql = array();
+			foreach ($userids as $userid) {
+				$userssql[] = "(" . intval($roleid) . ", " . intval($userid) . ")";
 			}
-			$sql = "INSERT INTO `userroles` (`userid`, `roleid`) VALUES " . implode(",", $rolesql);
+			$sql = "INSERT INTO `userroles` (`roleid`, `userid`) VALUES " . implode(",", $userssql);
 			$this->query($sql);
 		}
 		return true;
@@ -175,37 +193,19 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->query($sql);
 	}
 
-	public function getRolePermissionResult($roleid) {
-		$sql = "SELECT `permissions`.`permissionid` AS 'permissionid', `permissions`.`label`, `permissions`.`description` AS 'description' FROM `rolepermissions` LEFT JOIN `permissions` USING (`permissionid`) WHERE `rolepermissions`.`roleid` = '" . $this->escape($roleid) . "'";
-		return $this->getResult($sql, array($this, "parsePermission"));
+	public function getUserRoleResult($userid) {
+		$sql = "SELECT `roleid`, `label`, `description` FROM `roles` LEFT JOIN `userroles` USING (`roleid`) WHERE `userid` = " . intval($userid);
+		return $this->getResult($sql, array($this, "parseRole"));
 	}
-	public function setRolePermissionList($roleid, $permissionids) {
-		$sql = "DELETE FROM `rolepermissions` WHERE `roleid` = " . intval($roleid);
+	public function setUserRoleList($userid, $roleids) {
+		$sql = "DELETE FROM `userroles` WHERE `userid` = " . intval($userid);
 		$this->query($sql);
-		if (count($permissionids) > 0) {
-			$permissionssql = array();
-			foreach ($permissionids as $permissionid) {
-				$permissionssql[] = "(" . intval($roleid) . ", " . intval($permissionid) . ")";
+		if (count($roleids) > 0) {
+			$rolesql = array();
+			foreach ($roleids as $roleid) {
+				$rolesql[] = "(" . intval($userid) . ", " . intval($roleid) . ")";
 			}
-			$sql = "INSERT INTO `rolepermissions` (`roleid`, `permissionid`) VALUES " . implode(",", $permissionssql);
-			$this->query($sql);
-		}
-		return true;
-	}
-
-	public function getRoleUserResult($roleid) {
-		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
-		return $this->getResult($sql, array($this, "parseUser"));
-	}
-	public function setRoleUserList($roleid, $userids) {
-		$sql = "DELETE FROM `userroles` WHERE `roleid` = " . intval($roleid);
-		$this->query($sql);
-		if (count($userids) > 0) {
-			$userssql = array();
-			foreach ($userids as $userid) {
-				$userssql[] = "(" . intval($roleid) . ", " . intval($userid) . ")";
-			}
-			$sql = "INSERT INTO `userroles` (`roleid`, `userid`) VALUES " . implode(",", $userssql);
+			$sql = "INSERT INTO `userroles` (`userid`, `roleid`) VALUES " . implode(",", $rolesql);
 			$this->query($sql);
 		}
 		return true;
@@ -265,7 +265,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $beitrag;
 	}
 	public function delBeitrag($beitragid) {
-		$sql = "DELETE FROM `beitrag` WHERE `beitragid` = " . intval($beitragid);
+		$sql = "DELETE FROM `beitraege` WHERE `beitragid` = " . intval($beitragid);
 		return $this->query($sql);
 	}
 
@@ -281,8 +281,21 @@ abstract class SQLStorage extends AbstractStorage {
 		$sql = "SELECT `mb`.`mitgliedid` AS `mb_mitgliedid`, `mb`.`beitragid` AS `mb_beitragid`, `mb`.`hoehe` AS `mb_hoehe`, `mb`.`bezahlt` AS `mb_bezahlt`, `b`.`beitragid` as `b_beitragid`, `b`.`label` AS `b_label`, `b`.`hoehe` AS `b_hoehe` FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`mitgliedid` = " . intval($mitgliedid);
 		return $this->getResult($sql, array($this, "parseMitgliedBeitrag"));
 	}
-	public function getMitgliederBeitragByBeitragResult($beitragid) {
+	public function getMitgliederBeitragByBeitragCount($beitragid) {
+		$sql = "SELECT COUNT(`mb`.`beitragid`) FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`beitragid` = " . intval($beitragid);
+		return reset($this->getResult($sql)->fetchRow());
+	}
+	public function getMitgliederBeitragByBeitragResult($beitragid, $limit = null, $offset = null) {
 		$sql = "SELECT `mb`.`mitgliedid` AS `mb_mitgliedid`, `mb`.`beitragid` AS `mb_beitragid`, `mb`.`hoehe` AS `mb_hoehe`, `mb`.`bezahlt` AS `mb_bezahlt`, `b`.`beitragid` as `b_beitragid`, `b`.`label` AS `b_label`, `b`.`hoehe` AS `b_hoehe` FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`beitragid` = " . intval($beitragid);
+		if ($limit !== null or $offset !== null) {
+			$sql .= " LIMIT ";
+			if ($offset !== null) {
+				$sql .= $offset . ",";
+			}
+			if ($limit !== null) {
+				$sql .= $limit;
+			}
+		}
 		return $this->getResult($sql, array($this, "parseMitgliedBeitrag"));
 	}
 	public function setMitgliederBeitragByMitgliedList($mitgliedid, $beitragids, $hoehelist, $bezahltlist) {

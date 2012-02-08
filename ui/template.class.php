@@ -98,7 +98,7 @@ class Template {
 		$row["headers"] = array();
 		foreach ($template->getHeaders() as $header) {
 			$row["headers"][$header->getField()] = $header->getValue();
-		}
+	}
 		$row["attachments"] = $this->parseFiles($template->getAttachments());
 		return $row;
 	}
@@ -119,18 +119,20 @@ class Template {
 		return array_map(array($this, 'parseBeitrag'), $rows);
 	}
 
-	protected function parseMitgliedBeitrag($mitgliedbeitrag) {
+	protected function parseMitgliedBeitrag($mitgliedbeitrag, &$mitglied = null) {
 		$row = array();
-		// Avoid endless recursion
-		// $row["mitglied"] = $this->parseMitglied($mitgliedbeitrag->getMitglied());
+		if ($mitglied == null) {
+			$mitglied = $this->parseMitglied($mitgliedbeitrag->getMitglied());
+		}
+		$row["mitglied"] = $mitglied;
 		$row["beitrag"] = $this->parseBeitrag($mitgliedbeitrag->getBeitrag());
 		$row["hoehe"] = $mitgliedbeitrag->getHoehe();
 		$row["bezahlt"] = $mitgliedbeitrag->getBezahlt();
 		return $row;
 	}
 
-	protected function parseMitgliedBeitragList($rows) {
-		return array_map(array($this, 'parseMitgliedBeitrag'), $rows);
+	protected function parseMitgliedBeitragList($rows, &$mitglied = null) {
+		return array_map(array($this, 'parseMitgliedBeitrag'), $rows, count($rows) > 0 ? array_fill(0, count($rows), $mitglied) : array());
 	}
 
 	protected function parseMitgliederFilter($filter) {
@@ -152,7 +154,7 @@ class Template {
 		if ($mitglied->isAusgetreten()) {
 			$row["austritt"] = $mitglied->getAustrittsdatum();
 		}
-		$row["beitraege"] = $this->parseMitgliedBeitragList($mitglied->getBeitragList());
+		$row["beitraege"] = $this->parseMitgliedBeitragList($mitglied->getBeitragList(), $row);
 		$row["beitraege_hoehe"] = 0;
 		$row["beitraege_bezahlt"] = 0;
 		foreach ($mitglied->getBeitragList() as $beitrag) {
@@ -460,6 +462,23 @@ class Template {
 
 	public function viewRoleCreate() {
 		$this->smarty->display("rolecreate.html.tpl");
+	}
+
+	public function viewBeitragList($beitraege) {
+		$this->smarty->assign("beitraege", $this->parseBeitragList($beitraege));
+		$this->smarty->display("beitraglist.html.tpl");
+	}
+
+	public function viewBeitragCreate() {
+		$this->smarty->display("beitragcreate.html.tpl");
+	}
+
+	public function viewBeitragDetails($beitrag, $mitgliederbeitraglist, $page, $pagecount) {
+		$this->smarty->assign("beitrag", $this->parseBeitrag($beitrag));
+		$this->smarty->assign("mitgliederbeitraglist", $this->parseMitgliedBeitragList($mitgliederbeitraglist));
+		$this->smarty->assign("mitgliederbeitraglist_page", $page);
+		$this->smarty->assign("mitgliederbeitraglist_pagecount", $pagecount);
+		$this->smarty->display("beitragdetails.html.tpl");
 	}
 
 	public function viewMailTemplateList($mailtemplates) {

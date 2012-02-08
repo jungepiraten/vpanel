@@ -135,7 +135,10 @@ class Mitglied extends GlobalClass {
 			$this->getAustrittsdatum() ));
 		// TODO revisions speichern ?
 
-		if ($this->beitraglist != null) {
+		if ($this->beitraglist !== null) {
+			$beitragids = array();
+			$hoehelist = array();
+			$bezahltlist = array();
 			foreach ($this->getBeitragList() as $mitgliedbeitrag) {
 				$beitragids[] = $mitgliedbeitrag->getBeitragID();
 				$hoehelist[] = $mitgliedbeitrag->getHoehe();

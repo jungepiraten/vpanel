@@ -11,12 +11,14 @@ if (!$session->isAllowed("roles_show")) {
 	exit;
 }
 
+require_once(VPANEL_CORE . "/role.class.php");
+
 function parseRoleFormular($session, &$role = null) {
 	$label = $session->getVariable("label");
 	$description = $session->getVariable("description");
 
 	if ($role == null) {
-		
+		$role = new Role($session->getStorage());
 	}
 	$role->setLabel($label);
 	$role->setDescription($description);

@@ -177,7 +177,7 @@ case "beitraege":
 case "beitragdelete":
 	$mitglied = $session->getStorage()->getMitglied($session->getIntVariable("mitgliedid"));
 	$beitrag = $session->getStorage()->getBeitrag($session->getIntVariable("beitragid"));
-	
+
 	$mitglied->delBeitrag($beitrag->getBeitragID());
 	$mitglied->save();
 	

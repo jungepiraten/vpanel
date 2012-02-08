@@ -63,7 +63,7 @@ function changeBeitragNeuHoehe(beitragID) {
 </tr>
 {foreach from=$mitglied.beitraege item=beitrag}
 <tr>
- <th>{$beitrag.beitrag.label|escape:html}</th>
+ <th><a href="{"beitraege_details"|___:$beitrag.beitrag.beitragid}">{$beitrag.beitrag.label|escape:html}</a></th>
  <td><input type="text" size="5" name="beitraege_hoehe[{$beitrag.beitrag.beitragid}]" value="{$beitrag.hoehe|string_format:"%.2f"}" /></td>
  <td><input type="text" size="5" name="beitraege_bezahlt[{$beitrag.beitrag.beitragid}]" value="{$beitrag.bezahlt|string_format:"%.2f"}" /></td>
  <td>{$beitrag.hoehe-$beitrag.bezahlt|string_format:"%.2f"}</td>

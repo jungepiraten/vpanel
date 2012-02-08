@@ -42,12 +42,12 @@ interface Storage {
 	public function getMitgliederBeitragByMitgliedList($mitgliedid);
 	public function setMitgliederBeitragByMitgliedList($mitgliedid, $beitragid, $hoehelist, $bezahltlist);
 	public function delMitgliederBeitragByMitglied($mitgliedid);
-	public function getMitgliederBeitragByBeitragResult($beitragid);
-	public function getMitgliederBeitragByBeitragList($beitragid);
+	public function getMitgliederBeitragByBeitragCount($beitragid);
+	public function getMitgliederBeitragByBeitragResult($beitragid, $pagesize = null, $offset = null);
+	public function getMitgliederBeitragByBeitragList($beitragid, $pagesize = null, $offset = null);
 	public function setMitgliederBeitragByBeitragList($beitragid, $mitgliedids, $hoehelist, $bezahltlist);
 	public function delMitgliederBeitragByBeitrag($beitragid);
 	public function getMitgliederBeitrag($mitgliedid, $beitragid);
-
 	public function addMitgliedDokument($mitgliedid, $dokumentid);
 	public function delMitgliedDokument($mitgliedid, $dokumentid);
 
@@ -228,8 +228,8 @@ abstract class AbstractStorage implements Storage {
 		return $this->getMitgliederBeitragByMitgliedResult($mitgliedid)->fetchAll();
 	}
 
-	public function getMitgliederBeitragByBeitragList($beitragid) {
-		return $this->getMitgliederBeitragByBeitragResult($beitragid)->fetchAll();
+	public function getMitgliederBeitragByBeitragList($beitragid, $pagesize = null, $offset = null) {
+		return $this->getMitgliederBeitragByBeitragResult($beitragid, $pagesize, $offset)->fetchAll();
 	}
 
 	public function getMitgliederList($filter = null, $limit = null, $offset = null) {

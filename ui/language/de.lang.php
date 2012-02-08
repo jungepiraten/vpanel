@@ -37,5 +37,9 @@ $lang['statistik_show']		= 'Mitgliederstatistik anzeigen';
 $lang['dokumente_show']		= 'Dokumente anzeigen';
 $lang['dokumente_create']	= 'Dokumente anlegen';
 $lang['dokumente_modify']	= 'Dokumente bearbeiten';
+$lang['beitraege_show']		= 'Beiträge anzeigen';
+$lang['beitraege_create']	= 'Beiträge anlegen';
+$lang['beitraege_modify']	= 'Beiträge bearbeiten';
+$lang['beitraege_delete']	= 'Beiträge löschen';
 
 ?>

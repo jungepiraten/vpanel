@@ -7,11 +7,7 @@
 {if $showmitglieddokumentdel and isset($dokument)}
 <a style="float:right; margin-top:7px;margin-right:7px;"href="{"mitglieddokument_delete"|___:$mitglied.mitgliedid:$dokument.dokumentid}" class="delimg" title="{"Zuordnung entfernen"|__}">&nbsp;</a>
 {/if}
-<div style="float:left; margin-left:10px;"><a href="{"mitglieder_details"|___:$mitglied.mitgliedid}">
-{if isset($mitglied.latest.natperson)}{$mitglied.latest.natperson.name|escape:html}, {$mitglied.latest.natperson.vorname|escape:html}{/if}
-{if isset($mitglied.latest.jurperson)}{$mitglied.latest.jurperson.label|escape:html}{/if}
-</a><br>
-<span class="description">{$mitglied.latest.kontakt.strasse} {$mitglied.latest.kontakt.hausnummer}, {$mitglied.latest.kontakt.ort.plz} {$mitglied.latest.kontakt.ort.label}</span></div>
+{include file=mitgliederlist.item.tpl mitglied=$mitglied}
 <div style="clear:both;"></div>
 </li>
 {/foreach}

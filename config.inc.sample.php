@@ -38,6 +38,7 @@ $config->registerPage("roles_adduser", "user.php?mode=addrole&roleid=%d");
 $config->registerPage("roles_deluser", "user.php?mode=delrole&roleid=%d&userid=%d");
 
 $config->registerPage("dokumente", "dokumente.php");
+$config->registerPage("dokumente_page", "dokumente.php?kategorieid=%d&statusid=%d&page=%d");
 $config->registerPage("dokumente_json", "json/dokumente.php");
 $config->registerPage("dokumente_create", "dokumente.php?mode=create");
 $config->registerPage("dokumente_create_kategoriestatus", "dokumente.php?mode=create&kategorieid=%s&statusid=%s");
@@ -67,6 +68,12 @@ $config->registerPage("mitglieder_sendmail.send", "mitglieder.php?mode=sendmail.
 $config->registerPage("mitglieder_sendmail.done", "mitglieder.php?mode=sendmail.done&processid=%d");
 $config->registerPage("mitglieder_export.options", "mitglieder.php?mode=export.options&filterid=%s");
 $config->registerPage("mitglieder_export.export", "mitglieder.php?mode=export.export");
+
+$config->registerPage("beitraege", "beitraege.php");
+$config->registerPage("beitraege_create", "beitraege.php?mode=create");
+$config->registerPage("beitraege_details", "beitraege.php?mode=details&beitragid=%d");
+$config->registerPage("beitraege_details_page", "beitraege.php?mode=details&beitragid=%d&page=%d");
+$config->registerPage("beitraege_del", "beitraege.php?mode=delete&beitragid=%d");
 
 $config->registerPage("mailtemplates", "mailtemplates.php");
 $config->registerPage("mailtemplates_create", "mailtemplates.php?mode=create");
