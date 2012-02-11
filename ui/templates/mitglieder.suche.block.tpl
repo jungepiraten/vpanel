@@ -17,6 +17,7 @@ function VPanel_DropdownMitgliederSuche() {
 	this.active = false;
 	this.ignoreKey = false;
 	this.interval = null;
+	this.query = null;
 	this.init();
 }
 
@@ -54,10 +55,12 @@ VPanel_DropdownMitgliederSuche.prototype = {
 		}
 	},
 	onBlur: function() {
+		this._cancel();
 		this._close();
 	},
 
 	onChange: function() {
+		this._cancel();
 		if(this.interval != null) {
 			window.clearTimeout(this.interval);
 		}
@@ -80,12 +83,21 @@ VPanel_DropdownMitgliederSuche.prototype = {
 		this.onChange();
 	},
 	search: function(query) {
-		$.post("{/literal}{"mitglieder_json"|___}{literal}",{
+		this.query = $.post("{/literal}{"mitglieder_json"|___}{literal}",{
 			q: query
 		}, this._open.createDelegate(this) ,'json');
+		this.inputq.addClass("loading");
 	},
-		
+	
+	_cancel: function() {
+		if (this.query != null) {
+			this.query.abort();
+			this.query = null;
+			this.inputq.removeClass("loading");
+		}
+	},
 	_renderData: function(data) {
+		this.inputq.removeClass("loading");
 		this.list.html("")
 		this.data = data;
 		for(i in data) {
@@ -123,6 +135,7 @@ VPanel_DropdownMitgliederSuche.prototype = {
 		}
 	},
 	_close: function() {
+		this._cancel();
 		this.overlay.hide();	
 	}
 }

@@ -408,14 +408,16 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof SearchMitgliederMatcher) {
 			$fields = array("`m`.`mitgliedid`", "`m`.`globalid`", "`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`n`.`anrede`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`adresszusatz`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`k`.`email`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
 			$wordclauses = array();
+			$escapedwords = array();
 			foreach ($matcher->getWords() as $word) {
+				$escapedwords[] = $this->escape($word);
 				$clauses = array();
 				foreach ($fields as $field) {
 					$clauses[] = $field . " LIKE '%" . $this->escape($word) . "%'";
 				}
 				$wordclauses[] = implode(" OR ", $clauses);
 			}
-			return "(" . implode(") AND (", $wordclauses) . ")";
+			return "(" . implode(") AND (", $wordclauses) . ") OR `m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliedernotizen` WHERE `kommentar` LIKE '%" . implode("%' OR `kommentar` LIKE '%", $escapedwords) . "%')";
 		}
 		throw new Exception("Not implemented: ".get_class($matcher));
 	}
@@ -1369,14 +1371,16 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		$fields = array("`identifier`", "`label`", "`content`");
 		$wordclauses = array();
+		$escapedwords = array();
 		foreach ($querys as $word) {
+			$escapedwords[] = $this->escape($word);
 			$clauses = array();
 			foreach ($fields as $field) {
 				$clauses[] = $field . " LIKE '%" . $this->escape($word) . "%'";
 			}
 			$wordclauses[] = implode(" OR ", $clauses);
 		}
-		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `fileid` FROM `dokument` WHERE (" . implode(") AND (", $wordclauses) . ")";
+		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `fileid` FROM `dokument` WHERE (" . implode(") AND (", $wordclauses) . ") OR `dokumentid` IN (SELECT `dokumentid` FROM `dokumentnotizen` WHERE `kommentar` LIKE '%" . implode("%' OR `kommentar` LIKE '%", $escapedwords) . "%')";
 		if ($limit !== null or $offset !== null) {
 			$sql .= " LIMIT ";
 			if ($offset !== null) {
