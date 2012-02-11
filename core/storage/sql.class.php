@@ -381,6 +381,9 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof NatPersonMitgliederMatcher) {
 			return "`r`.`natpersonid` IS NOT NULL";
 		}
+		if ($matcher instanceof NatPersonAgeMitgliederMatcher) {
+			return "`r`.`natpersonid` IS NOT NULL AND ADDDATE(`n`.`geburtsdatum`, INTERVAL " . intval($matcher->getAge()) . " YEAR) <= CURRENT_DATE()";
+		}
 		if ($matcher instanceof JurPersonMitgliederMatcher) {
 			return "`r`.`jurpersonid` IS NOT NULL";
 		}
@@ -472,7 +475,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
 				`n`.`vorname` AS `n_vorname`,
-				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
+				`n`.`geburtsdatum` AS `n_geburtsdatum`,
 				`n`.`nationalitaet` AS `n_nationalitaet`,
 				`j`.`jurpersonid` AS `j_jurpersonid`,
 				`j`.`label` AS `j_label`,
@@ -532,7 +535,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
 				`n`.`vorname` AS `n_vorname`,
-				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
+				`n`.`geburtsdatum` AS `n_geburtsdatum`,
 				`n`.`nationalitaet` AS `n_nationalitaet`,
 				`j`.`jurpersonid` AS `j_jurpersonid`,
 				`j`.`label` AS `j_label`,
@@ -759,7 +762,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
 				`n`.`vorname` AS `n_vorname`,
-				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
+				`n`.`geburtsdatum` AS `n_geburtsdatum`,
 				`n`.`nationalitaet` AS `n_nationalitaet`,
 				`j`.`jurpersonid` AS `j_jurpersonid`,
 				`j`.`label` AS `j_label`,
@@ -800,7 +803,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
 				`n`.`vorname` AS `n_vorname`,
-				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
+				`n`.`geburtsdatum` AS `n_geburtsdatum`,
 				`n`.`nationalitaet` AS `n_nationalitaet`,
 				`j`.`jurpersonid` AS `j_jurpersonid`,
 				`j`.`label` AS `j_label`,
@@ -842,7 +845,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
 				`n`.`vorname` AS `n_vorname`,
-				UNIX_TIMESTAMP(`n`.`geburtsdatum`) AS `n_geburtsdatum`,
+				`n`.`geburtsdatum` AS `n_geburtsdatum`,
 				`n`.`nationalitaet` AS `n_nationalitaet`,
 				`j`.`jurpersonid` AS `j_jurpersonid`,
 				`j`.`label` AS `j_label`,
@@ -1063,8 +1066,7 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($mitgliedschaftid == null) {
 			$sql = "INSERT INTO `mitgliedschaften` (`label`, `description`, `defaultbeitrag`, `defaultcreatemail`) VALUES ('" . $this->escape($label) . "', '" . $this->escape($description) . "', " . doubleval($defaultbeitrag) . ", " . intval($defaultcreatemail) . ")";
 		} else {
-			$sql = "UPDATE `mitgliedschaften` SET `label` = 
-'" . $this->escape($label) . "', `description` = '" . $this->escape($description) . "', `defaultbeitrag` = " . doubleval($defaultbeitrag) . ", `defaultcreatemail` = " . intval($defaultcreatemail) . " WHERE `mitgliedschaftid` = " . intval($mitgliedschaftid);
+			$sql = "UPDATE `mitgliedschaften` SET `label` = '" . $this->escape($label) . "', `description` = '" . $this->escape($description) . "', `defaultbeitrag` = " . doubleval($defaultbeitrag) . ", `defaultcreatemail` = " . intval($defaultcreatemail) . " WHERE `mitgliedschaftid` = " . intval($mitgliedschaftid);
 		}
 		$this->query($sql);
 		if ($mitgliedschaftid == null) {
@@ -1081,6 +1083,9 @@ abstract class SQLStorage extends AbstractStorage {
 	 * NatPerson
 	 **/
 	public function parseNatPerson($row) {
+		// MySQLs UNIX_TIMESTAMP returns 0 for all values before 1970-01-01, so do not use this here
+		list($gebdatum_y, $gebdatum_m, $gebdatum_d) = explode("-", $row["geburtsdatum"]);
+		$row["geburtsdatum"] = mktime(0, 0, 0, $gebdatum_m, $gebdatum_d, $gebdatum_y);
 		return $this->parseRow($row, null, "NatPerson");
 	}
 	public function getNatPerson($natpersonid) {
