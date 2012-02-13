@@ -1,11 +1,16 @@
 {include file="header.html.tpl" ansicht="Dokument anzeigen"}
 <p class="pagetitle">Dokument {$dokument.label}</p>
-<iframe src="{"dokumente_view"|___:$dokument.dokumentid}" width="650px" height="300px"></iframe>
-<div style="clear:both;">&nbsp;</div>
-{include file="dokumentform.block.tpl" dokument=$dokument dokumentkategorien=$dokumentkategorien dokumentstatuslist=$dokumentstatuslist}
 
-<div style="position:relative;">
-<div style="float:left; width:400px;">
+<div>
+<iframe style="float:left; width:50%;" src="{"dokumente_view"|___:$dokument.dokumentid}" height="300px"></iframe>
+
+<div style="float:right; width:45%;">
+{include file="dokumentform.block.tpl" dokument=$dokument dokumentkategorien=$dokumentkategorien dokumentstatuslist=$dokumentstatuslist}
+</div>
+
+<div style="clear:both;"></div>
+
+<div style="float:left; width:40%;">
 <div class="buttonbox">
  <a href="{"dokumente_mitglied"|___:$dokument.dokumentid}">Mitglied verlinken</a>
  <a href="{"dokumente_mitglied_create"|___:$dokument.dokumentid}">Mitglied anlegen</a>
@@ -19,7 +24,7 @@
 {/if}
 </div>
 
-<div style="float:left; margin-left:50px; width:400px;">
+<div style="float:right; width:55%;">
 {foreach from=$dokumentnotizen item=notiz}
 <div class="notiz">
  <span class="meta">{"Von %s"|__:$notiz.author.username}</span>
@@ -30,6 +35,6 @@
 {/foreach}
 </div>
 
-<div style="clear:left;">&nbsp;</div>
+<div style="clear:both;"></div>
 </div>
 {include file="footer.html.tpl"}

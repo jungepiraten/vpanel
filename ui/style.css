@@ -158,6 +158,8 @@ form.filter, form.filter fieldset {
 
 .buttonbox a {
     font-size:70%;
+    white-space:nowrap;
+    margin:2px;
     color:white;
     background-color:#404040;
     padding:4px;
@@ -331,6 +333,8 @@ select {
 
 .pages a, .pagingsep {
     background-color:#404040;
+    white-space:nowrap;
+    margin:2px;
     padding:4px;
     color:white;
     font-size:70%;
