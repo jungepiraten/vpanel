@@ -114,17 +114,21 @@ class MailTemplate extends StorageClass {
 	}
 	
 	public function generateMail(Mitglied $mitglied) {
+		global $config;
+		$mail = $config->createMail();
+		
 		$headers = array();
 		foreach ($this->getHeaders() as $header) {
-			$headers[$header->getField()] = $mitglied->replaceText($header->getValue());
+			$mail->setHeader($header->getField(), $mitglied->replaceText($header->getValue()));
 		}
 
 		$body = $this->getBody();
-		$body = $mitglied->replaceText($body);
+		$mail->setBody($mitglied->replaceText($body));
 
-		$attachments = $this->getAttachments();
+		foreach ($this->getAttachments() as $attachment) {
+			$mail->addAttachment($attachment);
+		}
 
-		$mail = new Mail($headers, $body, $attachments);
 		$mail->setRecipient($mitglied->getLatestRevision()->getKontakt()->getEMail());
 		
 		return $mail;

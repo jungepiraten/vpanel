@@ -77,6 +77,15 @@ class DefaultConfig {
 	public function getSendMailBackend() {
 		return $this->sendmailbackend;
 	}
+	protected function getFromMailAddress() {
+		return "vpanel@" . $this->getHostPart();
+	}
+	public function createMail() {
+		$mail = new Mail();
+		$mail->setHeader("From", $this->getFromMailAddress());
+		$mail->setHeader("X-VPanel", $this->getHostPart());
+		return $mail;
+	}
 }
 
 ?>

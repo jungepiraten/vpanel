@@ -66,6 +66,10 @@ class File extends StorageClass {
 			$this->getExportFilename(),
 			$this->getMimeType()));
 	}
+
+	public function getContent() {
+		return file_get_contents($this->getAbsoluteFilename());
+	}
 }
 
 ?>

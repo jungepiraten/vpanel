@@ -52,6 +52,10 @@ function parseDokumentFormular($session, &$dokument = null) {
 	}
 	$notiz->setKommentar($kommentar);
 	$notiz->save();
+
+	foreach ($session->getStorage()->getDokumentNotifyList($kategorieid, $statusid) as $notify) {
+		$notify->notify($dokument, $notiz);
+	}
 }
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {

@@ -160,6 +160,11 @@ interface Storage {
 	public function getDokument($dokumentid);
 	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatus, $identifier, $label, $content, $fileid);
 
+	public function getDokumentNotifyResult($dokumentkategorieid = null, $dokumentstatusid = null);
+	public function getDokumentNotifyList($dokumentkategorieid = null, $dokumentstatusid = null);
+	public function getDokumentNotify($dokumentnotifyid);
+	public function setDokumentNotify($dokumentnotifyid, $dokumentkategorieid, $dokumentstatusid, $mail);
+
 	public function getDokumentKategorieResult();
 	public function getDokumentKategorieList();
 	public function getDokumentKategorie($dokumentkategorieid);
@@ -314,6 +319,10 @@ abstract class AbstractStorage implements Storage {
 
 	public function getDokumentSearchList($query, $limit = null, $offset = null) {
 		return $this->getDokumentSearchResult($query, $limit = null, $offset = null)->fetchAll();
+	}
+
+	public function getDokumentNotifyList($dokumentkategorieid = null, $dokumentstatusid = null) {
+		return $this->getDokumentNotifyResult($dokumentkategorieid, $dokumentstatusid)->fetchAll();
 	}
 
 	public function getDokumentKategorieList() {

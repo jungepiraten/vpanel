@@ -19,6 +19,7 @@ require_once(VPANEL_CORE . "/mailtemplate.class.php");
 require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
 require_once(VPANEL_CORE . "/process.class.php");
 require_once(VPANEL_CORE . "/dokument.class.php");
+require_once(VPANEL_CORE . "/dokumentnotify.class.php");
 require_once(VPANEL_CORE . "/dokumentkategorie.class.php");
 require_once(VPANEL_CORE . "/dokumentstatus.class.php");
 require_once(VPANEL_CORE . "/dokumentnotiz.class.php");
@@ -1424,6 +1425,39 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 
 	/**
+	 * DokumentNotify
+	 **/
+	public function parseDokumentNotify($row) {
+		return $this->parseRow($row, null, "DokumentNotify");
+	}
+	public function getDokumentNotifyResult($dokumentkategorieid = null, $dokumentstatusid = null) {
+		$sql = "SELECT `dokumentnotifyid`, `dokumentkategorieid`, `dokumentstatusid`, `mail` FROM `dokumentnotifies` WHERE `dokumentkategorieid` IS NULL OR `dokumentstatusid` IS NULL";
+		if ($dokumentkategorieid != null) {
+			$sql .= " OR `dokumentkategorieid` = " . intval($dokumentkategorieid);
+		}
+		if ($dokumentstatusid != null) {
+			$sql .= " OR `dokumentstatusid` = " . intval($dokumentstatusid);
+		}
+		return $this->getResult($sql, array($this, "parseDokumentNotify"));
+	}
+	public function getDokumentNotify($dokumentnotifyid) {
+		$sql = "SELECT `dokumentnotifyid`, `dokumentkategorieid`, `dokumentstatusid`, `mail` FROM `dokumentnotifies` WHERE `dokumentnotifyid` = " . intval($dokumentnotifyid);
+		return $this->getResult($sql, array($this, "parseDokumentNotify"))->fetchRow();
+	}
+	public function setDokumentNotify($dokumentnotifyid, $dokumentkategorieid, $dokumentstatusid, $mail) {
+		if ($dokumentnotifyid == null) {
+			$sql = "INSERT INTO `dokumentnotifies` (`dokumentkategorieid`, `dokumentstatusid`, `mail`) VALUES (`dokumentkategorieid` = " . ($dokumentkategorieid == null ? "NULL" : intval($dokumentkategorieid)) . ", `dokumentstatusid` = " . ($dokumentstatusid == null ? "NULL" : intval($dokumentstatusid)) . ", " . ($mail == null ? "NULL" : "'" . $this->escape($mail) . "'") . ")";
+		} else {
+			$sql = "UPDATE `dokumentnotifies` SET `dokumentkategorieid` = " . ($dokumentkategorieid == null ? "NULL" : intval($dokumentkategorieid)) . ", `dokumentstatusid` = " . ($dokumentstatusid == null ? "NULL" : intval($dokumentstatusid)) . ", `mail` = " . ($mail == null ? "NULL" : "'" . $this->escape($mail) . "'") . " WHERE `dokumentnotifyid` = " . intval($dokumentnotifyid);
+		}
+		$this->query($sql);
+		if ($dokumentnotifyid == null) {
+			$dokumentnotifyid = $this->getInsertID();
+		}
+		return $dokumentnotifyid;
+	}
+
+	/**
 	 * DokumentKategorie
 	 **/
 	public function parseDokumentKategorie($row) {
@@ -1629,8 +1663,7 @@ class SQLStorageResult extends AbstractStorageResult {
 		$this->callback = $callback;
 	}
 
-	public function fetchRow() {
-		$row = $this->stor->fetchRow($this->rslt);
+	public function parseRow($row) {
 		if ($row == null) {
 			return null;
 		}
@@ -1640,13 +1673,21 @@ class SQLStorageResult extends AbstractStorageResult {
 		return $row;
 	}
 
+	public function fetchRaw() {
+		return $this->stor->fetchRow($this->rslt);
+	}
+
+	public function fetchRow() {
+		return $this->parseRow($this->fetchRaw());
+	}
+
 	public function fetchAll($keyfield = null) {
 		$rows = array();
-		while ($row = $this->fetchRow()) {
+		while ($row = $this->fetchRaw()) {
 			if ($keyfield != null) {
-				$rows[$row[$keyfield]] = $row;
+				$rows[$row[$keyfield]] = $this->parseRow($row);
 			} else {
-				$rows[] = $row;
+				$rows[] = $this->parseRow($row);
 			}
 		}
 		return $rows;

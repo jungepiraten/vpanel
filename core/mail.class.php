@@ -9,7 +9,7 @@ class Mail {
 	private $mailfrom;
 	private $fromlabel;
 
-	public function __construct($headers, $body, $attachments) {
+	public function __construct($headers = array(), $body = "", $attachments = array()) {
 		$this->headers = $headers;
 		$this->body = $body;
 		$this->attachments = $attachments;
@@ -29,12 +29,24 @@ class Mail {
 		return $rcpt;
 	}
 
+	public function setHeader($field, $value) {
+		$this->headers[$field] = $value;
+	}
+
 	public function getHeaders() {
 		return $this->headers;
 	}
 
+	public function setBody($body) {
+		$this->body = $body;
+	}
+
 	public function getBody() {
 		return $this->body;
+	}
+
+	public function addAttachment($attachment) {
+		$this->attachments[] = $attachment;
 	}
 
 	public function getAttachments() {
@@ -87,7 +99,7 @@ class Mail {
 			foreach ($this->getAttachments() as $attachment) {
 				$raw .= "--" . $this->getBoundary() . "\n";
 				$raw .= "Content-Type: " . $attachment->getMimeType() . "\n";
-				$raw .= "Content-Disposition: inline; filename=\"" . addslashes(mb_encode_mimeheader($attachment->getFilename(), $charset)) . "\"\n";
+				$raw .= "Content-Disposition: inline; filename=\"" . addslashes(mb_encode_mimeheader($attachment->getExportFilename(), $charset)) . "\"\n";
 				$raw .= "Content-Transfer-Encoding: base64" . "\n";
 				$raw .= "\n";
 				$raw .= chunk_split(base64_encode($attachment->getContent()), 78, "\n");
