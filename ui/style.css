@@ -288,6 +288,7 @@ form.filter, form.filter fieldset {
 
 input[type="submit"]  {
     border:none;
+    margin:2px;
     background-color:#404040;
     color:white;
     padding:4px;
@@ -313,6 +314,7 @@ input[type="text"]:hover, input[type="password"]:hover, textarea:hover{
 
 select {
     border:none;
+    margin:2px;
     background-color:#404040;
     color:white;
     padding:4px;

@@ -103,6 +103,8 @@ Hallo,
 
 bitte beachte das Dokument {$dokument->getLabel()}:
 
+{$config->getLink("dokumente_details", $dokument->getDokumentID())}
+
 Kategorie: {$dokument->getDokumentKategorie()->getLabel()}
 Status:    {$dokument->getDokumentStatus()->getLabel()}
 
@@ -113,6 +115,7 @@ Viele Grüße,
 VPanel
 EOT
 );
+			$mail->addAttachment($dokument->getFile());
 			$mail->setRecipient($this->getMail());
 			$config->getSendMailBackend()->send($mail);
 		}
