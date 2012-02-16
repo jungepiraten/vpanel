@@ -6,7 +6,7 @@
  <fieldset>
   <select name="revisionid" onChange="this.form.submit()">
    {foreach from=$mitgliedrevisions item=rev}
-   <option value="{$rev.revisionid}" {if $rev.revisionid == $mitgliedrevision.revisionid}selected="selected"{/if}>Version vom {$rev.timestamp|date_format:"%d.%m.%Y"} um {$rev.timestamp|date_format:"%H:%M"} Uhr von {$rev.user.username}</option>
+   <option value="{$rev.revisionid}" {if $rev.revisionid == $mitgliedrevision.revisionid}selected="selected"{/if}>Version vom {$rev.timestamp|date_format:"%d.%m.%Y"} um {$rev.timestamp|date_format:"%H:%M"} Uhr{if isset($rev.user)} von {$rev.user.username}{/if}</option>
    {/foreach}
   </select>
  </fieldset>
@@ -19,7 +19,7 @@
 <div style="float:left; width:400px;">
 {foreach from=$mitgliednotizen item=notiz}
 <div class="notiz">
- <span class="meta">{"Von %s"|__:$notiz.author.username}</span>
+ <span class="meta">{if isset($notiz.author)}{"Von %s"|__:$notiz.author.username}{/if}</span>
  <div class="kommentar">{$notiz.kommentar}</div>
 </div>
 {/foreach}

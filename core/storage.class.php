@@ -158,7 +158,7 @@ interface Storage {
 	public function getDokumentSearchList($query, $limit = null, $offset = null);
 	public function getDokumentCount($dokumentkategorieid = null, $dokumentstatus = null);
 	public function getDokument($dokumentid);
-	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatus, $identifier, $label, $content, $fileid);
+	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatus, $identifier, $label, $content, $data, $fileid);
 
 	public function getDokumentNotifyResult($dokumentkategorieid = null, $dokumentstatusid = null);
 	public function getDokumentNotifyList($dokumentkategorieid = null, $dokumentstatusid = null);

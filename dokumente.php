@@ -31,6 +31,7 @@ function parseDokumentFormular($session, &$dokument = null) {
 		$dokument = new Dokument($session->getStorage());
 		$dokument->setFile($file);
 		$dokument->setIdentifier($idkey);
+		$dokument->setData(array());
 	} else {
 		$oldkategorieid = $dokument->getDokumentKategorieID();
 		$oldstatusid = $dokument->getDokumentStatusID();

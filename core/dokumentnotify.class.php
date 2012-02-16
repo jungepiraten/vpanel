@@ -103,7 +103,11 @@ Hallo,
 
 bitte beachte das Dokument {$dokument->getLabel()}:
 
+Dokument ansehen:
 {$config->getLink("dokumente_details", $dokument->getDokumentID())}
+
+Neues Mitglied erstellen:
+{$config->getLink("dokumente_mitglied_create", $dokument->getDokumentID())}
 
 Kategorie: {$dokument->getDokumentKategorie()->getLabel()}
 Status:    {$dokument->getDokumentStatus()->getLabel()}

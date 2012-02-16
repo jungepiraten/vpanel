@@ -49,7 +49,7 @@ $config->registerPage("dokumente_get", "file.php?mode=get&dokumentid=%d");
 $config->registerPage("dokumente_view", "file.php?mode=view&dokumentid=%d");
 
 $config->registerPage("mitglieddokument", "mitglieddokument.php");
-$config->registerPage("mitglieddokument_delete", "mitglieddokument.php?mode=delete&mitgliedid=%d&dokumentid=%d")
+$config->registerPage("mitglieddokument_delete", "mitglieddokument.php?mode=delete&mitgliedid=%d&dokumentid=%d");
 
 $config->registerPage("orte_json", "json/orte.php");
 

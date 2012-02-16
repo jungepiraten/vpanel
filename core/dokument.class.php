@@ -9,6 +9,7 @@ class Dokument extends StorageClass {
 	private $identifier;
 	private $label;
 	private $content;
+	private	$data;
 	private $fileid;
 
 	private $dokumentkategorie;
@@ -23,6 +24,7 @@ class Dokument extends StorageClass {
 		$dokument->setIdentifier($row["identifier"]);
 		$dokument->setLabel($row["label"]);
 		$dokument->setContent($row["content"]);
+		$dokument->setData(json_decode($row["data"]));
 		$dokument->setFileID($row["fileid"]);
 		return $dokument;
 	}
@@ -105,6 +107,14 @@ class Dokument extends StorageClass {
 		$this->content = $content;
 	}
 
+	public function getData() {
+		return $this->data;
+	}
+
+	public function setData($data) {
+		$this->data = $data;
+	}
+
 	public function getFileID() {
 		return $this->fileid;
 	}
@@ -139,6 +149,7 @@ class Dokument extends StorageClass {
 			$this->getIdentifier(),
 			$this->getLabel(),
 			$this->getContent(),
+			json_encode($this->getData()),
 			$this->getFileID() ));
 	}
 }

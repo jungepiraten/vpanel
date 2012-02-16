@@ -1344,7 +1344,7 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($dokumentstatusid instanceof DokumentStatus) {
 			$dokumentstatusid = $dokumentstatusid->getDokumentStatusID();
 		}
-		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `fileid` FROM `dokument` WHERE 1=1";
+		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE 1=1";
 		if ($dokumentkategorieid != null) {
 			$sql .= " AND `dokumentkategorieid` = " . intval($dokumentkategorieid);
 		}
@@ -1363,7 +1363,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parseDokument"));
 	}
 	public function getDokumentByMitgliedResult($mitgliedid) {
-		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `fileid` FROM `dokument` LEFT JOIN `mitglieddokument` USING (`dokumentid`) WHERE `mitgliedid` = " . intval($mitgliedid);
+		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` LEFT JOIN `mitglieddokument` USING (`dokumentid`) WHERE `mitgliedid` = " . intval($mitgliedid);
 		return $this->getResult($sql, array($this, "parseDokument"));
 	}
 	public function getDokumentSearchResult($querys, $limit = null, $offset = null) {
@@ -1381,7 +1381,7 @@ abstract class SQLStorage extends AbstractStorage {
 			}
 			$wordclauses[] = implode(" OR ", $clauses);
 		}
-		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `fileid` FROM `dokument` WHERE (" . implode(") AND (", $wordclauses) . ") OR `dokumentid` IN (SELECT `dokumentid` FROM `dokumentnotizen` WHERE `kommentar` LIKE '%" . implode("%' OR `kommentar` LIKE '%", $escapedwords) . "%')";
+		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE (" . implode(") AND (", $wordclauses) . ") OR `dokumentid` IN (SELECT `dokumentid` FROM `dokumentnotizen` WHERE `kommentar` LIKE '%" . implode("%' OR `kommentar` LIKE '%", $escapedwords) . "%')";
 		if ($limit !== null or $offset !== null) {
 			$sql .= " LIMIT ";
 			if ($offset !== null) {
@@ -1394,18 +1394,19 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parseDokument"));
 	}
 	public function getDokument($dokumentid) {
-		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `fileid` FROM `dokument` WHERE `dokumentid` = " . intval($dokumentid);
+		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE `dokumentid` = " . intval($dokumentid);
 		return $this->getResult($sql, array($this, "parseDokument"))->fetchRow();
 	}
-	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatusid, $identifier, $label, $content, $fileid) {
+	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatusid, $identifier, $label, $content, $data, $fileid) {
 		if ($dokumentid == null) {
 			$sql = "INSERT INTO `dokument`
-				(`dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `fileid`) VALUES
+				(`dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid`) VALUES
 				(" . intval($dokumentkategorieid) . ",
 				 " . intval($dokumentstatusid) . ",
 				 '" . $this->escape($identifier) . "',
 				 '" . $this->escape($label) . "',
 				 '" . $this->escape($content) . "',
+				 '" . $this->escape($data) . "',
 				 " . intval($fileid) . ")";
 		} else {
 			$sql = "UPDATE `dokument`
@@ -1414,6 +1415,7 @@ abstract class SQLStorage extends AbstractStorage {
 					`identifier` = '" . $this->escape($identifier) . "',
 					`label` = '" . $this->escape($label) . "',
 					`content` = '" . $this->escape($content) . "',
+					`data` = '" . $this->escape($data) . "',
 					`fileid` = " . intval($fileid) . "
 				WHERE `dokumentid` = " . intval($dokumentid);
 		}

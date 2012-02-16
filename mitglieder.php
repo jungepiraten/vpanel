@@ -229,14 +229,17 @@ case "details":
 	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields, $beitraege);
 	exit;
 case "create":
-	$mitgliedschaft = null;
-	if ($session->hasVariable("mitgliedschaftid")) {
-		$mitgliedschaft = $session->getStorage()->getMitgliedschaft($session->getVariable("mitgliedschaftid"));
-	}
+	$data = array();
 
 	$dokument = null;
 	if ($session->hasVariable("dokumentid")) {
 		$dokument = $session->getStorage()->getDokument($session->getVariable("dokumentid"));
+		$data = $dokument->getData();
+	}
+
+	$mitgliedschaft = null;
+	if ($session->hasVariable("mitgliedschaftid")) {
+		$mitgliedschaft = $session->getStorage()->getMitgliedschaft($session->getVariable("mitgliedschaftid"));
 	}
 
 	if ($session->getBoolVariable("save")) {
@@ -247,7 +250,11 @@ case "create":
 
 		parseMitgliederFormular($session, &$mitglied, $dokument);
 
-		$ui->redirect($session->getLink("mitglieder_details", $mitglied->getMitgliedID()));
+		if ($dokument != null) {
+			$ui->redirect($session->getLink("dokumente_details", $dokument->getDokumentID()));
+		} else {
+			$ui->redirect($session->getLink("mitglieder_details", $mitglied->getMitgliedID()));
+		}
 	}
 
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
@@ -255,7 +262,7 @@ case "create":
 	$mitgliedertextfields = $session->getStorage()->getMitgliedTextFieldList();
 	$states = $session->getStorage()->getStateList();
 
-	$ui->viewMitgliedCreate($mitgliedschaft, $dokument, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields);
+	$ui->viewMitgliedCreate($mitgliedschaft, $dokument, $data, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields);
 	exit;
 case "delete":
 	if (!$session->isAllowed("mitglieder_delete")) {

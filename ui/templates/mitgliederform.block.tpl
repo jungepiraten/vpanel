@@ -4,55 +4,56 @@
  <table>
      <tr>
         <th>{"Mitgliedsart:"|__}</th>
-        <td><select name="mitgliedschaftid" onChange="toggleMitgliedschaft()">{foreach from=$mitgliedschaften item=m}<option value="{$m.mitgliedschaftid}" {if isset($mitgliedrevision) and $m.mitgliedschaftid == $mitgliedrevision.mitgliedschaft.mitgliedschaftid or $m.mitgliedschaftid == $mitgliedschaft.mitgliedschaftid}selected="selected"{/if}>{$m.label|escape:html}</option>{/foreach}</select></td>
+        <td><select name="mitgliedschaftid" onChange="toggleMitgliedschaft()">{foreach from=$mitgliedschaften item=m}<option value="{$m.mitgliedschaftid}" {if isset($mitgliedrevision) and $m.mitgliedschaftid == $mitgliedrevision.mitgliedschaft.mitgliedschaftid or $m.mitgliedschaftid == $mitgliedschaft.mitgliedschaftid or $m.mitgliedschaftid == $data.mitgliedschaftid}selected="selected"{/if}>{$m.label|escape:html}</option>{/foreach}</select></td>
      </tr>
      <tr>
          <th>{"Typ:"|__}</th>
          <td>
-          <input type="radio" onChange="toggleJurNatPerson()" name="persontyp" value="nat" {if isset($mitgliedrevision.natperson)}checked="checked"{/if} /> {"Natürliche Person"|__}
-          <input type="radio" onChange="toggleJurNatPerson()" name="persontyp" value="jur" {if isset($mitgliedrevision.jurperson)}checked="checked"{/if} /> {"Juristische Person"|__}
+          <input type="radio" onChange="toggleJurNatPerson()" name="persontyp" value="nat" {if isset($mitgliedrevision.natperson) or $data.natperson}checked="checked"{/if} /> {"Natürliche Person"|__}
+          <input type="radio" onChange="toggleJurNatPerson()" name="persontyp" value="jur" {if isset($mitgliedrevision.jurperson) or $data.jurperson}checked="checked"{/if} /> {"Juristische Person"|__}
          </td>
      </tr>
      <tr id="nat_0">
          <th><label for="anrede">{"Anrede:"|__}</label></th>
-         <td><input class="anrede" type="text" name="anrede" size="10" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.anrede|escape:html}{/if}" /></td>
+         <td><input class="anrede" type="text" name="anrede" size="10" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.anrede|escape:html}{else}{$data.anrede|escape:html}{/if}" /></td>
      </tr>
      <tr id="nat_1">
          <th><label for="name">{"Name:"|__}</label></th>
-         <td><input class="vorname" type="text" name="vorname" size="20" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.vorname|escape:html}{/if}" /> <input class="name" type="text" name="name" size="20" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.name|escape:html}{/if}" /></td>
+         <td><input class="vorname" type="text" name="vorname" size="20" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.vorname|escape:html}{else}{$data.vorname|escape:html}{/if}" />
+             <input class="name" type="text" name="name" size="20" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.name|escape:html}{else}{$data.name|escape:html}{/if}" /></td>
      </tr>
      <tr id="nat_2">
          <th><label for="geburtsdatum">{"Geboren:"|__}</label></th>
-         <td><input class="geburtsdatum" type="text" name="geburtsdatum" size="20" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.geburtsdatum|date_format:"%d.%m.%Y"}{/if}" /></td>
+         <td><input class="geburtsdatum" type="text" name="geburtsdatum" size="20" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.geburtsdatum|date_format:"%d.%m.%Y"}{else}{$data.geburtsdatum}{/if}" /></td>
      </tr>
      <tr id="nat_3">
          <th><label for="nationalitaet">{"Nationalität:"|__}</label></th>
-         <td><input class="nationalitaet" type="text" name="nationalitaet" size="20" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.nationalitaet|escape:html}{/if}" /></td>
+         <td><input class="nationalitaet" type="text" name="nationalitaet" size="20" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.nationalitaet|escape:html}{else}{$data.nationalitaet|escape:html}{/if}" /></td>
      </tr>
      <tr id="jur_0">
          <th><label for="firma">{"Firma:"|__}</label></th>
-         <td><input class="firma" type="text" name="firma" size="40" value="{if isset($mitgliedrevision.jurperson)}{$mitgliedrevision.jurperson.label|escape:html}{/if}" /></td>
+         <td><input class="firma" type="text" name="firma" size="40" value="{if isset($mitgliedrevision.jurperson)}{$mitgliedrevision.jurperson.label|escape:html}{else}{$data.firma|escape:html}{/if}" /></td>
      </tr>
      <tr>
          <th><label for="adresszusatz">{"Adresszusatz:"|__}</label></th>
-         <td><input class="adresszusatz" type="text" name="adresszusatz" size="40" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.adresszusatz|escape:html}{/if}" /></td>
+         <td><input class="adresszusatz" type="text" name="adresszusatz" size="40" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.adresszusatz|escape:html}{else}{$data.adresszusatz|escape:html}{/if}" /></td>
      </tr>
      <tr>
          <th><label for="strasse">{"Adresse:"|__}</label></th>
-         <td><input class="strasse" type="text" name="strasse" size="37" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.strasse|escape:html}{/if}" /> <input class="hausnummer" type="text" name="hausnummer" size="3" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.hausnummer|escape:html}{/if}" /></td>
+         <td><input class="strasse" type="text" name="strasse" size="37" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.strasse|escape:html}{else}{$data.strasse|escape:html}{/if}" />
+             <input class="hausnummer" type="text" name="hausnummer" size="3" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.hausnummer|escape:html}{else}{$data.hausnummer|escape:html}{/if}" /></td>
      </tr>
      <tr>
       <th><label for="ortid">{"Ort:"|__}</label></th>
       <td>
        <input class="plz" type="text" name="plz" id="plz" size="5" autocomplete="off"
-        value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.plz|escape:html}{/if}" />
+        value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.plz|escape:html}{else}{$data.plz|escape:html}{/if}" />
        <input class="ort" type="text" name="ort" id="ort" size="35" autocomplete="off"
-        value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.label|escape:html}{/if}" />
+        value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.label|escape:html}{else}{$data.ort|escape:html}{/if}" />
        <select name="stateid" id="state">
         {foreach from=$states item=state}
          <option value="{$state.stateid|escape:html}" id="state{$state.stateid|escape:html}"
-          {if isset($mitgliedrevision.kontakt) and
-              $mitgliedrevision.kontakt.ort.state.stateid == $state.stateid}selected="selected"{/if}>
+          {if (isset($mitgliedrevision.kontakt) and $mitgliedrevision.kontakt.ort.state.stateid == $state.stateid) or $state.stateid == $data.stateid}selected="selected"{/if}>
           {$state.label|escape:html} ({$state.country.label})
          </option>
         {/foreach}
@@ -62,25 +63,27 @@
      </tr>
      <tr>
          <th><label for="telefon">{"Telefonnummer:"|__}</label></th>
-         <td><input class="telefon" type="text" name="telefon" size="30" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.telefon|escape:html}{/if}" /></td>
+         <td><input class="telefon" type="text" name="telefon" size="30" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.telefon|escape:html}{else}{$data.telefon|escape:html}{/if}" /></td>
      </tr>
      <tr>
          <th><label for="handy">{"Handynummer:"|__}</label></th>
-         <td><input class="handy" type="text" name="handy" size="30" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.handy|escape:html}{/if}" /></td>
+         <td><input class="handy" type="text" name="handy" size="30" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.handy|escape:html}{else}{$data.handy|escape:html}{/if}" /></td>
      </tr>
      <tr>
          <th><label for="email">{"EMail-Adresse:"|__}</label></th>
-         <td><input class="email" type="text" name="email" size="40" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.email|escape:html}{/if}" /></td>
+         <td><input class="email" type="text" name="email" size="40" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.email|escape:html}{else}{$data.email|escape:html}{/if}" /></td>
      </tr>
      <tr id="beitrag">
          <th><label for="beitrag">{"Beitrag:"|__}</label></th>
-         <td><input class="beitrag" type="text" name="beitrag" size="5" onChange="beitragEdited=true;" value="{if isset($mitgliedrevision)}{$mitgliedrevision.beitrag|string_format:"%.2f"|escape:html}{else}{$mitgliedschaft.defaultbeitrag|string_format:"%.2f"|escape:html}{/if}" /> EUR</td>
+         <td><input class="beitrag" type="text" name="beitrag" size="5" onChange="beitragEdited=true;" value="{if isset($mitgliedrevision)}{$mitgliedrevision.beitrag|string_format:"%.2f"|escape:html}
+                                                                                                              {elseif isset($data.beitrag)}{$data.beitrag|string_format:"%.2f"|escape:html}
+                                                                                                              {else}{$mitgliedschaft.defaultbeitrag|string_format:"%.2f"|escape:html}{/if}" /> EUR</td>
      </tr>
      {foreach from=$flags item=flag}
      {assign var=flagid value=$flag.flagid}
      <tr>
          <th><label for="flags[{$flag.flagid}]">{$flag.label|escape:html}</label></th>
-         <td><input type="checkbox" name="flags[{$flag.flagid}]" {if isset($mitgliedrevision.flags.$flagid)}checked="checked"{/if} /></td>
+         <td><input type="checkbox" name="flags[{$flag.flagid}]" {if isset($mitgliedrevision.flags.$flagid) or isset($data.flags.$flagid)}checked="checked"{/if} /></td>
      </tr>
      {/foreach}
      {foreach from=$textfields item=textfield}
@@ -88,7 +91,8 @@
      {assign var=revisiontextfield value=$mitgliedrevision.textfields.$textfieldid}
      <tr>
          <th><label for="textfields[{$textfield.textfieldid}]">{$textfield.label|escape:html}</label></th>
-         <td><input type="text" name="textfields[{$textfield.textfieldid}]" value="{if isset($mitgliedrevision.textfields.$textfieldid)}{$revisiontextfield.value|escape:html}{/if}" /></td>
+         <td><input type="text" name="textfields[{$textfield.textfieldid}]" value="{if isset($mitgliedrevision.textfields.$textfieldid)}{$revisiontextfield.value|escape:html}
+                                                                                   {elseif isset($data.textfields.$textfieldid)}{$data.textfields.$textfieldid}{/if}" /></td>
      </tr>
      {/foreach}
      <tr>

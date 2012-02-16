@@ -208,7 +208,9 @@ class Template {
 		$row = array();
 		$row["mitgliednotizid"] = $notiz->getMitgliedNotizID();
 		$row["mitgliedid"] = $notiz->getMitgliedID();
-		$row["author"] = $this->parseUser($notiz->getAuthor());
+		if ($notiz->getAuthor() != null) {
+			$row["author"] = $this->parseUser($notiz->getAuthor());
+		}
 		$row["timestamp"] = $notiz->getTimestamp();
 		$row["kommentar"] = $notiz->getKommentar();
 		return $row;
@@ -223,7 +225,9 @@ class Template {
 		$row["revisionid"] = $revision->getRevisionID();
 		$row["globalid"] = $revision->getGlobalID();
 		$row["timestamp"] = $revision->getTimestamp();
-		$row["user"] = $this->parseUser($revision->getUser());
+		if ($revision->getUser() != null) {
+			$row["user"] = $this->parseUser($revision->getUser());
+		}
 		$row["mitgliedschaft"] = $this->parseMitgliedschaft($revision->getMitgliedschaft());
 		if ($revision->getNatPersonID() != null) {
 			$row["bezeichnung"] = $revision->getNatPerson()->getVorname() . " " . $revision->getNatPerson()->getName();
@@ -526,12 +530,15 @@ class Template {
 		$this->smarty->display("mitgliederdetails.html.tpl");
 	}
 
-	public function viewMitgliedCreate($mitgliedschaft, $dokument, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields) {
+	public function viewMitgliedCreate($mitgliedschaft, $dokument, $data, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields) {
+		if ($mitgliedschaft != null) {
+			$this->smarty->assign("mitgliedschaft", $this->parseMitgliedschaft($mitgliedschaft));
+		}
 		if ($dokument != null) {
 			$this->smarty->assign("dokument", $this->parseDokument($dokument));
 		}
-		if ($mitgliedschaft != null) {
-			$this->smarty->assign("mitgliedschaft", $this->parseMitgliedschaft($mitgliedschaft));
+		if ($data != null) {
+			$this->smarty->assign("data", $data);
 		}
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
 		$this->smarty->assign("states", $this->parseStates($states));
