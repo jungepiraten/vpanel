@@ -84,6 +84,7 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 		$mitgliedbeitrag->setMitglied($mitglied);
 		$mitgliedbeitrag->setBeitrag($session->getStorage()->searchBeitrag(date("Y"), null));
 		$mitgliedbeitrag->setHoehe($beitrag);
+		$mitgliedbeitrag->save();
 		$mitglied->setBeitrag($mitgliedbeitrag);
 		$mitglied->save();
 	}
