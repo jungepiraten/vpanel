@@ -324,6 +324,10 @@ select {
     -moz-border-radius: 3px;
     border-radius: 3px;
 }
+select option {
+    background-color:#404040;
+    color:white;
+}
 
 .permissionrow:hover {
     color:#000000;
