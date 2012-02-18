@@ -401,10 +401,10 @@ abstract class SQLStorage extends AbstractStorage {
 			return "`r`.`revisionid` IN (SELECT `revisionid` FROM `mitgliederrevisiontextfields` WHERE `textfieldid` = " . intval($matcher->getTextFieldID()) . " AND `value` = '" . $this->escape($matcher->getValue()) . "')";
 		}
 		if ($matcher instanceof BeitragMissingBelowMitgliederMatcher) {
-			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` HAVING SUM(`hoehe` - `bezahlt`) <= " . floatval($matcher->getBeitragMark()) . ")";
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` GROUP BY `mitgliedid` HAVING SUM(`hoehe` - `bezahlt`) <= " . floatval($matcher->getBeitragMark()) . ")";
 		}
 		if ($matcher instanceof BeitragMissingAboveMitgliederMatcher) {
-			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` HAVING SUM(`hoehe` - `bezahlt`) > " . floatval($matcher->getBeitragMark()) . ")";
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` GROUP BY `mitgliedid` HAVING SUM(`hoehe` - `bezahlt`) > " . floatval($matcher->getBeitragMark()) . ")";
 		}
 		if ($matcher instanceof SearchMitgliederMatcher) {
 			$fields = array("`m`.`mitgliedid`", "`m`.`globalid`", "`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`n`.`anrede`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`adresszusatz`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`k`.`email`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
