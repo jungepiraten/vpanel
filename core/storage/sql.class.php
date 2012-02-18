@@ -400,6 +400,15 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof RevisionTextFieldMitgliederMatcher) {
 			return "`r`.`revisionid` IN (SELECT `revisionid` FROM `mitgliederrevisiontextfields` WHERE `textfieldid` = " . intval($matcher->getTextFieldID()) . " AND `value` = '" . $this->escape($matcher->getValue()) . "')";
 		}
+		if ($matcher instanceof BeitragMitgliederMatcher) {
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID()).")";
+		}
+		if ($matcher instanceof BeitragMissingMitgliederMatcher) {
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID())." AND `hoehe` - `bezahlt` > 0)";
+		}
+		if ($matcher instanceof BeitragPaidMitgliederMatcher) {
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID())." AND `hoehe` - `bezahlt` <= 0)";
+		}
 		if ($matcher instanceof BeitragMissingBelowMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` GROUP BY `mitgliedid` HAVING SUM(`hoehe` - `bezahlt`) <= " . floatval($matcher->getBeitragMark()) . ")";
 		}
