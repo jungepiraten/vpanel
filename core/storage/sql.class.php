@@ -254,7 +254,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $beitragid;
 	}
 	public function searchBeitrag($label, $hoehe) {
-		$sql = "SELECT `beitragid`, `label`, `hoehe` FROM `beitraege` WHERE `label` = '" . $this->escape($label) . "' AND `hoehe` = " . floatval($hoehe);
+		$sql = "SELECT `beitragid`, `label`, `hoehe` FROM `beitraege` WHERE `label` = '" . $this->escape($label) . "' AND `hoehe` " . ($hoehe == NULL ? "IS NULL" : "= " . floatval($hoehe));
 		$result = $this->getResult($sql, array($this, "parseBeitrag"));
 		if ($result->getCount() > 0) {
 			return $result->fetchRow();
