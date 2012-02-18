@@ -56,12 +56,16 @@ class MitgliedRevision extends GlobalClass {
 		$r->setMitgliedschaftID($this->getMitgliedschaftID());
 		$r->setGliederungID($this->getGliederungID());
 		$r->isGeloescht($this->isGeloescht());
-		$r->isMitgliedPiraten($this->isMitgliedPiraten());
-		$r->isVerteilerEingetragen($this->isVerteilerEingetragen());
 		$r->setBeitrag($this->getBeitrag());
 		$r->setNatPersonID($this->getNatPersonID());
 		$r->setJurPersonID($this->getJurPersonID());
 		$r->setKontaktID($this->getKontaktID());
+		foreach ($this->getFlags() as $flag) {
+			$r->setFlag($flag);
+		}
+		foreach ($this->getTextFields() as $textfield) {
+			$r->setTextField($textfield);
+		}
 		return $r;
 	}
 

@@ -1,7 +1,18 @@
 {include file="header.html.tpl" ansicht="Mitglied bearbeiten"}
 <p class="pagetitle">Mitglied #{$mitglied.mitgliedid} ({if isset($mitglied.latest.natperson)}{$mitglied.latest.natperson.vorname|escape:html} {$mitglied.latest.natperson.name|escape:html}{/if}
 {if isset($mitglied.latest.jurperson)}{$mitglied.latest.jurperson.label|escape:html}{/if}) bearbeiten.</p>
-{if isset($mitglied.austritt)}<p class="exmessage">AUSGETRETEN!</span>{/if}
+<table>
+<tr>
+ <th>Eingetreten</th>
+ <td>{$mitglied.eintritt|date_format:"%d.%m.%Y"}</td>
+</tr>
+{if isset($mitglied.austritt)}
+<tr>
+ <th>Ausgetreten</th>
+ <td>{$mitglied.austritt|date_format:"%d.%m.%Y"}</td>
+</tr>
+{/if}
+</table>
 <form action="{"mitglieder_details"|___:$mitglied.mitgliedid}" method="post">
  <fieldset>
   <select name="revisionid" onChange="this.form.submit()">
