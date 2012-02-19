@@ -125,7 +125,7 @@ class Session {
 		if (isset($this->stor["mitgliederfilter"][$filterid])) {
 			return unserialize($this->stor["mitgliederfilter"][$filterid]);
 		}
-		return $this->getStorage()->getMitgliederFilter($filterid)->getMatcher();
+		return $this->getStorage()->getMitgliederFilter($filterid);
 	}
 	public function getMitgliederMatcher($filterid) {
 		$filter = $this->getMitgliederFilter($filterid);
