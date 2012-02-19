@@ -194,6 +194,10 @@ interface Storage {
 	public function getTempFile($tempfileid);
 	public function setTempFile($tempfileid, $userid, $fileid);
 	public function delTempFile($tempfileid);
+
+	public function getMitgliederFilterList();
+	public function hasMitgliederFilter($filterid);
+	public function getMitgliederFilter($filterid);
 }
 
 abstract class AbstractStorage implements Storage {
@@ -343,6 +347,21 @@ abstract class AbstractStorage implements Storage {
 
 	public function getTempFileList() {
 		return $this->getTempFileResult()->fetchAll();
+	}
+
+	/** Filter **/
+	private $mitgliederfilters = array();
+	public function getMitgliederFilterList() {
+		return $this->mitgliederfilters;
+	}
+	public function hasMitgliederFilter($filterid) {
+		return isset($this->mitgliederfilters[$filterid]);
+	}
+	public function getMitgliederFilter($filterid) {
+		return $this->mitgliederfilters[$filterid];
+	}
+	public function registerMitgliederFilter($filter) {
+		$this->mitgliederfilters[$filter->getFilterID()] = $filter;
 	}
 }
 

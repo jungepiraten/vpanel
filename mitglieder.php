@@ -14,10 +14,12 @@ if (!$session->isAllowed("mitglieder_show")) {
 require_once(VPANEL_CORE . "/mitglied.class.php");
 require_once(VPANEL_CORE . "/mitgliednotiz.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
+require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfiltersendmail.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterexport.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterbeitrag.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/search.class.php");
 
 $predefinedfields = array(
 	array("label" => "Bezeichnung",		"template" => "{BEZEICHNUNG}"),
@@ -284,15 +286,15 @@ case "delete":
 	exit;
 case "sendmail":
 case "sendmail.select":
-	$filters = $config->getMitgliederFilterList();
+	$filters = $session->getStorage()->getMitgliederFilterList();
 	$templates = $session->getStorage()->getMailTemplateList();
 
 	$ui->viewMitgliederSendMailForm($filters, $templates);
 	exit;
 case "sendmail.preview":
 	$filter = null;
-	if ($session->hasVariable("filterid") && $config->hasMitgliederFilter($session->getVariable("filterid"))) {
-		$filter = $config->getMitgliederFilter($session->getVariable("filterid"));
+	if ($session->hasVariable("filterid") && $session->getStorage()->hasMitgliederFilter($session->getVariable("filterid"))) {
+		$filter = $session->getStorage()->getMitgliederFilter($session->getVariable("filterid"));
 	}
 	$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("mailtemplateid"));
 
@@ -304,8 +306,8 @@ case "sendmail.preview":
 	exit;
 case "sendmail.send":
 	$filter = null;
-	if ($session->hasVariable("filterid") && $config->hasMitgliederFilter($session->getVariable("filterid"))) {
-		$filter = $config->getMitgliederFilter($session->getVariable("filterid"));
+	if ($session->hasVariable("filterid") && $session->getStorage()->hasMitgliederFilter($session->getVariable("filterid"))) {
+		$filter = $session->getStorage()->getMitgliederFilter($session->getVariable("filterid"));
 	}
 	$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("templateid"));
 	
@@ -325,14 +327,14 @@ case "sendmail.done":
 	echo "Dinge getan.";
 	exit;
 case "export.options":
-	$filters = $config->getMitgliederFilterList();
+	$filters = $session->getStorage()->getMitgliederFilterList();
 	
 	$ui->viewMitgliederExportOptions($filters, $predefinedfields);
 	exit;
 case "export.export":
 	$filter = null;
-	if ($session->hasVariable("filterid") && $config->hasMitgliederFilter($session->getVariable("filterid"))) {
-		$filter = $config->getMitgliederFilter($session->getVariable("filterid"));
+	if ($session->hasVariable("filterid") && $session->getStorage()->hasMitgliederFilter($session->getVariable("filterid"))) {
+		$filter = $session->getStorage()->getMitgliederFilter($session->getVariable("filterid"));
 	}
 
 	// Headerfelder
@@ -365,13 +367,13 @@ case "export.export":
 	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
 	exit;
 case "setbeitrag.selectbeitrag":
-	$filters = $config->getMitgliederFilterList();
+	$filters = $session->getStorage()->getMitgliederFilterList();
 	$beitraglist = $session->getStorage()->getBeitragList();
 
 	$ui->viewMitgliederSetBeitragSelect($filters, $beitraglist);
 	exit;
 case "setbeitrag.start":
-	$filter = $config->getMitgliederFilter($session->getVariable("filterid"));
+	$filter = $session->getStorage()->getMitgliederFilter($session->getVariable("filterid"));
 	$beitrag = $session->getStorage()->getBeitrag($session->getIntVariable("beitragid"));
 
 	$process = new MitgliederFilterBeitragProcess($session->getStorage());
@@ -383,10 +385,16 @@ case "setbeitrag.start":
 	exit;
 default:
 	$filter = null;
-	if ($session->hasVariable("filterid") && $config->hasMitgliederFilter($session->getVariable("filterid"))) {
-		$filter = $config->getMitgliederFilter($session->getVariable("filterid"));
+
+	if ($session->hasVariable("mitgliedersuche")) {
+		$matcher = new SearchMitgliederMatcher(explode(" ", $session->getVariable("mitgliedersuche")));
+		$filter = new MitgliederFilter("search", "Suchergebnisse " . $session->getVariable("mitgliedersuche"), $matcher);
 	}
 	
+	if ($session->hasVariable("filterid") && $session->getStorage()->hasMitgliederFilter($session->getVariable("filterid"))) {
+		$filter = $session->getStorage()->getMitgliederFilter($session->getVariable("filterid"));
+	}
+
 	$pagesize = 20;
 	$pagecount = ceil($session->getStorage()->getMitgliederCount($filter) / $pagesize);
 	$page = 0;
@@ -397,7 +405,7 @@ default:
 
 	$mitglieder = $session->getStorage()->getMitgliederList($filter, $pagesize, $offset);
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
-	$filters = $config->getMitgliederFilterList();
+	$filters = $session->getStorage()->getMitgliederFilterList();
 	$ui->viewMitgliederList($mitglieder, $mitgliedschaften, $filters, $filter, $page, $pagecount);
 	exit;
 }

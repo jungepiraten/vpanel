@@ -37,21 +37,6 @@ class DefaultConfig {
 		$this->langs[$name] = $lang;
 	}
 
-	/** Filter **/
-	private $mitgliederfilters = array();
-	public function getMitgliederFilterList() {
-		return $this->mitgliederfilters;
-	}
-	public function hasMitgliederFilter($filterid) {
-		return isset($this->mitgliederfilters[$filterid]);
-	}
-	public function getMitgliederFilter($filterid) {
-		return $this->mitgliederfilters[$filterid];
-	}
-	public function registerMitgliederFilter($filter) {
-		$this->mitgliederfilters[$filter->getFilterID()] = $filter;
-	}
-
 	private $pages;
 	public function getLink() {
 		$params = func_get_args();
