@@ -158,7 +158,7 @@ $(function() {
 {/literal}
 <form action="" class="suche">
  <fieldset class="suche">
-  <input type="text" id="dokumentsuche" name="dokumentsuche" autocomplete="off" />
+  <input type="text" id="dokumentsuche" name="dokumentsuche" autocomplete="off" {if isset($smarty.request.dokumentsuche)}value="{$smarty.request.dokumentsuche|escape:html}"{/if} />
   <div id="dropdowndokumentsuche"><ul></ul></div>
  </fieldset>
 </form>
