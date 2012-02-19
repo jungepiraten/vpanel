@@ -128,7 +128,11 @@ class Session {
 		return $this->getStorage()->getMitgliederFilter($filterid)->getMatcher();
 	}
 	public function getMitgliederMatcher($filterid) {
-		return $this->getMitgliederFilter($filterid)->getMatcher();
+		$filter = $this->getMitgliederFilter($filterid);
+		if ($filter == null) {
+			return null;
+		}
+		return $filter->getMatcher();
 	}
 
 	public function getEncoding() {

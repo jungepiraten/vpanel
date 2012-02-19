@@ -2,13 +2,16 @@
 <p class="pagetitle">Mail verschicken</p>
 <form action="{"mitglieder_sendmail.preview"|___}" method="post">
  <fieldset>
+  {if isset($smarty.request.filterid)}<input type="hidden" name="filterid" value="{$smarty.request.filterid|escape:html}" />
   <table>
+  {if !isset($smarty.request.filterid)}
   <tr>
    <th>{"Filter:"|__}</th>
    <td>
-    <select name="filterid"><option value="">{"(kein Filter)"|__}</option>{foreach from=$filters item=filter}<option value="{$filter.filterid|escape:html}" {if $smarty.request.filterid == $filter.filterid}selected="selected"{/if}>{$filter.label|escape:html}</option>{/foreach}</select>
+    <select name="filterid"><option value="">{"(kein Filter)"|__}</option>{foreach from=$filters item=filter}<option value="{$filter.filterid|escape:html}">{$filter.label|escape:html}</option>{/foreach}</select>
    </td>
   </tr>
+  {/if}
   <tr>
    <th>{"Mailvorlage:"|__}</th>
    <td>

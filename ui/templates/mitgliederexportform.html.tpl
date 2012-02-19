@@ -2,14 +2,18 @@
 <p class="pagetitle">Mitgliederdaten exportieren</p>
 <form action="{"mitglieder_export.export"|___}" method="post">
  <fieldset>
+  {if isset($smarty.request.filterid)}
+  <input type="hidden" name="filterid" value="{$smarty.request.filterid|escape:html}" />
+  {else}
   <table>
   <tr>
    <th>{"Filter:"|__}</th>
    <td>
-    <select name="filterid"><option value="">{"(kein Filter)"|__}</option>{foreach from=$filters item=filter}<option value="{$filter.filterid|escape:html}" {if $smarty.request.filterid == $filter.filterid}selected="selected"{/if}>{$filter.label|escape:html}</option>{/foreach}</select>
+    <select name="filterid"><option value="">{"(kein Filter)"|__}</option>{foreach from=$filters item=filter}<option value="{$filter.filterid|escape:html}">{$filter.label|escape:html}</option>{/foreach}</select>
    </td>
   </tr>
   </table>
+  {/if}
 
 
   <table>
