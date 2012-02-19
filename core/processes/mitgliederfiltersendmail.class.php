@@ -6,13 +6,13 @@ class MitgliederFilterSendMailProcess extends Process {
 	private $templateid;
 
 	private $backend;
-	private $filter;
+	private $matcher;
 	private $template;
 
 	public static function factory(Storage $storage, $row) {
 		$process = new MitgliederFilterSendMailProcess($storage);
 		$process->setBackend($row["backend"]);
-		$process->setFilter($row["filter"]);
+		$process->setMatcher($row["matcher"]);
 		$process->setTemplateID($row["templateid"]);
 		return $process;
 	}
@@ -25,16 +25,12 @@ class MitgliederFilterSendMailProcess extends Process {
 		$this->backend = $backend;
 	}
 
-	public function getFilterID() {
-		return $this->getFilter()->getFilterID();
+	public function getMatcher() {
+		return $this->matcher;
 	}
 
-	public function getFilter() {
-		return $this->filter;
-	}
-
-	public function setFilter($filter) {
-		$this->filter = $filter;
+	public function setMatcher($matcher) {
+		$this->matcher = $matcher;
 	}
 
 	public function getTemplateID() {
@@ -61,11 +57,11 @@ class MitgliederFilterSendMailProcess extends Process {
 	}
 	
 	protected function getData() {
-		return array("backend" => $this->getBackend(), "filter" => $this->getFilter(), "templateid" => $this->getTemplateID());
+		return array("backend" => $this->getBackend(), "matcher" => $this->getMatcher(), "templateid" => $this->getTemplateID());
 	}
 
 	public function runProcess() {
-		$result = $this->getStorage()->getMitgliederResult($this->getFilter());
+		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
 		$max = $result->getCount();
 		$i = 0;
 		$stepwidth = max(1, ceil($max / 100));

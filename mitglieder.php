@@ -305,15 +305,12 @@ case "sendmail.preview":
 	$ui->viewMitgliederSendMailPreview($mail, $filter, $mailtemplate);
 	exit;
 case "sendmail.send":
-	$filter = null;
-	if ($session->hasVariable("filterid") && $session->getStorage()->hasMitgliederFilter($session->getVariable("filterid"))) {
-		$filter = $session->getStorage()->getMitgliederFilter($session->getVariable("filterid"));
-	}
+	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
 	$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("templateid"));
 	
 	$process = new MitgliederFilterSendMailProcess($session->getStorage());
 	$process->setBackend($config->getSendMailBackend());
-	$process->setFilter($filter);
+	$process->setMatcher($matcher);
 	$process->setTemplate($mailtemplate);
 	// Muss den Prozess erst mal speichern, damit er eine ID zugewiesen bekommt
 	$process->save();
@@ -332,10 +329,7 @@ case "export.options":
 	$ui->viewMitgliederExportOptions($filters, $predefinedfields);
 	exit;
 case "export.export":
-	$filter = null;
-	if ($session->hasVariable("filterid") && $session->getStorage()->hasMitgliederFilter($session->getVariable("filterid"))) {
-		$filter = $session->getStorage()->getMitgliederFilter($session->getVariable("filterid"));
-	}
+	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
 
 	// Headerfelder
 	$exportfields = array();
@@ -358,7 +352,7 @@ case "export.export":
 	$tempfile->save();
 
 	$process = new MitgliederFilterExportCSVProcess($session->getStorage());
-	$process->setFilter($filter);
+	$process->setMatcher($matcher);
 	$process->setFile($tempfile);
 	$process->setFields($exportfields);
 	$process->setFinishedPage($session->getLink("tempfile_get", $tempfile->getTempFileID()));
@@ -373,11 +367,11 @@ case "setbeitrag.selectbeitrag":
 	$ui->viewMitgliederSetBeitragSelect($filters, $beitraglist);
 	exit;
 case "setbeitrag.start":
-	$filter = $session->getStorage()->getMitgliederFilter($session->getVariable("filterid"));
+	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
 	$beitrag = $session->getStorage()->getBeitrag($session->getIntVariable("beitragid"));
 
 	$process = new MitgliederFilterBeitragProcess($session->getStorage());
-	$process->setFilter($filter);
+	$process->setMatcher($matcher);
 	$process->setBeitrag($beitrag);
 	$process->setFinishedPage($ui->getRedirectURL());
 	$process->save();
@@ -387,12 +381,11 @@ default:
 	$filter = null;
 
 	if ($session->hasVariable("mitgliedersuche")) {
-		$matcher = new SearchMitgliederMatcher(explode(" ", $session->getVariable("mitgliedersuche")));
-		$filter = new MitgliederFilter("search", "Suchergebnisse " . $session->getVariable("mitgliedersuche"), $matcher);
+		$filter = $session->addMitgliederMatcher(new SearchMitgliederMatcher($session->getVariable("mitgliedersuche")));
 	}
 	
-	if ($session->hasVariable("filterid") && $session->getStorage()->hasMitgliederFilter($session->getVariable("filterid"))) {
-		$filter = $session->getStorage()->getMitgliederFilter($session->getVariable("filterid"));
+	if ($session->hasVariable("filterid")) {
+		$filter = $session->getMitgliederFilter($session->getVariable("filterid"));
 	}
 
 	$pagesize = 20;

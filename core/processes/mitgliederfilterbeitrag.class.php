@@ -6,25 +6,21 @@ class MitgliederFilterBeitragProcess extends Process {
 	private $beitragid;
 
 	private $beitrag;
-	private $filter;
+	private $matcher;
 
 	public static function factory(Storage $storage, $row) {
 		$process = new MitgliederFilterBeitragProcess($storage);
-		$process->setFilter($row["filter"]);
+		$process->setMatcher($row["matcher"]);
 		$process->setBeitragID($row["beitragid"]);
 		return $process;
 	}
 
-	public function getFilterID() {
-		return $this->getFilter()->getFilterID();
+	public function getMatcher() {
+		return $this->matcher;
 	}
 
-	public function getFilter() {
-		return $this->filter;
-	}
-
-	public function setFilter($filter) {
-		$this->filter = $filter;
+	public function setMatcher($matcher) {
+		$this->matcher = $matcher;
 	}
 
 	public function getBeitragID() {
@@ -58,11 +54,11 @@ class MitgliederFilterBeitragProcess extends Process {
 	}
 	
 	protected function getData() {
-		return array("filter" => $this->getFilter(), "beitragid" => $this->getBeitragID());
+		return array("matcher" => $this->getMatcher(), "beitragid" => $this->getBeitragID());
 	}
 
 	public function runProcess() {
-		$result = $this->getStorage()->getMitgliederResult($this->getFilter());
+		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
 		$max = $result->getCount();
 		$i = 0;
 		$stepwidth = max(1, ceil($max / 100));

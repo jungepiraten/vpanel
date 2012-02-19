@@ -1,6 +1,7 @@
 <?php
 
 require_once(VPANEL_CORE . "/user.class.php");
+require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 require_once(VPANEL_UI . "/template.class.php");
 
 class Session {
@@ -113,6 +114,21 @@ class Session {
 	}
 	public function getDefaultDokumentStatusID() {
 		return $this->stor["defaultdokumentstatusid"];
+	}
+
+	public function addMitgliederMatcher($matcher) {
+		$id = "custom" . substr(md5(microtime(true) . "-" . rand(1000,9999)),0,8);
+		$this->stor["mitgliederfilter"][$id] = serialize(new MitgliederFilter($id, "Userdefined #" . $id, $matcher));
+		return $this->getMitgliederFilter($id);
+	}
+	public function getMitgliederFilter($filterid) {
+		if (isset($this->stor["mitgliederfilter"][$filterid])) {
+			return unserialize($this->stor["mitgliederfilter"][$filterid]);
+		}
+		return $this->getStorage()->getMitgliederFilter($filterid)->getMatcher();
+	}
+	public function getMitgliederMatcher($filterid) {
+		return $this->getMitgliederFilter($filterid)->getMatcher();
 	}
 
 	public function getEncoding() {

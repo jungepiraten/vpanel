@@ -6,27 +6,23 @@ abstract class MitgliederFilterExportProcess extends Process {
 	private $fileid;
 	private $fields = array();
 
-	private $filter;
+	private $matcher;
 	private $file;
 
 	public static function factory(Storage $storage, $row) {
 		$process = new $row["class"]($storage);
-		$process->setFilter($row["filter"]);
+		$process->setMatcher($row["matcher"]);
 		$process->setFileID($row["fileid"]);
 		$process->setFields($row["fields"]);
 		return $process;
 	}
 
-	public function getFilterID() {
-		return $this->getFilter()->getFilterID();
+	public function getMatcher() {
+		return $this->matcher;
 	}
 
-	public function getFilter() {
-		return $this->filter;
-	}
-
-	public function setFilter($filter) {
-		$this->filter = $filter;
+	public function setMatcher($matcher) {
+		$this->matcher = $matcher;
 	}
 
 	public function getFileID() {
@@ -65,7 +61,7 @@ abstract class MitgliederFilterExportProcess extends Process {
 	}
 	
 	protected function getData() {
-		return array("class" => get_class($this), "filter" => $this->getFilter(), "fileid" => $this->getFileID(), "fields" => $this->getFields());
+		return array("class" => get_class($this), "matcher" => $this->getMatcher(), "fileid" => $this->getFileID(), "fields" => $this->getFields());
 	}
 
 	public function generateFieldsRow($mitglied) {
@@ -85,7 +81,7 @@ abstract class MitgliederFilterExportProcess extends Process {
 	abstract protected function closeFile();
 
 	public function runProcess() {
-		$result = $this->getStorage()->getMitgliederResult($this->getFilter());
+		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
 		$max = $result->getCount();
 		$i = 0;
 		$stepwidth = max(1, ceil($max / 100));

@@ -6,6 +6,9 @@ class SearchMitgliederMatcher extends MitgliederMatcher {
 	private $words;
 	
 	public function __construct($words) {
+		if (!is_array($words)) {
+			$words = explode(" ", $words);
+		}
 		$this->words = $words;
 	}
 
