@@ -107,7 +107,7 @@ interface Storage {
 	public function getStateResult();
 	public function getStateList();
 	public function getState($stateid);
-	public function setState($stateid, $label, $countryid);
+	public function setState($stateid, $label, $population, $countryid);
 	public function delState($stateid);
 
 	public function getCountryResult();

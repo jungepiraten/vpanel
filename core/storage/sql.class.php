@@ -1005,18 +1005,18 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "State");
 	}
 	public function getStateResult() {
-		$sql = "SELECT `stateid`, `label`, `countryid` FROM `states`";
+		$sql = "SELECT `stateid`, `label`, `population`, `countryid` FROM `states`";
 		return $this->getResult($sql, array($this, "parseState"));
 	}
 	public function getState($stateid) {
-		$sql = "SELECT `stateid`, `label`, `countryid` FROM `states` WHERE `stateid` = " . intval($stateid);
+		$sql = "SELECT `stateid`, `label`, `population`, `countryid` FROM `states` WHERE `stateid` = " . intval($stateid);
 		return $this->getResult($sql, array($this, "parseState"))->fetchRow();
 	}
-	public function setState($stateid, $label, $countryid) {
+	public function setState($stateid, $label, $population, $countryid) {
 		if ($stateid == null) {
-			$sql = "INSERT INTO `states` (`label`, `countryid`) VALUES ('" . $this->escape($label) . "', " . intval($countryid) . ")";
+			$sql = "INSERT INTO `states` (`label`, `population`, `countryid`) VALUES ('" . $this->escape($label) . "', " . ($population == null ? "NULL" : intval($population)) . ", " . intval($countryid) . ")";
 		} else {
-			$sql = "UPDATE `states` SET `label` = '" . $this->escape($label) . "', `countryid` = '" . $this->escape($countryid) . "' WHERE `stateid` = " . intval($stateid);
+			$sql = "UPDATE `states` SET `label` = '" . $this->escape($label) . "', `population` = " . ($population == null ? "NULL" : intval($population)) . ", `countryid` = '" . $this->escape($countryid) . "' WHERE `stateid` = " . intval($stateid);
 		}
 		$this->query($sql);
 		if ($stateid == null) {

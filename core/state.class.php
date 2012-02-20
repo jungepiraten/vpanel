@@ -16,6 +16,7 @@ class State extends StorageClass {
 		$state = new State($storage);
 		$state->setStateID($row["stateid"]);
 		$state->setLabel($row["label"]);
+		$state->setPopulation($row["population"]);
 		$state->setCountryID($row["countryid"]);
 		return $state;
 	}
@@ -34,6 +35,14 @@ class State extends StorageClass {
 
 	public function setLabel($label) {
 		$this->label = $label;
+	}
+
+	public function getPopulation() {
+		return $this->population;
+	}
+
+	public function setPopulation($population) {
+		$this->population = $population;
 	}
 
 	public function getCountry() {
@@ -66,6 +75,7 @@ class State extends StorageClass {
 		$storage->setState(
 			$this->getStateID(),
 			$this->getLabel(),
+			$this->getPopulation(),
 			$this->getCountryID() );
 	}
 

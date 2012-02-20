@@ -17,6 +17,7 @@
 <tr>
  <td class="count">{$state.count}</td>
  <td class="percent">{$state.count/$mitgliedercount*100|string_format:"%.2f"} %</td>
+ <td class="countperpopulation">{if $state.population != null}{$state.count/$state.population*1000*1000|string_format:"%.2f"} pro Mio{/if}</td>
  <th class="label">{$state.label}</th>
 </tr>
 {/foreach}

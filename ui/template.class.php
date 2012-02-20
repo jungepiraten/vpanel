@@ -311,6 +311,7 @@ class Template {
 		$row = array();
 		$row["stateid"] = $state->getStateID();
 		$row["label"] = $state->getLabel();
+		$row["population"] = $state->getPopulation();
 		$row["country"] = $this->parseCountry($state->getCountry());
 		return $row;
 	}
