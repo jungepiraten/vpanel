@@ -59,7 +59,7 @@ class MitgliederFilterStatistikProcess extends Process {
 
 		$w = 600; $h = 250;
 		$offsetX = 40;
-		$scalaX = 110; $scalaY = 60;
+		$scalaTime = 84600; $scalaX = 110; $scalaY = 60;
 
 		$img = ImageCreateTrueColor($offsetX + $w, 20 + $h);
 		$white    = ImageColorAllocate($img, 255, 255, 255);
@@ -70,7 +70,7 @@ class MitgliederFilterStatistikProcess extends Process {
 		$deltaScale = array();
 		$maxTime = $minTime = floor(time() / 84600);
 		while ($mitglied = $result->fetchRow()) {
-			$eintritt = floor($mitglied->getEintrittsdatum() / 84600);
+			$eintritt = floor($mitglied->getEintrittsdatum() / $scalaTime);
 			$minTime = min($minTime, $eintritt);
 			$maxTime = max($maxTime, $eintritt);
 			if (!isset($deltaScale[$eintritt])) {
@@ -78,7 +78,7 @@ class MitgliederFilterStatistikProcess extends Process {
 			}
 			$deltaScale[$eintritt] ++;
 
-			$austritt = floor($mitglied->getAustrittsdatum() / 84600);
+			$austritt = floor($mitglied->getAustrittsdatum() / $scalaTime);
 			if ($austritt != null) {
 				$minTime = min($minTime, $austritt);
 				$maxTime = max($maxTime, $austritt);
@@ -106,6 +106,11 @@ class MitgliederFilterStatistikProcess extends Process {
 		$pixelsPerValue = ($h - $scalaY / 3) / $maxValue;
 		$timePerPixel = ($maxTime - $minTime) / $w;
 
+		while (round($scalaY / $pixelsPerValue) % 10 != 0) {
+			$scalaY ++;
+		}
+		$scalaY = $pixelsPerValue * round($scalaY / $pixelsPerValue);
+
 		for ($y = 0; $y < $h - imagefontheight(3); $y += $scalaY) {
 			ImageString($img, 3, $offsetX - 10, $h - $y - imagefontheight(3), round($y / $pixelsPerValue), $boxcolor);
 			ImageLine($img, $offsetX, $h - $y, $offsetX + $w, $h - $y, $boxcolor);
@@ -117,7 +122,7 @@ class MitgliederFilterStatistikProcess extends Process {
 
 			ImageLine($img, $offsetX + $x, $h, $offsetX + $x, $h - round($curValue * $pixelsPerValue), $color);
 			if ($x % $scalaX == 0 && $x > 0 && $x < $w - imagefontwidth(3) * 5) {
-				ImageString($img, 3, $offsetX + $x - imagefontwidth(3) * 5, $h + 5, date("d.m.Y", $curTime * 84600), $boxcolor);
+				ImageString($img, 3, $offsetX + $x - imagefontwidth(3) * 5, $h + 5, date("d.m.Y", $curTime * $scalaTime), $boxcolor);
 			}
 		}
 
