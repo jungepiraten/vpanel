@@ -106,7 +106,7 @@ class MitgliederFilterStatistikProcess extends Process {
 		$pixelsPerValue = ($h - $scalaY / 3) / $maxValue;
 		$timePerPixel = ($maxTime - $minTime) / $w;
 
-		for ($y = 0; $y < $h; $y += $scalaY) {
+		for ($y = 0; $y < $h - imagefontheight(3); $y += $scalaY) {
 			ImageString($img, 3, $offsetX - 10, $h - $y - imagefontheight(3), round($y / $pixelsPerValue), $boxcolor);
 			ImageLine($img, $offsetX, $h - $y, $offsetX + $w, $h - $y, $boxcolor);
 		}
@@ -116,8 +116,8 @@ class MitgliederFilterStatistikProcess extends Process {
 			$curValue = $scale[$curTime];
 
 			ImageLine($img, $offsetX + $x, $h, $offsetX + $x, $h - round($curValue * $pixelsPerValue), $color);
-			if ($x % $scalaX == 0 && $x > 0) {
-				ImageString($img, 3, $offsetX + $x - imagefontwidth(3) * 10, $h + 5, date("d.m.Y", $curTime * 84600), $boxcolor);
+			if ($x % $scalaX == 0 && $x > 0 && $x < $w - imagefontwidth(3) * 5) {
+				ImageString($img, 3, $offsetX + $x - imagefontwidth(3) * 5, $h + 5, date("d.m.Y", $curTime * 84600), $boxcolor);
 			}
 		}
 
