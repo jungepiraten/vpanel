@@ -88,7 +88,6 @@ abstract class MitgliederFilterExportProcess extends Process {
 
 		$this->openFile();
 		while ($mitglied = $result->fetchRow()) {
-			$data = array();
 			$this->writeFile($this->generateFieldsRow($mitglied));
 			
 			if ((++$i % $stepwidth) == 0) {

@@ -68,6 +68,7 @@ $config->registerPage("mitglieder_sendmail.send", "mitglieder.php?mode=sendmail.
 $config->registerPage("mitglieder_sendmail.done", "mitglieder.php?mode=sendmail.done&processid=%d");
 $config->registerPage("mitglieder_export.options", "mitglieder.php?mode=export.options&filterid=%s");
 $config->registerPage("mitglieder_export.export", "mitglieder.php?mode=export.export");
+$config->registerPage("mitglieder_statistik.start", "mitglieder.php?mode=statistik.start&filterid=%s");
 $config->registerPage("mitglieder_setbeitrag.selectbeitrag", "mitglieder.php?mode=setbeitrag.selectbeitrag&filterid=%s");
 $config->registerPage("mitglieder_setbeitrag.start", "mitglieder.php?mode=setbeitrag.start");
 

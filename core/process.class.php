@@ -1,9 +1,9 @@
 <?php
 
 require_once(VPANEL_CORE . "/storageobject.class.php");
-require_once(VPANEL_CORE . "/processes/mitgliederfiltersendmail.class.php");
-require_once(VPANEL_CORE . "/processes/mitgliederfilterexport.class.php");
-require_once(VPANEL_CORE . "/processes/mitgliederfilterbeitrag.class.php");
+foreach (glob(VPANEL_CORE . "/processes/*.class.php") as $processfile) {
+	require_once($processfile);
+}
 
 abstract class Process extends StorageClass {
 	private $processid;

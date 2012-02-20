@@ -18,6 +18,7 @@ require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfiltersendmail.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterexport.class.php");
+require_once(VPANEL_PROCESSES . "/mitgliederfilterstatistik.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterbeitrag.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/search.class.php");
 
@@ -358,6 +359,24 @@ case "export.export":
 	$process->setFinishedPage($session->getLink("tempfile_get", $tempfile->getTempFileID()));
 	$process->save();
 
+	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
+	exit;
+case "statistik.start":
+	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
+
+	$tempfile = new TempFile($session->getStorage());
+	$tempfile->setUser($session->getUser());
+	$file = new File($session->getStorage());
+	$file->setExportFilename("vpanel-statisik-" . date("Y-m-d"));
+	$file->save();
+	$tempfile->setFile($file);
+	$tempfile->save();
+
+	$process = new MitgliederFilterStatistikProcess($session->getStorage());
+	$process->setMatcher($matcher);
+	$process->setFile($tempfile);
+	$process->setFinishedPage($session->getLink("tempfile_get", $tempfile->getTempFileID()));
+	$process->save();
 	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
 	exit;
 case "setbeitrag.selectbeitrag":
