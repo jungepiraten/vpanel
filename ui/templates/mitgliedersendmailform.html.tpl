@@ -2,7 +2,7 @@
 <p class="pagetitle">Mail verschicken</p>
 <form action="{"mitglieder_sendmail.preview"|___}" method="post">
  <fieldset>
-  {if isset($smarty.request.filterid)}<input type="hidden" name="filterid" value="{$smarty.request.filterid|escape:html}" />
+  {if isset($smarty.request.filterid)}<input type="hidden" name="filterid" value="{$smarty.request.filterid|escape:html}" />{/if}
   <table>
   {if !isset($smarty.request.filterid)}
   <tr>
