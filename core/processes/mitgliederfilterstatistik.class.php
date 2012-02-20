@@ -58,11 +58,14 @@ class MitgliederFilterStatistikProcess extends Process {
 		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
 
 		$w = 600; $h = 250;
+		$offsetX = 40;
+		$scalaX = 100; $scalaY = 50;
 
-		$img = ImageCreateTrueColor($w, $h);
-		$white = ImageColorAllocate($img, 255, 255, 255);
-		$color = ImageColorAllocate($img, 255,   0,   0);
-		ImageFilledRectangle($img, 0,0, $w,$h, $white);
+		$img = ImageCreateTrueColor($offsetX + $w, 20 + $h);
+		$white    = ImageColorAllocate($img, 255, 255, 255);
+		$color    = ImageColorAllocate($img, 255,   0,   0);
+		$boxcolor = ImageColorAllocate($img,  20,  20,  20);
+		ImageFilledRectangle($img, 0,0, $offsetX+$w,20+$h, $white);
 
 		$deltaScale = array();
 		$maxTime = $minTime = floor(time() / 84600);
@@ -100,14 +103,22 @@ class MitgliederFilterStatistikProcess extends Process {
 		$this->setProgress(0.66);
 		$this->save();
 
-		$pixelsPerValue = $h / $maxValue;
+		$pixelsPerValue = ($h - $scalaY / 3) / $maxValue;
 		$timePerPixel = ($maxTime - $minTime) / $w;
+
+		for ($y = 0; $y <= $maxValue * $pixelsPerValue; $y += $scalaY) {
+			ImageString($img, 3, $offsetX - 10, $h - $y - imagefontheight(3), round($y / $pixelsPerValue), $boxcolor);
+			ImageLine($img, $offsetX, $h - $y, $offsetX + $w, $h - $y, $boxcolor);
+		}
 
 		for ($x = 0; $x <= $w; $x++) {
 			$curTime = $minTime + floor($x * $timePerPixel);
 			$curValue = $scale[$curTime];
 
-			ImageLine($img, $x, $h, $x, $h - round($curValue * $pixelsPerValue), $color);
+			ImageLine($img, $offsetX + $x, $h, $offsetX + $x, $h - round($curValue * $pixelsPerValue), $color);
+			if ($x % $scalaX == 0 && $x > 0) {
+				ImageString($img, 3, $offsetX + $x - imagefontwidth(3) * 10, $h + 5, date("d.m.Y", $curTime * 84600), $boxcolor);
+			}
 		}
 
 		$this->getFile()->setMimeType("image/png");
