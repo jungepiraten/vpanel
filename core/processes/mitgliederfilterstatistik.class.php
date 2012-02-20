@@ -59,7 +59,7 @@ class MitgliederFilterStatistikProcess extends Process {
 
 		$w = 600; $h = 250;
 		$offsetX = 40;
-		$scalaX = 100; $scalaY = 50;
+		$scalaX = 110; $scalaY = 60;
 
 		$img = ImageCreateTrueColor($offsetX + $w, 20 + $h);
 		$white    = ImageColorAllocate($img, 255, 255, 255);
