@@ -106,7 +106,7 @@ class MitgliederFilterStatistikProcess extends Process {
 		$pixelsPerValue = ($h - $scalaY / 3) / $maxValue;
 		$timePerPixel = ($maxTime - $minTime) / $w;
 
-		for ($y = 0; $y <= $maxValue * $pixelsPerValue; $y += $scalaY) {
+		for ($y = 0; $y < $h; $y += $scalaY) {
 			ImageString($img, 3, $offsetX - 10, $h - $y - imagefontheight(3), round($y / $pixelsPerValue), $boxcolor);
 			ImageLine($img, $offsetX, $h - $y, $offsetX + $w, $h - $y, $boxcolor);
 		}
