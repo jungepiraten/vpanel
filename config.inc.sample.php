@@ -64,7 +64,7 @@ $config->registerPage("mitglieder_beitraege", "mitglieder.php?mode=beitraege&mit
 $config->registerPage("mitglieder_beitraege_del", "mitglieder.php?mode=beitragdelete&mitgliedid=%d&beitragid=%d");
 $config->registerPage("mitglieder_sendmail.select", "mitglieder.php?mode=sendmail.select&filterid=%s");
 $config->registerPage("mitglieder_sendmail.preview", "mitglieder.php?mode=sendmail.preview");
-$config->registerPage("mitglieder_sendmail.send", "mitglieder.php?mode=sendmail.send");
+$config->registerPage("mitglieder_sendmail.send", "mitglieder.php?mode=sendmail.send&filterid=%s&templateid=%d");
 $config->registerPage("mitglieder_sendmail.done", "mitglieder.php?mode=sendmail.done&processid=%d");
 $config->registerPage("mitglieder_export.options", "mitglieder.php?mode=export.options&filterid=%s");
 $config->registerPage("mitglieder_export.export", "mitglieder.php?mode=export.export");

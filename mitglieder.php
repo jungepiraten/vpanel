@@ -293,10 +293,7 @@ case "sendmail.select":
 	$ui->viewMitgliederSendMailForm($filters, $templates);
 	exit;
 case "sendmail.preview":
-	$filter = null;
-	if ($session->hasVariable("filterid") && $session->getStorage()->hasMitgliederFilter($session->getVariable("filterid"))) {
-		$filter = $session->getStorage()->getMitgliederFilter($session->getVariable("filterid"));
-	}
+	$filter = $session->getMitgliederFilter($session->getVariable("filterid"));
 	$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("mailtemplateid"));
 
 	$mitgliedercount = $session->getStorage()->getMitgliederCount($filter);
