@@ -5,6 +5,7 @@ require_once(VPANEL_CORE . "/storageobject.class.php");
 class TempFile extends StorageClass {
 	private $tempfileid;
 	private $userid;
+	private $timestamp;
 	private $fileid;
 
 	private $user;
@@ -13,6 +14,7 @@ class TempFile extends StorageClass {
 	public static function factory(Storage $storage, $row) {
 		$tempfile = new TempFile($storage);
 		$tempfile->setTempFileID($row["tempfileid"]);
+		$tempfile->setTimestamp($row["timestamp"]);
 		$tempfile->setUserID($row["userid"]);
 		$tempfile->setFileID($row["fileid"]);
 		return $tempfile;
@@ -24,29 +26,6 @@ class TempFile extends StorageClass {
 
 	public function getTempFileID() {
 		return $this->tempfileid;
-	}
-
-	public function setFileID($fileid) {
-		if ($fileid != $this->fileid) {
-			$this->file = null;
-		}
-		$this->fileid = $fileid;
-	}
-
-	public function getFileID() {
-		return $this->fileid;
-	}
-
-	public function setFile($file) {
-		$this->setFileID($file->getFileID());
-		$this->file = $file;
-	}
-
-	public function getFile() {
-		if ($this->file == null) {
-			$this->file = $this->getStorage()->getFile($this->getFileID());
-		}
-		return $this->file;
 	}
 
 	public function setUserID($userid) {
@@ -72,6 +51,37 @@ class TempFile extends StorageClass {
 		return $this->user;
 	}
 
+	public function setTimestamp($timestamp) {
+		$this->timestamp = $timestamp;
+	}
+
+	public function getTimestamp() {
+		return $this->timestamp;
+	}
+
+	public function setFileID($fileid) {
+		if ($fileid != $this->fileid) {
+			$this->file = null;
+		}
+		$this->fileid = $fileid;
+	}
+
+	public function getFileID() {
+		return $this->fileid;
+	}
+
+	public function setFile($file) {
+		$this->setFileID($file->getFileID());
+		$this->file = $file;
+	}
+
+	public function getFile() {
+		if ($this->file == null) {
+			$this->file = $this->getStorage()->getFile($this->getFileID());
+		}
+		return $this->file;
+	}
+
 	public function isAllowed($user) {
 		return $this->userid == $user->getUserID();
 	}
@@ -83,6 +93,7 @@ class TempFile extends StorageClass {
 		$this->setTempFileID($storage->setTempFile(
 			$this->getTempFileID(),
 			$this->getUserID(),
+			$this->getTimestamp(),
 			$this->getFileID()));
 	}
 }

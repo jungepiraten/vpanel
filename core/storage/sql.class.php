@@ -1632,22 +1632,24 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "TempFile");
 	}
 	public function getTempFileResult() {
-		$sql = "SELECT `tempfileid`, `userid`, `fileid` FROM `tempfiles`";
+		$sql = "SELECT `tempfileid`, `userid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `fileid` FROM `tempfiles`";
 		return $this->getResult($sql, array($this, "parseTempFile"));
 	}
 	public function getTempFile($tempfileid) {
-		$sql = "SELECT `tempfileid`, `userid`, `fileid` FROM `tempfiles` WHERE `tempfileid` = " . intval($tempfileid);
+		$sql = "SELECT `tempfileid`, `userid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `fileid` FROM `tempfiles` WHERE `tempfileid` = " . intval($tempfileid);
 		return $this->getResult($sql, array($this, "parseTempFile"))->fetchRow();
 	}
-	public function setTempFile($tempfileid, $userid, $fileid) {
+	public function setTempFile($tempfileid, $userid, $timestamp, $fileid) {
 		if ($tempfileid == null) {
 			$sql = "INSERT INTO `tempfiles`
-				(`userid`, `fileid`) VALUES
-				(" . $this->escape($userid) . ",
-				 " . $this->escape($fileid) . ")";
+				(`userid`, `timestamp`, `fileid`) VALUES
+				(" . intval($userid) . ",
+				 '" . date("Y-m-d H:i:s", $timestamp) . "',
+				 " . intval($fileid) . ")";
 		} else {
 			$sql = "UPDATE	`tempfiles`
 				SET	`userid` = " . intval($userid) . ",
+					`timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "',
 					`fileid` = " . intval($fileid) . "
 				WHERE `tempfileid` = " . intval($tempfileid);
 		}

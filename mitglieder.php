@@ -343,6 +343,7 @@ case "export.export":
 
 	$tempfile = new TempFile($session->getStorage());
 	$tempfile->setUser($session->getUser());
+	$tempfile->setTimestamp(time());
 	$file = new File($session->getStorage());
 	$file->setExportFilename("vpanel-export-" . date("Y-m-d"));
 	$file->save();
@@ -363,6 +364,7 @@ case "statistik.start":
 
 	$tempfile = new TempFile($session->getStorage());
 	$tempfile->setUser($session->getUser());
+	$tempfile->setTimestamp(time());
 	$file = new File($session->getStorage());
 	$file->setExportFilename("vpanel-statisik-" . date("Y-m-d"));
 	$file->save();

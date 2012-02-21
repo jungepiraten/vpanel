@@ -192,7 +192,7 @@ interface Storage {
 	public function getTempFileResult();
 	public function getTempFileList();
 	public function getTempFile($tempfileid);
-	public function setTempFile($tempfileid, $userid, $fileid);
+	public function setTempFile($tempfileid, $userid, $timestamp, $fileid);
 	public function delTempFile($tempfileid);
 
 	public function getMitgliederFilterList();
