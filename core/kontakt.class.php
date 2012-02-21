@@ -1,6 +1,7 @@
 <?php
 
 require_once(VPANEL_CORE . "/globalobject.class.php");
+require_once(VPANEL_CORE . "/email.class.php");
 require_once(VPANEL_CORE . "/ort.class.php");
 
 class Kontakt extends GlobalClass {
@@ -11,9 +12,10 @@ class Kontakt extends GlobalClass {
 	private $ortid;
 	private $telefonnummer;
 	private $handynummer;
-	private $email;
+	private $emailid;
 
 	private $ort;
+	private $email;
 	
 	public static function factory(Storage $storage, $row) {
 		$kontakt = new Kontakt($storage);
@@ -24,7 +26,7 @@ class Kontakt extends GlobalClass {
 		$kontakt->setOrtID($row["ortid"]);
 		$kontakt->setTelefonnummer($row["telefonnummer"]);
 		$kontakt->setHandynummer($row["handynummer"]);
-		$kontakt->setEMail($row["email"]);
+		$kontakt->setEMailID($row["emailid"]);
 		return $kontakt;
 	}
 
@@ -99,11 +101,26 @@ class Kontakt extends GlobalClass {
 		$this->handynummer = $handynummer;
 	}
 
+	public function getEMailID() {
+		return $this->emailid;
+	}
+
+	public function setEMailID($emailid) {
+		if ($this->emailid != $emailid) {
+			$this->email = null;
+		}
+		$this->emailid = $emailid;
+	}
+
 	public function getEMail() {
+		if ($this->email == null) {
+			$this->email = $this->getStorage()->getEMail($this->emailid);
+		}
 		return $this->email;
 	}
 
 	public function setEMail($email) {
+		$this->setEMailID($email->getEMailID());
 		$this->email = $email;
 	}
 
@@ -119,7 +136,7 @@ class Kontakt extends GlobalClass {
 			$this->getOrtID(),
 			$this->getTelefonnummer(),
 			$this->getHandynummer(),
-			$this->getEMail() ));
+			$this->getEMailID() ));
 	}
 }
 

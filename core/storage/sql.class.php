@@ -15,6 +15,8 @@ require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/mitgliedschaft.class.php");
 require_once(VPANEL_CORE . "/natperson.class.php");
 require_once(VPANEL_CORE . "/jurperson.class.php");
+require_once(VPANEL_CORE . "/kontakt.class.php");
+require_once(VPANEL_CORE . "/email.class.php");
 require_once(VPANEL_CORE . "/mailtemplate.class.php");
 require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
 require_once(VPANEL_CORE . "/process.class.php");
@@ -395,6 +397,12 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof MitgliedMitgliederMatcher) {
 			return "`m`.`mitgliedid` = " . intval($matcher->getMitgliedID());
 		}
+		if ($matcher instanceof EMailBounceCountAboveMitgliederMatcher) {
+			return "`e`.`bouncecount` > " . intval($matcher->getCountLimit());
+		}
+		if ($matcher instanceof EMailBounceCountBelowMitgliederMatcher) {
+			return "`e`.`bouncecount` <= " . intval($matcher->getCountLimit());
+		}
 		if ($matcher instanceof RevisionFlagMitgliederMatcher) {
 			return "`r`.`revisionid` IN (SELECT `revisionid` FROM `mitgliederrevisionflags` WHERE `flagid` = " . intval($matcher->getFlagID()) . ")";
 		}
@@ -404,11 +412,17 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof BeitragMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID()).")";
 		}
-		if ($matcher instanceof BeitragMissingMitgliederMatcher) {
-			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID())." AND `hoehe` - `bezahlt` > 0)";
-		}
 		if ($matcher instanceof BeitragPaidMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID())." AND `hoehe` - `bezahlt` <= 0)";
+		}
+		if ($matcher instanceof BeitragPaidBelowMitgliederMatcher) {
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` GROUP BY `mitgliedid` HAVING SUM(`bezahlt`) <= " . floatval($matcher->getBeitragMark()) . ")";
+		}
+		if ($matcher instanceof BeitragPaidAboveMitgliederMatcher) {
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` GROUP BY `mitgliedid` HAVING SUM(`bezahlt`) > " . floatval($matcher->getBeitragMark()) . ")";
+		}
+		if ($matcher instanceof BeitragMissingMitgliederMatcher) {
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID())." AND `hoehe` - `bezahlt` > 0)";
 		}
 		if ($matcher instanceof BeitragMissingBelowMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` GROUP BY `mitgliedid` HAVING SUM(`hoehe` - `bezahlt`) <= " . floatval($matcher->getBeitragMark()) . ")";
@@ -451,8 +465,9 @@ abstract class SQLStorage extends AbstractStorage {
 		return reset($this->getResult($sql)->fetchRow());
 	}
 	public function parseMitglied($row) {
-		$o = $this->parseRow($row, null, array("r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => 'Ort', "m" => 'Mitglied'));
+		$o = $this->parseRow($row, null, array("r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => 'Ort', "e" => 'EMail', "m" => 'Mitglied'));
 		$o["k"]->setOrt($o["o"]);
+		$o["k"]->setEMail($o["e"]);
 		if ($o["r"]->getNatPersonID() !== null) {
 			$o["r"]->setNatPerson($o["n"]);
 		}
@@ -499,7 +514,10 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`ortid` AS `k_ortid`,
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
-				`k`.`email` AS `k_email`,
+				`k`.`emailid` AS `k_emailid`,
+				`e`.`emailid` AS `e_emailid`,
+				`e`.`email` AS `e_email`,
+				`e`.`bouncecount` AS `e_bouncecount`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -510,6 +528,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `natperson` `n` ON (`n`.`natpersonid` = `r`.`natpersonid`)
 			LEFT JOIN `jurperson` `j` ON (`j`.`jurpersonid` = `r`.`jurpersonid`)
 			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
+			LEFT JOIN `emails` `e` ON (`e`.`emailid` = `k`.`emailid`)
 			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
 			".($matcher != null ? "WHERE ".$this->parseMitgliederMatcher($matcher) : "")."
 			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
@@ -559,7 +578,10 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`ortid` AS `k_ortid`,
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
-				`k`.`email` AS `k_email`,
+				`k`.`emailid` AS `k_emailid`,
+				`e`.`emailid` AS `e_emailid`,
+				`e`.`email` AS `e_email`,
+				`e`.`bouncecount` AS `e_bouncecount`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -571,6 +593,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `natperson` `n` ON (`n`.`natpersonid` = `r`.`natpersonid`)
 			LEFT JOIN `jurperson` `j` ON (`j`.`jurpersonid` = `r`.`jurpersonid`)
 			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
+			LEFT JOIN `emails` `e` ON (`e`.`emailid` = `k`.`emailid`)
 			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
 			WHERE	`dokumentid` = " . intval($dokumentid) . "
 			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
@@ -751,8 +774,9 @@ abstract class SQLStorage extends AbstractStorage {
 	 * MitgliederRevisions
 	 **/
 	public function parseMitgliederRevision($row) {
-		$o = $this->parseRow($row, null, array("r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => "Ort"));
+		$o = $this->parseRow($row, null, array("r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => "Ort", "e" => "EMail"));
 		$o["k"]->setOrt($o["o"]);
+		$o["k"]->setEMail($o["e"]);
 		$o["r"]->setNatPerson($o["n"]);
 		$o["r"]->setJurPerson($o["j"]);
 		$o["r"]->setKontakt($o["k"]);
@@ -786,7 +810,10 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`ortid` AS `k_ortid`,
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
-				`k`.`email` AS `k_email`,
+				`k`.`emailid` AS `k_emailid`,
+				`e`.`emailid` AS `e_emailid`,
+				`e`.`email` AS `e_email`,
+				`e`.`bouncecount` AS `e_bouncecount`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -796,6 +823,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
 			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
 			LEFT JOIN `orte` `o` USING (`ortid`)
+			LEFT JOIN `emails` `e` USING (`emailid`)
 			ORDER BY `r`.`timestamp`";
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
 	}
@@ -827,7 +855,10 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`ortid` AS `k_ortid`,
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
-				`k`.`email` AS `k_email`,
+				`k`.`emailid` AS `k_emailid`,
+				`e`.`emailid` AS `e_emailid`,
+				`e`.`email` AS `e_email`,
+				`e`.`bouncecount` AS `e_bouncecount`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -837,6 +868,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
 			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
 			LEFT JOIN `orte` `o` USING (`ortid`)
+			LEFT JOIN `emails` `e` USING (`emailid`)
 			WHERE `r`.`mitgliedid` = " . intval($mitgliedid) . "
 			ORDER BY `r`.`timestamp`";
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
@@ -869,7 +901,10 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`ortid` AS `k_ortid`,
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
-				`k`.`email` AS `k_email`,
+				`k`.`emailid` AS `k_emailid`,
+				`e`.`emailid` AS `e_emailid`,
+				`e`.`email` AS `e_email`,
+				`e`.`bouncecount` AS `e_bouncecount`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -879,6 +914,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
 			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
 			LEFT JOIN `orte` `o` USING (`ortid`)
+			LEFT JOIN `emails` `e` USING (`emailid`)
 			WHERE	`r`.`revisionid` = " . intval($revisionid);
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"))->fetchRow();
 	}
@@ -902,14 +938,14 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "Kontakt");
 	}
 	public function getKontakt($kontaktid) {
-		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email` FROM `kontakt` WHERE `kontaktid` = " . intval($kontaktid);
+		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid` FROM `kontakt` WHERE `kontaktid` = " . intval($kontaktid);
 		return $this->getResult($sql, array($this, "parseKontakt"))->fetchRow();
 	}
-	public function setKontakt($kontaktid, $adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $email) {
+	public function setKontakt($kontaktid, $adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $emailid) {
 		if ($kontaktid == null) {
-			$sql = "INSERT INTO `kontakte` (`adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email`) VALUES ('" . $this->escape($adresszusatz) . "', '" . $this->escape($strasse) . "', '" . $this->escape($hausnummer) . "', " . intval($ortid) . ", '" . $this->escape($telefon) . "', '" . $this->escape($handy) . "', '" . $this->escape($email) . "')";
+			$sql = "INSERT INTO `kontakte` (`adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid`) VALUES ('" . $this->escape($adresszusatz) . "', '" . $this->escape($strasse) . "', '" . $this->escape($hausnummer) . "', " . intval($ortid) . ", '" . $this->escape($telefon) . "', '" . $this->escape($handy) . "', " . intval($emailid) . ")";
 		} else {
-			$sql = "UPDATE `kontakte` SET `adresszusatz` = '" . $this->escape($adresszusatz) . "', `strasse` = '" . $this->escape($strasse) . "', `hausnummer` = '" . $this->escape($hausnummer) . "', `ortid` = " . intval($ortid) . ", `telefonnummer` = '" . $this->escape($telefon) . "', `handynummer` = '" . $this->escape($handy) . "', `email` = '" . $this->escape($email) . "' WHERE `kontaktid` = " . intval($kontaktid);
+			$sql = "UPDATE `kontakte` SET `adresszusatz` = '" . $this->escape($adresszusatz) . "', `strasse` = '" . $this->escape($strasse) . "', `hausnummer` = '" . $this->escape($hausnummer) . "', `ortid` = " . intval($ortid) . ", `telefonnummer` = '" . $this->escape($telefon) . "', `handynummer` = '" . $this->escape($handy) . "', `emailid` = " . intval($emailid) . " WHERE `kontaktid` = " . intval($kontaktid);
 		}
 		$this->query($sql);
 		if ($kontaktid == null) {
@@ -921,8 +957,8 @@ abstract class SQLStorage extends AbstractStorage {
 		$sql = "DELETE FROM `kontakte` WHERE `kontaktid` = " . intval($kontaktid);
 		return $this->query($sql);
 	}
-	public function searchKontakt($adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $email) {
-		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email` FROM `kontakte` WHERE `adresszusatz` = '" . $this->escape($adresszusatz) . "' AND `strasse` = '" . $this->escape($strasse) . "' AND `hausnummer` = '" . $this->escape($hausnummer) . "' AND `ortid` = " . intval($ortid) . " AND `telefonnummer` = '" . $this->escape($telefon) . "' AND `handynummer` = '" . $this->escape($handy) . "' AND `email` = '" . $this->escape($email) . "'";
+	public function searchKontakt($adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $emailid) {
+		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email` FROM `kontakte` WHERE `adresszusatz` = '" . $this->escape($adresszusatz) . "' AND `strasse` = '" . $this->escape($strasse) . "' AND `hausnummer` = '" . $this->escape($hausnummer) . "' AND `ortid` = " . intval($ortid) . " AND `telefonnummer` = '" . $this->escape($telefon) . "' AND `handynummer` = '" . $this->escape($handy) . "' AND `emailid` = '" . intval($emailid) . "'";
 		$result = $this->getResult($sql, array($this, "parseKontakt"));
 		if ($result->getCount() > 0) {
 			return $result->fetchRow();
@@ -934,9 +970,48 @@ abstract class SQLStorage extends AbstractStorage {
 		$kontakt->setOrtID($ortid);
 		$kontakt->setTelefonnummer($telefon);
 		$kontakt->setHandynummer($handy);
-		$kontakt->setEMail($email);
+		$kontakt->setEMailID($emailid);
 		$kontakt->save();
 		return $kontakt;
+	}
+
+	/**
+	 * EMail
+	 **/
+	public function parseEMail($row) {
+		return $this->parseRow($row, null, "EMail");
+	}
+	public function getEMail($emailid) {
+		$sql = "SELECT `emailid`, `email`, `bouncecount` FROM `emails` WHERE `emailid` = " . intval($emailid);
+		return $this->getResult($sql, array($this, "parseEMail"))->fetchRow();
+	}
+	public function setEMail($emailid, $email, $bouncecount) {
+		if ($emailid == null) {
+			$sql = "INSERT INTO `emails` (`email`, `bouncecount`) VALUES ('" . $this->escape($email) . "', " . intval($bouncecount) . ")";
+		} else {
+			$sql = "UPDATE `emails` SET `email` = '" . $this->escape($email) . "', `bouncecount` = " . intval($bouncecount) . "' WHERE `emailid` = " . intval($emailid);
+		}
+		$this->query($sql);
+		if ($emailid == null) {
+			$emailid = $this->getInsertID();
+		}
+		return $emailid;
+	}
+	public function delEMail($emailid) {
+		$sql = "DELETE FROM `emails` WHERE `emailid` = " . intval($emailid);
+		return $this->query($sql);
+	}
+	public function searchEMail($email) {
+		$sql = "SELECT `emailid`, `email`, `bouncecount` FROM `emails` WHERE `email` = '" . $this->escape($email) . "'";
+		$result = $this->getResult($sql, array($this, "parseEMail"));
+		if ($result->getCount() > 0) {
+			return $result->fetchRow();
+		}
+		$email = new EMail($this);
+		$email->setEMail($plz);
+		$email->setBounceCount(0);
+		$email->save();
+		return $email;
 	}
 
 	/**

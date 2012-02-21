@@ -129,7 +129,7 @@ class MailTemplate extends StorageClass {
 			$mail->addAttachment($attachment);
 		}
 
-		$mail->setRecipient($mitglied->getLatestRevision()->getKontakt()->getEMail());
+		$mail->setRecipient($mitglied->getLatestRevision()->getKontakt()->getEMail()->getEMail());
 		
 		return $mail;
 	}

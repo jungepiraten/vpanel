@@ -95,6 +95,11 @@ interface Storage {
 	public function delKontakt($kontaktid);
 	public function searchKontakt($strasse, $adresszusatz, $hausnummer, $ortid, $telefon, $handy, $email);
 
+	public function getEmail($emailid);
+	public function setEMail($emailid, $email, $bouncecount);
+	public function delEMail($emailid);
+	public function searchEMail($email);
+
 	public function getOrtResult();
 	public function getOrtList();
 	public function getOrtResultLimit($plz = null, $label = null, $stateid = null, $count = null);
