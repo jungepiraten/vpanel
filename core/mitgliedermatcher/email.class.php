@@ -5,7 +5,7 @@ require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 class EMailBounceCountAboveMitgliederMatcher extends MitgliederMatcher {
 	private $countlimit;
 
-	public __construct($countlimit) {
+	public function __construct($countlimit) {
 		$this->countlimit = $countlimit;
 	}
 
@@ -21,7 +21,7 @@ class EMailBounceCountAboveMitgliederMatcher extends MitgliederMatcher {
 class EMailBounceCountBelowMitgliederMatcher extends MitgliederMatcher {
 	private $countlimit;
 
-	public __construct($countlimit) {
+	public function __construct($countlimit) {
 		$this->countlimit = $countlimit;
 	}
 
