@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . "/config.inc.php");
+require_once(dirname(__FILE__) . "/../config.inc.php");
 $storage = $config->getStorage();
 
 $processes = $storage->getProcessList();
