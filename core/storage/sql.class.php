@@ -457,6 +457,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `jurperson` `j` ON (`j`.`jurpersonid` = `r`.`jurpersonid`)
 			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
 			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
+			LEFT JOIN `emails` `e` ON (`e`.`emailid` = `k`.`emailid`)
 			WHERE	`r`.`timestamp` = (
 				SELECT	MAX(`rmax`.`timestamp`)
 				FROM	`mitgliederrevisions` `rmax`
