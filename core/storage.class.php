@@ -195,6 +195,12 @@ interface Storage {
 	public function setTempFile($tempfileid, $userid, $timestamp, $fileid);
 	public function delTempFile($tempfileid);
 
+	public function getMitgliederStatistikResult();
+	public function getMitgliederStatistikList();
+	public function getMitgliederStatistik($tempfileid);
+	public function setMitgliederStatistik($statistikid, $timestamp, $agegraphfileid, $timegraphfileid);
+	public function delMitgliederStatistik($statistikid);
+
 	public function getMitgliederFilterList();
 	public function hasMitgliederFilter($filterid);
 	public function getMitgliederFilter($filterid);
@@ -347,6 +353,10 @@ abstract class AbstractStorage implements Storage {
 
 	public function getTempFileList() {
 		return $this->getTempFileResult()->fetchAll();
+	}
+
+	public function getMitgliederStatistikList() {
+		return $this->getMitgliederStatistikResult()->fetchAll();
 	}
 
 	/** Filter **/

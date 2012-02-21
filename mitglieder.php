@@ -16,6 +16,7 @@ require_once(VPANEL_CORE . "/mitgliednotiz.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
+require_once(VPANEL_CORE . "/mitgliederstatistik.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfiltersendmail.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterexport.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterstatistik.class.php");
@@ -96,8 +97,7 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 	$revision->setUser($session->getUser());
 	$revision->setMitglied($mitglied);
 	$revision->setMitgliedschaft($mitgliedschaft);
-	$revision->setGliederung($gliederung);
-	$revision->setBeitrag($beitrag);
+	$revision->setGliederung($gliederung);	$revision->setBeitrag($beitrag);
 	$revision->setNatPerson($natperson);
 	$revision->setJurPerson($jurperson);
 	$revision->setKontakt($kontakt);
@@ -163,6 +163,11 @@ function parseMitgliederBeitraegeFormular($session, &$mitglied) {
 }
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
+case "statistik":
+	$statistik = $session->getStorage()->getMitgliederStatistik($session->getVariable("statistikid"));
+
+	$ui->viewMitgliederStatistik($statistik);
+	break;
 case "beitraege":
 	$mitgliedid = intval($session->getVariable("mitgliedid"));
 	$mitglied = $session->getStorage()->getMitglied($mitgliedid);
@@ -362,19 +367,24 @@ case "export.export":
 case "statistik.start":
 	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
 
-	$tempfile = new TempFile($session->getStorage());
-	$tempfile->setUser($session->getUser());
-	$tempfile->setTimestamp(time());
-	$file = new File($session->getStorage());
-	$file->setExportFilename("vpanel-statisik-" . date("Y-m-d"));
-	$file->save();
-	$tempfile->setFile($file);
-	$tempfile->save();
+	$statistik = new MitgliederStatistik($session->getStorage());
+	$statistik->setTimestamp(time());
+
+	$agegraphfile = new File($session->getStorage());
+	$agegraphfile->setExportFilename("vpanel-agegraph-" . date("Y-m-d"));
+	$agegraphfile->save();
+	$statistik->setAgeGraphFile($agegraphfile);
+
+	$timegraphfile = new File($session->getStorage());
+	$timegraphfile->setExportFilename("vpanel-timegraph-" . date("Y-m-d"));
+	$timegraphfile->save();
+	$statistik->setTimeGraphFile($timegraphfile);
+	$statistik->save();
 
 	$process = new MitgliederFilterStatistikProcess($session->getStorage());
 	$process->setMatcher($matcher);
-	$process->setFile($tempfile);
-	$process->setFinishedPage($session->getLink("tempfile_get", $tempfile->getTempFileID()));
+	$process->setStatistik($statistik);
+	$process->setFinishedPage($session->getLink("mitglieder_statistik", $statistik->getStatistikID()));
 	$process->save();
 	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
 	exit;

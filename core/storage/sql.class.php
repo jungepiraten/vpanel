@@ -25,6 +25,7 @@ require_once(VPANEL_CORE . "/dokumentstatus.class.php");
 require_once(VPANEL_CORE . "/dokumentnotiz.class.php");
 require_once(VPANEL_CORE . "/file.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
+require_once(VPANEL_CORE . "/mitgliederstatistik.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/mitglied.class.php");
 
 abstract class SQLStorage extends AbstractStorage {
@@ -1661,6 +1662,45 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 	public function delTempFile($tempfileid) {
 		$sql = "DELETE `tempfiles` WHERE `tempfileid` = " . intval($tempfileid);
+		return $this->query($sql);
+	}
+
+	/**
+	 * MitgliederStatistik
+	 **/
+	public function parseMitgliederStatistik($row) {
+		return $this->parseRow($row, null, "MitgliederStatistik");
+	}
+	public function getMitgliederStatistikResult() {
+		$sql = "SELECT `statistikid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid` FROM `mitgliederstatistiken`";
+		return $this->getResult($sql, array($this, "parseMitgliederStatistik"));
+	}
+	public function getMitgliederStatistik($statistikid) {
+		$sql = "SELECT `statistikid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid` FROM `mitgliederstatistiken` WHERE `statistikid` = " . intval($statistikid);
+		return $this->getResult($sql, array($this, "parseMitgliederStatistik"))->fetchRow();
+	}
+	public function setMitgliederStatistik($statistikid, $timestamp, $agegraphfileid, $timegraphfileid) {
+		if ($statistikid == null) {
+			$sql = "INSERT INTO `mitgliederstatistiken`
+				(`timestamp`, `agegraphfileid`, `timegraphfileid`) VALUES
+				('" . date("Y-m-d H:i:s", $timestamp) . "',
+				 " . intval($agegraphfileid) . ",
+				 " . intval($timegraphfileid) . ")";
+		} else {
+			$sql = "UPDATE	`mitgliederstatistiken`
+				SET	`timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "',
+					`agegraphfileid` = " . intval($agegraphfileid) . ",
+					`timegraphfileid` = " . intval($timegraphfileid) . "
+				WHERE `statistikid` = " . intval($statistikid);
+		}
+		$this->query($sql);
+		if ($statistikid == null) {
+			$statistikid = $this->getInsertID();
+		}
+		return $statistikid;
+	}
+	public function delMitgliederStatistik($statistikid) {
+		$sql = "DELETE `mitgliederstatistiken` WHERE `statistikid` = " . intval($statistikid);
 		return $this->query($sql);
 	}
 }

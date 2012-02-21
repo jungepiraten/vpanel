@@ -417,6 +417,19 @@ class Template {
 		return array_map(array($this, 'parseFile'), $rows);
 	}
 
+	protected function parseMitgliederStatistik($statistik) {
+		$row = array();
+		$row["statistikid"] = $statistik->getStatistikID();
+		$row["timestamp"] = $statistik->getTimestamp();
+		$row["agegraphfile"] = $this->parseFile($statistik->getAgeGraphFile());
+		$row["timegraphfile"] = $this->parseFile($statistik->getTimeGraphFile());
+		return $row;
+	}
+
+	protected function parseMitgliederStatistiken($rows) {
+		return array_map(array($this, 'parseMitgliederStatistik'), $rows);
+	}
+
 
 	public function viewIndex() {
 		$this->smarty->display("index.html.tpl");
@@ -671,6 +684,11 @@ class Template {
 		$this->smarty->assign("token", $token);
 		$this->smarty->assign("parts", $parts);
 		$this->smarty->display("filepdfpreview.html.tpl");
+	}
+
+	public function viewMitgliederStatistik($statistik) {
+		$this->smarty->assign("statistik", $this->parseMitgliederStatistik($statistik));
+		$this->smarty->display("mitgliederstatistik.html.tpl");
 	}
 
 	public function getRedirectURL() {

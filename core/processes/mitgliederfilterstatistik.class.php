@@ -3,15 +3,15 @@
 require_once(VPANEL_CORE . "/process.class.php");
 
 class MitgliederFilterStatistikProcess extends Process {
-	private $fileid;
+	private $statistikid;
 
 	private $matcher;
-	private $file;
+	private $statistik;
 
 	public static function factory(Storage $storage, $row) {
-		$process = new $row["class"]($storage);
+		$process = new MitgliederFilterStatistikProcess($storage);
 		$process->setMatcher($row["matcher"]);
-		$process->setFileID($row["fileid"]);
+		$process->setStatistikID($row["statistikid"]);
 		return $process;
 	}
 
@@ -23,65 +23,57 @@ class MitgliederFilterStatistikProcess extends Process {
 		$this->matcher = $matcher;
 	}
 
-	public function getFileID() {
-		return $this->fileid;
+	public function getStatistikID() {
+		return $this->statistikid;
 	}
 
-	public function setFileID($fileid) {
-		if ($fileid != $this->fileid) {
-			$this->file = null;
+	public function setStatistikID($statistikid) {
+		if ($statistikid != $this->statistikid) {
+			$this->statistik = null;
 		}
-		$this->fileid = $fileid;
+		$this->statistikid = $statistikid;
 	}
 
-	public function getFile() {
-		if ($this->file == null) {
-			$this->file = $this->getStorage()->getFile($this->getFileID());
+	public function getStatistik() {
+		if ($this->statistik == null) {
+			$this->statistik = $this->getStorage()->getMitgliederStatistik($this->getStatistikID());
 		}
-		return $this->file;
+		return $this->statistik;
 	}
 
-	public function setFile($file) {
-		$this->setFileID($file->getFileID());
-		$this->file = $file;
-	}
-
-	public function getFields() {
-		return $this->fields;
+	public function setStatistik($statistik) {
+		$this->setStatistikID($statistik->getStatistikID());
+		$this->statistik = $statistik;
 	}
 
 	protected function getData() {
-		return array("class" => get_class($this), "matcher" => $this->getMatcher(), "fileid" => $this->getFileID());
+		return array("matcher" => $this->getMatcher(), "statistikid" => $this->getStatistikID());
 	}
 
-	public function runProcess() {
+	private $scalaMitgliederTime = 84600;
+	private $minMitgliederTime;
+	private $maxMitgliederTime;
+	private $mitgliederCount = array();
+	private $maxMitgliederCount = 1;
+
+	public function runPrepareData($progressOffset, $progress) {
 		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
-
-		$w = 600; $h = 250;
-		$offsetX = 40;
-		$scalaTime = 84600; $scalaX = 110; $scalaY = 60;
-
-		$img = ImageCreateTrueColor($offsetX + $w, 20 + $h);
-		$white    = ImageColorAllocate($img, 255, 255, 255);
-		$color    = ImageColorAllocate($img, 255,   0,   0);
-		$boxcolor = ImageColorAllocate($img,  20,  20,  20);
-		ImageFilledRectangle($img, 0,0, $offsetX+$w,20+$h, $white);
-
+		
 		$deltaScale = array();
-		$maxTime = $minTime = floor(time() / 84600);
+		$this->maxMitgliederTime = $this->minMitgliederTime = floor(time() / $this->scalaMitgliederTime);
 		while ($mitglied = $result->fetchRow()) {
-			$eintritt = floor($mitglied->getEintrittsdatum() / $scalaTime);
-			$minTime = min($minTime, $eintritt);
-			$maxTime = max($maxTime, $eintritt);
+			$eintritt = floor($mitglied->getEintrittsdatum() / $this->scalaMitgliederTime);
+			$this->minMitgliederTime = min($this->minMitgliederTime, $eintritt);
+			$this->maxMitgliederTime = max($this->maxMitgliederTime, $eintritt);
 			if (!isset($deltaScale[$eintritt])) {
 				$deltaScale[$eintritt] = 0;
 			}
 			$deltaScale[$eintritt] ++;
 
-			$austritt = floor($mitglied->getAustrittsdatum() / $scalaTime);
+			$austritt = floor($mitglied->getAustrittsdatum() / $this->scalaMitgliederTime);
 			if ($austritt != null) {
-				$minTime = min($minTime, $austritt);
-				$maxTime = max($maxTime, $austritt);
+				$this->minMitgliederTime = min($this->minMitgliederTime, $austritt);
+				$this->maxMitgliederTime = max($this->maxMitgliederTime, $austritt);
 				if (!isset($deltaScale[$austritt])) {
 					$deltaScale[$austritt] = 0;
 				}
@@ -89,22 +81,35 @@ class MitgliederFilterStatistikProcess extends Process {
 			}
 		}
 
-		$this->setProgress(0.33);
+		$this->setProgress($progressOffset + 0.7 * $progress);
 		$this->save();
 
-		$scale = array();
 		$curValue = 0;
-		$maxValue = 1;
-		for ($time = $minTime; $time <= $maxTime; $time ++) {
-			$scale[$time] = $curValue = $curValue + (isset($deltaScale[$time]) ? $deltaScale[$time] : 0);
-			$maxValue = max($maxValue, $curValue);
+		for ($time = $this->minMitgliederTime; $time <= $this->maxMitgliederTime; $time ++) {
+			$this->mitgliederCount[$time] = $curValue = $curValue + (isset($deltaScale[$time]) ? $deltaScale[$time] : 0);
+			$this->maxMitgliederCount = max($this->maxMitgliederCount, $curValue);
 		}
 
-		$this->setProgress(0.66);
+		$this->setProgress($progressOffset + 1 * $progress);
 		$this->save();
+	}
 
-		$pixelsPerValue = ($h - $scalaY / 3) / $maxValue;
-		$timePerPixel = ($maxTime - $minTime) / $w;
+	public function runGenerateAgeGraph($w, $h, $file, $progressOffset, $progress) {
+		
+	}
+
+	public function runGenerateTimeGraph($w, $h, $file, $progressOffset, $progress) {
+		$offsetX = 40;
+		$scalaX = 110; $scalaY = 60;
+
+		$img = ImageCreateTrueColor($offsetX + $w, 20 + $h);
+		$white    = ImageColorAllocate($img, 255, 255, 255);
+		$color    = ImageColorAllocate($img, 255,   0,   0);
+		$boxcolor = ImageColorAllocate($img,  20,  20,  20);
+		ImageFilledRectangle($img, 0,0, $offsetX+$w,20+$h, $white);
+
+		$pixelsPerValue = ($h - $scalaY / 3) / $this->maxMitgliederCount;
+		$timePerPixel = ($this->maxMitgliederTime - $this->minMitgliederTime) / $w;
 
 		while (round($scalaY / $pixelsPerValue) % 10 != 0) {
 			$scalaY ++;
@@ -117,22 +122,28 @@ class MitgliederFilterStatistikProcess extends Process {
 		}
 
 		for ($x = 0; $x <= $w; $x++) {
-			$curTime = $minTime + floor($x * $timePerPixel);
-			$curValue = $scale[$curTime];
+			$curTime = $this->minMitgliederTime + floor($x * $timePerPixel);
+			$curValue = $this->mitgliederCount[$curTime];
 
 			ImageLine($img, $offsetX + $x, $h, $offsetX + $x, $h - round($curValue * $pixelsPerValue), $color);
 			if ($x % $scalaX == 0 && $x > 0 && $x < $w - imagefontwidth(3) * 5) {
-				ImageString($img, 3, $offsetX + $x - imagefontwidth(3) * 5, $h + 5, date("d.m.Y", $curTime * $scalaTime), $boxcolor);
+				ImageString($img, 3, $offsetX + $x - imagefontwidth(3) * 5, $h + 5, date("d.m.Y", $curTime * $this->scalaMitgliederTime), $boxcolor);
 			}
 		}
 
-		$this->getFile()->setMimeType("image/png");
-		$this->getFile()->setExportFilename($this->getFile()->getExportFilename() . ".png");
-		$this->getFile()->save();
-		ImagePNG($img, $this->getFile()->getAbsoluteFileName());
+		$file->setMimeType("image/png");
+		$file->setExportFilename($file->getExportFilename() . ".png");
+		$file->save();
+		ImagePNG($img, $file->getAbsoluteFileName());
 
-		$this->setProgress(1);
+		$this->setProgress($progressOffset + 1 * $progress);
 		$this->save();
+	}
+
+	public function runProcess() {
+		$this->runPrepareData(0, 0.6);
+		$this->runGenerateAgeGraph(600, 250, $this->getStatistik()->getAgeGraphFile(), 0.6, 0.2);
+		$this->runGenerateTimeGraph(600, 250, $this->getStatistik()->getTimeGraphFile(), 0.8, 0.2);
 	}
 }
 

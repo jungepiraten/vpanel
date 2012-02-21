@@ -21,26 +21,40 @@ if ($session->hasVariable("tempfileid")) {
 
 	$file = $tempfile->getFile();
 } elseif ($session->hasVariable("dokumentid")) {
-	$dokumentid = $session->getIntVariable("dokumentid");
-	$dokument = $session->getStorage()->getDokument($dokumentid);
-
 	if (!$session->isAllowed("dokumente_show")) {
 		die("<h1>403 Forbidden</h1>");
 	}
 
+	$dokumentid = $session->getIntVariable("dokumentid");
+	$dokument = $session->getStorage()->getDokument($dokumentid);
+
 	$file = $dokument->getFile();
 } elseif ($session->hasVariable("mailtemplateid") && $session->hasVariable("fileid")) {
-	$file = $session->getStorage()->getMailTemplate($session->getVariable("mailtemplateid"))->getAttachment($session->getVariable("fileid"));
-	
 	if (!$session->isAllowed("mailtemplates_show")) {
 		die("<h1>403 Forbidden</h1>");
 	}
+
+	$file = $session->getStorage()->getMailTemplate($session->getVariable("mailtemplateid"))->getAttachment($session->getVariable("fileid"));
 } elseif ($session->hasVariable("fileid") && $session->hasVariable("token")) {
 	$file = $session->getStorage()->getFile($session->getVariable("fileid"));
 	$token = $session->getVariable("token");
 	
 	if (!$session->validToken("file" . $file->getFileID(), $token)) {
 		die("<h1>403 Forbidden</h1>");
+	}
+} elseif ($session->hasVariable("statistikid") && $session->hasVariable("part")) {
+	if (!$session->isAllowed("mitglieder_show")) {
+		die("<h1>403 Forbidden</h1>");
+	}
+
+	$statistik = $session->getStorage()->getMitgliederStatistik($session->getVariable("statistikid"));
+	switch ($session->getVariable("part")) {
+	case "agegraph":
+		$file = $statistik->getAgeGraphFile();
+		break;
+	case "timegraph":
+		$file = $statistik->getTimeGraphFile();
+		break;
 	}
 }
 
@@ -76,7 +90,7 @@ case "getpart":
 		exit;
 	}
 case "get":
-	if (!isset($file)) {
+	if (!isset($file) || !file_exists($file->getAbsoluteFilename())) {
 		die("<h1>404 Not Found</h1>");
 	}
 
