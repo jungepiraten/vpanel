@@ -115,7 +115,7 @@ class MailTemplate extends StorageClass {
 	
 	public function generateMail(Mitglied $mitglied) {
 		global $config;
-		$mail = $config->createMail();
+		$mail = $config->createMail($mitglied->getLatestRevision()->getKontakt()->getEMail());
 		
 		$headers = array();
 		foreach ($this->getHeaders() as $header) {
@@ -128,8 +128,6 @@ class MailTemplate extends StorageClass {
 		foreach ($this->getAttachments() as $attachment) {
 			$mail->addAttachment($attachment);
 		}
-
-		$mail->setRecipient($mitglied->getLatestRevision()->getKontakt()->getEMail()->getEMail());
 		
 		return $mail;
 	}

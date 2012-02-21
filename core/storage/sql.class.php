@@ -1519,7 +1519,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "DokumentNotify");
 	}
 	public function getDokumentNotifyResult($dokumentkategorieid = null, $dokumentstatusid = null) {
-		$sql = "SELECT `dokumentnotifyid`, `dokumentkategorieid`, `dokumentstatusid`, `mail` FROM `dokumentnotifies` WHERE `dokumentkategorieid` IS NULL OR `dokumentstatusid` IS NULL";
+		$sql = "SELECT `dokumentnotifyid`, `dokumentkategorieid`, `dokumentstatusid`, `emailid` FROM `dokumentnotifies` WHERE `dokumentkategorieid` IS NULL OR `dokumentstatusid` IS NULL";
 		if ($dokumentkategorieid != null) {
 			$sql .= " OR `dokumentkategorieid` = " . intval($dokumentkategorieid);
 		}
@@ -1529,14 +1529,14 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parseDokumentNotify"));
 	}
 	public function getDokumentNotify($dokumentnotifyid) {
-		$sql = "SELECT `dokumentnotifyid`, `dokumentkategorieid`, `dokumentstatusid`, `mail` FROM `dokumentnotifies` WHERE `dokumentnotifyid` = " . intval($dokumentnotifyid);
+		$sql = "SELECT `dokumentnotifyid`, `dokumentkategorieid`, `dokumentstatusid`, `emailid` FROM `dokumentnotifies` WHERE `dokumentnotifyid` = " . intval($dokumentnotifyid);
 		return $this->getResult($sql, array($this, "parseDokumentNotify"))->fetchRow();
 	}
-	public function setDokumentNotify($dokumentnotifyid, $dokumentkategorieid, $dokumentstatusid, $mail) {
+	public function setDokumentNotify($dokumentnotifyid, $dokumentkategorieid, $dokumentstatusid, $emailid) {
 		if ($dokumentnotifyid == null) {
-			$sql = "INSERT INTO `dokumentnotifies` (`dokumentkategorieid`, `dokumentstatusid`, `mail`) VALUES (`dokumentkategorieid` = " . ($dokumentkategorieid == null ? "NULL" : intval($dokumentkategorieid)) . ", `dokumentstatusid` = " . ($dokumentstatusid == null ? "NULL" : intval($dokumentstatusid)) . ", " . ($mail == null ? "NULL" : "'" . $this->escape($mail) . "'") . ")";
+			$sql = "INSERT INTO `dokumentnotifies` (`dokumentkategorieid`, `dokumentstatusid`, `emailid`) VALUES (`dokumentkategorieid` = " . ($dokumentkategorieid == null ? "NULL" : intval($dokumentkategorieid)) . ", `dokumentstatusid` = " . ($dokumentstatusid == null ? "NULL" : intval($dokumentstatusid)) . ", " . ($emailid == null ? "NULL" : intval($emailid)) . ")";
 		} else {
-			$sql = "UPDATE `dokumentnotifies` SET `dokumentkategorieid` = " . ($dokumentkategorieid == null ? "NULL" : intval($dokumentkategorieid)) . ", `dokumentstatusid` = " . ($dokumentstatusid == null ? "NULL" : intval($dokumentstatusid)) . ", `mail` = " . ($mail == null ? "NULL" : "'" . $this->escape($mail) . "'") . " WHERE `dokumentnotifyid` = " . intval($dokumentnotifyid);
+			$sql = "UPDATE `dokumentnotifies` SET `dokumentkategorieid` = " . ($dokumentkategorieid == null ? "NULL" : intval($dokumentkategorieid)) . ", `dokumentstatusid` = " . ($dokumentstatusid == null ? "NULL" : intval($dokumentstatusid)) . ", `emailid` = " . ($emailid == null ? "NULL" : intval($emailid)) . " WHERE `dokumentnotifyid` = " . intval($dokumentnotifyid);
 		}
 		$this->query($sql);
 		if ($dokumentnotifyid == null) {

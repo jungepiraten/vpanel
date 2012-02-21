@@ -6,8 +6,8 @@ class Mail {
 	private $attachments;
 
 	private $boundary;
-	private $mailfrom;
-	private $fromlabel;
+	private $recipient;
+	private $bounceaddress;
 
 	public function __construct($headers = array(), $body = "", $attachments = array()) {
 		$this->headers = $headers;
@@ -15,18 +15,20 @@ class Mail {
 		$this->attachments = $attachments;
 	}
 
-	public function setRecipient($mail, $label = null) {
-		$this->mailfrom = $mail;
-		$this->fromlabel = $label;
+	public function setRecipient($mail) {
+		$this->recipient = $mail;
 	}
 
 	public function getRecipient() {
-		$rcpt = "";
-		if ($this->fromlabel != null) {
-			$rcpt .= $this->fromlabel . " ";
-		}
-		$rcpt .= "<" . $this->mailfrom . ">";
-		return $rcpt;
+		return $this->recipient;
+	}
+
+	public function setBounceAddress($address) {
+		$this->bounceaddress = $address;
+	}
+
+	public function getBounceAddress() {
+		return $this->bounceaddress;
 	}
 
 	public function setHeader($field, $value) {
@@ -72,8 +74,9 @@ class Mail {
 		$raw = "";
 		$charset = "UTF-8";
 		
+		$raw .= "Return-Path: <" . $this->getBounceAddress() . ">" . "\n";
 		$raw .= "User-Agent: VPanel Mailer" . "\n";
-		$raw .= "To: " . $this->getRecipient() . "\n";
+		$raw .= "To: <" . $this->getRecipient()->getEMail() . ">" . "\n";
 		if ($this->isMultipart()) {
 			$raw .= "MIME-Version: 1.0" . "\n";
 			$raw .= "Content-Type: multipart/mixed; boundary=" . $this->getBoundary() . "\n";

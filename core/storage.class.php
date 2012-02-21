@@ -168,7 +168,7 @@ interface Storage {
 	public function getDokumentNotifyResult($dokumentkategorieid = null, $dokumentstatusid = null);
 	public function getDokumentNotifyList($dokumentkategorieid = null, $dokumentstatusid = null);
 	public function getDokumentNotify($dokumentnotifyid);
-	public function setDokumentNotify($dokumentnotifyid, $dokumentkategorieid, $dokumentstatusid, $mail);
+	public function setDokumentNotify($dokumentnotifyid, $dokumentkategorieid, $dokumentstatusid, $emailid);
 
 	public function getDokumentKategorieResult();
 	public function getDokumentKategorieList();

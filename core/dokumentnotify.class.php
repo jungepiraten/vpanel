@@ -6,17 +6,18 @@ class DokumentNotify extends StorageClass {
 	private $dokumentnotifyid;
 	private $dokumentkategorieid;
 	private $dokumentstatusid;
-	private $mail;
+	private $emailid;
 
 	private $dokumentkategorie;
 	private $dokumentstatus;
+	private $email;
 
 	public static function factory(Storage $storage, $row) {
 		$dokumentnotify = new DokumentNotify($storage);
 		$dokumentnotify->setDokumentNotifyID($row["dokumentnotifyid"]);
 		$dokumentnotify->setDokumentKategorieID($row["dokumentkategorieid"]);
 		$dokumentnotify->setDokumentStatusID($row["dokumentstatusid"]);
-		$dokumentnotify->setMail($row["mail"]);
+		$dokumentnotify->setEMailID($row["emailid"]);
 		return $dokumentnotify;
 	}
 
@@ -74,12 +75,27 @@ class DokumentNotify extends StorageClass {
 		$this->dokumentstatus = $dokumentstatus;
 	}
 
-	public function getMail() {
-		return $this->mail;
+	public function getEMailID() {
+		return $this->emailid;
 	}
 
-	public function setMail($mail) {
-		$this->mail = $mail;
+	public function setEMailID($emailid) {
+		if ($this->emailid == $emailid) {
+			$this->email = null;
+		}
+		$this->emailid = $emailid;
+	}
+
+	public function getEMail() {
+		if ($this->email == null) {
+			$this->email = $this->getStorage()->getEMail($this->emailid);
+		}
+		return $this->email;
+	}
+
+	public function setEMail($email) {
+		$this->setEMailID($email->getEMailID());
+		$this->email = $email;
 	}
 
 	public function save(Storage $storage = null) {
@@ -90,13 +106,13 @@ class DokumentNotify extends StorageClass {
 			$this->getDokumentNotifyID(),
 			$this->getDokumentKategorieID(),
 			$this->getDokumentStatusID(),
-			$this->getMail() ));
+			$this->getEMailID() ));
 	}
 
 	public function notify($dokument, $notiz) {
 		global $config;
 		if ($this->getMail() != null) {
-			$mail = $config->createMail();
+			$mail = $config->createMail($this->getEMail());
 			$mail->setHeader("Subject", "[VPanel] Dokument");
 			$mail->setBody(<<<EOT
 Hallo,
@@ -120,7 +136,6 @@ VPanel
 EOT
 );
 			$mail->addAttachment($dokument->getFile());
-			$mail->setRecipient($this->getMail());
 			$config->getSendMailBackend()->send($mail);
 		}
 	}

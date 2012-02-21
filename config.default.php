@@ -62,11 +62,16 @@ class DefaultConfig {
 	public function getSendMailBackend() {
 		return $this->sendmailbackend;
 	}
+	protected function getBounceAddress($email) {
+		return "bounce-" . $email->getEMailID() . "@" . $this->getHostPart();
+	}
 	protected function getFromMailAddress() {
 		return "vpanel@" . $this->getHostPart();
 	}
-	public function createMail() {
+	public function createMail($email) {
 		$mail = new Mail();
+		$mail->setRecipient($email);
+		$mail->setBounceAddress($this->getBounceAddress($email));
 		$mail->setHeader("From", $this->getFromMailAddress());
 		$mail->setHeader("X-VPanel", $this->getHostPart());
 		return $mail;
