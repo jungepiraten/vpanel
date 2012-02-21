@@ -990,7 +990,7 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($emailid == null) {
 			$sql = "INSERT INTO `emails` (`email`, `bouncecount`) VALUES ('" . $this->escape($email) . "', " . intval($bouncecount) . ")";
 		} else {
-			$sql = "UPDATE `emails` SET `email` = '" . $this->escape($email) . "', `bouncecount` = " . intval($bouncecount) . "' WHERE `emailid` = " . intval($emailid);
+			$sql = "UPDATE `emails` SET `email` = '" . $this->escape($email) . "', `bouncecount` = " . intval($bouncecount) . " WHERE `emailid` = " . intval($emailid);
 		}
 		$this->query($sql);
 		if ($emailid == null) {

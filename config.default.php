@@ -63,7 +63,7 @@ class DefaultConfig {
 		return $this->sendmailbackend;
 	}
 	protected function getBounceAddress($email) {
-		return "bounce-" . $email->getEMailID() . "@" . $this->getHostPart();
+		return "bounce+" . $email->getEMailID() . "@" . $this->getHostPart();
 	}
 	protected function getFromMailAddress() {
 		return "vpanel@" . $this->getHostPart();
