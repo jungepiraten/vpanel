@@ -1002,14 +1002,14 @@ abstract class SQLStorage extends AbstractStorage {
 		$sql = "DELETE FROM `emails` WHERE `emailid` = " . intval($emailid);
 		return $this->query($sql);
 	}
-	public function searchEMail($email) {
-		$sql = "SELECT `emailid`, `email`, `bouncecount` FROM `emails` WHERE `email` = '" . $this->escape($email) . "'";
+	public function searchEMail($address) {
+		$sql = "SELECT `emailid`, `email`, `bouncecount` FROM `emails` WHERE `email` = '" . $this->escape($address) . "'";
 		$result = $this->getResult($sql, array($this, "parseEMail"));
 		if ($result->getCount() > 0) {
 			return $result->fetchRow();
 		}
 		$email = new EMail($this);
-		$email->setEMail($plz);
+		$email->setEMail($address);
 		$email->setBounceCount(0);
 		$email->save();
 		return $email;
