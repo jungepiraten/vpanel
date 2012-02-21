@@ -312,7 +312,7 @@ case "sendmail.send":
 	$process->setTemplate($mailtemplate);
 	// Muss den Prozess erst mal speichern, damit er eine ID zugewiesen bekommt
 	$process->save();
-	$process->setFinishedPage($session->getLink("mitglieder_sendmail.done", $process->getProcessID()));
+	$process->setFinishedPage($session->getLink("mitglieder_page", $session->getVariable("filterid"), 0));
 	$process->save();
 
 	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
