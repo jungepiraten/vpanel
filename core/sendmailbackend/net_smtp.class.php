@@ -12,11 +12,11 @@ class NetSMTPSendMailBackend extends SendMailBackend {
 	}
 	
 	public function send(Mail $mail) {
-		$conn->connect();
-		$conn->mailFrom($mail->getBounceAddress());
-		$conn->rcptTo($mail->getRecipient()->getEMail());
-		$conn->data($mail->getRaw());
-		$conn->disconnect();
+		$this->conn->connect();
+		$this->conn->mailFrom($mail->getBounceAddress());
+		$this->conn->rcptTo($mail->getRecipient()->getEMail());
+		$this->conn->data($mail->getRaw());
+		$this->conn->disconnect();
 	}
 }
 
