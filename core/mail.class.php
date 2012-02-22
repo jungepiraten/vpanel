@@ -97,18 +97,18 @@ class Mail {
 			$raw .= "Content-Type: text/plain; charset=" . $charset . "\n";
 			$raw .= "Content-Transfer-Encoding: base64" . "\n";
 			$raw .= "\n";
-			$raw .= chunk_split(base64_encode($this->getBody()), 78, "\n");
+			$raw .= chunk_split(base64_encode($this->getBody()), 76, "\n");
 			foreach ($this->getAttachments() as $attachment) {
 				$raw .= "--" . $this->getBoundary() . "\n";
 				$raw .= "Content-Type: " . $attachment->getMimeType() . "\n";
 				$raw .= "Content-Disposition: inline; filename=\"" . addslashes(mb_encode_mimeheader($attachment->getExportFilename(), $charset)) . "\"\n";
 				$raw .= "Content-Transfer-Encoding: base64" . "\n";
 				$raw .= "\n";
-				$raw .= chunk_split(base64_encode($attachment->getContent()), 78, "\n");
+				$raw .= chunk_split(base64_encode($attachment->getContent()), 76, "\n");
 			}
 			$raw .= "--" . $this->getBoundary() . "--" . "\n";
 		} else {
-			$raw .= chunk_split(base64_encode($this->getBody()), 78, "\n");
+			$raw .= chunk_split(base64_encode($this->getBody()), 76, "\n");
 		}
 		
 		return $raw;
