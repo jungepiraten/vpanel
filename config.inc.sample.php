@@ -58,6 +58,8 @@ $config->registerPage("mitglieder_json", "json/mitglieder.php");
 $config->registerPage("mitglieder_page", "mitglieder.php?filterid=%s&page=%d");
 $config->registerPage("mitglieder_create", "mitglieder.php?mode=create&mitgliedschaftid=%d");
 $config->registerPage("mitglieder_details", "mitglieder.php?mode=details&mitgliedid=%d");
+$config->registerPage("mitglieder_details_revision", "mitglieder.php?mode=details&revisionid=%d");
+$config->registerPage("mitglieder_bouncelist", "emails.php?mode=listbounces&mitgliederrevisionid=%d");
 $config->registerPage("mitglieder_dokument", "mitglieddokument.php?mode=add&mitgliedid=%d");
 $config->registerPage("mitglieder_del", "mitglieder.php?mode=delete&mitgliedid=%d");
 $config->registerPage("mitglieder_beitraege", "mitglieder.php?mode=beitraege&mitgliedid=%d");
@@ -73,7 +75,7 @@ $config->registerPage("mitglieder_statistik_get_timegraph", "file.php?mode=get&p
 $config->registerPage("mitglieder_setbeitrag.selectbeitrag", "mitglieder.php?mode=setbeitrag.selectbeitrag&filterid=%s");
 $config->registerPage("mitglieder_setbeitrag.start", "mitglieder.php?mode=setbeitrag.start");
 
-$config->registerPage("emailbounces_email", "emails.php?mode=listbounces&emailid=%d");
+$config->registerPage("emailbounces_delete", "emails.php?mode=delbounce&bounceid=%d");
 
 $config->registerPage("beitraege", "beitraege.php");
 $config->registerPage("beitraege_create", "beitraege.php?mode=create");
