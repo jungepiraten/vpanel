@@ -383,7 +383,7 @@ abstract class AbstractStorage implements Storage {
 		return isset($this->mitgliederfilters[$filterid]);
 	}
 	public function getMitgliederFilter($filterid) {
-		if ($this->hasMitgliederFilter($filterid)) {
+		if (!$this->hasMitgliederFilter($filterid)) {
 			return null;
 		}
 		return $this->mitgliederfilters[$filterid];
