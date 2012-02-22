@@ -2,6 +2,8 @@
 
 require_once("Smarty/Smarty.class.php");
 
+require_once(VPANEL_MITGLIEDERMATCHER . "/mitglied.class.php");
+
 class Template {
 	private $smarty;
 	private $session;
@@ -149,6 +151,7 @@ class Template {
 	protected function parseMitglied($mitglied) {
 		$row = array();
 		$row["mitgliedid"] = $mitglied->getMitgliedID();
+		$row["filterid"] = $this->session->addMitgliederMatcher(new MitgliedMitgliederMatcher($mitglied->getMitgliedID()))->getFilterID();
 		$row["globalid"] = $mitglied->getGlobalID();
 		$row["eintritt"] = $mitglied->getEintrittsdatum();
 		if ($mitglied->isAusgetreten()) {

@@ -17,6 +17,7 @@ require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
 require_once(VPANEL_CORE . "/mitgliederstatistik.class.php");
+require_once(VPANEL_PROCESSES . "/mitgliederfilterdelete.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfiltersendmail.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterexport.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterstatistik.class.php");
@@ -278,18 +279,17 @@ case "delete":
 		$ui->viewLogin();
 		exit;
 	}
-	$mitgliedid = $session->getIntVariable("mitgliedid");
-	$mitglied = $session->getStorage()->getMitglied($mitgliedid);
-	$mitglied->setAustrittsdatum(time());
-	$mitglied->save();
 
-	$revision = $mitglied->getLatestRevision()->fork();
-	$revision->setTimestamp(time());
-	$revision->setUser($session->getUser());
-	$revision->isGeloescht(true);
-	$revision->save();
+	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
 
-	$ui->redirect($session->getLink("mitglieder"));
+	$process = new MitgliederFilterDeleteProcess($session->getStorage());
+	$process->setMatcher($matcher);
+	$process->setUserID($session->getUser()->getUserID());
+	$process->setTimestamp(time());
+	$process->setFinishedPage($session->getLink("mitglieder_page", $session->getVariable("filterid"), 0));
+	$process->save();
+
+	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
 	exit;
 case "sendmail":
 case "sendmail.select":
@@ -316,16 +316,10 @@ case "sendmail.send":
 	$process->setBackend($config->getSendMailBackend());
 	$process->setMatcher($matcher);
 	$process->setTemplate($mailtemplate);
-	// Muss den Prozess erst mal speichern, damit er eine ID zugewiesen bekommt
-	$process->save();
 	$process->setFinishedPage($session->getLink("mitglieder_page", $session->getVariable("filterid"), 0));
 	$process->save();
 
 	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
-	exit;
-case "sendmail.done":
-	// TODO :3
-	echo "Dinge getan.";
 	exit;
 case "export.options":
 	$filters = $session->getStorage()->getMitgliederFilterList();

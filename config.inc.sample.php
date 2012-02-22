@@ -61,7 +61,7 @@ $config->registerPage("mitglieder_details", "mitglieder.php?mode=details&mitglie
 $config->registerPage("mitglieder_details_revision", "mitglieder.php?mode=details&revisionid=%d");
 $config->registerPage("mitglieder_bouncelist", "emails.php?mode=listbounces&mitgliederrevisionid=%d");
 $config->registerPage("mitglieder_dokument", "mitglieddokument.php?mode=add&mitgliedid=%d");
-$config->registerPage("mitglieder_del", "mitglieder.php?mode=delete&mitgliedid=%d");
+$config->registerPage("mitglieder_del", "mitglieder.php?mode=delete&filterid=%s");
 $config->registerPage("mitglieder_beitraege", "mitglieder.php?mode=beitraege&mitgliedid=%d");
 $config->registerPage("mitglieder_beitraege_del", "mitglieder.php?mode=beitragdelete&mitgliedid=%d&beitragid=%d");
 $config->registerPage("mitglieder_sendmail.select", "mitglieder.php?mode=sendmail.select&filterid=%s");

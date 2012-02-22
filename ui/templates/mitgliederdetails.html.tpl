@@ -1,6 +1,9 @@
 {include file="header.html.tpl" ansicht="Mitglied bearbeiten"}
 <p class="pagetitle">Mitglied #{$mitglied.mitgliedid} ({if isset($mitglied.latest.natperson)}{$mitglied.latest.natperson.vorname|escape:html} {$mitglied.latest.natperson.name|escape:html}{/if}
 {if isset($mitglied.latest.jurperson)}{$mitglied.latest.jurperson.label|escape:html}{/if}) bearbeiten.</p>
+<div class="buttonbox">
+ {include file="mitgliederfilter.options.tpl" filterid=$mitglied.filterid}
+</div>
 <table>
 <tr>
  <th>Eingetreten</th>

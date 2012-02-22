@@ -1,6 +1,5 @@
 <div class="buttonbox">
 &nbsp;
-<div class="create">
  <form action="{"mitglieder"|___}" method="post" class="filter">
   <fieldset>
    <select name="filterid" onChange="this.form.submit()">
@@ -9,14 +8,10 @@
    </select>
   </fieldset>
  </form>
- <a href="{"mitglieder_sendmail.select"|___:$filter.filterid}">{"Mails verschicken"|__}</a>
- <a href="{"mitglieder_export.options"|___:$filter.filterid}">{"Exportieren"|__}</a>
- <a href="{"mitglieder_statistik.start"|___:$filter.filterid}">{"Statistik erzeugen"|__}</a>
- <a href="{"mitglieder_setbeitrag.selectbeitrag"|___:$filter.filterid}">{"Beitrag eintragen"|__}</a>
+ {include file="mitgliederfilter.options.tpl" filterid=$filter.filterid}
  {foreach from=$mitgliedschaften item=mitgliedschaft}
   <a href="{"mitglieder_create"|___:$mitgliedschaft.mitgliedschaftid}" class="neuset">{"%s"|__:$mitgliedschaft.label}</a>
  {/foreach}
-</div>
 <div class="pages">
 {if $page > 1} <a href="{"mitglieder_page"|___:$filter.filterid:'0'}" class="pagebutton">&lt;&lt;</a>{/if}
 {if $page > 0} <a href="{"mitglieder_page"|___:$filter.filterid:$page-1}">&lt;</a>{/if}
