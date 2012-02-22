@@ -74,7 +74,6 @@ class Mail {
 		$raw = "";
 		$charset = "UTF-8";
 		
-		$raw .= "Return-Path: <" . $this->getBounceAddress() . ">" . "\n";
 		$raw .= "User-Agent: VPanel Mailer" . "\n";
 		$raw .= "To: <" . $this->getRecipient()->getEMail() . ">" . "\n";
 		if ($this->isMultipart()) {
