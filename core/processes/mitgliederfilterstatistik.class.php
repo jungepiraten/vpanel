@@ -96,6 +96,8 @@ class MitgliederFilterStatistikProcess extends Process {
 
 	public function runGenerateAgeGraph($w, $h, $file, $progressOffset, $progress) {
 		
+		$this->setProgress($progressOffset + 1 * $progress);
+		$this->save();
 	}
 
 	public function runGenerateTimeGraph($w, $h, $file, $progressOffset, $progress) {
@@ -108,18 +110,33 @@ class MitgliederFilterStatistikProcess extends Process {
 		$boxcolor = ImageColorAllocate($img,  20,  20,  20);
 		ImageFilledRectangle($img, 0,0, $offsetX+$w,20+$h, $white);
 
+		$this->setProgress($progressOffset + 0.1 * $progress);
+		$this->save();
+
 		$pixelsPerValue = ($h - $scalaY / 3) / $this->maxMitgliederCount;
 		$timePerPixel = ($this->maxMitgliederTime - $this->minMitgliederTime) / $w;
+
+		$this->setProgress($progressOffset + 0.2 * $progress);
+		$this->save();
 
 		while (round($scalaY / $pixelsPerValue) % 10 != 0) {
 			$scalaY ++;
 		}
+		if ($scalaY < $pixelsPerValue) {
+			$scalaY = $pixelsPerValue;
+		}
 		$scalaY = $pixelsPerValue * round($scalaY / $pixelsPerValue);
+
+		$this->setProgress($progressOffset + 0.3 * $progress);
+		$this->save();
 
 		for ($y = 0; $y < $h - imagefontheight(3); $y += $scalaY) {
 			ImageString($img, 3, $offsetX - 10, $h - $y - imagefontheight(3), round($y / $pixelsPerValue), $boxcolor);
 			ImageLine($img, $offsetX, $h - $y, $offsetX + $w, $h - $y, $boxcolor);
 		}
+
+		$this->setProgress($progressOffset + 0.6 * $progress);
+		$this->save();
 
 		for ($x = 0; $x <= $w; $x++) {
 			$curTime = $this->minMitgliederTime + floor($x * $timePerPixel);
@@ -130,6 +147,9 @@ class MitgliederFilterStatistikProcess extends Process {
 				ImageString($img, 3, $offsetX + $x - imagefontwidth(3) * 5, $h + 5, date("d.m.Y", $curTime * $this->scalaMitgliederTime), $boxcolor);
 			}
 		}
+
+		$this->setProgress($progressOffset + 0.9 * $progress);
+		$this->save();
 
 		$file->setMimeType("image/png");
 		$file->setExportFilename($file->getExportFilename() . ".png");

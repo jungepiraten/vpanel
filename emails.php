@@ -14,6 +14,11 @@ case "delbounce":
 	break;
 case "listbounces":
 	if ($session->hasVariable("mitgliederrevisionid")) {
+		if (!$session->isAllowed("mitglieder_show")) {
+			$ui->viewLogin();
+			exit;
+		}
+
 		$email = $session->getStorage()->getMitgliederRevision($session->getVariable("mitgliederrevisionid"))->getKontakt()->getEMail();
 	} else {
 		exit;

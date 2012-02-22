@@ -2,6 +2,15 @@
 <p class="pagetitle">Mitglied #{$mitglied.mitgliedid} ({if isset($mitglied.latest.natperson)}{$mitglied.latest.natperson.vorname|escape:html} {$mitglied.latest.natperson.name|escape:html}{/if}
 {if isset($mitglied.latest.jurperson)}{$mitglied.latest.jurperson.label|escape:html}{/if}) bearbeiten.</p>
 <div class="buttonbox">
+ <form action="{"mitglieder_details"|___:$mitglied.mitgliedid}" method="post" class="revision">
+  <fieldset>
+   <select name="revisionid" onChange="this.form.submit()">
+    {foreach from=$mitgliedrevisions item=rev}
+    <option value="{$rev.revisionid}" {if $rev.revisionid == $mitgliedrevision.revisionid}selected="selected"{/if}>Version vom {$rev.timestamp|date_format:"%d.%m.%Y"} um {$rev.timestamp|date_format:"%H:%M"} Uhr{if isset($rev.user)} von {$rev.user.username}{/if}</option>
+    {/foreach}
+   </select>
+  </fieldset>
+ </form>
  {include file="mitgliederfilter.options.tpl" filterid=$mitglied.filterid}
 </div>
 <table>
@@ -16,18 +25,7 @@
 </tr>
 {/if}
 </table>
-<form action="{"mitglieder_details"|___:$mitglied.mitgliedid}" method="post">
- <fieldset>
-  <select name="revisionid" onChange="this.form.submit()">
-   {foreach from=$mitgliedrevisions item=rev}
-   <option value="{$rev.revisionid}" {if $rev.revisionid == $mitgliedrevision.revisionid}selected="selected"{/if}>Version vom {$rev.timestamp|date_format:"%d.%m.%Y"} um {$rev.timestamp|date_format:"%H:%M"} Uhr{if isset($rev.user)} von {$rev.user.username}{/if}</option>
-   {/foreach}
-  </select>
- </fieldset>
-</form>
-<div>
 {include file="mitgliederform.block.tpl" mitglied=$mitglied}
-</div>
 
 <div style="position:relative;">
 <div style="float:left; width:400px;">

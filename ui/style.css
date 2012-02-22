@@ -152,10 +152,6 @@ a:hover {
     font-weight:bold;
 }
 
-form.filter, form.filter fieldset {
-	display:inline;
-}
-
 .buttonbox a {
     font-size:70%;
     white-space:nowrap;
@@ -173,6 +169,10 @@ form.filter, form.filter fieldset {
 	color:white;
 	background-color:#ff8800;
 
+}
+
+.buttonbox form, .buttonbox form fieldset {
+	display:inline;
 }
 
 .separator {
