@@ -73,6 +73,8 @@ $config->registerPage("mitglieder_statistik_get_timegraph", "file.php?mode=get&p
 $config->registerPage("mitglieder_setbeitrag.selectbeitrag", "mitglieder.php?mode=setbeitrag.selectbeitrag&filterid=%s");
 $config->registerPage("mitglieder_setbeitrag.start", "mitglieder.php?mode=setbeitrag.start");
 
+$config->registerPage("emailbounces_email", "emails.php?mode=listbounces&emailid=%d");
+
 $config->registerPage("beitraege", "beitraege.php");
 $config->registerPage("beitraege_create", "beitraege.php?mode=create");
 $config->registerPage("beitraege_details", "beitraege.php?mode=details&beitragid=%d");

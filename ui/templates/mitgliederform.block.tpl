@@ -72,7 +72,8 @@
      <tr>
          <th><label for="email">{"EMail-Adresse:"|__}</label></th>
          <td><input class="email" type="text" name="email" size="40" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.email.email|escape:html}{else}{$data.email|escape:html}{/if}" />
-             {if isset($mitgliedrevision.kontakt) && $mitgliedrevision.kontakt.email.bouncecount > 0} <span class="bouncecount">{$mitgliedrevision.kontakt.email.bouncecount} Bounces</span>{/if}</td>
+             {if isset($mitgliedrevision.kontakt) && count($mitgliedrevision.kontakt.email.bounces) > 0} <a href="{"emailbounces_email"|___:$mitgliedrevision.kontakt.email.emailid}" 
+class="bouncecount">{$mitgliedrevision.kontakt.email.bounces|@count} Bounces</a>{/if}</td>
      </tr>
      <tr id="beitrag">
          <th><label for="beitrag">{"Beitrag:"|__}</label></th>

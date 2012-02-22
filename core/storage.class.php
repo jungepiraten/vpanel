@@ -95,10 +95,16 @@ interface Storage {
 	public function delKontakt($kontaktid);
 	public function searchKontakt($strasse, $adresszusatz, $hausnummer, $ortid, $telefon, $handy, $email);
 
-	public function getEmail($emailid);
-	public function setEMail($emailid, $email, $bouncecount);
+	public function getEMail($emailid);
+	public function setEMail($emailid, $email);
 	public function delEMail($emailid);
 	public function searchEMail($email);
+
+	public function getEMailBounceResultByEMail($emailid);
+	public function getEMailBounceListByEMail($emailid);
+	public function getEMailBounce($bounceid);
+	public function setEMailBounce($bounceid, $emailid, $timestamp, $message);
+	public function delEMailBounce($bounceid);
 
 	public function getOrtResult();
 	public function getOrtList();
@@ -286,6 +292,10 @@ abstract class AbstractStorage implements Storage {
 
 	public function getMitgliederRevisionTextFieldList($revisionid) {
 		return $this->getMitgliederRevisionTextFieldResult($revisionid)->fetchAll();
+	}
+
+	public function getEMailBounceListByEMail($emailid) {
+		return $this->getEMailBounceResultByEMail($emailid)->fetchAll();
 	}
 
 	public function getOrtList() {

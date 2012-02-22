@@ -284,8 +284,24 @@ class Template {
 		$row = array();
 		$row["emailid"] = $email->getEMailID();
 		$row["email"] = $email->getEMail();
-		$row["bouncecount"] = $email->getBounceCount();
+		$row["bounces"] = $this->parseEMailBounces($email->getBounces(), &$row);
 		return $row;
+	}
+
+	protected function parseEMailBounce($bounce, &$email = null) {
+		$row = array();
+		if ($email == null) {
+			$email = $this->parseEMail($bounce->getEMail());
+		}
+		$row["bounceid"] = $bounce->getBounceID();
+		$row["email"] = $email;
+		$row["timestamp"] = $bounce->getTimestamp();
+		$row["message"] = $bounce->getMessage();
+		return $row;
+	}
+
+	protected function parseEMailBounces($rows, &$email = null) {
+		return array_map(array($this, "parseEMailBounce"), $rows, count($rows) > 0 ? array_fill(0, count($rows), $email) : array());
 	}
 
 	protected function parseMitgliedschaft($mitgliedschaft) {
@@ -697,6 +713,11 @@ class Template {
 	public function viewMitgliederStatistik($statistik) {
 		$this->smarty->assign("statistik", $this->parseMitgliederStatistik($statistik));
 		$this->smarty->display("mitgliederstatistik.html.tpl");
+	}
+
+	public function viewEMailBounceList($bounces) {
+		$this->smarty->assign("bounces", $this->parseEMailBounces($bounces));
+		$this->smarty->display("emailbounces.html.tpl");
 	}
 
 	public function getRedirectURL() {

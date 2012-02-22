@@ -17,6 +17,7 @@ require_once(VPANEL_CORE . "/natperson.class.php");
 require_once(VPANEL_CORE . "/jurperson.class.php");
 require_once(VPANEL_CORE . "/kontakt.class.php");
 require_once(VPANEL_CORE . "/email.class.php");
+require_once(VPANEL_CORE . "/emailbounce.class.php");
 require_once(VPANEL_CORE . "/mailtemplate.class.php");
 require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
 require_once(VPANEL_CORE . "/process.class.php");
@@ -398,10 +399,10 @@ abstract class SQLStorage extends AbstractStorage {
 			return "`m`.`mitgliedid` = " . intval($matcher->getMitgliedID());
 		}
 		if ($matcher instanceof EMailBounceCountAboveMitgliederMatcher) {
-			return "`e`.`bouncecount` > " . intval($matcher->getCountLimit());
+			return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` GROUP BY `emailid` HAVING COUNT(`bounceid`) > " . intval($matcher->getCountLimit()) . ")";
 		}
 		if ($matcher instanceof EMailBounceCountBelowMitgliederMatcher) {
-			return "`e`.`bouncecount` <= " . intval($matcher->getCountLimit());
+			return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` GROUP BY `emailid` HAVING COUNT(`bounceid`) <= " . intval($matcher->getCountLimit()) . ")";
 		}
 		if ($matcher instanceof RevisionFlagMitgliederMatcher) {
 			return "`r`.`revisionid` IN (SELECT `revisionid` FROM `mitgliederrevisionflags` WHERE `flagid` = " . intval($matcher->getFlagID()) . ")";
@@ -518,7 +519,6 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`emailid` AS `k_emailid`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
-				`e`.`bouncecount` AS `e_bouncecount`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -582,7 +582,6 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`emailid` AS `k_emailid`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
-				`e`.`bouncecount` AS `e_bouncecount`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -814,7 +813,6 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`emailid` AS `k_emailid`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
-				`e`.`bouncecount` AS `e_bouncecount`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -859,7 +857,6 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`emailid` AS `k_emailid`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
-				`e`.`bouncecount` AS `e_bouncecount`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -905,7 +902,6 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`emailid` AS `k_emailid`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
-				`e`.`bouncecount` AS `e_bouncecount`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -983,14 +979,14 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "EMail");
 	}
 	public function getEMail($emailid) {
-		$sql = "SELECT `emailid`, `email`, `bouncecount` FROM `emails` WHERE `emailid` = " . intval($emailid);
+		$sql = "SELECT `emailid`, `email` FROM `emails` WHERE `emailid` = " . intval($emailid);
 		return $this->getResult($sql, array($this, "parseEMail"))->fetchRow();
 	}
-	public function setEMail($emailid, $email, $bouncecount) {
+	public function setEMail($emailid, $email) {
 		if ($emailid == null) {
-			$sql = "INSERT INTO `emails` (`email`, `bouncecount`) VALUES ('" . $this->escape($email) . "', " . intval($bouncecount) . ")";
+			$sql = "INSERT INTO `emails` (`email`) VALUES ('" . $this->escape($email) . "')";
 		} else {
-			$sql = "UPDATE `emails` SET `email` = '" . $this->escape($email) . "', `bouncecount` = " . intval($bouncecount) . " WHERE `emailid` = " . intval($emailid);
+			$sql = "UPDATE `emails` SET `email` = '" . $this->escape($email) . "' WHERE `emailid` = " . intval($emailid);
 		}
 		$this->query($sql);
 		if ($emailid == null) {
@@ -1003,16 +999,46 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->query($sql);
 	}
 	public function searchEMail($address) {
-		$sql = "SELECT `emailid`, `email`, `bouncecount` FROM `emails` WHERE `email` = '" . $this->escape($address) . "'";
+		$sql = "SELECT `emailid`, `email` FROM `emails` WHERE `email` = '" . $this->escape($address) . "'";
 		$result = $this->getResult($sql, array($this, "parseEMail"));
 		if ($result->getCount() > 0) {
 			return $result->fetchRow();
 		}
 		$email = new EMail($this);
 		$email->setEMail($address);
-		$email->setBounceCount(0);
 		$email->save();
 		return $email;
+	}
+
+	/**
+	 * EMailBounce
+	 **/
+	public function parseEMailBounce($row) {
+		return $this->parseRow($row, null, "EMailBounce");
+	}
+	public function getEMailBounceResultByEMail($emailid) {
+		$sql = "SELECT `bounceid`, `emailid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `message` FROM `emailbounces` WHERE `emailid` = " . intval($emailid);
+		return $this->getResult($sql, array($this, "parseEMailBounce"));
+	}
+	public function getEMailBounce($bounceid) {
+		$sql = "SELECT `bounceid`, `emailid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `message` FROM `emailbounces` WHERE `bounceid` = " . intval($bounceid);
+		return $this->getResult($sql, array($this, "parseEMailBounce"))->fetchRow();
+	}
+	public function setEMailBounce($bounceid, $emailid, $timestamp, $message) {
+		if ($bounceid == null) {
+			$sql = "INSERT INTO `emailbounces` (`emailid`, `timestamp`, `message`) VALUES (" . intval($emailid) . ", '" . date("Y-m-d H:i:s", $timestamp) . "', '" . $this->escape($message) . "')";
+		} else {
+			$sql = "UPDATE `emailbounces` SET `emailid` = " . intval($emailid) . ", `timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "', `message` = '" . $this->escape($message) . "' WHERE `bounceid` = " . intval($bounceid);
+		}
+		$this->query($sql);
+		if ($bounceid == null) {
+			$bounceid = $this->getInsertID();
+		}
+		return $bounceid;
+	}
+	public function delEMailBounce($bounceid) {
+		$sql = "DELETE FROM `emailbounces` WHERE `bounceid` = " . intval($bounceid);
+		return $this->query($sql);
 	}
 
 	/**

@@ -14,7 +14,7 @@ class EMailBounceCountAboveMitgliederMatcher extends MitgliederMatcher {
 	}
 
 	public function match(Mitglied $mitglied) {
-		return $mitglied->getLatestRevision()->getKontakt()->getEMail()->getBeitragCount() > $this->getCountLimit();
+		return count($mitglied->getLatestRevision()->getKontakt()->getEMail()->getBounces()) > $this->getCountLimit();
 	}
 }
 
@@ -30,7 +30,7 @@ class EMailBounceCountBelowMitgliederMatcher extends MitgliederMatcher {
 	}
 
 	public function match(Mitglied $mitglied) {
-		return $mitglied->getLatestRevision()->getKontakt()->getEMail()->getBeitragCount() <= $this->getCountLimit();
+		return count($mitglied->getLatestRevision()->getKontakt()->getEMail()->getBounces()) <= $this->getCountLimit();
 	}
 }
 

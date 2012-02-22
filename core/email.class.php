@@ -5,13 +5,13 @@ require_once(VPANEL_CORE . "/storageobject.class.php");
 class EMail extends StorageClass {
 	private $emailid;
 	private $email;
-	private $bouncecount;
+
+	private $bounces;
 
 	public static function factory(Storage $storage, $row) {
 		$email = new EMail($storage);
 		$email->setEMailID($row["emailid"]);
 		$email->setEMail($row["email"]);
-		$email->setBounceCount($row["bouncecount"]);
 		return $email;
 	}
 
@@ -31,12 +31,11 @@ class EMail extends StorageClass {
 		$this->email = $email;
 	}
 
-	public function getBounceCount() {
-		return $this->bouncecount;
-	}
-
-	public function setBounceCount($bouncecount) {
-		$this->bouncecount = $bouncecount;
+	public function getBounces() {
+		if ($this->bounces == null) {
+			$this->bounces = $this->getStorage()->getEMailBounceListByEMail($this->getEMailID());
+		}
+		return $this->bounces;
 	}
 
 	public function save(Storage $storage = null) {
@@ -45,8 +44,7 @@ class EMail extends StorageClass {
 		}
 		$this->setEMailID( $storage->setEMail(
 			$this->getEMailID(),
-			$this->getEMail(),
-			$this->getBounceCount() ));
+			$this->getEMail() ));
 	}
 }
 
