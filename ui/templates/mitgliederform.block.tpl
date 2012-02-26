@@ -1,10 +1,27 @@
 <form action="{if isset($mitglied)}{"mitglieder_details"|___:$mitglied.mitgliedid}{else}{"mitglieder_create"|___:$mitgliedschaft.mitgliedschaftid}{/if}" method="post">
  <fieldset>
  {if isset($dokument)}<input type="hidden" name="dokumentid" value="{$dokument.dokumentid}" />{/if}
+ {if isset($mitgliedtemplate)}<input type="hidden" name="mitgliedtemplateid" value="{$mitgliedtemplate.mitgliedtemplateid}" />{/if}
  <table>
      <tr>
+        <th>{"Gliederung:"|__}</th>
+        <td>{if isset($mitgliedtemplate) && isset($mitgliedtemplate.gliederung)}
+              <input type="hidden" name="gliederungid" value="{$mitgliedtemplate.gliederung.gliederungid}" />
+              {$mitgliedtemplate.gliederung.label|escape:html}
+            {else}
+              <select name="gliederungid">{foreach from=$gliederungen item=g}<option value="{$g.gliederungid}" {if $g.gliederungid == $mitgliedrevision.gliederung.gliederungid}selected="selected"{/if}>{$g.label|escape:html}</option>{/foreach}</select>
+            {/if}
+        </td>
+     </tr>
+     <tr>
         <th>{"Mitgliedsart:"|__}</th>
-        <td><select name="mitgliedschaftid" onChange="toggleMitgliedschaft()">{foreach from=$mitgliedschaften item=m}<option value="{$m.mitgliedschaftid}" {if isset($mitgliedrevision) and $m.mitgliedschaftid == $mitgliedrevision.mitgliedschaft.mitgliedschaftid or $m.mitgliedschaftid == $mitgliedschaft.mitgliedschaftid or $m.mitgliedschaftid == $data.mitgliedschaftid}selected="selected"{/if}>{$m.label|escape:html}</option>{/foreach}</select></td>
+        <td>{if isset($mitgliedtemplate) && isset($mitgliedtemplate.mitgliedschaft)}
+              <input type="hidden" name="mitgliedschaftid" value="{$mitgliedtemplate.mitgliedschaft.mitgliedschaftid}" />
+              {$mitgliedtemplate.mitgliedschaft.label|escape:html}
+            {else}
+              <select name="mitgliedschaftid">{foreach from=$mitgliedschaften item=m}<option value="{$m.mitgliedschaftid}" {if $m.mitgliedschaftid == $mitgliedrevision.mitgliedschaft.mitgliedschaftid}selected="selected"{/if}>{$m.label|escape:html}</option>{/foreach}</select>
+            {/if}
+        </td>
      </tr>
      <tr>
          <th>{"Typ:"|__}</th>
@@ -76,9 +93,9 @@
      </tr>
      <tr id="beitrag">
          <th><label for="beitrag">{"Beitrag:"|__}</label></th>
-         <td><input class="beitrag" type="text" name="beitrag" size="5" onChange="beitragEdited=true;" value="{if isset($mitgliedrevision)}{$mitgliedrevision.beitrag|string_format:"%.2f"|escape:html}
-                                                                                                              {elseif isset($data.beitrag)}{$data.beitrag|string_format:"%.2f"|escape:html}
-                                                                                                              {else}{$mitgliedschaft.defaultbeitrag|string_format:"%.2f"|escape:html}{/if}" /> EUR</td>
+         <td><input class="beitrag" type="text" name="beitrag" size="5" value="{if isset($mitgliedrevision)}{$mitgliedrevision.beitrag|string_format:"%.2f"|escape:html}
+                                                                               {elseif isset($data.beitrag)}{$data.beitrag|string_format:"%.2f"|escape:html}
+                                                                               {elseif isset($mitgliedtemplate)}{$mitgliedtemplate.beitrag|string_format:"%.2f"|escape:html}{/if}" /> EUR</td>
      </tr>
      {foreach from=$flags item=flag}
      {assign var=flagid value=$flag.flagid}
@@ -96,6 +113,12 @@
                                                                                    {elseif isset($data.textfields.$textfieldid)}{$data.textfields.$textfieldid}{/if}" /></td>
      </tr>
      {/foreach}
+     {if !isset($mitglied)}
+     <tr>
+         <th><label for="mailtemplateid">{"Versende Willkommensmail:"|__}</label></th>
+         <td><select name="mailtemplateid"><option name="">{"(keine)"|__}</option>{foreach from=$mailtemplates item=mailtemplate}<option value="{$mailtemplate.templateid|escape:html}" {if $mitgliedtemplate.createmailtemplate.templateid == $mailtemplate.templateid}selected="selected"{/if}>{$mailtemplate.label|escape:html}</option>{/foreach}</select></td>
+     </tr>
+     {/if}
      <tr>
          <td colspan="2"><input class="submit" type="submit" name="save" value="{"Speichern"|__}" /></td>
      </tr>
@@ -131,24 +154,6 @@ function toggleJurNatPerson() {
 	} while (d != null);
 }
 toggleJurNatPerson();
-
-var beitragEdited = {/literal}{if isset($mitglied)}true{else}false{/if}{literal};
-function toggleMitgliedschaft() {
-	var feld = document.getElementsByName('mitgliedschaftid')[0];
-	var index = feld.selectedIndex;
-	var id = feld.options[index].value;
-	var name = feld.options[index].text;
-	switch (id) {
-	{/literal}{foreach from=$mitgliedschaften item=m}
-	case "{$m.mitgliedschaftid}":
-		{literal}if (!beitragEdited) {{/literal}
-			document.getElementsByName('beitrag')[0].value = "{$m.defaultbeitrag}";
-		{literal}}{/literal}
-		break;
-	{/foreach}{literal}
-	}
-}
-toggleMitgliedschaft();
 
 function VPanel_Dropdownorte() {
 	this.inputplz = $('#plz');

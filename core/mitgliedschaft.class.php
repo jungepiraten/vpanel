@@ -9,8 +9,6 @@ class Mitgliedschaft extends StorageClass {
 	private $mitgliedschaftid;
 	private $label;
 	private $description;
-	private $defaultbeitrag;
-	private $defaultcreatemailid;
 
 	private $defaultcreatemail;
 
@@ -19,8 +17,6 @@ class Mitgliedschaft extends StorageClass {
 		$mitgliedschaft->setMitgliedschaftID($row["mitgliedschaftid"]);
 		$mitgliedschaft->setLabel($row["label"]);
 		$mitgliedschaft->setDescription($row["description"]);
-		$mitgliedschaft->setDefaultBeitrag($row["defaultbeitrag"]);
-		$mitgliedschaft->setDefaultCreateMailID($row["defaultcreatemail"]);
 		return $mitgliedschaft;
 	}
 
@@ -48,37 +44,6 @@ class Mitgliedschaft extends StorageClass {
 		$this->description = $description;
 	}
 
-	public function getDefaultBeitrag() {
-		return $this->defaultbeitrag;
-	}
-
-	public function setDefaultBeitrag($defaultbeitrag) {
-		$this->defaultbeitrag = $defaultbeitrag;
-	}
-
-	public function getDefaultCreateMail() {
-		if ($this->defaultcreatemail == null) {
-			$this->defaultcreatemail = $this->getStorage()->getMailTemplate($this->getDefaultCreateMailID());
-		}
-		return $this->defaultcreatemail;
-	}
-
-	public function getDefaultCreateMailID() {
-		return $this->defaultcreatemailid;
-	}
-
-	public function setDefaultCreateMail($mailtemplate) {
-		$this->setDefaultCreateMailID($mailtemplate->getMailTemplateID());
-		$this->defaultcreatemail = $mailtemplate;
-	}
-
-	public function setDefaultCreateMailID($mailtemplateid) {
-		if ($this->defaultcreatemailid != $mailtemplateid) {
-			$this->defaultcreatemail = null;
-		}
-		$this->defaultcreatemailid = $mailtemplateid;
-	}
-
 	public function save(Storage $storage = null) {
 		if ($storage == null) {
 			$storage = $this->getStorage();
@@ -86,9 +51,7 @@ class Mitgliedschaft extends StorageClass {
 		$this->setMitgliedschaftID( $storage->setMitgliedschaft(
 			$this->getMitgliedschaftID(),
 			$this->getLabel(),
-			$this->getDescription(),
-			$this->getDefaultBeitrag(),
-			$this->getDefaultCreateMailID() ));
+			$this->getDescription() ));
 	}
 
 	public function getMitgliederCount() {

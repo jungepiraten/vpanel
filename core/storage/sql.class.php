@@ -29,6 +29,7 @@ require_once(VPANEL_CORE . "/dokumentnotiz.class.php");
 require_once(VPANEL_CORE . "/file.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
 require_once(VPANEL_CORE . "/mitgliederstatistik.class.php");
+require_once(VPANEL_CORE . "/mitgliedtemplate.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/mitglied.class.php");
 
 abstract class SQLStorage extends AbstractStorage {
@@ -376,6 +377,9 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		if ($matcher instanceof NotMitgliederMatcher) {
 			return "NOT (" . $this->parseMitgliederMatcher($matcher->getCondition()) . ")";
+		}
+		if ($matcher instanceof GliederungMitgliederMatcher) {
+			return "`r`.`gliederungsid` = " . intval($matcher->getGliederungID());
 		}
 		if ($matcher instanceof MitgliedschaftMitgliederMatcher) {
 			return "`r`.`mitgliedschaftid` = " . intval($matcher->getMitgliedschaftID());
@@ -955,7 +959,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->query($sql);
 	}
 	public function searchKontakt($adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $emailid) {
-		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `email` FROM `kontakte` WHERE `adresszusatz` = '" . $this->escape($adresszusatz) . "' AND `strasse` = '" . $this->escape($strasse) . "' AND `hausnummer` = '" . $this->escape($hausnummer) . "' AND `ortid` = " . intval($ortid) . " AND `telefonnummer` = '" . $this->escape($telefon) . "' AND `handynummer` = '" . $this->escape($handy) . "' AND `emailid` = '" . intval($emailid) . "'";
+		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid` FROM `kontakte` WHERE `adresszusatz` = '" . $this->escape($adresszusatz) . "' AND `strasse` = '" . $this->escape($strasse) . "' AND `hausnummer` = '" . $this->escape($hausnummer) . "' AND `ortid` = " . intval($ortid) . " AND `telefonnummer` = '" . $this->escape($telefon) . "' AND `handynummer` = '" . $this->escape($handy) . "' AND `emailid` = '" . intval($emailid) . "'";
 		$result = $this->getResult($sql, array($this, "parseKontakt"));
 		if ($result->getCount() > 0) {
 			return $result->fetchRow();
@@ -1170,18 +1174,18 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "Mitgliedschaft");
 	}
 	public function getMitgliedschaftResult() {
-		$sql = "SELECT `mitgliedschaftid`, `label`, `description`, `defaultbeitrag`, `defaultcreatemail` FROM `mitgliedschaften`";
+		$sql = "SELECT `mitgliedschaftid`, `label`, `description` FROM `mitgliedschaften`";
 		return $this->getResult($sql, array($this, "parseMitgliedschaft"));
 	}
 	public function getMitgliedschaft($mitgliedschaftid) {
-		$sql = "SELECT `mitgliedschaftid`, `label`, `description`, `defaultbeitrag`, `defaultcreatemail` FROM `mitgliedschaften` WHERE `mitgliedschaftid` = " . intval($mitgliedschaftid);
+		$sql = "SELECT `mitgliedschaftid`, `label`, `description` FROM `mitgliedschaften` WHERE `mitgliedschaftid` = " . intval($mitgliedschaftid);
 		return $this->getResult($sql, array($this, "parseMitgliedschaft"))->fetchRow();
 	}
-	public function setMitgliedschaft($mitgliedschaftid, $globaleid, $label, $description, $defaultbeitrag, $defaultcreatemail) {
+	public function setMitgliedschaft($mitgliedschaftid, $globaleid, $label, $description) {
 		if ($mitgliedschaftid == null) {
-			$sql = "INSERT INTO `mitgliedschaften` (`label`, `description`, `defaultbeitrag`, `defaultcreatemail`) VALUES ('" . $this->escape($label) . "', '" . $this->escape($description) . "', " . doubleval($defaultbeitrag) . ", " . intval($defaultcreatemail) . ")";
+			$sql = "INSERT INTO `mitgliedschaften` (`label`, `description`) VALUES ('" . $this->escape($label) . "', '" . $this->escape($description) . "')";
 		} else {
-			$sql = "UPDATE `mitgliedschaften` SET `label` = '" . $this->escape($label) . "', `description` = '" . $this->escape($description) . "', `defaultbeitrag` = " . doubleval($defaultbeitrag) . ", `defaultcreatemail` = " . intval($defaultcreatemail) . " WHERE `mitgliedschaftid` = " . intval($mitgliedschaftid);
+			$sql = "UPDATE `mitgliedschaften` SET `label` = '" . $this->escape($label) . "', `description` = '" . $this->escape($description) . "' WHERE `mitgliedschaftid` = " . intval($mitgliedschaftid);
 		}
 		$this->query($sql);
 		if ($mitgliedschaftid == null) {
@@ -1191,6 +1195,37 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 	public function delMitgliedschaft($mitgliedschaftid) {
 		$sql = "DELETE FROM `mitgliedschaften` WHERE `mitgliedschaftid` = " . intval($mitgliedschaftid);
+		return $this->query($sql);
+	}
+
+	/**
+	 * MitgliedTemplate
+	 **/
+	public function parseMitgliedTemplate($row) {
+		return $this->parseRow($row, null, "MitgliedTemplate");
+	}
+	public function getMitgliedTemplateResult() {
+		$sql = "SELECT `mitgliedtemplateid`, `label`, `gliederungid`, `mitgliedschaftid`, `beitrag`, `createmail` FROM `mitgliedtemplates`";
+		return $this->getResult($sql, array($this, "parseMitgliedTemplate"));
+	}
+	public function getMitgliedTemplate($templateid) {
+		$sql = "SELECT `mitgliedtemplateid`, `label`, `gliederungid`, `mitgliedschaftid`, `beitrag`, `createmail` FROM `mitgliedtemplates` WHERE `mitgliedtemplateid` = ".intval($templateid);
+		return $this->getResult($sql, array($this, "parseMitgliedTemplate"))->fetchRow();
+	}
+	public function setMitgliedTemplate($templateid, $label, $gliederungid, $mitgliedschaftid, $beitrag, $createmailtemplateid) {
+		if ($templateid == null) {
+			$sql = "INSERT INTO `mitgliedtemplates` (`gliederungid`, `label`, `mitgliedschaftid`, `beitrag`, `createmail`) VALUES (".($gliederungid == null ? "NULL" : intval($gliederungid)).", '".$this->escape($label)."', ".($mitgliedschaftid == null ? "NULL" : intval($mitgliedschaftid)).", ".doubleval($beitrag).", ".($createmailtemplateid == null ? "NULL" : intval($createmailtemplateid)).")";
+		} else {
+			$sql = "UPDATE `mitgliedtemplates` SET `gliederungid` = ".($gliederungid == null ? "NULL" : intval($gliederungid)).", `label` = '".$this->escape($label)."', `mitgliedschaftid` = ".($mitgliedschaftid == null ? "NULL" : intval($mitgliedschaftid)).", `beitrag` = ".doubleval($beitrag).", `createmail` = ".($createmailtemplateid == null ? "NULL" : intval($createmailtemplateid))." WHERE `mitgliedtemplateid` = " . intval($templateid);
+		}
+		$this->query($sql);
+		if ($templateid == null) {
+			$templateid = $this->getInsertID();
+		}
+		return $templateid;
+	}
+	public function delMitgliedTemplate($templateid) {
+		$sql = "DELETE FROM `mitgliedtemplates` WHERE `mitgliedtemplateid` = ".intval($templateid);
 		return $this->query($sql);
 	}
 

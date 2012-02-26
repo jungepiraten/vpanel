@@ -156,7 +156,7 @@ class MitgliedRevision extends GlobalClass {
 
 	public function getGliederung() {
 		if ($this->gliederung == null) {
-			$this->gliederung = Gliederung::factoryByGliederungID($this->getStorage(), $this->getGliederungID());
+			$this->gliederung = $this->getStorage()->getGliederung($this->getGliederungID());
 		}
 		return $this->gliederung;
 	}

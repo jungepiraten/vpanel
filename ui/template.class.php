@@ -78,6 +78,38 @@ class Template {
 		return array_map(array($this, 'parsePermission'), $rows);
 	}
 
+	protected function parseGliederung($gliederung) {
+		$row = array();
+		$row["gliederungid"] = $gliederung->getGliederungID();
+		$row["label"] = $gliederung->getLabel();
+		return $row;
+	}
+
+	protected function parseGliederungen($rows) {
+		return array_map(array($this, 'parseGliederung'), $rows);
+	}
+
+	protected function parseMitgliedTemplate($mitgliedtemplate) {
+		$row = array();
+		$row["mitgliedtemplateid"] = $mitgliedtemplate->getMitgliedTemplateID();
+		$row["label"] = $mitgliedtemplate->getLabel();
+		if ($mitgliedtemplate->getGliederungID() != null) {
+			$row["gliederung"] = $this->parseGliederung($mitgliedtemplate->getGliederung());
+		}
+		if ($mitgliedtemplate->getMitgliedschaftID() != null) {
+			$row["mitgliedschaft"] = $this->parseMitgliedschaft($mitgliedtemplate->getMitgliedschaft());
+		}
+		$row["beitrag"] = $mitgliedtemplate->getBeitrag();
+		if ($mitgliedtemplate->getCreateMailTemplateID() != null) {
+			$row["createmailtemplate"] = $this->parseMailTemplate($mitgliedtemplate->getCreateMailTemplate());
+		}
+		return $row;
+	}
+
+	protected function parseMitgliedTemplates($rows) {
+		return array_map(array($this, 'parseMitgliedTemplate'), $rows);
+	}
+
 	protected function parseMail($mail) {
 		$row = array();
 		$row["headers"] = array();
@@ -231,6 +263,7 @@ class Template {
 		if ($revision->getUser() != null) {
 			$row["user"] = $this->parseUser($revision->getUser());
 		}
+		$row["gliederung"] = $this->parseGliederung($revision->getGliederung());
 		$row["mitgliedschaft"] = $this->parseMitgliedschaft($revision->getMitgliedschaft());
 		if ($revision->getNatPersonID() != null) {
 			$row["bezeichnung"] = $revision->getNatPerson()->getVorname() . " " . $revision->getNatPerson()->getName();
@@ -312,8 +345,6 @@ class Template {
 		$row["mitgliedschaftid"] = $mitgliedschaft->getMitgliedschaftID();
 		$row["label"] = $mitgliedschaft->getLabel();
 		$row["description"] = $mitgliedschaft->getDescription();
-		$row["defaultbeitrag"] = $mitgliedschaft->getDefaultBeitrag();
-		$row["defaultmailcreate"] = $mitgliedschaft->getDefaultCreateMail();
 		return $row;
 	}
 
@@ -545,24 +576,25 @@ class Template {
 		$this->smarty->display("mailtemplatecreateattachment.html.tpl");
 	}
 
-	public function viewMitgliederList($mitglieder, $mitgliedschaften, $filters, $filter, $page, $pagecount) {
+	public function viewMitgliederList($mitglieder, $mitgliedtemplates, $filters, $filter, $page, $pagecount) {
 		if ($filter != null) {
 			$this->smarty->assign("filter", $this->parseMitgliederFilter($filter));
 		}
 		$this->smarty->assign("page", $page);
 		$this->smarty->assign("pagecount", $pagecount);
 		$this->smarty->assign("mitglieder", $this->parseMitglieder($mitglieder));
-		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
+		$this->smarty->assign("mitgliedtemplates", $this->parseMitgliedTemplates($mitgliedtemplates));
 		$this->smarty->assign("filters", $this->parseMitgliederFilters($filters));
 		$this->smarty->display("mitgliederlist.html.tpl");
 	}
 
-	public function viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields, $beitraege) {
+	public function viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields, $beitraege) {
 		$this->smarty->assign("mitglied", $this->parseMitglied($mitglied));
 		$this->smarty->assign("mitgliedrevisions", $this->parseMitgliedRevisions($revisions));
 		$this->smarty->assign("mitgliedrevision", $this->parseMitgliedRevision($revision));
 		$this->smarty->assign("mitgliednotizen", $this->parseMitgliedNotizen($notizen));
 		$this->smarty->assign("dokumente", $this->parseDokumente($dokumente));
+		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
 		$this->smarty->assign("states", $this->parseStates($states));
 		$this->smarty->assign("flags", $this->parseMitgliederFlags($mitgliederflags));
@@ -571,9 +603,9 @@ class Template {
 		$this->smarty->display("mitgliederdetails.html.tpl");
 	}
 
-	public function viewMitgliedCreate($mitgliedschaft, $dokument, $data, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields) {
-		if ($mitgliedschaft != null) {
-			$this->smarty->assign("mitgliedschaft", $this->parseMitgliedschaft($mitgliedschaft));
+	public function viewMitgliedCreate($mitgliedtemplate, $dokument, $data, $gliederungen, $mitgliedschaften, $mailtemplates, $states, $mitgliederflags, $mitgliedertextfields) {
+		if ($mitgliedtemplate != null) {
+			$this->smarty->assign("mitgliedtemplate", $this->parseMitgliedTemplate($mitgliedtemplate));
 		}
 		if ($dokument != null) {
 			$this->smarty->assign("dokument", $this->parseDokument($dokument));
@@ -581,7 +613,9 @@ class Template {
 		if ($data != null) {
 			$this->smarty->assign("data", $data);
 		}
+		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
+		$this->smarty->assign("mailtemplates", $this->parseMailTemplates($mailtemplates));
 		$this->smarty->assign("states", $this->parseStates($states));
 		$this->smarty->assign("flags", $this->parseMitgliederFlags($mitgliederflags));
 		$this->smarty->assign("textfields", $this->parseMitgliederTextFields($mitgliedertextfields));

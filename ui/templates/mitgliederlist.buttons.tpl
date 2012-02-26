@@ -9,9 +9,15 @@
   </fieldset>
  </form>
  {include file="mitgliederfilter.options.tpl" filterid=$filter.filterid}
- {foreach from=$mitgliedschaften item=mitgliedschaft}
-  <a href="{"mitglieder_create"|___:$mitgliedschaft.mitgliedschaftid}" class="neuset">{"%s"|__:$mitgliedschaft.label}</a>
- {/foreach}
+ <form action="{"mitglieder_create"|___}" method="post" class="filter">
+  <fieldset>
+   <select name="mitgliedtemplateid">
+    <option value="">{"(keine Vorlage)"|__}</option>
+    {foreach from=$mitgliedtemplates item=mitgliedtemplate}<option value="{$mitgliedtemplate.mitgliedtemplateid|escape:html}">{$mitgliedtemplate.label|escape:html}</option>{/foreach}
+   </select>
+   <input type="submit" value="{"Anlegen"|__}" />
+  </fieldset>
+ </form>
 <div class="pages">
 {if $page > 1} <a href="{"mitglieder_page"|___:$filter.filterid:'0'}" class="pagebutton">&lt;&lt;</a>{/if}
 {if $page > 0} <a href="{"mitglieder_page"|___:$filter.filterid:$page-1}">&lt;</a>{/if}

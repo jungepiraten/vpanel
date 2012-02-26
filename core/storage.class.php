@@ -130,7 +130,7 @@ interface Storage {
 	public function getMitgliedschaftResult();
 	public function getMitgliedschaftList();
 	public function getMitgliedschaft($mitgliedschaftid);
-	public function setMitgliedschaft($mitgliedschaftid, $globalid, $label, $description, $defaultbeitrag, $defaultcreatemail);
+	public function setMitgliedschaft($mitgliedschaftid, $globalid, $label, $description);
 	public function delMitgliedschaft($mitgliedschaftid);
 
 	public function getNatPerson($natpersonid);
@@ -211,6 +211,12 @@ interface Storage {
 	public function getMitgliederStatistik($tempfileid);
 	public function setMitgliederStatistik($statistikid, $timestamp, $agegraphfileid, $timegraphfileid);
 	public function delMitgliederStatistik($statistikid);
+
+	public function getMitgliedTemplateResult();
+	public function getMitgliedTemplateList();
+	public function getMitgliedTemplate($templateid);
+	public function setMitgliedTemplate($templateid, $label, $gliederungid, $mitgliedschaftid, $beitrag, $createmailtemplateid);
+	public function delMitgliedTemplate($templateid);
 
 	public function getMitgliederFilterList();
 	public function hasMitgliederFilter($filterid);
@@ -372,6 +378,10 @@ abstract class AbstractStorage implements Storage {
 
 	public function getMitgliederStatistikList() {
 		return $this->getMitgliederStatistikResult()->fetchAll();
+	}
+
+	public function getMitgliedTemplateList() {
+		return $this->getMitgliedTemplateResult()->fetchAll();
 	}
 
 	/** Filter **/

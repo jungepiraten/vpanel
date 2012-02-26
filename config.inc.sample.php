@@ -56,7 +56,7 @@ $config->registerPage("orte_json", "json/orte.php");
 $config->registerPage("mitglieder", "mitglieder.php");
 $config->registerPage("mitglieder_json", "json/mitglieder.php");
 $config->registerPage("mitglieder_page", "mitglieder.php?filterid=%s&page=%d");
-$config->registerPage("mitglieder_create", "mitglieder.php?mode=create&mitgliedschaftid=%d");
+$config->registerPage("mitglieder_create", "mitglieder.php?mode=create");
 $config->registerPage("mitglieder_details", "mitglieder.php?mode=details&mitgliedid=%d");
 $config->registerPage("mitglieder_details_revision", "mitglieder.php?mode=details&revisionid=%d");
 $config->registerPage("mitglieder_bouncelist", "emails.php?mode=listbounces&mitgliederrevisionid=%d");

@@ -57,8 +57,7 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 	$telefon = $session->getVariable("telefon");
 	$handy = $session->getVariable("handy");
 	$email = $session->getVariable("email");
-	// $gliederungid = intval($_POST["gliederungid"]);
-	$gliederungid = 1;
+	$gliederungid = intval($_POST["gliederungid"]);
 	$gliederung = $session->getStorage()->getGliederung($gliederungid);
 	$mitgliedschaftid = $session->getIntVariable("mitgliedschaftid");
 	$mitgliedschaft = $session->getStorage()->getMitgliedschaft($mitgliedschaftid);
@@ -78,9 +77,7 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 	$email = $session->getStorage()->searchEMail($email);
 	$kontakt = $session->getStorage()->searchKontakt($adresszusatz, $strasse, $hausnummer, $ort->getOrtID(), $telefon, $handy, $email->getEMailID());
 
-	$neumitglied = false;
 	if ($mitglied == null) {
-		$neumitglied = true;
 		$mitglied = new Mitglied($session->getStorage());
 		$mitglied->setEintrittsdatum(time());
 		$mitglied->setAustrittsdatum(null);
@@ -115,8 +112,8 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 		$session->getStorage()->addMitgliedDokument($mitglied->getMitgliedID(), $dokument->getDokumentID());
 	}
 
-	if ($neumitglied) {
-		$mailtemplate = $mitgliedschaft->getDefaultCreateMail();
+	if ($session->hasVariable("mailtemplateid")) {
+		$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("mailtemplateid"));
 		if ($mailtemplate != null) {
 			$mail = $mailtemplate->generateMail($mitglied);
 			$config->getSendMailBackend()->send($mail);
@@ -230,13 +227,14 @@ case "details":
 	$notizen = $session->getStorage()->getMitgliedNotizList($mitglied->getMitgliedID());
 	$dokumente = $session->getStorage()->getDokumentByMitgliedList($mitglied->getMitgliedID());
 
+	$gliederungen = $session->getStorage()->getGliederungList();
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
 	$mitgliederflags = $session->getStorage()->getMitgliedFlagList();
 	$mitgliedertextfields = $session->getStorage()->getMitgliedTextFieldList();
 	$states = $session->getStorage()->getStateList();
 	$beitraege = $session->getStorage()->getBeitragList();
 
-	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields, $beitraege);
+	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields, $beitraege);
 	exit;
 case "create":
 	$data = array();
@@ -247,9 +245,12 @@ case "create":
 		$data = $dokument->getData();
 	}
 
-	$mitgliedschaft = null;
-	if ($session->hasVariable("mitgliedschaftid")) {
-		$mitgliedschaft = $session->getStorage()->getMitgliedschaft($session->getVariable("mitgliedschaftid"));
+	$template = null;
+	if (isset($data["mitgliedtemplateid"])) {
+		$template = $session->getStorage()->getMitgliedTemplate($data["mitgliedtemplateid"]);
+	}
+	if ($session->hasVariable("mitgliedtemplateid")) {
+		$template = $session->getStorage()->getMitgliedTemplate($session->getVariable("mitgliedtemplateid"));
 	}
 
 	if ($session->getBoolVariable("save")) {
@@ -267,12 +268,14 @@ case "create":
 		}
 	}
 
+	$gliederungen = $session->getStorage()->getGliederungList();
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
+	$mailtemplates = $session->getStorage()->getMailTemplateList();
 	$mitgliederflags = $session->getStorage()->getMitgliedFlagList();
 	$mitgliedertextfields = $session->getStorage()->getMitgliedTextFieldList();
 	$states = $session->getStorage()->getStateList();
 
-	$ui->viewMitgliedCreate($mitgliedschaft, $dokument, $data, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields);
+	$ui->viewMitgliedCreate($template, $dokument, $data, $gliederungen, $mitgliedschaften, $mailtemplates, $states, $mitgliederflags, $mitgliedertextfields);
 	exit;
 case "delete":
 	if (!$session->isAllowed("mitglieder_delete")) {
@@ -420,9 +423,9 @@ default:
 	$offset = $page * $pagesize;
 
 	$mitglieder = $session->getStorage()->getMitgliederList($filter, $pagesize, $offset);
-	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
+	$mitgliedtemplates = $session->getStorage()->getMitgliedTemplateList();
 	$filters = $session->getStorage()->getMitgliederFilterList();
-	$ui->viewMitgliederList($mitglieder, $mitgliedschaften, $filters, $filter, $page, $pagecount);
+	$ui->viewMitgliederList($mitglieder, $mitgliedtemplates, $filters, $filter, $page, $pagecount);
 	exit;
 }
 
