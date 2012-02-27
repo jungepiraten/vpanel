@@ -27,13 +27,13 @@ class OrtDistanceMitgliederMatcher extends MitgliederMatcher {
 
 	public function match(Mitglied $mitglied) {
 		$ort = $mitglied->getLatestRevision()->getKontakt()->getOrt();
-		$lat1 = $ort->getLatitude();
-		$long1 = $ort->getLongitude();
+		$lat1 = $ort->getLatitude() / 180 * 3.141592;
+		$long1 = $ort->getLongitude() / 180 * 3.141592;
 		if ($lat1 == null or $long1 == null) {
 			return false;
 		}
-		$lat2 = $this->getLatitude();
-		$long2 = $this->getLongitude();
+		$lat2 = $this->getLatitude() / 180 * 3.141592;
+		$long2 = $this->getLongitude() / 180 * 3.141592;
 		// http://www.movable-type.co.uk/scripts/latlong.html
 		$dist = acos(sin($lat1)*sin($lat2) + cos($lat1)*cos($lat2) * cos($lon2-$lon1)) * 6371;
 		return ($dist <= $this->getDistance());

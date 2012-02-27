@@ -416,7 +416,7 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		if ($matcher instanceof OrtDistanceMitgliederMatcher) {
 			// http://www.movable-type.co.uk/scripts/latlong.html
-			return "ASIN(SIN(`o`.`latitude`)*SIN(".doubleval($matcher->getLatitude()).") + COS(`o`.`latitude`)*COS(".doubleval($matcher->getLatitude()).")*COS(".doubleval($matcher->getLongitude())."-`o`.`longitude`))*6371 <= ".doubleval($matcher->getDistance());
+			return "ASIN(SIN(`o`.`latitude`/180*3.1415)*SIN(".doubleval($matcher->getLatitude())."/180*3.1415) + COS(`o`.`latitude`/180*3.1415)*COS(".doubleval($matcher->getLatitude())."/180*3.1415)*COS(".doubleval($matcher->getLongitude())."/180*3.1415-`o`.`longitude`/180*3.1415))*6371 <= ".doubleval($matcher->getDistance());
 		}
 		if ($matcher instanceof BeitragMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID()).")";
