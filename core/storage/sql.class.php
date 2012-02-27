@@ -538,7 +538,7 @@ abstract class SQLStorage extends AbstractStorage {
 			".($matcher != null ? "WHERE ".$this->parseMitgliederMatcher($matcher) : "")."
 			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
 			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
-			ORDER BY `r`.`timestamp`";
+			ORDER BY `m`.`eintritt`";
 		if ($limit !== null or $offset !== null) {
 			$sql .= " LIMIT ";
 			if ($offset !== null) {
@@ -602,7 +602,7 @@ abstract class SQLStorage extends AbstractStorage {
 			WHERE	`dokumentid` = " . intval($dokumentid) . "
 			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
 			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
-			ORDER BY `r`.`timestamp`";
+			ORDER BY `m`.`eintritt`";
 		return $this->getResult($sql, array($this, "parseMitglied"));
 	}
 	public function getMitglied($mitgliedid) {		
@@ -827,7 +827,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
 			LEFT JOIN `orte` `o` USING (`ortid`)
 			LEFT JOIN `emails` `e` USING (`emailid`)
-			ORDER BY `r`.`timestamp`";
+			ORDER BY `m`.`eintritt`";
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
 	}
 	public function getMitgliederRevisionsByMitgliedIDResult($mitgliedid) {
@@ -872,7 +872,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `orte` `o` USING (`ortid`)
 			LEFT JOIN `emails` `e` USING (`emailid`)
 			WHERE `r`.`mitgliedid` = " . intval($mitgliedid) . "
-			ORDER BY `r`.`timestamp`";
+			ORDER BY `m`.`eintritt`";
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
 	}
 	public function getMitgliederRevision($revisionid) {
