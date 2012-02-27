@@ -414,6 +414,10 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof RevisionTextFieldMitgliederMatcher) {
 			return "`r`.`revisionid` IN (SELECT `revisionid` FROM `mitgliederrevisiontextfields` WHERE `textfieldid` = " . intval($matcher->getTextFieldID()) . " AND `value` = '" . $this->escape($matcher->getValue()) . "')";
 		}
+		if ($matcher instanceof OrtDistanceMitgliederMatcher) {
+			// http://en.wikipedia.org/wiki/Haversine_formula
+			return "2*6371*ASIN(SQRT(POW(SIN((`ort`.`latitude`-".doubleval($matcher->getLatitude()).")/2),2) + COS(`ort`.`latitude`)*COS(".doubleval($matcher->getLatitude()).")*POW(SIN((`ort`.`longitude`-".doubleval($matcher->getLongitude()).")/2),2))) <= ".doubleval($matcher->getDistance());
+		}
 		if ($matcher instanceof BeitragMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID()).")";
 		}
