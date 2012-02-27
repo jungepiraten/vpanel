@@ -45,6 +45,8 @@ class MitgliederFilterDeleteProcess extends Process {
 	}
 
 	public function runProcess() {
+		global $config;
+
 		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
 		$max = $result->getCount();
 		$i = 0;
@@ -55,6 +57,7 @@ class MitgliederFilterDeleteProcess extends Process {
 			$mitglied->save();
 
 			$revision = $mitglied->getLatestRevision()->fork();
+			$revision->setGlobalID($config->generateGlobalID());
 			$revision->setTimestamp($this->getTimestamp());
 			$revision->getUserID($this->getUserID());
 			$revision->isGeloescht(true);
