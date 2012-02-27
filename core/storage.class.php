@@ -111,7 +111,7 @@ interface Storage {
 	public function getOrtResultLimit($plz = null, $label = null, $stateid = null, $count = null);
 	public function getOrtListLimit($plz = null, $label = null, $stateid = null, $count = null);
 	public function getOrt($ortid);
-	public function setOrt($ortid, $plz, $label, $stateid);
+	public function setOrt($ortid, $plz, $label, $latitude, $longitude, $stateid);
 	public function delOrt($ortid);
 	public function searchOrt($plz, $label, $stateid);
 

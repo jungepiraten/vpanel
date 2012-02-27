@@ -526,6 +526,8 @@ abstract class SQLStorage extends AbstractStorage {
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
+				`o`.`latitude` AS `o_latitude`,
+				`o`.`longitude` AS `o_longitude`,
 				`o`.`stateid` AS `o_stateid`
 			FROM	`mitglieder` `m`
 			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
@@ -589,6 +591,8 @@ abstract class SQLStorage extends AbstractStorage {
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
+				`o`.`latitude` AS `o_latitude`,
+				`o`.`longitude` AS `o_longitude`,
 				`o`.`stateid` AS `o_stateid`
 			FROM	`mitglieddokument`
 			LEFT JOIN `mitglieder` `m` USING (`mitgliedid`)
@@ -820,6 +824,8 @@ abstract class SQLStorage extends AbstractStorage {
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
+				`o`.`latitude` AS `o_latitude`,
+				`o`.`longitude` AS `o_longitude`,
 				`o`.`stateid` AS `o_stateid`
 			FROM	`mitgliederrevisions` `r`
 			LEFT JOIN `natperson` `n` USING (`natpersonid`)
@@ -864,6 +870,8 @@ abstract class SQLStorage extends AbstractStorage {
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
+				`o`.`latitude` AS `o_latitude`,
+				`o`.`longitude` AS `o_longitude`,
 				`o`.`stateid` AS `o_stateid`
 			FROM	`mitgliederrevisions` `r`
 			LEFT JOIN `natperson` `n` USING (`natpersonid`)
@@ -909,6 +917,8 @@ abstract class SQLStorage extends AbstractStorage {
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
+				`o`.`latitude` AS `o_latitude`,
+				`o`.`longitude` AS `o_longitude`,
 				`o`.`stateid` AS `o_stateid`
 			FROM	`mitgliederrevisions` `r`
 			LEFT JOIN `natperson` `n` USING (`natpersonid`)
@@ -1052,11 +1062,11 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "Ort");
 	}
 	public function getOrtResult() {
-		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte`";
+		$sql = "SELECT `ortid`, `plz`, `label`, `latitude`, `longitude`, `stateid` FROM `orte`";
 		return $this->getResult($sql, array($this, "parseOrt"));
 	}
 	public function getOrtResultLimit($plz = null, $label = null, $stateid = null, $count = null) {
-		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte` WHERE 1";
+		$sql = "SELECT `ortid`, `plz`, `label`, `latitude`, `longitude`, `stateid` FROM `orte` WHERE 1";
 		if ($plz != null) {
 			$sql .= " and `plz` LIKE '" . $this->escape($plz) . "%'";
 		}
@@ -1072,14 +1082,14 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parseOrt"));
 	}
 	public function getOrt($ortid) {
-		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte` WHERE `ortid` = " . intval($ortid);
+		$sql = "SELECT `ortid`, `plz`, `label`, `latitude`, `longitude`, `stateid` FROM `orte` WHERE `ortid` = " . intval($ortid);
 		return $this->getResult($sql, array($this, "parseOrt"))->fetchRow();
 	}
-	public function setOrt($ortid, $plz, $label, $stateid) {
+	public function setOrt($ortid, $plz, $label, $latitude, $longitude, $stateid) {
 		if ($ortid == null) {
-			$sql = "INSERT INTO `orte` (`plz`, `label`, `stateid`) VALUES ('" . $this->escape($plz) . "', '" . $this->escape($label) . "', " . intval($stateid) . ")";
+			$sql = "INSERT INTO `orte` (`plz`, `label`, `latitude`, `longitude`, `stateid`) VALUES ('" . $this->escape($plz) . "', '" . $this->escape($label) . "', " . ($latitude == null ? "NULL" : doubleval($latitude)) . ", " . ($longitude == null ? "NULL" : doubleval($longitude)) . ", " . intval($stateid) . ")";
 		} else {
-			$sql = "UPDATE `orte` SET `plz` = '" . $this->escape($plz) . "', `label` = '" . $this->escape($label) . "', `stateid` = '" . $this->escape($stateid) . "' WHERE `ortid` = " . intval($ortid);
+			$sql = "UPDATE `orte` SET `plz` = '" . $this->escape($plz) . "', `label` = '" . $this->escape($label) . "', `latitude` = " . ($latitude == null ? "NULL" : doubleval($latitude)) . ", `longitude` = " . ($longitude == null ? "NULL" : doubleval($longitude)) . ", `stateid` = '" . $this->escape($stateid) . "' WHERE `ortid` = " . intval($ortid);
 		}
 		$this->query($sql);
 		if ($ortid == null) {
@@ -1092,7 +1102,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->query($sql);
 	}
 	public function searchOrt($plz, $label, $stateid) {
-		$sql = "SELECT `ortid`, `plz`, `label`, `stateid` FROM `orte` WHERE `plz` = '" . $this->escape($plz) . "' AND `label` = '" . $this->escape($label) . "' AND `stateid` = " . intval($stateid);
+		$sql = "SELECT `ortid`, `plz`, `label`, `latitude`, `longitude`, `stateid` FROM `orte` WHERE `plz` = '" . $this->escape($plz) . "' AND `label` = '" . $this->escape($label) . "' AND `stateid` = " . intval($stateid);
 		$result = $this->getResult($sql, array($this, "parseOrt"));
 		if ($result->getCount() > 0) {
 			return $result->fetchRow();

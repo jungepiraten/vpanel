@@ -16,6 +16,8 @@ class Ort extends StorageClass {
 		$ort->setOrtID($row["ortid"]);
 		$ort->setPLZ($row["plz"]);
 		$ort->setLabel($row["label"]);
+		$ort->setLatitude($row["latitude"]);
+		$ort->setLongitude($row["longitude"]);
 		$ort->setStateID($row["stateid"]);
 		return $ort;
 	}
@@ -42,6 +44,22 @@ class Ort extends StorageClass {
 
 	public function setLabel($label) {
 		$this->label = $label;
+	}
+
+	public function getLatitude() {
+		return $this->latitude;
+	}
+
+	public function setLatitude($latitude) {
+		$this->latitude = $latitude;
+	}
+
+	public function getLongitude() {
+		return $this->longitude;
+	}
+
+	public function setLongitude($longitude) {
+		$this->longitude = $longitude;
 	}
 
 	public function getState() {
@@ -75,6 +93,8 @@ class Ort extends StorageClass {
 			$this->getOrtID(),
 			$this->getPLZ(),
 			$this->getLabel(),
+			$this->getLatitude(),
+			$this->getLongitude(),
 			$this->getStateID() ));
 	}
 }
