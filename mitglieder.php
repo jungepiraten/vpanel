@@ -416,8 +416,9 @@ default:
 		$filter = $session->getMitgliederFilter($session->getVariable("filterid"));
 	}
 
+	$mitgliedercount = $session->getStorage()->getMitgliederCount($filter);
 	$pagesize = 20;
-	$pagecount = ceil($session->getStorage()->getMitgliederCount($filter) / $pagesize);
+	$pagecount = ceil($mitgliedercount / $pagesize);
 	$page = 0;
 	if ($session->hasVariable("page") and $session->getVariable("page") >= 0 and $session->getVariable("page") < $pagecount) {
 		$page = intval($session->getVariable("page"));
@@ -427,7 +428,7 @@ default:
 	$mitglieder = $session->getStorage()->getMitgliederList($filter, $pagesize, $offset);
 	$mitgliedtemplates = $session->getStorage()->getMitgliedTemplateList();
 	$filters = $session->getStorage()->getMitgliederFilterList();
-	$ui->viewMitgliederList($mitglieder, $mitgliedtemplates, $filters, $filter, $page, $pagecount);
+	$ui->viewMitgliederList($mitglieder, $mitgliedtemplates, $filters, $filter, $page, $pagecount, $mitgliedercount);
 	exit;
 }
 

@@ -576,12 +576,13 @@ class Template {
 		$this->smarty->display("mailtemplatecreateattachment.html.tpl");
 	}
 
-	public function viewMitgliederList($mitglieder, $mitgliedtemplates, $filters, $filter, $page, $pagecount) {
+	public function viewMitgliederList($mitglieder, $mitgliedtemplates, $filters, $filter, $page, $pagecount, $mitgliedercount) {
 		if ($filter != null) {
 			$this->smarty->assign("filter", $this->parseMitgliederFilter($filter));
 		}
 		$this->smarty->assign("page", $page);
 		$this->smarty->assign("pagecount", $pagecount);
+		$this->smarty->assign("mitgliedercount", $mitgliedercount);
 		$this->smarty->assign("mitglieder", $this->parseMitglieder($mitglieder));
 		$this->smarty->assign("mitgliedtemplates", $this->parseMitgliedTemplates($mitgliedtemplates));
 		$this->smarty->assign("filters", $this->parseMitgliederFilters($filters));
