@@ -827,7 +827,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
 			LEFT JOIN `orte` `o` USING (`ortid`)
 			LEFT JOIN `emails` `e` USING (`emailid`)
-			ORDER BY `m`.`eintritt`";
+			ORDER BY `r`.`timestamp`";
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
 	}
 	public function getMitgliederRevisionsByMitgliedIDResult($mitgliedid) {
@@ -872,7 +872,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `orte` `o` USING (`ortid`)
 			LEFT JOIN `emails` `e` USING (`emailid`)
 			WHERE `r`.`mitgliedid` = " . intval($mitgliedid) . "
-			ORDER BY `m`.`eintritt`";
+			ORDER BY `r`.`timestamp`";
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
 	}
 	public function getMitgliederRevision($revisionid) {
