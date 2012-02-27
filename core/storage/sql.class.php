@@ -415,8 +415,8 @@ abstract class SQLStorage extends AbstractStorage {
 			return "`r`.`revisionid` IN (SELECT `revisionid` FROM `mitgliederrevisiontextfields` WHERE `textfieldid` = " . intval($matcher->getTextFieldID()) . " AND `value` = '" . $this->escape($matcher->getValue()) . "')";
 		}
 		if ($matcher instanceof OrtDistanceMitgliederMatcher) {
-			// http://en.wikipedia.org/wiki/Haversine_formula
-			return "2*6371*ASIN(SQRT(POW(SIN((`o`.`latitude`-".doubleval($matcher->getLatitude()).")/2),2) + COS(`o`.`latitude`)*COS(".doubleval($matcher->getLatitude()).")*POW(SIN((`o`.`longitude`-".doubleval($matcher->getLongitude()).")/2),2))) <= ".doubleval($matcher->getDistance());
+			// http://www.movable-type.co.uk/scripts/latlong.html
+			return "ASIN(SIN(`o`.`latitude`)*SIN(".doubleval($matcher->getLatitude()).") + COS(`o`.`latitude`)*COS(".doubleval($matcher->getLatitude()).")*COS(".doubleval($matcher->getLongitude())."-`o`.`longitude`))*6371";
 		}
 		if ($matcher instanceof BeitragMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID()).")";
