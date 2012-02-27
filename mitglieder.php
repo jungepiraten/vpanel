@@ -79,6 +79,7 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 
 	if ($mitglied == null) {
 		$mitglied = new Mitglied($session->getStorage());
+		$mitglied->setGlobalID($config->generateGlobalID());
 		$mitglied->setEintrittsdatum(time());
 		$mitglied->setAustrittsdatum(null);
 		$mitglied->save();
@@ -93,6 +94,7 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 
 	$revision = new MitgliedRevision($session->getStorage());
 	$revision->setTimestamp(time());
+	$revision->setGlobalID($config->generateGlobalID());
 	$revision->setUser($session->getUser());
 	$revision->setMitglied($mitglied);
 	$revision->setMitgliedschaft($mitgliedschaft);
