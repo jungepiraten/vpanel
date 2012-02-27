@@ -34,8 +34,8 @@ class OrtDistanceMitgliederMatcher extends MitgliederMatcher {
 		}
 		$lat2 = $this->getLatitude() / 180 * 3.141592;
 		$long2 = $this->getLongitude() / 180 * 3.141592;
-		// http://www.movable-type.co.uk/scripts/latlong.html
-		$dist = acos(sin($lat1)*sin($lat2) + cos($lat1)*cos($lat2) * cos($lon2-$lon1)) * 6371;
+		// http://en.wikipedia.org/wiki/Haversine_formula
+		$dist = 2 * 6371 * acos(pow(($lat1-$lat2)/2,2) + cos($lat1)*cos($lat2)*pow(sin(($lon1-$lon2)/2),2));
 		return ($dist <= $this->getDistance());
 	}
 }
