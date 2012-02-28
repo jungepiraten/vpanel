@@ -162,10 +162,12 @@ class Graph {
 class Graph_DefaultAxis {
 	private $min;
 	private $max;
+	private $precision;
 
-	public function __construct($min, $max) {
+	public function __construct($min, $max, $precision = 0) {
 		$this->min = $min;
 		$this->max = $max;
+		$this->precision = 0;
 	}
 
 	private function getMinimum() {
@@ -176,8 +178,16 @@ class Graph_DefaultAxis {
 		return $this->max;
 	}
 
+	private function getPrecision() {
+		return $this->precision;
+	}
+
 	private function getDelta() {
 		return $this->getMaximum() - $this->getMinimum();
+	}
+
+	private function roundValue($val) {
+		return round($val, $this->getPrecision());
 	}
 
 	public function getLabelPosition($i) {
@@ -191,7 +201,7 @@ class Graph_DefaultAxis {
 		if ($val > $this->getMaximum()) {
 			return 1;
 		}
-		return ($val - $this->getMinimum()) / $this->getDelta();
+		return ($this->roundValue($val) - $this->getMinimum()) / $this->getDelta();
 	}
 
 	public function getValue($pos) {
@@ -199,7 +209,7 @@ class Graph_DefaultAxis {
 	}
 
 	public function getLabel($pos) {
-		return round($this->getValue($pos));
+		return $this->roundValue($this->getValue($pos));
 	}
 }
 
