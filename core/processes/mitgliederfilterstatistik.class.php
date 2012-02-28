@@ -2,6 +2,8 @@
 
 require_once(VPANEL_CORE . "/process.class.php");
 
+require_once(VPANEL_CORE . "/graph.class.php");
+
 class MitgliederFilterStatistikProcess extends Process {
 	private $statistikid;
 
@@ -56,9 +58,20 @@ class MitgliederFilterStatistikProcess extends Process {
 	private $mitgliederCount = array();
 	private $maxMitgliederCount = 1;
 
+	private $mitgliederStateCount = array();
+	private $maxMitgliederStateCount = 1;
+
+	private $minMitgliederAge = 99;
+	private $maxMitgliederAge = 0;
+	private $mitgliederAgeCount = array();
+	private $maxMitgliederAgeCount = 1;
+
 	public function runPrepareData($progressOffset, $progress) {
-		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
+		foreach ($this->getStorage()->getStateList() as $state) {
+			$this->mitgliederStateCount[$state->getStateID()] = 0;
+		}
 		
+		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
 		$deltaScale = array();
 		$this->maxMitgliederTime = $this->minMitgliederTime = floor(time() / $this->scalaMitgliederTime);
 		while ($mitglied = $result->fetchRow()) {
@@ -78,10 +91,24 @@ class MitgliederFilterStatistikProcess extends Process {
 					$deltaScale[$austritt] = 0;
 				}
 				$deltaScale[$austritt] --;
+			} else {
+				$revision = $mitglied->getLatestRevision();
+
+				$this->mitgliederStateCount[$revision->getKontakt()->getOrt()->getStateID()]++;
+
+				if ($revision->isNatPerson()) {
+					$age = new DateTime(time())->diff(new DateTime($revision->getNatPerson()->getGeburtsdatum()));
+					if (!isset($this->mitgliederAgeCount[$age])) {
+						$this->mitgliederAgeCount[$age] = 0;
+					}
+					$this->minMitgliederAge = min($this->minMitgliederAge, $age);
+					$this->maxMitgliederAge = max($this->maxMitgliederAge, $age);
+					$this->mitgliederAgeCount[$age]++;
+				}
 			}
 		}
 
-		$this->setProgress($progressOffset + 0.7 * $progress);
+		$this->setProgress($progressOffset + 0.5 * $progress);
 		$this->save();
 
 		$curValue = 0;
@@ -90,71 +117,44 @@ class MitgliederFilterStatistikProcess extends Process {
 			$this->maxMitgliederCount = max($this->maxMitgliederCount, $curValue);
 		}
 
+		$this->setProgress($progressOffset + 0.8 * $progress);
+		$this->save();
+
+		foreach ($this->mitgliederStateCount as $stateid => $count) {
+			$this->maxMitgliederStateCount = max($this->maxMitgliederStateCount, $count);
+		}
+
+		$this->setProgress($progressOffset + 0.9 * $progress);
+		$this->save();
+
+		for ($age = $this->minMitgliederAge; $age <= $this->maxMitgliederAge; $age++) {
+			if (!isset($this->mitgliederAgeCount[$age])) {
+				$this->mitgliederAgeCount[$age] = 0;
+			}
+			$this->maxMitgliederAgeCount = max($this->maxMitgliederAgeCount, $this->mitgliederAgeCount[$age]);
+		}
+
 		$this->setProgress($progressOffset + 1 * $progress);
 		$this->save();
 	}
 
 	public function runGenerateAgeGraph($w, $h, $file, $progressOffset, $progress) {
+		$graph = new Graph($w, $h);
+		$graph->setXAxis(new Graph_DefaultAxis($this->minMitgliederAge, $this->maxMitgliederAge));
+		$graph->setYAxis(new Graph_DefaultAxis(0, $this->maxMitgliederAgeCount));
+		$graph->setData($this->mitgliederAgeCount);
+		$graph->plot($file);
 		
 		$this->setProgress($progressOffset + 1 * $progress);
 		$this->save();
 	}
 
 	public function runGenerateTimeGraph($w, $h, $file, $progressOffset, $progress) {
-		$offsetX = 40;
-		$scalaX = 110; $scalaY = 60;
-
-		$img = ImageCreateTrueColor($offsetX + $w, 20 + $h);
-		$white    = ImageColorAllocate($img, 255, 255, 255);
-		$color    = ImageColorAllocate($img, 255,   0,   0);
-		$boxcolor = ImageColorAllocate($img,  20,  20,  20);
-		ImageFilledRectangle($img, 0,0, $offsetX+$w,20+$h, $white);
-
-		$this->setProgress($progressOffset + 0.1 * $progress);
-		$this->save();
-
-		$pixelsPerValue = ($h - $scalaY / 3) / $this->maxMitgliederCount;
-		$timePerPixel = ($this->maxMitgliederTime - $this->minMitgliederTime) / $w;
-
-		$this->setProgress($progressOffset + 0.2 * $progress);
-		$this->save();
-
-		while (round($scalaY / $pixelsPerValue) % 10 != 0) {
-			$scalaY ++;
-		}
-		if ($scalaY < $pixelsPerValue) {
-			$scalaY = $pixelsPerValue;
-		}
-		$scalaY = $pixelsPerValue * round($scalaY / $pixelsPerValue);
-
-		$this->setProgress($progressOffset + 0.3 * $progress);
-		$this->save();
-
-		for ($y = 0; $y < $h - imagefontheight(3); $y += $scalaY) {
-			ImageString($img, 3, $offsetX - 10, $h - $y - imagefontheight(3), round($y / $pixelsPerValue), $boxcolor);
-			ImageLine($img, $offsetX, $h - $y, $offsetX + $w, $h - $y, $boxcolor);
-		}
-
-		$this->setProgress($progressOffset + 0.6 * $progress);
-		$this->save();
-
-		for ($x = 0; $x <= $w; $x++) {
-			$curTime = $this->minMitgliederTime + floor($x * $timePerPixel);
-			$curValue = $this->mitgliederCount[$curTime];
-
-			ImageLine($img, $offsetX + $x, $h, $offsetX + $x, $h - round($curValue * $pixelsPerValue), $color);
-			if ($x % $scalaX == 0 && $x > 0 && $x < $w - imagefontwidth(3) * 5) {
-				ImageString($img, 3, $offsetX + $x - imagefontwidth(3) * 5, $h + 5, date("d.m.Y", $curTime * $this->scalaMitgliederTime), $boxcolor);
-			}
-		}
-
-		$this->setProgress($progressOffset + 0.9 * $progress);
-		$this->save();
-
-		$file->setMimeType("image/png");
-		$file->setExportFilename($file->getExportFilename() . ".png");
-		$file->save();
-		ImagePNG($img, $file->getAbsoluteFileName());
+		$graph = new Graph($w, $h);
+		$graph->setXAxis(new Graph_TimestampAxis($this->minMitgliederTime, $this->maxMitgliederTime, "d.m.Y", $this->scalaMitgliederTime));
+		$graph->setYAxis(new Graph_DefaultAxis(0, $this->maxMitgliederCount));
+		$graph->setData($this->mitgliederCount);
+		$graph->plot($file);
 
 		$this->setProgress($progressOffset + 1 * $progress);
 		$this->save();
