@@ -93,8 +93,7 @@ class Graph {
 		while ($this->getXAxis()->getLabelPosition($posXaxis) < 1) {
 			$labelPosition = $this->getXAxis()->getLabelPosition($posXaxis);
 			$label = $this->getXAxis()->getLabel($labelPosition);
-			$value = $this->getXAxis()->getValue($labelPosition);
-			$xPixel = $this->getXAxis()->getPosition($value) * $this->getPlotWidth();
+			$xPixel = $labelPosition * $this->getPlotWidth();
 			$x = $this->getPlotXOffset() + $xPixel;
 			$preXpixel = ImageFontWidth($axisfont) * strlen($label) / 2;
 			$postXpixel = ImageFontWidth($axisfont) * strlen($label) / 2;
@@ -117,8 +116,7 @@ class Graph {
 		while ($this->getYAxis()->getLabelPosition($posYaxis) < 1) {
 			$labelPosition = $this->getYAxis()->getLabelPosition($posYaxis);
 			$label = $this->getYAxis()->getLabel($labelPosition);
-			$value = $this->getYAxis()->getValue($labelPosition);
-			$yPixel = $this->getYAxis()->getPosition($value) * $this->getPlotHeight();
+			$yPixel = $labelPosition * $this->getPlotHeight();
 			$y = $this->getPlotYOffset() + ($this->getPlotHeight() - $yPixel);
 			$preXpixel = ImageFontWidth($axisfont) * strlen($label);
 			$preYpixel = ImageFontHeight($axisfont) / 2;
@@ -191,7 +189,7 @@ class Graph_DefaultAxis {
 	}
 
 	public function getLabelPosition($i) {
-		return $this->getPosition($this->getMinimum() + $i * ($this->getDelta() / 10));
+		return $this->getPosition($this->getMinimum() + $i * $this->roundValue($this->getDelta() / 10));
 	}
 
 	public function getPosition($val) {
