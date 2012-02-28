@@ -98,7 +98,7 @@ class MitgliederFilterStatistikProcess extends Process {
 
 				if ($revision->isNatPerson()) {
 					$age = date("Y") - date("Y", $revision->getNatPerson()->getGeburtsdatum());
-					if (date("md") < date("md", $revision->getNatPerson()->getGeburtsdatum()) {
+					if (date("md") < date("md", $revision->getNatPerson()->getGeburtsdatum())) {
 						$age--;
 					}
 					if (!isset($this->mitgliederAgeCount[$age])) {
