@@ -5,7 +5,8 @@ class Graph {
 	private $height;
 	private $xaxis;
 	private $yaxis;
-	private $data;
+	private $data = array();
+	private $dataColor = array();
 
 	public function __construct($width, $height) {
 		$this->width = $width;
@@ -68,29 +69,40 @@ class Graph {
 		$this->yaxis = $axis;
 	}
 
-	private function getDataValue($key) {
-		if (isset($this->data[round($key)])) {
-			return $this->data[round($key)];
+	private function getDataValue($i, $key) {
+		if (isset($this->data[$i][$key])) {
+			return $this->data[$i][$key];
 		}
 		return 0;
 	}
 
-	public function setData($data) {
-		$this->data = $data;
+	private function getDataColor($i) {
+		if (isset($this->dataColor[$i]) && $this->dataColor[$i] != null) {
+			return $this->dataColor[$i];
+		}
+		return new Graph_Color(255,0,0);
+	}
+
+	public function addData($data, $color = null) {
+		$this->data[] = $data;
+		$this->dataColor[] = $color;
 	}
 
 	public function plot($file = null) {
 		$img = ImageCreate($this->getWidth(), $this->getHeight());
 		$background	= ImageColorAllocate($img, 255,255,255);
-		$plotcolor	= ImageColorAllocate($img, 255,  0,  0);
 		$axiscolor	= ImageColorAllocate($img,   0,  0,  0);
 		$axisfont	= 3;
+		$dataColor = array();
+		for ($i = 0; $i < count($this->data); $i++) {
+			$dataColor[$i] = $this->getDataColor($i)->gdAllocate($img);
+		}
 
 		// X-Axis
 		$posXaxis = 0;
 		$lastXpixel_label = null;
 		$lastXpixel_line = null;
-		while ($this->getXAxis()->getLabelPosition($posXaxis) < 1) {
+		while ($this->getXAxis()->getLabelPosition($posXaxis) < 1 && $posXaxis < 30) {
 			$labelPosition = $this->getXAxis()->getLabelPosition($posXaxis);
 			$label = $this->getXAxis()->getLabel($labelPosition);
 			$xPixel = $labelPosition * $this->getPlotWidth();
@@ -113,7 +125,7 @@ class Graph {
 		$posYaxis = 0;
 		$lastYpixel_label = null;
 		$lastYpixel_line = null;
-		while ($this->getYAxis()->getLabelPosition($posYaxis) < 1) {
+		while ($this->getYAxis()->getLabelPosition($posYaxis) < 1 && $posYaxis < 30) {
 			$labelPosition = $this->getYAxis()->getLabelPosition($posYaxis);
 			$label = $this->getYAxis()->getLabel($labelPosition);
 			$yPixel = $labelPosition * $this->getPlotHeight();
@@ -135,11 +147,13 @@ class Graph {
 
 		// Data
 		for ($x = 0; $x <= $this->getPlotWidth(); $x++) {
-			$data_key = $this->getXAxis()->getValue($x / $this->getPlotWidth());
-			$data_value = $this->getDataValue($data_key);
-			$y = $this->getPlotHeight() - $this->getPlotHeight() * $this->getYAxis()->getPosition($data_value);
+			for ($i = 0; $i < count($this->data); $i++) {
+				$data_key = $this->getXAxis()->getValue($x / $this->getPlotWidth());
+				$data_value = $this->getDataValue($i, $data_key);
+				$y = $this->getPlotHeight() - $this->getPlotHeight() * $this->getYAxis()->getPosition($data_value);
 
-			ImageLine($img, $this->getPlotXOffset() + $x, $y, $this->getPlotXOffset() + $x, $this->getPlotHeight(), $plotcolor);
+				ImageLine($img, $this->getPlotXOffset() + $x, $y, $this->getPlotXOffset() + $x, $this->getPlotHeight(), $dataColor[$i]);
+			}
 		}
 
 		// Output
@@ -157,15 +171,31 @@ class Graph {
 	}
 }
 
+class Graph_Color {
+	private $r;
+	private $g;
+	private $b;
+
+	public function __construct($r, $g, $b) {
+		$this->r = $r;
+		$this->g = $g;
+		$this->b = $b;
+	}
+
+	public function gdAllocate($img) {
+		return ImageColorAllocate($img, $this->r, $this->g, $this->b);
+	}
+}
+
 class Graph_DefaultAxis {
 	private $min;
 	private $max;
 	private $precision;
 
-	public function __construct($min, $max, $precision = 0) {
+	public function __construct($min, $max, $precision = 1) {
 		$this->min = $min;
 		$this->max = $max;
-		$this->precision = 0;
+		$this->precision = $precision;
 	}
 
 	private function getMinimum() {
@@ -185,7 +215,7 @@ class Graph_DefaultAxis {
 	}
 
 	private function roundValue($val) {
-		return round($val, $this->getPrecision());
+		return round($val / $this->getPrecision(), 0) * $this->getPrecision();
 	}
 
 	public function getLabelPosition($i) {
@@ -203,26 +233,24 @@ class Graph_DefaultAxis {
 	}
 
 	public function getValue($pos) {
-		return $this->getMinimum() + $pos * $this->getDelta();
+		return $this->roundValue($this->getMinimum() + $pos * $this->getDelta());
 	}
 
 	public function getLabel($pos) {
-		return $this->roundValue($this->getValue($pos));
+		return $this->getValue($pos);
 	}
 }
 
 class Graph_TimestampAxis extends Graph_DefaultAxis {
 	private $dateFormat;
-	private $timeMulti;
 	
 	public function __construct($min, $max, $dateFormat, $timeMulti) {
-		parent::__construct($min, $max);
+		parent::__construct($min, $max, $timeMulti);
 		$this->dateFormat = $dateFormat;
-		$this->timeMulti = $timeMulti;
 	}
 
 	public function getLabel($pos) {
-		return date($this->dateFormat, $this->getValue($pos) * $this->timeMulti);
+		return date($this->dateFormat, $this->getValue($pos));
 	}
 }
 

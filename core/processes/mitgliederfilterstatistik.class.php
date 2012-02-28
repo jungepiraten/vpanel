@@ -52,17 +52,12 @@ class MitgliederFilterStatistikProcess extends Process {
 		return array("matcher" => $this->getMatcher(), "statistikid" => $this->getStatistikID());
 	}
 
-	private $scalaMitgliederTime = 84600;
-	private $minMitgliederTime;
-	private $maxMitgliederTime;
 	private $mitgliederCount = array();
 	private $maxMitgliederCount = 1;
 
 	private $mitgliederStateCount = array();
 	private $maxMitgliederStateCount = 1;
 
-	private $minMitgliederAge = 99;
-	private $maxMitgliederAge = 0;
 	private $mitgliederAgeCount = array();
 	private $maxMitgliederAgeCount = 1;
 
@@ -73,21 +68,16 @@ class MitgliederFilterStatistikProcess extends Process {
 		
 		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
 		$deltaScale = array();
-		$this->maxMitgliederTime = $this->minMitgliederTime = floor($this->getStatistik()->getTimestamp() / $this->scalaMitgliederTime);
 		while ($mitglied = $result->fetchRow()) {
-			if ($mitglied->getEintrittsdatum() < $this->getStatistik()->getTimestamp()) {
-				$eintritt = floor($mitglied->getEintrittsdatum() / $this->scalaMitgliederTime);
-				$this->minMitgliederTime = min($this->minMitgliederTime, $eintritt);
-				$this->maxMitgliederTime = max($this->maxMitgliederTime, $eintritt);
+			if ($mitglied->getEintrittsdatum() <= $this->getStatistik()->getTimestamp()) {
+				$eintritt = floor($mitglied->getEintrittsdatum() / $this->getStatistik()->getMitgliederCountScale());
 				if (!isset($deltaScale[$eintritt])) {
 					$deltaScale[$eintritt] = 0;
 				}
 				$deltaScale[$eintritt] ++;
 
-				if ($mitglied->getAustrittsdatum() != null && $mitglied->getAustrittsdatum() < $this->getStatistik()->getTimestamp()) {
-					$austritt = floor($mitglied->getAustrittsdatum() / $this->scalaMitgliederTime);
-					$this->minMitgliederTime = min($this->minMitgliederTime, $austritt);
-					$this->maxMitgliederTime = max($this->maxMitgliederTime, $austritt);
+				if ($mitglied->getAustrittsdatum() != null && $mitglied->getAustrittsdatum() <= $this->getStatistik()->getTimestamp()) {
+					$austritt = floor($mitglied->getAustrittsdatum() / $this->getStatistik()->getMitgliederCountScale());
 					if (!isset($deltaScale[$austritt])) {
 						$deltaScale[$austritt] = 0;
 					}
@@ -106,8 +96,6 @@ class MitgliederFilterStatistikProcess extends Process {
 						if (!isset($this->mitgliederAgeCount[$age])) {
 							$this->mitgliederAgeCount[$age] = 0;
 						}
-						$this->minMitgliederAge = min($this->minMitgliederAge, $age);
-						$this->maxMitgliederAge = max($this->maxMitgliederAge, $age);
 						$this->mitgliederAgeCount[$age]++;
 					}
 				}
@@ -118,8 +106,10 @@ class MitgliederFilterStatistikProcess extends Process {
 		$this->save();
 
 		$curValue = 0;
-		for ($time = $this->minMitgliederTime; $time <= $this->maxMitgliederTime; $time ++) {
-			$this->mitgliederCount[$time] = $curValue = $curValue + (isset($deltaScale[$time]) ? $deltaScale[$time] : 0);
+		for ($time = $this->getStatistik()->getMitgliederCountStart(); $time <= $this->getStatistik()->getMitgliederCountEnd(); $time += $this->getStatistik()->getMitgliederCountScale()) {
+			$deltaKey = floor($time / $this->getStatistik()->getMitgliederCountScale());
+			$delta = isset($deltaScale[$deltaKey]) ? $deltaScale[$deltaKey] : 0;
+			$this->mitgliederCount[$time] = $curValue = $curValue + $delta;
 			$this->maxMitgliederCount = max($this->maxMitgliederCount, $curValue);
 		}
 
@@ -133,7 +123,7 @@ class MitgliederFilterStatistikProcess extends Process {
 		$this->setProgress($progressOffset + 0.9 * $progress);
 		$this->save();
 
-		for ($age = $this->minMitgliederAge; $age <= $this->maxMitgliederAge; $age++) {
+		for ($age = $this->getStatistik()->getMitgliederAgeMinimum(); $age <= $this->getStatistik()->getMitgliederAgeMaximum(); $age++) {
 			if (!isset($this->mitgliederAgeCount[$age])) {
 				$this->mitgliederAgeCount[$age] = 0;
 			}
@@ -146,9 +136,9 @@ class MitgliederFilterStatistikProcess extends Process {
 
 	public function runGenerateAgeGraph($w, $h, $file, $progressOffset, $progress) {
 		$graph = new Graph($w, $h);
-		$graph->setXAxis(new Graph_DefaultAxis($this->minMitgliederAge, $this->maxMitgliederAge));
+		$graph->setXAxis(new Graph_DefaultAxis($this->getStatistik()->getMitgliederAgeMinimum(), $this->getStatistik()->getMitgliederAgeMaximum()));
 		$graph->setYAxis(new Graph_DefaultAxis(0, $this->maxMitgliederAgeCount));
-		$graph->setData($this->mitgliederAgeCount);
+		$graph->addData($this->mitgliederAgeCount);
 		$graph->plot($file);
 		
 		$this->setProgress($progressOffset + 1 * $progress);
@@ -157,9 +147,9 @@ class MitgliederFilterStatistikProcess extends Process {
 
 	public function runGenerateTimeGraph($w, $h, $file, $progressOffset, $progress) {
 		$graph = new Graph($w, $h);
-		$graph->setXAxis(new Graph_TimestampAxis($this->minMitgliederTime, $this->maxMitgliederTime, "d.m.Y", $this->scalaMitgliederTime));
+		$graph->setXAxis(new Graph_TimestampAxis($this->getStatistik()->getMitgliederCountStart(), $this->getStatistik()->getMitgliederCountEnd(), "d.m.Y", $this->getStatistik()->getMitgliederCountScale()));
 		$graph->setYAxis(new Graph_DefaultAxis(0, $this->maxMitgliederCount));
-		$graph->setData($this->mitgliederCount);
+		$graph->addData($this->mitgliederCount);
 		$graph->plot($file);
 
 		$this->setProgress($progressOffset + 1 * $progress);

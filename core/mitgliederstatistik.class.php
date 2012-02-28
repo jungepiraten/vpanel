@@ -36,6 +36,26 @@ class MitgliederStatistik extends StorageClass {
 		return $this->timestamp;
 	}
 
+	public function getMitgliederCountScale() {
+		return 24*60*60;
+	}
+
+	public function getMitgliederCountStart() {
+		return $this->getMitgliederCountEnd() - 5*365*24*60*60;
+	}
+
+	public function getMitgliederCountEnd() {
+		return floor($this->getTimestamp() / $this->getMitgliederCountScale()) * $this->getMitgliederCountScale();
+	}
+
+	public function getMitgliederAgeMinimum() {
+		return 0;
+	}
+
+	public function getMitgliederAgeMaximum() {
+		return 70;
+	}
+
 	public function setAgeGraphFileID($fileid) {
 		if ($fileid != $this->agegraphfileid) {
 			$this->agegraphfile = null;
