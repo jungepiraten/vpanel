@@ -1248,9 +1248,6 @@ abstract class SQLStorage extends AbstractStorage {
 	 * NatPerson
 	 **/
 	public function parseNatPerson($row) {
-		// MySQLs UNIX_TIMESTAMP returns 0 for all values before 1970-01-01, so do not use this here
-		list($gebdatum_y, $gebdatum_m, $gebdatum_d) = explode("-", $row["geburtsdatum"]);
-		$row["geburtsdatum"] = mktime(0, 0, 0, $gebdatum_m, $gebdatum_d, $gebdatum_y);
 		return $this->parseRow($row, null, "NatPerson");
 	}
 	public function getNatPerson($natpersonid) {

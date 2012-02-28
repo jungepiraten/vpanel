@@ -12,6 +12,10 @@ class NatPerson extends Person {
 	private $nationalitaet;
 	
 	public static function factory(Storage $storage, $row) {
+		if (!is_numeric($row["geburtsdatum"])) {
+			list($gebdatum_y, $gebdatum_m, $gebdatum_d) = explode("-", $row["geburtsdatum"]);
+			$row["geburtsdatum"] = mktime(0, 0, 0, $gebdatum_m, $gebdatum_d, $gebdatum_y);
+		}
 		$natperson = new NatPerson($storage);
 		$natperson->setNatPersonID($row["natpersonid"]);
 		$natperson->setAnrede($row["anrede"]);
