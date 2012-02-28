@@ -97,7 +97,10 @@ class MitgliederFilterStatistikProcess extends Process {
 				$this->mitgliederStateCount[$revision->getKontakt()->getOrt()->getStateID()]++;
 
 				if ($revision->isNatPerson()) {
-					$age = new DateTime(time())->diff(new DateTime($revision->getNatPerson()->getGeburtsdatum()));
+					$age = date("Y") - date("Y", $revision->getNatPerson()->getGeburtsdatum());
+					if (date("md") < date("md", $revision->getNatPerson()->getGeburtsdatum()) {
+						$age--;
+					}
 					if (!isset($this->mitgliederAgeCount[$age])) {
 						$this->mitgliederAgeCount[$age] = 0;
 					}
