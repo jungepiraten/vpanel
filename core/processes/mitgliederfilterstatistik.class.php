@@ -73,41 +73,43 @@ class MitgliederFilterStatistikProcess extends Process {
 		
 		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
 		$deltaScale = array();
-		$this->maxMitgliederTime = $this->minMitgliederTime = floor(time() / $this->scalaMitgliederTime);
+		$this->maxMitgliederTime = $this->minMitgliederTime = floor($this->getStatistik()->getTimestamp() / $this->scalaMitgliederTime);
 		while ($mitglied = $result->fetchRow()) {
-			$eintritt = floor($mitglied->getEintrittsdatum() / $this->scalaMitgliederTime);
-			$this->minMitgliederTime = min($this->minMitgliederTime, $eintritt);
-			$this->maxMitgliederTime = max($this->maxMitgliederTime, $eintritt);
-			if (!isset($deltaScale[$eintritt])) {
-				$deltaScale[$eintritt] = 0;
-			}
-			$deltaScale[$eintritt] ++;
-
-			$austritt = floor($mitglied->getAustrittsdatum() / $this->scalaMitgliederTime);
-			if ($austritt != null) {
-				$this->minMitgliederTime = min($this->minMitgliederTime, $austritt);
-				$this->maxMitgliederTime = max($this->maxMitgliederTime, $austritt);
-				if (!isset($deltaScale[$austritt])) {
-					$deltaScale[$austritt] = 0;
+			if ($mitglied->getEintrittsdatum() < $this->getStatistik()->getTimestamp()) {
+				$eintritt = floor($mitglied->getEintrittsdatum() / $this->scalaMitgliederTime);
+				$this->minMitgliederTime = min($this->minMitgliederTime, $eintritt);
+				$this->maxMitgliederTime = max($this->maxMitgliederTime, $eintritt);
+				if (!isset($deltaScale[$eintritt])) {
+					$deltaScale[$eintritt] = 0;
 				}
-				$deltaScale[$austritt] --;
-			} else {
-				$revision = $mitglied->getLatestRevision();
+				$deltaScale[$eintritt] ++;
 
-				$this->mitgliederStateCount[$revision->getKontakt()->getOrt()->getStateID()]++;
+				if ($mitglied->getAustrittsdatum() != null && $mitglied->getAustrittsdatum() < $this->getStatistik()->getTimestamp()) {
+					$austritt = floor($mitglied->getAustrittsdatum() / $this->scalaMitgliederTime);
+					$this->minMitgliederTime = min($this->minMitgliederTime, $austritt);
+					$this->maxMitgliederTime = max($this->maxMitgliederTime, $austritt);
+					if (!isset($deltaScale[$austritt])) {
+						$deltaScale[$austritt] = 0;
+					}
+					$deltaScale[$austritt] --;
+				} else {
+					$revision = $mitglied->getLatestRevision();
 
-				if ($revision->isNatPerson()) {
-					$geburtsdatum = $revision->getNatPerson()->getGeburtsdatum();
-					$age = date("Y") - date("Y", $geburtsdatum);
-					if (date("md") < date("md", $geburtsdatum)) {
-						$age--;
+					$this->mitgliederStateCount[$revision->getKontakt()->getOrt()->getStateID()]++;
+
+					if ($revision->isNatPerson()) {
+						$geburtsdatum = $revision->getNatPerson()->getGeburtsdatum();
+						$age = date("Y") - date("Y", $geburtsdatum);
+						if (date("md") < date("md", $geburtsdatum)) {
+							$age--;
+						}
+						if (!isset($this->mitgliederAgeCount[$age])) {
+							$this->mitgliederAgeCount[$age] = 0;
+						}
+						$this->minMitgliederAge = min($this->minMitgliederAge, $age);
+						$this->maxMitgliederAge = max($this->maxMitgliederAge, $age);
+						$this->mitgliederAgeCount[$age]++;
 					}
-					if (!isset($this->mitgliederAgeCount[$age])) {
-						$this->mitgliederAgeCount[$age] = 0;
-					}
-					$this->minMitgliederAge = min($this->minMitgliederAge, $age);
-					$this->maxMitgliederAge = max($this->maxMitgliederAge, $age);
-					$this->mitgliederAgeCount[$age]++;
 				}
 			}
 		}
