@@ -295,7 +295,12 @@ class Graph_DefaultAxis {
 		$min = $this->floorValue($this->getMinimum() + $pos * $this->getDelta());
 		// Wir wollen die Werte _innerhalb_ des Bereiches Minimum _inklusive_, Maximum _exklusive_
 		$max = max($min, $this->ceilValue($this->getMinimum() + $pos * $this->getDelta()) - $this->getPrecision());
-		return range($min, $max, $this->getPrecision());
+
+		if ($min == $max) {
+			return array($this->roundValue($this->getMinimum() + $pos * $this->getDelta()));
+		} else {
+			return range($min, $max, $this->getPrecision());
+		}
 	}
 
 	public function getLabel($pos) {
