@@ -66,6 +66,10 @@ class MitgliederFilterStatistikProcess extends Process {
 	private $mitgliederAgeCount = array();
 	private $maxMitgliederAgeCount = 1;
 
+	private function normMitgliederCountTime($value) {
+		return $this->getStatistik()->getMitgliederCountStart() + floor(($value - $this->getStatistik()->getMitgliederCountStart()) / $this->getStatistik()->getMitgliederCountScale()) * $this->getStatistik()->getMitgliederCountScale();
+	}
+
 	public function runPrepareData($progressOffset, $progress) {
 		foreach ($this->getStorage()->getStateList() as $state) {
 			$this->mitgliederStateCount[$state->getStateID()] = 0;
@@ -75,7 +79,7 @@ class MitgliederFilterStatistikProcess extends Process {
 		$curMitgliederCount = 0;
 		while ($mitglied = $result->fetchRow()) {
 			if ($mitglied->getEintrittsdatum() <= $this->getStatistik()->getTimestamp()) {
-				$eintritt = floor($mitglied->getEintrittsdatum() / $this->getStatistik()->getMitgliederCountScale()) * $this->getStatistik()->getMitgliederCountScale();
+				$eintritt = $this->normMitgliederCountTime($mitglied->getEintrittsdatum());
 				if ($eintritt < $this->getStatistik()->getMitgliederCountStart()) {
 					$curMitgliederCount ++;
 				} else {
@@ -87,7 +91,7 @@ class MitgliederFilterStatistikProcess extends Process {
 				}
 
 				if ($mitglied->getAustrittsdatum() != null && $mitglied->getAustrittsdatum() <= $this->getStatistik()->getTimestamp()) {
-					$austritt = floor($mitglied->getAustrittsdatum() / $this->getStatistik()->getMitgliederCountScale()) * $this->getStatistik()->getMitgliederCountScale();
+					$austritt = $this->normMitgliederCountTime($mitglied->getAustrittsdatum());
 					if ($austritt < $this->getStatistik()->getMitgliederCountStart()) {
 						$curMitgliederCount --;
 					} else {
