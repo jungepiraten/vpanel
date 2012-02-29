@@ -144,14 +144,16 @@ class Graph {
 
 		// Data
 		$y_null = $this->getPlotHeight() - $this->getPlotHeight() * $this->getYAxis()->getPosition(0);
+		$lastX = null;
 		for ($x = 0; $x <= $this->getPlotWidth(); $x++) {
 			for ($i = 0; $i < count($this->data); $i++) {
-				$data_keys = $this->getXAxis()->getValueList($x / $this->getPlotWidth());
+				$data_keys = $this->getXAxis()->getValueList($lastX / $this->getPlotWidth(), $x / $this->getPlotWidth());
 				$data_value = $this->getDataValue($i, $data_keys);
 				$y = $this->getPlotHeight() - $this->getPlotHeight() * $this->getYAxis()->getPosition($data_value);
 
 				ImageLine($img, $this->getPlotXOffset() + $x, $y, $this->getPlotXOffset() + $x, $y_null, $dataColor[$i]);
 			}
+			$lastX = $x;
 		}
 
 		// Output
@@ -291,16 +293,15 @@ class Graph_DefaultAxis {
 		return ($this->roundValue($val) - $this->getMinimum()) / $this->getDelta();
 	}
 
-	public function getValueList($pos) {
-		$min = $this->floorValue($this->getMinimum() + $pos * $this->getDelta());
-		// Wir wollen die Werte _innerhalb_ des Bereiches Minimum _inklusive_, Maximum _exklusive_
-		$max = max($min, $this->ceilValue($this->getMinimum() + $pos * $this->getDelta()) - $this->getPrecision());
-
-		if ($min == $max) {
-			return array($this->roundValue($this->getMinimum() + $pos * $this->getDelta()));
-		} else {
-			return range($min, $max, $this->getPrecision());
+	public function getValueList($min, $max) {
+		if ($min == null) {
+			return array($this->roundValue($this->getMinimum() + $max * $this->getDelta()));
 		}
+
+		$min = $this-> ceilValue($this->getMinimum() + $min * $this->getDelta());
+		$max = $this->floorValue($this->getMinimum() + $max * $this->getDelta());
+
+		return range($min, $max, $this->getPrecision());
 	}
 
 	public function getLabel($pos) {
