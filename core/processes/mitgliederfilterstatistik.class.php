@@ -192,7 +192,7 @@ class MitgliederFilterStatistikProcess extends Process {
 		$agegraph = new File($this->getStorage());
 		$agegraph->setExportFilename("vpanel-agegraph-" . date("Y-m-d"));
 		$agegraph->save();
-		$this->runGenerateAgeGraph(600, 250, $this->getStatistik()->getAgeGraphFile(), 0.7, 0.1);
+		$this->runGenerateAgeGraph(600, 250, $agegraph, 0.7, 0.1);
 		$this->getStatistik()->setAgeGraphFile($agegraph);
 
 		$timegraph = new File($this->getStorage());
