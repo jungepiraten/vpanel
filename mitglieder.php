@@ -369,20 +369,6 @@ case "statistik.start":
 
 	$statistik = new MitgliederStatistik($session->getStorage());
 	$statistik->setTimestamp(time());
-
-	$agegraphfile = new File($session->getStorage());
-	$agegraphfile->setExportFilename("vpanel-agegraph-" . date("Y-m-d"));
-	$agegraphfile->save();
-	$statistik->setAgeGraphFile($agegraphfile);
-
-	$timegraphfile = new File($session->getStorage());
-	$timegraphfile->setExportFilename("vpanel-timegraph-" . date("Y-m-d"));
-	$timegraphfile->save();
-	$statistik->setTimeGraphFile($timegraphfile);
-
-	$timebalancegraphfile = new File($session->getStorage());
-	$timebalancegraphfile->setExportFilename("vpanel-timebalancegraph-" . date("Y-m-d"));
-	$timebalancegraphfile->save();
 	$statistik->setTimeBalanceGraphFile($timebalancegraphfile);
 	$statistik->save();
 

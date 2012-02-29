@@ -188,9 +188,26 @@ class MitgliederFilterStatistikProcess extends Process {
 
 	public function runProcess() {
 		$this->runPrepareData(0, 0.7);
+
+		$agegraph = new File($this->getStorage());
+		$agegraph->setExportFilename("vpanel-agegraph-" . date("Y-m-d"));
+		$agegraph->save();
 		$this->runGenerateAgeGraph(600, 250, $this->getStatistik()->getAgeGraphFile(), 0.7, 0.1);
-		$this->runGenerateTimeGraph(600, 250, $this->getStatistik()->getTimeGraphFile(), 0.8, 0.1);
-		$this->runGenerateBalanceTimeGraph(600, 250, $this->getStatistik()->getTimeBalanceGraphFile(), 0.9, 0.1);
+		$this->getStatistik()->setAgeGraphFile($agegraph);
+
+		$timegraph = new File($this->getStorage());
+		$timegraph->setExportFilename("vpanel-timegraph-" . date("Y-m-d"));
+		$timegraph->save();
+		$this->runGenerateTimeGraph(600, 250, $timegraph, 0.8, 0.1);
+		$this->getStatistik()->setTimeGraphFile($timegraph);
+
+		$timebalancegraph = new File($this->getStorage());
+		$timebalancegraph->setExportFilename("vpanel-timebalancegraph-" . date("Y-m-d"));
+		$timebalancegraph->save();
+		$this->runGenerateBalanceTimeGraph(600, 250, $timebalancegraph, 0.9, 0.1);
+		$this->getStatistik()->setTimeBalanceGraphFile($timebalancegraph);
+
+		$this->getStatistik()->save();
 	}
 }
 
