@@ -294,18 +294,18 @@ class Graph_DefaultAxis {
 	}
 
 	protected function getValue($pos) {
-		$this->roundValue($this->getMinimum() + $pos * $this->getDelta());
+		return $this->roundValue($this->getMinimum() + $pos * $this->getDelta());
 	}
 
 	public function getValueList($min, $max) {
-		if ($min == null) {
+		$minValue = $this-> ceilValue($this->getMinimum() + $min * $this->getDelta());
+		$maxValue = $this->floorValue($this->getMinimum() + $max * $this->getDelta());
+
+		if ($min == null || $minValue > $maxValue) {
 			return array($this->getValue($max));
 		}
 
-		$min = $this-> ceilValue($this->getMinimum() + $min * $this->getDelta());
-		$max = $this->floorValue($this->getMinimum() + $max * $this->getDelta());
-
-		return range($min, $max, $this->getPrecision());
+		return range($minValue, $maxValue, $this->getPrecision());
 	}
 
 	public function getLabel($pos) {
