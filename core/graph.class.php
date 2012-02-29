@@ -293,7 +293,7 @@ class Graph_DefaultAxis {
 		return ($this->roundValue($val) - $this->getMinimum()) / $this->getDelta();
 	}
 
-	private function getValue($pos) {
+	protected function getValue($pos) {
 		$this->roundValue($this->getMinimum() + $pos * $this->getDelta());
 	}
 
