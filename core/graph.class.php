@@ -299,7 +299,7 @@ class Graph_DefaultAxis {
 
 	public function getValueList($min, $max) {
 		if ($min == null) {
-			return array($this_>getValue($max));
+			return array($this->getValue($max));
 		}
 
 		$min = $this-> ceilValue($this->getMinimum() + $min * $this->getDelta());
