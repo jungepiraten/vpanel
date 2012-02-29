@@ -479,9 +479,15 @@ class Template {
 		$row = array();
 		$row["statistikid"] = $statistik->getStatistikID();
 		$row["timestamp"] = $statistik->getTimestamp();
-		$row["agegraphfile"] = $this->parseFile($statistik->getAgeGraphFile());
-		$row["timegraphfile"] = $this->parseFile($statistik->getTimeGraphFile());
-		$row["timebalancegraphfile"] = $this->parseFile($statistik->getTimeBalanceGraphFile());
+		if ($statistik->getAgeGraphFile() != null) {
+			$row["agegraphfile"] = $this->parseFile($statistik->getAgeGraphFile());
+		}
+		if ($statistik->getTimeGraphFile() != null) {
+			$row["timegraphfile"] = $this->parseFile($statistik->getTimeGraphFile());
+		}
+		if ($statistik->getTimeBalanceGraphFile() != null) {
+			$row["timebalancegraphfile"] = $this->parseFile($statistik->getTimeBalanceGraphFile());
+		}
 		return $row;
 	}
 
