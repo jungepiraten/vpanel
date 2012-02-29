@@ -293,7 +293,8 @@ class Graph_DefaultAxis {
 
 	public function getValueList($pos) {
 		$min = $this->floorValue($this->getMinimum() + $pos * $this->getDelta());
-		$max = $this-> ceilValue($this->getMinimum() + $pos * $this->getDelta());
+		// Wir wollen die Werte _innerhalb_ des Bereiches Minimum _inklusive_, Maximum _exklusive_
+		$max = max($min, $this->ceilValue($this->getMinimum() + $pos * $this->getDelta()) - $this->getPrecision());
 		return range($min, $max, $this->getPrecision());
 	}
 
