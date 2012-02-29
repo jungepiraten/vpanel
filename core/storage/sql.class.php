@@ -1821,25 +1821,27 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "MitgliederStatistik");
 	}
 	public function getMitgliederStatistikResult() {
-		$sql = "SELECT `statistikid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid` FROM `mitgliederstatistiken`";
+		$sql = "SELECT `statistikid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid` FROM `mitgliederstatistiken`";
 		return $this->getResult($sql, array($this, "parseMitgliederStatistik"));
 	}
 	public function getMitgliederStatistik($statistikid) {
-		$sql = "SELECT `statistikid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid` FROM `mitgliederstatistiken` WHERE `statistikid` = " . intval($statistikid);
+		$sql = "SELECT `statistikid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid` FROM `mitgliederstatistiken` WHERE `statistikid` = " . intval($statistikid);
 		return $this->getResult($sql, array($this, "parseMitgliederStatistik"))->fetchRow();
 	}
-	public function setMitgliederStatistik($statistikid, $timestamp, $agegraphfileid, $timegraphfileid) {
+	public function setMitgliederStatistik($statistikid, $timestamp, $agegraphfileid, $timegraphfileid, $timebalancegraphfileid) {
 		if ($statistikid == null) {
 			$sql = "INSERT INTO `mitgliederstatistiken`
-				(`timestamp`, `agegraphfileid`, `timegraphfileid`) VALUES
+				(`timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`) VALUES
 				('" . date("Y-m-d H:i:s", $timestamp) . "',
 				 " . intval($agegraphfileid) . ",
-				 " . intval($timegraphfileid) . ")";
+				 " . intval($timegraphfileid) . ",
+				 " . intval($timebalancegraphfileid) . ")";
 		} else {
 			$sql = "UPDATE	`mitgliederstatistiken`
 				SET	`timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "',
 					`agegraphfileid` = " . intval($agegraphfileid) . ",
-					`timegraphfileid` = " . intval($timegraphfileid) . "
+					`timegraphfileid` = " . intval($timegraphfileid) . ",
+					`timebalancegraphfileid` = " . intval($timebalancegraphfileid) . "
 				WHERE `statistikid` = " . intval($statistikid);
 		}
 		$this->query($sql);

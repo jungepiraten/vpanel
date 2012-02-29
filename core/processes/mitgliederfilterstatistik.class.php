@@ -55,6 +55,11 @@ class MitgliederFilterStatistikProcess extends Process {
 	private $mitgliederCount = array();
 	private $maxMitgliederCount = 1;
 
+	private $mitgliederEintritte = array();
+	private $maxMitgliederEintritte = 0;
+	private $mitgliederAustritte = array();
+	private $maxMitgliederAustritte = 0;
+
 	private $mitgliederStateCount = array();
 	private $maxMitgliederStateCount = 1;
 
@@ -67,21 +72,31 @@ class MitgliederFilterStatistikProcess extends Process {
 		}
 		
 		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
-		$deltaScale = array();
+		$curMitgliederCount = 0;
 		while ($mitglied = $result->fetchRow()) {
 			if ($mitglied->getEintrittsdatum() <= $this->getStatistik()->getTimestamp()) {
-				$eintritt = floor($mitglied->getEintrittsdatum() / $this->getStatistik()->getMitgliederCountScale());
-				if (!isset($deltaScale[$eintritt])) {
-					$deltaScale[$eintritt] = 0;
+				$eintritt = floor($mitglied->getEintrittsdatum() / $this->getStatistik()->getMitgliederCountScale()) * $this->getStatistik()->getMitgliederCountScale();
+				if ($eintritt < $this->getStatistik()->getMitgliederCountStart()) {
+					$curMitgliederCount ++;
+				} else {
+					if (!isset($this->mitgliederEintritte[$eintritt])) {
+						$this->mitgliederEintritte[$eintritt] = 0;
+					}
+					$this->mitgliederEintritte[$eintritt] ++;
+					$this->maxMitgliederEintritte = max($this->maxMitgliederEintritte, $this->mitgliederEintritte[$eintritt]);
 				}
-				$deltaScale[$eintritt] ++;
 
 				if ($mitglied->getAustrittsdatum() != null && $mitglied->getAustrittsdatum() <= $this->getStatistik()->getTimestamp()) {
-					$austritt = floor($mitglied->getAustrittsdatum() / $this->getStatistik()->getMitgliederCountScale());
-					if (!isset($deltaScale[$austritt])) {
-						$deltaScale[$austritt] = 0;
+					$austritt = floor($mitglied->getAustrittsdatum() / $this->getStatistik()->getMitgliederCountScale()) * $this->getStatistik()->getMitgliederCountScale();
+					if ($austritt < $this->getStatistik()->getMitgliederCountStart()) {
+						$curMitgliederCount --;
+					} else {
+						if (!isset($this->mitgliederAustritte[$austritt])) {
+							$this->mitgliederAustritte[$austritt] = 0;
+						}
+						$this->mitgliederAustritte[$austritt] ++;
+						$this->maxMitgliederAustritte = max($this->maxMitgliederAustritte, $this->mitgliederAustritte[$austritt]);
 					}
-					$deltaScale[$austritt] --;
 				} else {
 					$revision = $mitglied->getLatestRevision();
 
@@ -105,12 +120,15 @@ class MitgliederFilterStatistikProcess extends Process {
 		$this->setProgress($progressOffset + 0.5 * $progress);
 		$this->save();
 
-		$curValue = 0;
 		for ($time = $this->getStatistik()->getMitgliederCountStart(); $time <= $this->getStatistik()->getMitgliederCountEnd(); $time += $this->getStatistik()->getMitgliederCountScale()) {
-			$deltaKey = floor($time / $this->getStatistik()->getMitgliederCountScale());
-			$delta = isset($deltaScale[$deltaKey]) ? $deltaScale[$deltaKey] : 0;
-			$this->mitgliederCount[$time] = $curValue = $curValue + $delta;
-			$this->maxMitgliederCount = max($this->maxMitgliederCount, $curValue);
+			if (!isset($this->mitgliederEintritte[$time])) {
+				$this->mitgliederEintritte[$time] = 0;
+			}
+			if (!isset($this->mitgliederAustritte[$time])) {
+				$this->mitgliederAustritte[$time] = 0;
+			}
+			$this->mitgliederCount[$time] = $curMitgliederCount = $curMitgliederCount + $this->mitgliederEintritte[$time] - $this->mitgliederAustritte[$time];
+			$this->maxMitgliederCount = max($this->maxMitgliederCount, $curMitgliederCount);
 		}
 
 		$this->setProgress($progressOffset + 0.8 * $progress);
@@ -138,7 +156,7 @@ class MitgliederFilterStatistikProcess extends Process {
 		$graph = new Graph($w, $h);
 		$graph->setXAxis(new Graph_DefaultAxis($this->getStatistik()->getMitgliederAgeMinimum(), $this->getStatistik()->getMitgliederAgeMaximum()));
 		$graph->setYAxis(new Graph_DefaultAxis(0, $this->maxMitgliederAgeCount));
-		$graph->addData($this->mitgliederAgeCount);
+		$graph->addData(new Graph_AvgData($this->mitgliederAgeCount));
 		$graph->plot($file);
 		
 		$this->setProgress($progressOffset + 1 * $progress);
@@ -149,7 +167,19 @@ class MitgliederFilterStatistikProcess extends Process {
 		$graph = new Graph($w, $h);
 		$graph->setXAxis(new Graph_TimestampAxis($this->getStatistik()->getMitgliederCountStart(), $this->getStatistik()->getMitgliederCountEnd(), "d.m.Y", $this->getStatistik()->getMitgliederCountScale()));
 		$graph->setYAxis(new Graph_DefaultAxis(0, $this->maxMitgliederCount));
-		$graph->addData($this->mitgliederCount);
+		$graph->addData(new Graph_AvgData($this->mitgliederCount));
+		$graph->plot($file);
+
+		$this->setProgress($progressOffset + 1 * $progress);
+		$this->save();
+	}
+
+	public function runGenerateBalanceTimeGraph($w, $h, $file, $progressOffset, $progress) {
+		$graph = new Graph($w, $h);
+		$graph->setXAxis(new Graph_TimestampAxis($this->getStatistik()->getMitgliederCountStart(), $this->getStatistik()->getMitgliederCountEnd(), "d.m.Y", $this->getStatistik()->getMitgliederCountScale()));
+		$graph->setYAxis(new Graph_DefaultAxis(-1 * $this->maxMitgliederAustritte, $this->maxMitgliederEintritte));
+		$graph->addData(new Graph_SumData($this->mitgliederEintritte, 0,  1, new Graph_Color( 30,240, 30)));
+		$graph->addData(new Graph_SumData($this->mitgliederAustritte, 0, -1, new Graph_Color(255,  0,  0)));
 		$graph->plot($file);
 
 		$this->setProgress($progressOffset + 1 * $progress);
@@ -157,9 +187,10 @@ class MitgliederFilterStatistikProcess extends Process {
 	}
 
 	public function runProcess() {
-		$this->runPrepareData(0, 0.6);
-		$this->runGenerateAgeGraph(600, 250, $this->getStatistik()->getAgeGraphFile(), 0.6, 0.2);
-		$this->runGenerateTimeGraph(600, 250, $this->getStatistik()->getTimeGraphFile(), 0.8, 0.2);
+		$this->runPrepareData(0, 0.7);
+		$this->runGenerateAgeGraph(600, 250, $this->getStatistik()->getAgeGraphFile(), 0.7, 0.1);
+		$this->runGenerateTimeGraph(600, 250, $this->getStatistik()->getTimeGraphFile(), 0.8, 0.1);
+		$this->runGenerateBalanceTimeGraph(600, 250, $this->getStatistik()->getTimeBalanceGraphFile(), 0.9, 0.1);
 	}
 }
 

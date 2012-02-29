@@ -55,6 +55,9 @@ if ($session->hasVariable("tempfileid")) {
 	case "timegraph":
 		$file = $statistik->getTimeGraphFile();
 		break;
+	case "timebalancegraph":
+		$file = $statistik->getTimeBalanceGraphFile();
+		break;
 	}
 }
 

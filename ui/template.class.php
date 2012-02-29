@@ -481,6 +481,7 @@ class Template {
 		$row["timestamp"] = $statistik->getTimestamp();
 		$row["agegraphfile"] = $this->parseFile($statistik->getAgeGraphFile());
 		$row["timegraphfile"] = $this->parseFile($statistik->getTimeGraphFile());
+		$row["timebalancegraphfile"] = $this->parseFile($statistik->getTimeBalanceGraphFile());
 		return $row;
 	}
 

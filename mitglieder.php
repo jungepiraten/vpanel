@@ -379,6 +379,11 @@ case "statistik.start":
 	$timegraphfile->setExportFilename("vpanel-timegraph-" . date("Y-m-d"));
 	$timegraphfile->save();
 	$statistik->setTimeGraphFile($timegraphfile);
+
+	$timebalancegraphfile = new File($session->getStorage());
+	$timebalancegraphfile->setExportFilename("vpanel-timebalancegraph-" . date("Y-m-d"));
+	$timebalancegraphfile->save();
+	$statistik->setTimeBalanceGraphFile($timebalancegraphfile);
 	$statistik->save();
 
 	$process = new MitgliederFilterStatistikProcess($session->getStorage());

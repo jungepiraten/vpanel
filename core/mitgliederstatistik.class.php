@@ -7,9 +7,11 @@ class MitgliederStatistik extends StorageClass {
 	private $timestamp;
 	private $agegraphfileid;
 	private $timegraphfileid;
+	private $timebalancegraphfileid;
 
 	private $agegraphfile;
 	private $timegraphfile;
+	private $timebalancegraphfile;
 	
 	public static function factory(Storage $storage, $row) {
 		$statistik = new MitgliederStatistik($storage);
@@ -17,6 +19,7 @@ class MitgliederStatistik extends StorageClass {
 		$statistik->setTimestamp($row["timestamp"]);
 		$statistik->setAgeGraphFileID($row["agegraphfileid"]);
 		$statistik->setTimeGraphFileID($row["timegraphfileid"]);
+		$statistik->setTimeBalanceGraphFileID($row["timebalancegraphfileid"]);
 		return $statistik;
 	}
 
@@ -102,6 +105,29 @@ class MitgliederStatistik extends StorageClass {
 		return $this->timegraphfile;
 	}
 
+	public function setTimeBalanceGraphFileID($fileid) {
+		if ($fileid != $this->timebalancegraphfileid) {
+			$this->timebalancegraphfile = null;
+		}
+		$this->timebalancegraphfileid = $fileid;
+	}
+
+	public function getTimeBalanceGraphFileID() {
+		return $this->timebalancegraphfileid;
+	}
+
+	public function setTimeBalanceGraphFile($file) {
+		$this->setTimeBalanceGraphFileID($file->getFileID());
+		$this->timebalancegraphfile = $file;
+	}
+	
+	public function getTimeBalanceGraphFile() {
+		if ($this->timebalancegraphfile == null) {
+			$this->timebalancegraphfile = $this->getStorage()->getFile($this->getTimeBalanceGraphFileID());
+		}
+		return $this->timebalancegraphfile;
+	}
+
 	public function save(Storage $storage = null) {
 		if ($storage == null) {
 			$storage = $this->getStorage();
@@ -110,7 +136,8 @@ class MitgliederStatistik extends StorageClass {
 			$this->getStatistikID(),
 			$this->getTimestamp(),
 			$this->getAgeGraphFileID(),
-			$this->getTimeGraphFileID() ));
+			$this->getTimeGraphFileID(),
+			$this->getTimeBalanceGraphFileID() ));
 	}
 }
 

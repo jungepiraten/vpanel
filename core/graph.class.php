@@ -6,7 +6,6 @@ class Graph {
 	private $xaxis;
 	private $yaxis;
 	private $data = array();
-	private $dataColor = array();
 
 	public function __construct($width, $height) {
 		$this->width = $width;
@@ -69,18 +68,16 @@ class Graph {
 		$this->yaxis = $axis;
 	}
 
-	private function getDataValue($i, $key) {
-		if (isset($this->data[$i][$key])) {
-			return $this->data[$i][$key];
-		}
-		return 0;
+	private function getDataValue($i, $keys) {
+		return $this->data[$i]->getValue($keys);
 	}
 
 	private function getDataColor($i) {
-		if (isset($this->dataColor[$i]) && $this->dataColor[$i] != null) {
-			return $this->dataColor[$i];
+		$color = $this->data[$i]->getColor();
+		if ($color == null) {
+			$color = new Graph_Color(255,0,0);
 		}
-		return new Graph_Color(255,0,0);
+		return $color;
 	}
 
 	public function addData($data, $color = null) {
@@ -146,13 +143,14 @@ class Graph {
 		}
 
 		// Data
+		$y_null = $this->getPlotHeight() - $this->getPlotHeight() * $this->getYAxis()->getPosition(0);
 		for ($x = 0; $x <= $this->getPlotWidth(); $x++) {
 			for ($i = 0; $i < count($this->data); $i++) {
-				$data_key = $this->getXAxis()->getValue($x / $this->getPlotWidth());
-				$data_value = $this->getDataValue($i, $data_key);
+				$data_keys = $this->getXAxis()->getValueList($x / $this->getPlotWidth());
+				$data_value = $this->getDataValue($i, $data_keys);
 				$y = $this->getPlotHeight() - $this->getPlotHeight() * $this->getYAxis()->getPosition($data_value);
 
-				ImageLine($img, $this->getPlotXOffset() + $x, $y, $this->getPlotXOffset() + $x, $this->getPlotHeight(), $dataColor[$i]);
+				ImageLine($img, $this->getPlotXOffset() + $x, $y, $this->getPlotXOffset() + $x, $y_null, $dataColor[$i]);
 			}
 		}
 
@@ -187,6 +185,59 @@ class Graph_Color {
 	}
 }
 
+abstract class Graph_Data {
+	private $data;
+	private $defaultvalue;
+	private $valuemodifier;
+	private $color;
+
+	public function __construct($data, $defaultvalue = 0, $valuemodifier = 1, $color = null) {
+		$this->data = $data;
+		$this->defaultvalue = $defaultvalue;
+		$this->valuemodifier = $valuemodifier;
+		$this->color = $color;
+	}
+
+	private function hasRawData($key) {
+		return isset($this->data[$key]);
+	}
+
+	private function getRawData($key) {
+		return $this->data[$key];
+	}
+
+	abstract protected function normValues($values);
+
+	public function getValue($values) {
+		$rawValues = array();
+		foreach ($values as $value) {
+			if ($this->hasRawData($value)) {
+				$rawValues[$value] = $this->getRawData($value);
+			}
+		}
+		if (count($rawValues) == 0) {
+			return $this->defaultvalue;
+		}
+		return $this->normValues($rawValues) * $this->valuemodifier;
+	}
+
+	public function getColor() {
+		return $this->color;
+	}
+}
+
+class Graph_AvgData extends Graph_Data {
+	protected function normValues($values) {
+		return array_sum($values) / count($values);
+	}
+}
+
+class Graph_SumData extends Graph_Data {
+	protected function normValues($values) {
+		return array_sum($values);
+	}
+}
+
 class Graph_DefaultAxis {
 	private $min;
 	private $max;
@@ -218,6 +269,14 @@ class Graph_DefaultAxis {
 		return round($val / $this->getPrecision(), 0) * $this->getPrecision();
 	}
 
+	private function floorValue($val) {
+		return floor($val / $this->getPrecision()) * $this->getPrecision();
+	}
+
+	private function ceilValue($val) {
+		return ceil($val / $this->getPrecision()) * $this->getPrecision();
+	}
+
 	public function getLabelPosition($i) {
 		return $this->getPosition($this->getMinimum() + $i * $this->roundValue($this->getDelta() / 10));
 	}
@@ -232,12 +291,14 @@ class Graph_DefaultAxis {
 		return ($this->roundValue($val) - $this->getMinimum()) / $this->getDelta();
 	}
 
-	public function getValue($pos) {
-		return $this->roundValue($this->getMinimum() + $pos * $this->getDelta());
+	public function getValueList($pos) {
+		$min = $this->floorValue($this->getMinimum() + $pos * $this->getDelta());
+		$max = $this-> ceilValue($this->getMinimum() + $pos * $this->getDelta());
+		return range($min, $max, $this->getPrecision());
 	}
 
 	public function getLabel($pos) {
-		return $this->getValue($pos);
+		return array_shift($this->getValueList($pos));
 	}
 }
 
@@ -250,7 +311,7 @@ class Graph_TimestampAxis extends Graph_DefaultAxis {
 	}
 
 	public function getLabel($pos) {
-		return date($this->dateFormat, $this->getValue($pos));
+		return date($this->dateFormat, array_shift($this->getValueList($pos)));
 	}
 }
 

@@ -71,7 +71,9 @@ $config->registerPage("mitglieder_export.options", "mitglieder.php?mode=export.o
 $config->registerPage("mitglieder_export.export", "mitglieder.php?mode=export.export");
 $config->registerPage("mitglieder_statistik.start", "mitglieder.php?mode=statistik.start&filterid=%s");
 $config->registerPage("mitglieder_statistik", "mitglieder.php?mode=statistik&statistikid=%d");
+$config->registerPage("mitglieder_statistik_get_agegraph", "file.php?mode=get&part=agegraph&statistikid=%d");
 $config->registerPage("mitglieder_statistik_get_timegraph", "file.php?mode=get&part=timegraph&statistikid=%d");
+$config->registerPage("mitglieder_statistik_get_timebalancegraph", "file.php?mode=get&part=timebalancegraph&statistikid=%d");
 $config->registerPage("mitglieder_setbeitrag.selectbeitrag", "mitglieder.php?mode=setbeitrag.selectbeitrag&filterid=%s");
 $config->registerPage("mitglieder_setbeitrag.start", "mitglieder.php?mode=setbeitrag.start");
 
