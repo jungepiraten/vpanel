@@ -56,10 +56,6 @@ class Role extends StorageClass {
 		return $this->permissions;
 	}
 
-	public function getPermissionIDs() {
-		return array_keys($this->getPermissions());
-	}
-
 	public function addPermissionID($permissionid) {
 		$this->addPermission($this->getStorage()->getPermission($permissionid));
 	}
@@ -91,7 +87,7 @@ class Role extends StorageClass {
 			$this->getLabel(),
 			$this->getDescription() ));
 
-		$storage->setRolePermissionList($this->getRoleID(), $this->getPermissionIDs());
+		$storage->setRolePermissionList($this->getRoleID(), $this->getPermissions());
 	}
 }
 

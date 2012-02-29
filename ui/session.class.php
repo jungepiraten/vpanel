@@ -40,26 +40,52 @@ class Session {
 	public function isSignedIn() {
 		return isset($this->stor["user"]) and $this->stor["user"] != null;
 	}
+	private function buildGliederungChildList($gliederung, &$gliederungChilds) {
+		$gliederungid = $gliederung->getGliederungID();
+		$parentid = $gliederung->getParentID();
+
+		$gliederungen[$gliederungid] = $gliederung;
+		if (!isset($gliederungChilds[$gliederungid])) {
+			$gliederungChilds[$gliederungid] = array();
+		}
+		if ($parentid != null) {
+			if (!isset($gliederungChilds[$parentid])) {
+				$gliederungChilds[$parentid] = array();
+			}
+			$gliederungChilds[$parentid][] = $gliederung->getGliederungID();
+			$this->buildGliederungChildList($gliederung->getParent(), $gliederungChilds);
+		}
+	}
 	public function login($username, $password) {
 		$user = $this->getStorage()->getUserByUsername($username);
 		if ($user == null or !$user->isValidPassword($password)) {
 			throw new Exception("Login failed.");
 		}
+		$gliederungen = array();
+		$gliederungChilds = array();
+		foreach ($this->getStorage()->getGliederungList() as $gliederung) {
+			$gliederungen[$gliederung->getGliederungID()] = $gliederung;
+			$this->buildGliederungChildList($gliederung, $gliederungChilds);
+		}
 		$roles = $user->getRoles();
 		$permissions = array();
 		foreach ($roles as $role) {
 			foreach ($role->getPermissions() as $permission) {
-				$permissions[$permission->getPermissionID()] = $permission;
+				if ($permission->isTransitive()) {
+					foreach ($gliederungChilds[$permission->getGliederungID()] as $childid) {
+						$this->addPermission($permission);
+					}
+				}
+				$this->addPermission($permission);
 			}
 		}
 		$this->setUser($user);
-		$this->setPermissions($permissions);
 		$this->setDefaultDokumentKategorieID($user->getDefaultDokumentKategorieID());
 		$this->setDefaultDokumentStatusID($user->getDefaultDokumentStatusID());
 	}
 	public function logout() {
 		$this->setUser(null);
-		$this->setPermissions(null);
+		$this->stor["permissions"] = array();
 	}
 	public function setUser($user) {
 		$this->stor["user"] = $user;
@@ -72,25 +98,18 @@ class Session {
 		return new User($this->getStorage());
 	}
 
-	public function getPermissions() {
+	private function addPermission($permission) {
 		if (!isset($this->stor["permissions"])) {
-			return array();
+			$this->stor["permissions"] = array();
 		}
-		return $this->stor["permissions"];
+		$this->stor["permissions"][$permission->getPermission()->getLabel()][$permission->getGliederungID()] = true;
 	}
-	public function setPermissions($permissions) {
-		$this->stor["permissions"] = $permissions;
-	}
-	public function isAllowed($permission) {
-		if (!is_array($this->getPermissions())) {
-			return false;
+	public function isAllowed($permission, $gliederungid = null) {
+		if ($gliederungid == null) {
+			return isset($this->stor["permissions"][$permission]) && count($this->stor["permissions"][$permission]) > 0;
+		} else {
+			return isset($this->stor["permissions"][$permission][$gliederungid]);
 		}
-		foreach ($this->getPermissions() as $perm) {
-			if ($perm->getLabel() == $permission) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public function setLang($lang) {

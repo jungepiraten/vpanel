@@ -30,6 +30,7 @@ interface Storage {
 	public function getGliederungResult();
 	public function getGliederungList();
 	public function getGliederung($gliederungid);
+	public function setGliederung($gliederungid, $label, $parentid);
 
 	public function getBeitragResult();
 	public function getBeitragList();

@@ -4,6 +4,7 @@ require_once(VPANEL_CORE . "/storage.class.php");
 require_once(VPANEL_CORE . "/user.class.php");
 require_once(VPANEL_CORE . "/role.class.php");
 require_once(VPANEL_CORE . "/permission.class.php");
+require_once(VPANEL_CORE . "/rolepermission.class.php");
 require_once(VPANEL_CORE . "/mitglied.class.php");
 require_once(VPANEL_CORE . "/mitgliedflag.class.php");
 require_once(VPANEL_CORE . "/mitgliedtextfield.class.php");
@@ -92,19 +93,22 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parsePermission"))->fetchRow();
 	}
 
-	public function getRolePermissionResult($roleid) {
-		$sql = "SELECT `permissions`.`permissionid` AS 'permissionid', `permissions`.`label`, `permissions`.`description` AS 'description' FROM `rolepermissions` LEFT JOIN `permissions` USING (`permissionid`) WHERE `rolepermissions`.`roleid` = '" . $this->escape($roleid) . "'";
-		return $this->getResult($sql, array($this, "parsePermission"));
+	public function parseRolePermission($row) {
+		return $this->parseRow($row, null, "RolePermission");
 	}
-	public function setRolePermissionList($roleid, $permissionids) {
+	public function getRolePermissionResult($roleid) {
+		$sql = "SELECT `roleid`, `permissionid`, `gliederungid`, `transitive` FROM `rolepermissions` WHERE `roleid` = '" . $this->escape($roleid) . "'";
+		return $this->getResult($sql, array($this, "parseRolePermission"));
+	}
+	public function setRolePermissionList($roleid, $permissions) {
 		$sql = "DELETE FROM `rolepermissions` WHERE `roleid` = " . intval($roleid);
 		$this->query($sql);
 		if (count($permissionids) > 0) {
 			$permissionssql = array();
-			foreach ($permissionids as $permissionid) {
-				$permissionssql[] = "(" . intval($roleid) . ", " . intval($permissionid) . ")";
+			foreach ($permissions as $perm) {
+				$permissionssql[] = "(" . intval($roleid) . ", " . intval($perm->getPermissionID()) . ", " . intval($perm->getGliederungID()) . ", " . ($perm->isTransitive() ? 1 : 0) . ")";
 			}
-			$sql = "INSERT INTO `rolepermissions` (`roleid`, `permissionid`) VALUES " . implode(",", $permissionssql);
+			$sql = "INSERT INTO `rolepermissions` (`roleid`, `permissionid`, `gliederungid`, `transitive`) VALUES " . implode(",", $permissionssql);
 			$this->query($sql);
 		}
 		return true;
@@ -224,12 +228,24 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "Gliederung");
 	}
 	public function getGliederungResult() {
-		$sql = "SELECT `gliederungsid`, `label` FROM `gliederungen`";
+		$sql = "SELECT `gliederungsid`, `label`, `parentid` FROM `gliederungen`";
 		return $this->getResult($sql, array($this, "parseGliederung"));
 	}
 	public function getGliederung($gliederungid) {
-		$sql = "SELECT `gliederungsid`, `label` FROM `gliederungen` WHERE `gliederungsid` = " . intval($gliederungid);
+		$sql = "SELECT `gliederungsid`, `label`, `parentid` FROM `gliederungen` WHERE `gliederungsid` = " . intval($gliederungid);
 		return $this->getResult($sql, array($this, "parseGliederung"))->fetchRow();
+	}
+	public function setGliederung($gliederungid, $label, $parentid) {
+		if ($gliederungid == null) {
+			$sql = "INSERT INTO `gliederungen` (`label`, `parentid`) VALUES ('" . $this->escape($label) . "', " . ($parentid == null ? "NULL" : intval($parentid)) . ")";
+		} else {
+			$sql = "UPDATE `gliederungen` SET `label` = '" . $this->escape($label) . "', `parentid` = " . ($parentid == null ? "NULL" : intval($parentid)) . " WHERE `gliederungid` = " . intval($gliederungid);
+		}
+		$this->query($sql);
+		if ($gliederungid == null) {
+			$gliederungid = $this->getInsertID();
+		}
+		return $gliederungid;
 	}
 
 	/**
