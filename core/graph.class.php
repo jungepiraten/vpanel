@@ -268,15 +268,15 @@ class Graph_DefaultAxis {
 	}
 
 	private function roundValue($val) {
-		return round($val / $this->getPrecision(), 0) * $this->getPrecision();
+		return $this->getMinimum() + round(($val - $this->getMinimum()) / $this->getPrecision(), 0) * $this->getPrecision();
 	}
 
 	private function floorValue($val) {
-		return floor($val / $this->getPrecision()) * $this->getPrecision();
+		return $this->getMinimum() + floor(($val - $this->getMinimum()) / $this->getPrecision()) * $this->getPrecision();
 	}
 
 	private function ceilValue($val) {
-		return ceil($val / $this->getPrecision()) * $this->getPrecision();
+		return $this->getMinimum() + ceil(($val - $this->getMinimum()) / $this->getPrecision()) * $this->getPrecision();
 	}
 
 	public function getLabelPosition($i) {
