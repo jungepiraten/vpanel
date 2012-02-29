@@ -293,9 +293,13 @@ class Graph_DefaultAxis {
 		return ($this->roundValue($val) - $this->getMinimum()) / $this->getDelta();
 	}
 
+	private function getValue($pos) {
+		$this->roundValue($this->getMinimum() + $pos * $this->getDelta());
+	}
+
 	public function getValueList($min, $max) {
 		if ($min == null) {
-			return array($this->roundValue($this->getMinimum() + $max * $this->getDelta()));
+			return array($this_>getValue($max));
 		}
 
 		$min = $this-> ceilValue($this->getMinimum() + $min * $this->getDelta());
@@ -305,7 +309,7 @@ class Graph_DefaultAxis {
 	}
 
 	public function getLabel($pos) {
-		return array_shift($this->getValueList($pos));
+		return $this->getValue($pos);
 	}
 }
 
@@ -318,7 +322,7 @@ class Graph_TimestampAxis extends Graph_DefaultAxis {
 	}
 
 	public function getLabel($pos) {
-		return date($this->dateFormat, array_shift($this->getValueList($pos)));
+		return date($this->dateFormat, $this->getValue($pos));
 	}
 }
 
