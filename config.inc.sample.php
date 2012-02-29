@@ -97,7 +97,6 @@ $config->registerPage("mailtemplateattachment_get", "file.php?mode=get&mailtempl
 $config->registerPage("statistik", "statistik.php");
 
 $config->registerPage("file_tokenget", "file.php?mode=get&fileid=%d&token=%s");
-$config->registerPage("file_tokenget_part", "file.php?mode=getpart&fileid=%d&token=%s&part=%d");
 
 $config->registerPage("tempfile_get", "file.php?mode=get&tempfileid=%d");
 

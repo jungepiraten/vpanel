@@ -70,26 +70,7 @@ case "view":
 		exit;
 	}
 	if ($file->getMimeType() == "application/pdf") {
-		$fileparts = explode(".", $file->getAbsoluteFilename());
-		array_pop($fileparts);
-		$fileprefix = implode(".", $fileparts);
-		$parts = glob($fileprefix . "*.png");
-		if (count($parts) == 0) {
-			exec("convert " . escapeshellarg($file->getAbsoluteFilename()) . " " . escapeshellarg($fileprefix . ".png"));
-		}
-		$parts = glob($fileprefix . "*.png");
-		$ui->viewFilePDFPreview($file, $token, count($parts));
-		exit;
-	}
-case "getpart":
-	if ($file->getMimeType() == "application/pdf") {
-		$fileparts = explode(".", $file->getAbsoluteFilename());
-		array_pop($fileparts);
-		$fileprefix = implode(".", $fileparts);
-		$files = glob($fileprefix . "*.png");
-
-		header("Content-Type: image/png");
-		readfile($files[$session->getVariable("part")]);
+		$ui->viewFilePDFPreview($file, $token);
 		exit;
 	}
 case "get":

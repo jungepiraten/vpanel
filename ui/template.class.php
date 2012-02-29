@@ -748,10 +748,9 @@ class Template {
 		$this->smarty->display("fileimagepreview.html.tpl");
 	}
 
-	public function viewFilePDFPreview($file, $token, $parts) {
+	public function viewFilePDFPreview($file, $token) {
 		$this->smarty->assign("file", $this->parseFile($file));
 		$this->smarty->assign("token", $token);
-		$this->smarty->assign("parts", $parts);
 		$this->smarty->display("filepdfpreview.html.tpl");
 	}
 
