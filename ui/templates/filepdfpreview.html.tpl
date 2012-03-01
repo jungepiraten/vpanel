@@ -17,12 +17,10 @@
     <div id="controls">
       <button id="previous" onclick="PDFView.page--;" oncontextmenu="return false;">
         <img src="ui/pdfviewer/images/go-up.svg" align="top" height="16"/>
-        Previous
       </button>
 
       <button id="next" onclick="PDFView.page++;" oncontextmenu="return false;">
         <img src="ui/pdfviewer/images/go-down.svg" align="top" height="16"/>
-        Next
       </button>
 
       <div class="separator"></div>
@@ -60,12 +58,10 @@
 
       <button id="print" onclick="window.print();" oncontextmenu="return false;">
         <img src="ui/pdfviewer/images/document-print.svg" align="top" height="16"/>
-        Print
       </button>
 
       <button id="download" title="Download" onclick="PDFView.download();" oncontextmenu="return false;">
         <img src="ui/pdfviewer/images/download.svg" align="top" height="16"/>
-        Download
       </button>
 
       <div class="separator"></div>
