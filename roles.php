@@ -45,7 +45,6 @@ case "details":
 			exit;
 		}
 		$permissions = $session->getListVariable("permissions");
-		$permissionTransitive = $session->getListVariable("permissiontransitive");
 		$permissionsSaved = array();
 		foreach ($role->getPermissions() as $permission) {
 			$permissionkey = $permission->getPermissionID() . ($permission->getPermission()->isGlobal() ? "" : "-" . $permission->getGliederungID());
@@ -54,16 +53,16 @@ case "details":
 			} else {
 				$permissionid = $permission->getPermissionID();
 				$gliederungid = $permission->getGliederungID();
-				$role->setPermission($permissionid, $gliederungid, isset($permissionTransitive[$permissionkey]));
+				$role->setPermission($permissionid, $gliederungid, true);
 				$permissionsSaved[] = $permissionkey;
 			}
 		}
 		// Speichere neue Permissions
-		foreach (array_diff($permissions, $permissionsSaved) as $permission) {
-			$perm = explode("-", $permission);
+		foreach (array_diff($permissions, $permissionsSaved) as $permissionkey) {
+			$perm = explode("-", $permissionkey);
 			$permissionid = $perm[0];
 			$gliederungid = isset($perm[1]) ? $perm[1] : null;
-			$role->setPermission($permissionid, $gliederungid, isset($permissionTransitive[$permission]));
+			$role->setPermission($permissionid, $gliederungid, true);
 		}
 		$role->save();
 	}
