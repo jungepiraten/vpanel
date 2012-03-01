@@ -73,10 +73,10 @@ class Session {
 			foreach ($role->getPermissions() as $permission) {
 				if ($permission->isTransitive()) {
 					foreach ($gliederungChilds[$permission->getGliederungID()] as $childid) {
-						$this->addPermission($permission);
+						$this->addPermission($permission, $childid);
 					}
 				}
-				$this->addPermission($permission);
+				$this->addPermission($permission, $permission->getGliederungID());
 			}
 		}
 		$this->setUser($user);
@@ -98,11 +98,11 @@ class Session {
 		return new User($this->getStorage());
 	}
 
-	private function addPermission($permission) {
+	private function addPermission($permission, $gliederungid) {
 		if (!isset($this->stor["permissions"])) {
 			$this->stor["permissions"] = array();
 		}
-		$this->stor["permissions"][$permission->getPermission()->getLabel()][$permission->getGliederungID()] = true;
+		$this->stor["permissions"][$permission->getPermission()->getLabel()][$gliederungid] = true;
 	}
 	public function isAllowed($permission, $gliederungid = null) {
 		if ($gliederungid == null) {
@@ -137,7 +137,7 @@ class Session {
 
 	public function addMitgliederMatcher($matcher) {
 		$id = "custom" . substr(md5(microtime(true) . "-" . rand(1000,9999)),0,8);
-		$this->stor["mitgliederfilter"][$id] = serialize(new MitgliederFilter($id, "Userdefined #" . $id, $matcher));
+		$this->stor["mitgliederfilter"][$id] = serialize(new MitgliederFilter($id, "Userdefined #" . $id, null, $matcher));
 		return $this->getMitgliederFilter($id);
 	}
 	public function getMitgliederFilter($filterid) {

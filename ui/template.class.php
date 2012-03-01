@@ -71,11 +71,27 @@ class Template {
 		$row["permissionid"] = $permission->getPermissionID();
 		$row["label"] = $permission->getLabel();
 		$row["description"] = $permission->getDescription();
+		$row["global"] = $permission->isGlobal();
 		return $row;
 	}
 
 	protected function parsePermissions($rows) {
 		return array_map(array($this, 'parsePermission'), $rows);
+	}
+
+	protected function parseRolePermission($permission) {
+		$row = array();
+		$row["role"] = $this->parseRole($permission->getRole());
+		$row["permission"] = $this->parsePermission($permission->getPermission());
+		if ($permission->getGliederung() != null) {
+			$row["gliederung"] = $this->parseGliederung($permission->getGliederung());
+		}
+		$row["transitive"] = $permission->isTransitive();
+		return $row;
+	}
+
+	protected function parseRolePermissions($rows) {
+		return array_map(array($this, 'parseRolePermission'), $rows);
 	}
 
 	protected function parseGliederung($gliederung) {
@@ -534,12 +550,14 @@ class Template {
 		$this->smarty->display("rolelist.html.tpl");
 	}
 
-	public function viewRoleDetails($role, $users, $permissions) {
+	public function viewRoleDetails($role, $users, $permissions_global, $permissions_local, $gliederungen) {
 		$this->smarty->assign("role", $this->parseRole($role));
 		$this->smarty->assign("roleusers", $this->parseUsers($role->getUsers()));
 		$this->smarty->assign("users", $this->parseUsers($users));
-		$this->smarty->assign("rolepermissions", $this->parsePermissions($role->getPermissions()));
-		$this->smarty->assign("permissions", $this->parsePermissions($permissions));
+		$this->smarty->assign("rolepermissions", $this->parseRolePermissions($role->getPermissions()));
+		$this->smarty->assign("permissions_global", $this->parsePermissions($permissions_global));
+		$this->smarty->assign("permissions_local", $this->parsePermissions($permissions_local));
+		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->display("roledetails.html.tpl");
 	}
 

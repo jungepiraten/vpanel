@@ -20,18 +20,46 @@
 <span class="sideinfoheader">Benutzerrechte:</span>
 <form action="{"roles_details"|___:$role.roleid}" method="post" class="permissions">
  <fieldset>
-  <table class="permissionlist">
-  {foreach from=$permissions item=permission}
+  <select name="gliederungid" onChange="selectPermissionList(this)">
+   <option value="">{"Global"|__}</option>
+   {foreach from=$gliederungen item=gliederung}<option value="{$gliederung.gliederungid|escape:html}">{$gliederung.label|escape:html}</option>{/foreach}
+  </select>
+  <table class="permissionlist" name="permissionlist" id="permissionlist_">
+  {foreach from=$permissions_global item=permission}
   <tr class="permissionrow">
-   <td><input type="checkbox" name="permissions[]" value="{$permission.permissionid|escape:html}" {foreach from=$rolepermissions item=rolepermission} {foreach from=$rolepermission item=roleperm}{if $permission.permissionid == $roleperm}checked="checked"{/if}{/foreach}{/foreach} /></td>
+   <td><input type="checkbox" name="permissions[]" value="{$permission.permissionid|escape:html}" {foreach from=$rolepermissions item=rolepermission}{if $permission.permissionid == $rolepermission.permission.permissionid}checked="checked"{/if}{/foreach} /></td>
    <th>{$permission.label|__|escape:html}</th>
-   <td>{$permission.description|escape:html}</td>
+  </tr>
+  {/foreach}  
+  </table>
+  {foreach from=$gliederungen item=gliederung}
+  <table class="permissionlist" name="permissionlist" id="permissionlist_{$gliederung.gliederungid}">
+  {foreach from=$permissions_local item=permission}
+  <tr class="permissionrow">
+   <td><input type="checkbox" name="permissions[]" value="{$permission.permissionid|escape:html}-{$gliederung.gliederungid}" {foreach from=$rolepermissions item=rolepermission}{if $gliederung.gliederungid == $rolepermission.gliederung.gliederungid and $permission.permissionid == $rolepermission.permission.permissionid}checked="checked"{/if}{/foreach} /></td>
+   <th>{$permission.label|__|escape:html}</th>
   </tr>
   {/foreach}
   </table>
+  {/foreach}
   <input type="submit" name="savepermissions" value="{"Speichern"|__}" />
  </fieldset>
 </form>
+{literal}
+<script type="text/javascript">
+
+function selectPermissionList(elem) {
+	var permissionlist = "permissionlist_" + elem.options[elem.selectedIndex].value;
+	var elements = document.getElementsByName("permissionlist");
+	for (var element in elements) {
+		elements[element].style.display = (elements[element].id == permissionlist) ? "block" : "none";
+	}
+}
+
+selectPermissionList(document.getElementsByName("gliederungid")[0]);
+
+</script>
+{/literal}
 </div>
 <div style="clear:both;">&nbsp;</div>
 </div>

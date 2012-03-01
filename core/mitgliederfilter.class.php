@@ -1,38 +1,38 @@
 <?php
 
+require_once(VPANEL_MITGLIEDERMATCHER . "/logic.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/gliederung.class.php");
+
 class MitgliederFilter {
 	private $filterid;
 	private $label;
 	private $matcher;
+	private $gliederungid;
 
-	public function __construct($filterid, $label, $matcher) {
-		$this->setFilterID($filterid);
-		$this->setLabel($label);
-		$this->setMatcher($matcher);
+	public function __construct($filterid, $label, $gliederungid, $matcher) {
+		$this->filterid = $filterid;
+		$this->label = $label;
+		$this->gliederungid = $gliederungid;
+		if ($gliederungid != null) {
+			$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($gliederungid), $matcher);
+		}
+		$this->matcher = $matcher;
 	}
 	
 	public function getFilterID() {
 		return $this->filterid;
 	}
 	
-	public function setFilterID($filterid) {
-		$this->filterid = $filterid;
-	}
-	
 	public function getLabel() {
 		return $this->label;
 	}
 	
-	public function setLabel($label) {
-		$this->label = $label;
+	public function getGliederungID() {
+		return $this->gliederungid;
 	}
 	
 	public function getMatcher() {
 		return $this->matcher;
-	}
-	
-	public function setMatcher($matcher) {
-		$this->matcher = $matcher;
 	}
 
 	public function match($mitglied) {

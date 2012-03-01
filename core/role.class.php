@@ -2,6 +2,8 @@
 
 require_once(VPANEL_CORE . "/storageobject.class.php");
 
+require_once(VPANEL_CORE . "/rolepermission.class.php");
+
 class Role extends StorageClass {
 	private $roleid;
 	private $label;
@@ -51,31 +53,25 @@ class Role extends StorageClass {
 
 	public function getPermissions() {
 		if ($this->permissions === null) {
-			$this->permissions = $this->getStorage()->getRolePermissionList($this->getRoleID());
+			$this->permissions = array();
+			foreach ($this->getStorage()->getRolePermissionList($this->getRoleID()) as $permission) {
+				$this->permissions[$permission->getPermissionID() . "-" . $permission->getGliederungID()] = $permission;
+			}
 		}
 		return $this->permissions;
 	}
 
-	public function addPermissionID($permissionid) {
-		$this->addPermission($this->getStorage()->getPermission($permissionid));
+	public function setPermission($permissionid, $gliederungid, $transitive) {
+		$this->permissions[$permissionid . "-" . $gliederungid] = new RolePermission($this->getStorage());
+		$this->permissions[$permissionid . "-" . $gliederungid]->setRole($this);
+		$this->permissions[$permissionid . "-" . $gliederungid]->setPermissionID($permissionid);
+		$this->permissions[$permissionid . "-" . $gliederungid]->setGliederungID($gliederungid);
+		$this->permissions[$permissionid . "-" . $gliederungid]->isTransitive($transitive);
 	}
 
-	public function delPermissionID($permissionid) {
+	public function delPermission($permissionid, $gliederungid) {
 		$this->getPermissions();
-		if (isset($this->permissions[$permissionid])) {
-			unset($this->permissions[$permissionid]);
-		}
-	}
-
-	public function addPermission(Permission $permission) {
-		$this->getPermissions();
-		$this->permissions[$permission->getPermissionID()] = $permission;
-	}
-
-	public function delPermission($permission) {
-		$this->getPermissions();
-		
-		$this->permissions[$permission->getPermissionID()] = $permission;
+		unset($this->permissions[$permissionid . "-" . $gliederungid]);
 	}
 
 	public function save(Storage $storage = null) {

@@ -12,6 +12,7 @@ class Permission extends StorageClass {
 		$permission->setPermissionID($row["permissionid"]);
 		$permission->setLabel($row["label"]);
 		$permission->setDescription($row["description"]);
+		$permission->isGlobal($row["global"]);
 		return $permission;
 	}
 
@@ -39,6 +40,13 @@ class Permission extends StorageClass {
 		$this->description = $description;
 	}
 
+	public function isGlobal($global = null) {
+		if ($global != null) {
+			$this->global = $global;
+		}
+		return $this->global;
+	}
+
 	public function save(Storage $storage = null) {
 		if ($storage === null) {
 			$storage = $this->getStorage();
@@ -46,7 +54,8 @@ class Permission extends StorageClass {
 		$this->setPermissionID( $storage->setPermission(
 			$this->getPermissionID(),
 			$this->getLabel(),
-			$this->getDescription() ));
+			$this->getDescription(),
+			$this->isGlobal() ));
 	}
 }
 

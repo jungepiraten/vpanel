@@ -104,29 +104,29 @@ $config->registerPage("processes_view", "processes.php?mode=view&processid=%d");
 $config->registerPage("processes_json", "json/processes.php");
 #$config->registerPage("");
 
-$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(1, "Ordentliche Mitglieder",
+$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(1, "Ordentliche Mitglieder", null,
 	new AndMitgliederMatcher(
 		new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()),
 		new MitgliedschaftMitgliederMatcher(1) ) ));
-$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(2, "Fördermitglieder",
+$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(2, "Fördermitglieder", null,
 	new AndMitgliederMatcher(
 		new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()),
 		new MitgliedschaftMitgliederMatcher(2) ) ));
-$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(3, "Ehrenmitglieder",
+$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(3, "Ehrenmitglieder", null,
 	new AndMitgliederMatcher(
 		new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()),
 		new MitgliedschaftMitgliederMatcher(3) ) ));
-$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(4, "Natürliche Personen",
+$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(4, "Natürliche Personen", null,
 	new AndMitgliederMatcher(
 		new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()),
 		new NatPersonMitgliederMatcher() ) ));
-$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(5, "Juristische Personen",
+$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(5, "Juristische Personen", null,
 	new AndMitgliederMatcher(
 		new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()),
 		new JurPersonMitgliederMatcher() ) ));
-$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(6, "Momentane Mitglieder",
+$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(6, "Momentane Mitglieder", null,
 	new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()) ));
-$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(7, "Ausgetretene Mitglieder",
+$config->getStorage()->registerMitgliederFilter(new MitgliederFilter(7, "Ausgetretene Mitglieder", null,
 	new AusgetretenMitgliederMatcher() ));
 
 ?>

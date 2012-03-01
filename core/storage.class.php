@@ -3,6 +3,10 @@
 interface Storage {
 	public function getPermissionResult();
 	public function getPermissionList();
+	public function getPermissionGlobalResult();
+	public function getPermissionGlobalList();
+	public function getPermissionLocalResult();
+	public function getPermissionLocalList();
 	public function getPermission($permissionid);
 
 	public function getUserResult();
@@ -227,6 +231,14 @@ interface Storage {
 abstract class AbstractStorage implements Storage {
 	public function getPermissionList() {
 		return $this->getPermissionResult()->fetchAll();
+	}
+
+	public function getPermissionGlobalList() {
+		return $this->getPermissionGlobalResult()->fetchAll();
+	}
+
+	public function getPermissionLocalList() {
+		return $this->getPermissionLocalResult()->fetchAll();
 	}
 
 	public function getUserList() {

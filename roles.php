@@ -45,20 +45,35 @@ case "details":
 			exit;
 		}
 		$permissions = $session->getListVariable("permissions");
-		$rolepermissions = $role->getPermissionIDs();
-		foreach (array_diff($permissions, $rolepermissions) as $perm) {
-			$role->addPermissionID($perm);
+		$permissionTransitive = $session->getListVariable("permissiontransitive");
+		$permissionsSaved = array();
+		foreach ($role->getPermissions() as $permission) {
+			$permissionkey = $permission->getPermissionID() . ($permission->getPermission()->isGlobal() ? "" : "-" . $permission->getGliederungID());
+			if (!in_array($permissionkey, $permissions)) {
+				$role->delPermission($permission->getPermissionID(), $permission->getGliederungID());
+			} else {
+				$permissionid = $permission->getPermissionID();
+				$gliederungid = $permission->getGliederungID();
+				$role->setPermission($permissionid, $gliederungid, isset($permissionTransitive[$permissionkey]));
+				$permissionsSaved[] = $permissionkey;
+			}
 		}
-		foreach (array_diff($rolepermissions, $permissions) as $perm) {
-			$role->delPermissionID($perm);
+		// Speichere neue Permissions
+		foreach (array_diff($permissions, $permissionsSaved) as $permission) {
+			$perm = explode("-", $permission);
+			$permissionid = $perm[0];
+			$gliederungid = isset($perm[1]) ? $perm[1] : null;
+			$role->setPermission($permissionid, $gliederungid, isset($permissionTransitive[$permission]));
 		}
 		$role->save();
 	}
 
 	$users = $session->getStorage()->getUserList();
-	$permissions = $session->getStorage()->getPermissionList();
+	$permissions_global = $session->getStorage()->getPermissionGlobalList();
+	$permissions_local = $session->getStorage()->getPermissionLocalList();
+	$gliederungen = $session->getStorage()->getGliederungList();
 
-	$ui->viewRoleDetails($role, $users, $permissions);
+	$ui->viewRoleDetails($role, $users, $permissions_global, $permissions_local, $gliederungen);
 	exit;
 case "create":
 	if ($session->getBoolVariable("save")) {

@@ -85,11 +85,19 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "Permission");
 	}
 	public function getPermissionResult() {
-		$sql = "SELECT `permissionid`, `label`, `description` FROM `permissions`";
+		$sql = "SELECT `permissionid`, `label`, `description`, `global` FROM `permissions`";
+		return $this->getResult($sql, array($this, "parsePermission"));
+	}
+	public function getPermissionGlobalResult() {
+		$sql = "SELECT `permissionid`, `label`, `description`, `global` FROM `permissions` WHERE `global` = 1";
+		return $this->getResult($sql, array($this, "parsePermission"));
+	}
+	public function getPermissionLocalResult() {
+		$sql = "SELECT `permissionid`, `label`, `description`, `global` FROM `permissions` WHERE `global` = 0";
 		return $this->getResult($sql, array($this, "parsePermission"));
 	}
 	public function getPermission($permissionid) {
-		$sql = "SELECT `permissionid`, `label`, `description` FROM `permissions` WHERE `permissionid` = " . intval($permissionid);
+		$sql = "SELECT `permissionid`, `label`, `description`, `global` FROM `permissions` WHERE `permissionid` = " . intval($permissionid);
 		return $this->getResult($sql, array($this, "parsePermission"))->fetchRow();
 	}
 
@@ -103,10 +111,10 @@ abstract class SQLStorage extends AbstractStorage {
 	public function setRolePermissionList($roleid, $permissions) {
 		$sql = "DELETE FROM `rolepermissions` WHERE `roleid` = " . intval($roleid);
 		$this->query($sql);
-		if (count($permissionids) > 0) {
+		if (count($permissions) > 0) {
 			$permissionssql = array();
 			foreach ($permissions as $perm) {
-				$permissionssql[] = "(" . intval($roleid) . ", " . intval($perm->getPermissionID()) . ", " . intval($perm->getGliederungID()) . ", " . ($perm->isTransitive() ? 1 : 0) . ")";
+				$permissionssql[] = "(" . intval($roleid) . ", " . intval($perm->getPermissionID()) . ", " . ($perm->getGliederungID() == null ? "NULL" : intval($perm->getGliederungID())) . ", " . ($perm->isTransitive() ? 1 : 0) . ")";
 			}
 			$sql = "INSERT INTO `rolepermissions` (`roleid`, `permissionid`, `gliederungid`, `transitive`) VALUES " . implode(",", $permissionssql);
 			$this->query($sql);
