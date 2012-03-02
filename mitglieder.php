@@ -429,7 +429,7 @@ default:
 		$filter = $session->getMitgliederFilter($session->getVariable("filterid"));
 	}
 
-	$matcher = ($filter != null ? $filter->getMitgliederMatcher() : null);
+	$matcher = ($filter != null ? $filter->getMatcher() : null);
 	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_show")), $matcher);
 
 	$mitgliedercount = $session->getStorage()->getMitgliederCount($matcher);
