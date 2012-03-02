@@ -369,7 +369,6 @@ case "statistik.start":
 
 	$statistik = new MitgliederStatistik($session->getStorage());
 	$statistik->setTimestamp(time());
-	$statistik->setTimeBalanceGraphFile($timebalancegraphfile);
 	$statistik->save();
 
 	$process = new MitgliederFilterStatistikProcess($session->getStorage());

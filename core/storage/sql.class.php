@@ -1845,27 +1845,33 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "MitgliederStatistik");
 	}
 	public function getMitgliederStatistikResult() {
-		$sql = "SELECT `statistikid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid` FROM `mitgliederstatistiken`";
+		$sql = "SELECT `statistikid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`, `gliederungchartfileid`, `statechartfileid`, `mitgliedschaftchartfileid` FROM `mitgliederstatistiken`";
 		return $this->getResult($sql, array($this, "parseMitgliederStatistik"));
 	}
 	public function getMitgliederStatistik($statistikid) {
-		$sql = "SELECT `statistikid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid` FROM `mitgliederstatistiken` WHERE `statistikid` = " . intval($statistikid);
+		$sql = "SELECT `statistikid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`, `gliederungchartfileid`, `statechartfileid`, `mitgliedschaftchartfileid` FROM `mitgliederstatistiken` WHERE `statistikid` = " . intval($statistikid);
 		return $this->getResult($sql, array($this, "parseMitgliederStatistik"))->fetchRow();
 	}
-	public function setMitgliederStatistik($statistikid, $timestamp, $agegraphfileid, $timegraphfileid, $timebalancegraphfileid) {
+	public function setMitgliederStatistik($statistikid, $timestamp, $agegraphfileid, $timegraphfileid, $timebalancegraphfileid, $gliederungchartfileid, $statechartfileid, $mitgliedschaftchartfileid) {
 		if ($statistikid == null) {
 			$sql = "INSERT INTO `mitgliederstatistiken`
-				(`timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`) VALUES
+				(`timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`, `gliederungchartfileid`, `statechartfileid`, `mitgliedschaftchartfileid`) VALUES
 				('" . date("Y-m-d H:i:s", $timestamp) . "',
-				 " . intval($agegraphfileid) . ",
-				 " . intval($timegraphfileid) . ",
-				 " . intval($timebalancegraphfileid) . ")";
+				 " . ($agegraphfileid == null ? "NULL" : intval($agegraphfileid)) . ",
+				 " . ($timegraphfileid == null ? "NULL" : intval($timegraphfileid)) . ",
+				 " . ($timebalancegraphfileid == null ? "NULL" : intval($timebalancegraphfileid)) . ",
+				 " . ($gliederungchartfileid == null ? "NULL" : intval($gliederungchartfileid)) . ",
+				 " . ($statechartfileid == null ? "NULL" : intval($statechartfileid)) . ",
+				 " . ($mitgliedschaftchartfileid == null ? "NULL" : intval($mitgliedschaftchartfileid)) . ")";
 		} else {
 			$sql = "UPDATE	`mitgliederstatistiken`
 				SET	`timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "',
-					`agegraphfileid` = " . intval($agegraphfileid) . ",
-					`timegraphfileid` = " . intval($timegraphfileid) . ",
-					`timebalancegraphfileid` = " . intval($timebalancegraphfileid) . "
+					`agegraphfileid` = " . ($agegraphfileid == null ? "NULL" : intval($agegraphfileid)) . ",
+					`timegraphfileid` = " . ($timegraphfileid == null ? "NULL" : intval($timegraphfileid)) . ",
+					`timebalancegraphfileid` = " . ($timebalancegraphfileid == null ? "NULL" : intval($timebalancegraphfileid)) . ",
+					`gliederungchartfileid` = " . ($gliederungchartfileid == null ? "NULL" : intval($gliederungchartfileid)) . ",
+					`statechartfileid` = " . ($statechartfileid == null ? "NULL" : intval($statechartfileid)) . ",
+					`mitgliedschaftchartfileid` = " . ($mitgliedschaftchartfileid == null ? "NULL" : intval($mitgliedschaftchartfileid)) . "
 				WHERE `statistikid` = " . intval($statistikid);
 		}
 		$this->query($sql);

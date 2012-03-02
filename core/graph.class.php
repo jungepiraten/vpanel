@@ -108,7 +108,7 @@ class Graph {
 			$postXpixel = ImageFontWidth($axisfont) * strlen($label) / 2;
 
 			if ($lastXpixel_label == null || $lastXpixel_label + 20 < $xPixel - $preXpixel) {
-				ImageString($img, $axisfont, $x - $preXpixel, $this->getPlotXAxisPosition(), $label, $axiscolor);
+				ImageString($img, $axisfont, $x - $preXpixel, $this->getPlotXAxisPosition(), iconv("UTF8", "ISO-8859-1", $label), $axiscolor);
 				$lastXpixel_label = $xPixel + $postXpixel;
 			}
 			if ($lastXpixel_line == null || $lastXpixel_line + 20 < $xPixel) {
@@ -132,7 +132,7 @@ class Graph {
 			$postYpixel = ImageFontHeight($axisfont) / 2;
 
 			if ($lastYpixel_label == null || $lastYpixel_label + 20 < $yPixel - $preYpixel) {
-				ImageString($img, $axisfont, $this->getPlotYAxisPosition() - $preXpixel, $y - $preYpixel, $label, $axiscolor);
+				ImageString($img, $axisfont, $this->getPlotYAxisPosition() - $preXpixel, $y - $preYpixel, iconv("UTF8", "ISO-8859-1", $label), $axiscolor);
 				$lastYpixel_label = $yPixel + $postYpixel;
 			}
 			if ($lastYpixel_line == null || $lastYpixel_line + 20 < $yPixel) {

@@ -504,6 +504,15 @@ class Template {
 		if ($statistik->getTimeBalanceGraphFile() != null) {
 			$row["timebalancegraphfile"] = $this->parseFile($statistik->getTimeBalanceGraphFile());
 		}
+		if ($statistik->getGliederungChartFile() != null) {
+			$row["gliederungchartfile"] = $this->parseFile($statistik->getGliederungChartFile());
+		}
+		if ($statistik->getStateChartFile() != null) {
+			$row["statechartfile"] = $this->parseFile($statistik->getStateChartFile());
+		}
+		if ($statistik->getMitgliedschaftChartFile() != null) {
+			$row["mitgliedschaftchartfile"] = $this->parseFile($statistik->getMitgliedschaftChartFile());
+		}
 		return $row;
 	}
 

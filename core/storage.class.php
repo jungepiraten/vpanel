@@ -214,7 +214,7 @@ interface Storage {
 	public function getMitgliederStatistikResult();
 	public function getMitgliederStatistikList();
 	public function getMitgliederStatistik($tempfileid);
-	public function setMitgliederStatistik($statistikid, $timestamp, $agegraphfileid, $timegraphfileid, $timebalancegraphfileid);
+	public function setMitgliederStatistik($statistikid, $timestamp, $agegraphfileid, $timegraphfileid, $timebalancegraphfileid, $gliederungchartfileid, $statechartfileid, $mitgliedschaftchartfileid);
 	public function delMitgliederStatistik($statistikid);
 
 	public function getMitgliedTemplateResult();

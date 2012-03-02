@@ -58,6 +58,15 @@ if ($session->hasVariable("tempfileid")) {
 	case "timebalancegraph":
 		$file = $statistik->getTimeBalanceGraphFile();
 		break;
+	case "gliederungchart":
+		$file = $statistik->getGliederungChartFile();
+		break;
+	case "statechart":
+		$file = $statistik->getStateChartFile();
+		break;
+	case "mitgliedschaftchart":
+		$file = $statistik->getMitgliedschaftChartFile();
+		break;
 	}
 }
 

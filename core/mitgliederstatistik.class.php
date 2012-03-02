@@ -8,11 +8,17 @@ class MitgliederStatistik extends StorageClass {
 	private $agegraphfileid;
 	private $timegraphfileid;
 	private $timebalancegraphfileid;
+	private $gliederungchartfileid;
+	private $statechartfileid;
+	private $mitgliedschaftchartfileid;
 
 	private $agegraphfile;
 	private $timegraphfile;
 	private $timebalancegraphfile;
-	
+	private $gliederungchartfile;
+	private $statechartfile;
+	private $mitgliedschaftchartfile;
+
 	public static function factory(Storage $storage, $row) {
 		$statistik = new MitgliederStatistik($storage);
 		$statistik->setStatistikID($row["statistikid"]);
@@ -20,6 +26,9 @@ class MitgliederStatistik extends StorageClass {
 		$statistik->setAgeGraphFileID($row["agegraphfileid"]);
 		$statistik->setTimeGraphFileID($row["timegraphfileid"]);
 		$statistik->setTimeBalanceGraphFileID($row["timebalancegraphfileid"]);
+		$statistik->setGliederungChartFileID($row["gliederungchartfileid"]);
+		$statistik->setStateChartFileID($row["statechartfileid"]);
+		$statistik->setMitgliedschaftChartFileID($row["mitgliedschaftchartfileid"]);
 		return $statistik;
 	}
 
@@ -128,6 +137,75 @@ class MitgliederStatistik extends StorageClass {
 		return $this->timebalancegraphfile;
 	}
 
+	public function setGliederungChartFileID($fileid) {
+		if ($fileid != $this->gliederungchartfileid) {
+			$this->gliederungchartfile = null;
+		}
+		$this->gliederungchartfileid = $fileid;
+	}
+
+	public function getGliederungChartFileID() {
+		return $this->gliederungchartfileid;
+	}
+
+	public function setGliederungChartFile($file) {
+		$this->setGliederungChartFileID($file->getFileID());
+		$this->gliederungchartfile = $file;
+	}
+	
+	public function getGliederungChartFile() {
+		if ($this->gliederungchartfile == null) {
+			$this->gliederungchartfile = $this->getStorage()->getFile($this->getGliederungChartFileID());
+		}
+		return $this->gliederungchartfile;
+	}
+
+	public function setStateChartFileID($fileid) {
+		if ($fileid != $this->statechartfileid) {
+			$this->statechartfile = null;
+		}
+		$this->statechartfileid = $fileid;
+	}
+
+	public function getStateChartFileID() {
+		return $this->statechartfileid;
+	}
+
+	public function setStateChartFile($file) {
+		$this->setStateChartFileID($file->getFileID());
+		$this->statechartfile = $file;
+	}
+	
+	public function getStateChartFile() {
+		if ($this->statechartfile == null) {
+			$this->statechartfile = $this->getStorage()->getFile($this->getStateChartFileID());
+		}
+		return $this->statechartfile;
+	}
+
+	public function setMitgliedschaftChartFileID($fileid) {
+		if ($fileid != $this->mitgliedschaftchartfileid) {
+			$this->mitgliedschaftchartfile = null;
+		}
+		$this->mitgliedschaftchartfileid = $fileid;
+	}
+
+	public function getMitgliedschaftChartFileID() {
+		return $this->mitgliedschaftchartfileid;
+	}
+
+	public function setMitgliedschaftChartFile($file) {
+		$this->setMitgliedschaftChartFileID($file->getFileID());
+		$this->mitgliedschaftchartfile = $file;
+	}
+	
+	public function getMitgliedschaftChartFile() {
+		if ($this->mitgliedschaftchartfile == null) {
+			$this->mitgliedschaftchartfile = $this->getStorage()->getFile($this->getMitgliedschaftChartFileID());
+		}
+		return $this->mitgliedschaftchartfile;
+	}
+
 	public function save(Storage $storage = null) {
 		if ($storage == null) {
 			$storage = $this->getStorage();
@@ -137,7 +215,10 @@ class MitgliederStatistik extends StorageClass {
 			$this->getTimestamp(),
 			$this->getAgeGraphFileID(),
 			$this->getTimeGraphFileID(),
-			$this->getTimeBalanceGraphFileID() ));
+			$this->getTimeBalanceGraphFileID(),
+			$this->getGliederungChartFileID(),
+			$this->getStateChartFileID(),
+			$this->getMitgliedschaftChartFileID() ));
 	}
 }
 

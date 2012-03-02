@@ -74,7 +74,11 @@ $config->registerPage("mitglieder_statistik", "mitglieder.php?mode=statistik&sta
 $config->registerPage("mitglieder_statistik_get_agegraph", "file.php?mode=get&part=agegraph&statistikid=%d");
 $config->registerPage("mitglieder_statistik_get_timegraph", "file.php?mode=get&part=timegraph&statistikid=%d");
 $config->registerPage("mitglieder_statistik_get_timebalancegraph", "file.php?mode=get&part=timebalancegraph&statistikid=%d");
-$config->registerPage("mitglieder_setbeitrag.selectbeitrag", "mitglieder.php?mode=setbeitrag.selectbeitrag&filterid=%s");
+$config->registerPage("mitglieder_statistik_get_gliederungchart", "file.php?mode=get&part=gliederungchart&statistikid=%d");
+$config->registerPage("mitglieder_statistik_get_statechart", "file.php?mode=get&part=statechart&statistikid=%d");
+$config->registerPage("mitglieder_statistik_get_mitgliedschaftchart", "file.php?mode=get&part=mitgliedschaftchart&statistikid=%d");
+$config->registerPage("mitglieder_setbeitrag.selectbeitrag", 
+"mitglieder.php?mode=setbeitrag.selectbeitrag&filterid=%s");
 $config->registerPage("mitglieder_setbeitrag.start", "mitglieder.php?mode=setbeitrag.start");
 
 $config->registerPage("emailbounces_delete", "emails.php?mode=delbounce&bounceid=%d");
