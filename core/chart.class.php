@@ -221,11 +221,15 @@ class VBarChart extends Chart {
 	}
 
 	private function getDataXPosition($i) {
-		return $this->getPlotXOffset() + ($i / $this->getDataCount()) * $this->getPlotWidth();
+		return $this->getPlotXOffset() + (($i + 0.5) / $this->getDataCount()) * $this->getPlotWidth();
 	}
 
 	private function getBarWidth() {
-		return 6;
+		return max(4, $this->getPlotWidth() / $this->getDataCount() - $this->getBarSpace());
+	}
+
+	private function getBarSpace() {
+		return 2;
 	}
 
 	private function getPlotXOffset() {

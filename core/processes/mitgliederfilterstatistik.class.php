@@ -131,7 +131,7 @@ class MitgliederFilterStatistikProcess extends Process {
 	public function runGenerateTimeGraph($w, $h, $file, $progressOffset, $progress) {
 		$graph = new Graph($w, $h);
 		$graph->setXAxis(new Graph_TimestampAxis($this->getStatistik()->getMitgliederCountStart(), $this->getStatistik()->getMitgliederCountEnd(), "d.m.Y", $this->getStatistik()->getMitgliederCountScale()));
-		$graph->setYAxis(new Graph_DefaultAxis(0, $this->maxMitgliederCount));
+		$graph->setYAxis(new Graph_DefaultAxis(0, 1.1 * $this->maxMitgliederCount));
 		$graph->addData(new Graph_AvgData($this->mitgliederCount));
 		$graph->plot($file);
 
@@ -142,7 +142,7 @@ class MitgliederFilterStatistikProcess extends Process {
 	public function runGenerateBalanceTimeGraph($w, $h, $file, $progressOffset, $progress) {
 		$graph = new Graph($w, $h);
 		$graph->setXAxis(new Graph_TimestampAxis($this->getStatistik()->getMitgliederCountStart(), $this->getStatistik()->getMitgliederCountEnd(), "d.m.Y", $this->getStatistik()->getMitgliederCountScale()));
-		$graph->setYAxis(new Graph_DefaultAxis(-1 * $this->maxMitgliederAustritte, $this->maxMitgliederEintritte));
+		$graph->setYAxis(new Graph_DefaultAxis(-1.05 * $this->maxMitgliederAustritte, 1.05 * $this->maxMitgliederEintritte));
 		$graph->addData(new Graph_SumData($this->mitgliederEintritte, 0,  1, new Graph_Color( 30,240, 30)));
 		$graph->addData(new Graph_SumData($this->mitgliederAustritte, 0, -1, new Graph_Color(255,  0,  0)));
 		$graph->plot($file);

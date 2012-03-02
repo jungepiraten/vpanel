@@ -283,7 +283,11 @@ class Graph_DefaultAxis {
 	}
 
 	public function getLabelPosition($i) {
-		return $this->getPosition($this->getMinimum() + $i * $this->roundValue($this->getDelta() / 10));
+		$stepSize = $this->roundValue($this->getDelta() / 10);
+		if ($stepSize == 0) {
+			$stepSize = $this->getPrecision();
+		}
+		return $this->getPosition($this->getMinimum() + $i * $stepSize);
 	}
 
 	public function getPosition($val) {
@@ -294,10 +298,6 @@ class Graph_DefaultAxis {
 			return 1;
 		}
 		return ($this->roundValue($val) - $this->getMinimum()) / $this->getDelta();
-	}
-
-	public function getValues() {
-		return $this->getValueList($this->getMinimum(), $this->getMaximum());
 	}
 
 	protected function getValue($pos) {
