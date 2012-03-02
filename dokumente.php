@@ -6,11 +6,6 @@ require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
 $ui = $session->getTemplate();
 
-if (!$session->isAllowed("dokumente_show")) {
-	$ui->viewLogin();
-	exit;
-}
-
 require_once(VPANEL_CORE . "/dokument.class.php");
 
 function parseDokumentFormular($session, &$dokument = null) {
@@ -31,6 +26,11 @@ function parseDokumentFormular($session, &$dokument = null) {
 	$oldkategorieid = null;
 	$oldstatusid = null;
 	if ($dokument == null) {
+		if (!$session->isAllowed("dokumente_create", $gliederungid)) {
+			$ui->viewLogin();
+			exit;
+		}
+
 		$dokument = new Dokument($session->getStorage());
 		$dokument->setGliederungID($gliederungid);
 		$dokument->setFile($file);
@@ -40,6 +40,11 @@ function parseDokumentFormular($session, &$dokument = null) {
 		$gliederungid = $dokument->getGliederungID();
 		$oldkategorieid = $dokument->getDokumentKategorieID();
 		$oldstatusid = $dokument->getDokumentStatusID();
+
+		if (!$session->isAllowed("dokument_modify", $gliederungid)) {
+			$ui->viewLogin();
+			exit;
+		}
 	}
 	$dokument->setDokumentKategorieID($kategorieid);
 	$dokument->setDokumentStatusID($statusid);
@@ -82,31 +87,25 @@ case "create":
 	}
 
 	if ($session->getBoolVariable("save")) {
-		if (!$session->isAllowed("dokumente_create")) {
-			$ui->viewLogin();
-			exit;
-		}
-
 		parseDokumentFormular($session, &$dokument);
 
 		$ui->redirect($session->getLink("dokumente_details", $dokument->getDokumentID()));
 	}
 
-	$gliederungen = $session->getStorage()->getGliederungList();
+	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("dokumente_create"));
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
 	$ui->viewDokumentCreate($gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus);
 	exit;
 case "details":
-	$dokumentid = $session->getIntVariable("dokumentid");
-	$dokument = $session->getStorage()->getDokument($dokumentid);
+	$dokument = $session->getStorage()->getDokument($session->getIntVariable("dokumentid"));
+
+	if (!$session->isAllowed("dokumente_show", $dokument->getGliederungID())) {
+		$ui->viewLogin();
+		exit;
+	}
 
 	if ($session->getBoolVariable("save")) {
-		if (!$session->isAllowed("dokumente_modify")) {
-			$ui->viewLogin();
-			exit;
-		}
-		
 		parseDokumentFormular($session, $dokument);
 		
 		$ui->redirect($session->getLink("dokumente_details", $dokument->getDokumentID()));
@@ -138,15 +137,15 @@ default:
 	}
 
 	$pagesize = 20;
-	$pagecount = ceil($session->getStorage()->getDokumentCount($dokumentkategorie, $dokumentstatus) / $pagesize);
+	$pagecount = ceil($session->getStorage()->getDokumentCount($session->getAllowedGliederungIDs("dokumente_show"), $dokumentkategorie, $dokumentstatus) / $pagesize);
 	$page = 0;
 	if ($session->hasVariable("page") and $session->getVariable("page") >= 0 and $session->getVariable("page") < $pagecount) {
 		$page = intval($session->getVariable("page"));
 	}
 	$offset = $page * $pagesize;
 
-	$dokumente = $session->getStorage()->getDokumentList($gliederung, $dokumentkategorie, $dokumentstatus, $pagesize, $offset);
-	$gliederungen = $session->getStorage()->getGliederungList();
+	$dokumente = $session->getStorage()->getDokumentList($session->getAllowedGliederungIDs("dokumente_show"), $gliederung, $dokumentkategorie, $dokumentstatus, $pagesize, $offset);
+	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("dokumente_show"));
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
 	$ui->viewDokumentList($dokumente, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount);

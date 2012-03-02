@@ -31,8 +31,8 @@ interface Storage {
 	public function getRoleUserList($roleid);
 	public function setRoleUserList($roleid, $userids);
 
-	public function getGliederungResult();
-	public function getGliederungList();
+	public function getGliederungResult($gliederungids = null);
+	public function getGliederungList($gliederungids = null);
 	public function getGliederung($gliederungid);
 	public function setGliederung($gliederungid, $label, $parentid);
 
@@ -166,13 +166,13 @@ interface Storage {
 	public function setProcess($processid, $type, $typedata, $progess, $queued, $started, $finished, $finishedpage);
 	public function delProcess($processid);
 
-	public function getDokumentResult($gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
-	public function getDokumentList($gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
+	public function getDokumentResult($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
+	public function getDokumentList($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
 	public function getDokumentByMitgliedResult($mitgliedid);
 	public function getDokumentByMitgliedList($mitgliedid);
-	public function getDokumentSearchResult($query, $limit = null, $offset = null);
-	public function getDokumentSearchList($query, $limit = null, $offset = null);
-	public function getDokumentCount($gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null);
+	public function getDokumentSearchResult($gliederungids, $query, $limit = null, $offset = null);
+	public function getDokumentSearchList($gliederungids, $query, $limit = null, $offset = null);
+	public function getDokumentCount($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null);
 	public function getDokument($dokumentid);
 	public function setDokument($dokumentid, $gliederungid, $dokumentkategorieid, $dokumentstatus, $identifier, $label, $content, $data, $fileid);
 
@@ -217,13 +217,13 @@ interface Storage {
 	public function setMitgliederStatistik($statistikid, $timestamp, $agegraphfileid, $timegraphfileid, $timebalancegraphfileid, $gliederungchartfileid, $statechartfileid, $mitgliedschaftchartfileid);
 	public function delMitgliederStatistik($statistikid);
 
-	public function getMitgliedTemplateResult();
-	public function getMitgliedTemplateList();
+	public function getMitgliedTemplateResult($gliederungids = null);
+	public function getMitgliedTemplateList($gliederungids = null);
 	public function getMitgliedTemplate($templateid);
 	public function setMitgliedTemplate($templateid, $label, $gliederungid, $mitgliedschaftid, $beitrag, $createmailtemplateid);
 	public function delMitgliedTemplate($templateid);
 
-	public function getMitgliederFilterList();
+	public function getMitgliederFilterList($gliederungids);
 	public function hasMitgliederFilter($filterid);
 	public function getMitgliederFilter($filterid);
 }
@@ -261,8 +261,8 @@ abstract class AbstractStorage implements Storage {
 		return $this->getRoleUserResult($roleid)->fetchAll();
 	}
 
-	public function getGliederungList() {
-		return $this->getGliederungResult()->fetchAll();
+	public function getGliederungList($gliederungids = null) {
+		return $this->getGliederungResult($gliederungids)->fetchAll();
 	}
 
 	public function getBeitragList() {
@@ -353,16 +353,16 @@ abstract class AbstractStorage implements Storage {
 		return $this->getProcessResult()->fetchAll();
 	}
 
-	public function getDokumentList($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
-		return $this->getDokumentResult($gliederungid, $dokumentkategorieid, $dokumentstatusid, $limit = null, $offset = null)->fetchAll();
+	public function getDokumentList($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
+		return $this->getDokumentResult($gliederungids, $gliederungid, $dokumentkategorieid, $dokumentstatusid, $limit = null, $offset = null)->fetchAll();
 	}
 
 	public function getDokumentByMitgliedList($mitgliedid) {
 		return $this->getDokumentByMitgliedResult($mitgliedid)->fetchAll();
 	}
 
-	public function getDokumentSearchList($query, $limit = null, $offset = null) {
-		return $this->getDokumentSearchResult($query, $limit = null, $offset = null)->fetchAll();
+	public function getDokumentSearchList($gliederungids, $query, $limit = null, $offset = null) {
+		return $this->getDokumentSearchResult($gliederungids, $query, $limit = null, $offset = null)->fetchAll();
 	}
 
 	public function getDokumentNotifyList($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null) {
@@ -393,14 +393,20 @@ abstract class AbstractStorage implements Storage {
 		return $this->getMitgliederStatistikResult()->fetchAll();
 	}
 
-	public function getMitgliedTemplateList() {
-		return $this->getMitgliedTemplateResult()->fetchAll();
+	public function getMitgliedTemplateList($gliederungids = null) {
+		return $this->getMitgliedTemplateResult($gliederungids)->fetchAll();
 	}
 
 	/** Filter **/
 	private $mitgliederfilters = array();
-	public function getMitgliederFilterList() {
-		return $this->mitgliederfilters;
+	public function getMitgliederFilterList($gliederungids) {
+		$filters = array();
+		foreach ($this->mitgliederfilters as $filter) {
+			if ($filter->getGliederungID() == null || in_array($filter->getGliederungID(), $gliederungids)) {
+				$filters[] = $filter;
+			}
+		}
+		return $filters;
 	}
 	public function hasMitgliederFilter($filterid) {
 		return isset($this->mitgliederfilters[$filterid]);
@@ -423,5 +429,19 @@ interface StorageResult {
 }
 
 abstract class AbstractStorageResult implements StorageResult {}
+
+class EmptyStorageResult extends AbstractStorageResult {
+	public function fetchRow() {
+		return null;
+	}
+
+	public function fetchAll() {
+		return array();
+	}
+
+	public function getCount() {
+		return 0;
+	}
+}
 
 ?>

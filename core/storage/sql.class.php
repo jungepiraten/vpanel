@@ -235,8 +235,11 @@ abstract class SQLStorage extends AbstractStorage {
 	public function parseGliederung($row) {
 		return $this->parseRow($row, null, "Gliederung");
 	}
-	public function getGliederungResult() {
+	public function getGliederungResult($gliederungids = null) {
 		$sql = "SELECT `gliederungsid`, `label`, `parentid` FROM `gliederungen`";
+		if ($gliederungids != null) {
+			$sql .= " WHERE `gliederungsid` IN (" . implode(",", array_map("intval", $gliederungids)) . ")";
+		}
 		return $this->getResult($sql, array($this, "parseGliederung"));
 	}
 	public function getGliederung($gliederungid) {
@@ -387,7 +390,7 @@ abstract class SQLStorage extends AbstractStorage {
 	 * Mitglieder
 	 **/
 	protected function parseMitgliederMatcher($matcher) {
-		if ($matcher instanceof TrueMitgliederMatcher) {
+		if ($matcher instanceof TrueMitgliederMatcher || $matcher == null) {
 			return "1";
 		}
 		if ($matcher instanceof FalseMitgliederMatcher) {
@@ -403,7 +406,7 @@ abstract class SQLStorage extends AbstractStorage {
 			return "NOT (" . $this->parseMitgliederMatcher($matcher->getCondition()) . ")";
 		}
 		if ($matcher instanceof GliederungMitgliederMatcher) {
-			return "`r`.`gliederungsid` = " . intval($matcher->getGliederungID());
+			return "`r`.`gliederungsid` IN (" . implode(",", array_map("intval", $matcher->getGliederungIDs())) . ")";
 		}
 		if ($matcher instanceof MitgliedschaftMitgliederMatcher) {
 			return "`r`.`mitgliedschaftid` = " . intval($matcher->getMitgliedschaftID());
@@ -440,8 +443,6 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		if ($matcher instanceof OrtDistanceMitgliederMatcher) {
 			return "2*6371*ASIN(SQRT(POW(SIN(radians(`o`.`latitude`-".doubleval($matcher->getLatitude()).")/2),2)+cos(radians(`o`.`latitude`))*cos(radians(".doubleval($matcher->getLatitude())."))*pow(sin(radians(`o`.`longitude`-".doubleval($matcher->getLongitude()).")/2),2))) <= " . doubleval($matcher->getDistance());
-			// http://www.movable-type.co.uk/scripts/latlong.html
-			//return "ASIN(SIN(`o`.`latitude`/180*3.1415)*SIN(".doubleval($matcher->getLatitude())."/180*3.1415) + COS(`o`.`latitude`/180*3.1415)*COS(".doubleval($matcher->getLatitude())."/180*3.1415)*COS(".doubleval($matcher->getLongitude())."/180*3.1415-`o`.`longitude`/180*3.1415))*6371 <= ".doubleval($matcher->getDistance());
 		}
 		if ($matcher instanceof BeitragMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID()).")";
@@ -496,7 +497,7 @@ abstract class SQLStorage extends AbstractStorage {
 				SELECT	MAX(`rmax`.`timestamp`)
 				FROM	`mitgliederrevisions` `rmax`
 				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)
-				".($matcher != null ? "AND ".$this->parseMitgliederMatcher($matcher) : "");
+					AND ".$this->parseMitgliederMatcher($matcher);
 		return reset($this->getResult($sql)->fetchRow());
 	}
 	public function parseMitglied($row) {
@@ -566,7 +567,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
 			LEFT JOIN `emails` `e` ON (`e`.`emailid` = `k`.`emailid`)
 			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
-			".($matcher != null ? "WHERE ".$this->parseMitgliederMatcher($matcher) : "")."
+			WHERE " . $this->parseMitgliederMatcher($matcher) . "
 			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
 			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
 			ORDER BY `m`.`eintritt`";
@@ -1243,8 +1244,14 @@ abstract class SQLStorage extends AbstractStorage {
 	public function parseMitgliedTemplate($row) {
 		return $this->parseRow($row, null, "MitgliedTemplate");
 	}
-	public function getMitgliedTemplateResult() {
+	public function getMitgliedTemplateResult($gliederungids = null) {
 		$sql = "SELECT `mitgliedtemplateid`, `label`, `gliederungid`, `mitgliedschaftid`, `beitrag`, `createmail` FROM `mitgliedtemplates`";
+		if ($gliederungids != null) {
+			if (empty($gliederungids)) {
+				return new EmptyStorageResult();
+			}
+			$sql .= " WHERE `gliederungid` IN (" . implode(",", array_map("intval", $gliederungids)) . ")";
+		}
 		return $this->getResult($sql, array($this, "parseMitgliedTemplate"));
 	}
 	public function getMitgliedTemplate($templateid) {
@@ -1504,7 +1511,10 @@ abstract class SQLStorage extends AbstractStorage {
 	public function parseDokument($row) {
 		return $this->parseRow($row, null, "Dokument");
 	}
-	public function getDokumentCount($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null) {
+	public function getDokumentCount($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null) {
+		if (empty($gliederungids)) {
+			return 0;
+		}
 		if ($gliederungid instanceof Gliederung) {
 			$gliederungid = $gliederungid->getGliederungID();
 		}
@@ -1514,7 +1524,7 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($dokumentstatusid instanceof DokumentStatus) {
 			$dokumentstatusid = $dokumentstatusid->getDokumentStatusID();
 		}
-		$sql = "SELECT COUNT(`dokumentid`) FROM `dokument` WHERE 1=1";
+		$sql = "SELECT COUNT(`dokumentid`) FROM `dokument` WHERE `gliederungid` IN (" . implode(",", array_map("intval", $gliederungids)) . ")";
 		if ($gliederungid != null) {
 			$sql .= " AND `gliederungid` = " . intval($gliederungid);
 		}
@@ -1526,7 +1536,10 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		return reset($this->getResult($sql)->fetchRow());
 	}
-	public function getDokumentResult($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
+	public function getDokumentResult($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
+		if (empty($gliederungids)) {
+			return new EmptyStorageResult();
+		}
 		if ($gliederungid instanceof Gliederung) {
 			$gliederungid = $gliederungid->getGliederungID();
 		}
@@ -1536,7 +1549,7 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($dokumentstatusid instanceof DokumentStatus) {
 			$dokumentstatusid = $dokumentstatusid->getDokumentStatusID();
 		}
-		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE 1=1";
+		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE `gliederungid` IN (" . implode(",", array_map("intval", $gliederungids)) . ")";
 		if ($gliederungid != null) {
 			$sql .= " AND `gliederungid` = " . intval($gliederungid);
 		}
@@ -1561,9 +1574,12 @@ abstract class SQLStorage extends AbstractStorage {
 		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` LEFT JOIN `mitglieddokument` USING (`dokumentid`) WHERE `mitgliedid` = " . intval($mitgliedid);
 		return $this->getResult($sql, array($this, "parseDokument"));
 	}
-	public function getDokumentSearchResult($querys, $limit = null, $offset = null) {
+	public function getDokumentSearchResult($gliederungids, $querys, $limit = null, $offset = null) {
 		if (!is_array($querys)) {
 			$querys = array($querys);
+		}
+		if (empty($gliederungids) || count($querys) == 0) {
+			return new EmptyStorageResult();
 		}
 		$fields = array("`identifier`", "`label`", "`content`");
 		$wordclauses = array();
@@ -1576,7 +1592,7 @@ abstract class SQLStorage extends AbstractStorage {
 			}
 			$wordclauses[] = implode(" OR ", $clauses);
 		}
-		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE (" . implode(") AND (", $wordclauses) . ") OR `dokumentid` IN (SELECT `dokumentid` FROM `dokumentnotizen` WHERE `kommentar` LIKE '%" . implode("%' OR `kommentar` LIKE '%", $escapedwords) . "%')";
+		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE `gliederungid` IN (" . implode(",", array_map("intval", $gliederungids)) . ") AND ((" . implode(") AND (", $wordclauses) . ") OR `dokumentid` IN (SELECT `dokumentid` FROM `dokumentnotizen` WHERE `kommentar` LIKE '%" . implode("%' OR `kommentar` LIKE '%", $escapedwords) . "%'))";
 		if ($limit !== null or $offset !== null) {
 			$sql .= " LIMIT ";
 			if ($offset !== null) {

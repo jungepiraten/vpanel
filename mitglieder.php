@@ -6,11 +6,6 @@ require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
 $ui = $session->getTemplate();
 
-if (!$session->isAllowed("mitglieder_show")) {
-	$ui->viewLogin();
-	exit;
-}
-
 require_once(VPANEL_CORE . "/mitglied.class.php");
 require_once(VPANEL_CORE . "/mitgliednotiz.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
@@ -22,6 +17,8 @@ require_once(VPANEL_PROCESSES . "/mitgliederfiltersendmail.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterexport.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterstatistik.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterbeitrag.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/logic.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/gliederung.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/search.class.php");
 
 $predefinedfields = array(
@@ -35,6 +32,7 @@ $predefinedfields = array(
 	array("label" => "Handynummer",		"template" => "{HANDYNUMMER}"),
 	array("label" => "E-Mail",		"template" => "{EMAIL}"),
 	array("label" => "Beitrag",		"template" => "{BEITRAG}"),
+	array("label" => "Gliederung",		"template" => "{GLIEDERUNG}"),
 	array("label" => "Mitgliedschaft",	"template" => "{MITGLIEDSCHAFT}")
 	);
 
@@ -78,6 +76,11 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 	$kontakt = $session->getStorage()->searchKontakt($adresszusatz, $strasse, $hausnummer, $ort->getOrtID(), $telefon, $handy, $email->getEMailID());
 
 	if ($mitglied == null) {
+		if (!$session->isAllowed("mitglieder_create", $gliederung->getGliederungID())) {
+			$ui->viewLogin();
+			exit;
+		}
+
 		$mitglied = new Mitglied($session->getStorage());
 		$mitglied->setGlobalID($config->generateGlobalID());
 		$mitglied->setEintrittsdatum(time());
@@ -90,6 +93,11 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 		$mitgliedbeitrag->setHoehe($beitrag);
 		$mitglied->setBeitrag($mitgliedbeitrag);
 		$mitglied->save();
+	} else {
+		if (!$session->isAllowed("mitglieder_modify", $gliederung->getGliederungID())) {
+			$ui->viewLogin();
+			exit;
+		}	
 	}
 
 	$revision = new MitgliedRevision($session->getStorage());
@@ -126,6 +134,11 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 function parseAddMitgliederNotizFormular($session, $mitglied, &$notiz) {
 	$kommentar = $session->getVariable("kommentar");
 
+	if (!$session->isAllowed("mitglieder_modify", $mitglied->getLatestRevision()->getGliederungID())) {
+		$ui->viewLogin();
+		exit;
+	}
+
 	if ($notiz == null) {
 		$notiz = new MitgliedNotiz($session->getStorage());
 	}
@@ -142,6 +155,11 @@ function parseMitgliederBeitraegeFormular($session, &$mitglied) {
 	$beitraege_neu_beitragid = $session->getVariable("beitrag_neu_beitragid");
 	$beitraege_neu_hoehe = $session->getDoubleVariable("beitrag_neu_hoehe");
 	$beitraege_neu_bezahlt = $session->getDoubleVariable("beitrag_neu_bezahlt");
+
+	if (!$session->isAllowed("mitglieder_modify", $mitglied->getLatestRevision()->getGliederungID())) {
+		$ui->viewLogin();
+		exit;
+	}
 
 	foreach ($beitraege_hoehe as $beitragid => $hoehe) {
 		$beitrag = $session->getStorage()->getBeitrag($beitragid);
@@ -165,6 +183,11 @@ function parseMitgliederBeitraegeFormular($session, &$mitglied) {
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
 case "statistik":
+	if (!$session->isAllowed("mitglieder_show")) {
+		$ui->viewLogin();
+		exit;
+	}
+
 	$statistik = $session->getStorage()->getMitgliederStatistik($session->getVariable("statistikid"));
 
 	$ui->viewMitgliederStatistik($statistik);
@@ -173,7 +196,7 @@ case "beitraege":
 	$mitgliedid = intval($session->getVariable("mitgliedid"));
 	$mitglied = $session->getStorage()->getMitglied($mitgliedid);
 
-	if (!$session->isAllowed("mitglieder_modify")) {
+	if (!$session->isAllowed("mitglieder_modify", $mitglied->getLatestRevision()->getGliederungID())) {
 		$ui->viewLogin();
 		exit;
 	}
@@ -187,6 +210,11 @@ case "beitraege":
 case "beitragdelete":
 	$mitglied = $session->getStorage()->getMitglied($session->getIntVariable("mitgliedid"));
 	$beitrag = $session->getStorage()->getBeitrag($session->getIntVariable("beitragid"));
+
+	if (!$session->isAllowed("mitglieder_modify", $mitglied->getLatestRevision()->getGliederungID())) {
+		$ui->viewLogin();
+		exit;
+	}
 
 	$mitglied->delBeitrag($beitrag->getBeitragID());
 	$mitglied->save();
@@ -204,32 +232,27 @@ case "details":
 		$revision = $mitglied->getLatestRevision();
 	}
 
+	if (!$session->isAllowed("mitglieder_show", $revision->getGliederungID())) {
+		$ui->viewLogin();
+		exit;
+	}
+
 	$revisions = $mitglied->getRevisionList();
 
 	if ($session->getBoolVariable("save")) {
-		if (!$session->isAllowed("mitglieder_modify")) {
-			$ui->viewLogin();
-			exit;
-		}
-
 		parseMitgliederFormular($session, $mitglied);
 
 		$ui->redirect($session->getLink("mitglieder_details", $mitglied->getMitgliedID()));
 	}
 
 	if ($session->getBoolVariable("addnotiz")) {
-		if (!$session->isAllowed("mitglieder_modify")) {
-			$ui->viewLogin();
-			exit;
-		}
-		
 		parseAddMitgliederNotizFormular($session, $mitglied, $notiz);
 	}
 	
 	$notizen = $session->getStorage()->getMitgliedNotizList($mitglied->getMitgliedID());
 	$dokumente = $session->getStorage()->getDokumentByMitgliedList($mitglied->getMitgliedID());
 
-	$gliederungen = $session->getStorage()->getGliederungList();
+	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("mitglieder_show"));
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
 	$mitgliederflags = $session->getStorage()->getMitgliedFlagList();
 	$mitgliedertextfields = $session->getStorage()->getMitgliedTextFieldList();
@@ -256,11 +279,6 @@ case "create":
 	}
 
 	if ($session->getBoolVariable("save")) {
-		if (!$session->isAllowed("mitglieder_create")) {
-			$ui->viewLogin();
-			exit;
-		}
-
 		parseMitgliederFormular($session, &$mitglied, $dokument);
 
 		if ($dokument != null) {
@@ -270,7 +288,7 @@ case "create":
 		}
 	}
 
-	$gliederungen = $session->getStorage()->getGliederungList();
+	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("mitglieder_create"));
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
 	$mailtemplates = $session->getStorage()->getMailTemplateList();
 	$mitgliederflags = $session->getStorage()->getMitgliedFlagList();
@@ -286,6 +304,7 @@ case "delete":
 	}
 
 	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
+	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_delete")), $matcher);
 
 	$process = new MitgliederFilterDeleteProcess($session->getStorage());
 	$process->setMatcher($matcher);
@@ -298,7 +317,7 @@ case "delete":
 	exit;
 case "sendmail":
 case "sendmail.select":
-	$filters = $session->getStorage()->getMitgliederFilterList();
+	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));
 	$templates = $session->getStorage()->getMailTemplateList();
 
 	$ui->viewMitgliederSendMailForm($filters, $templates);
@@ -315,6 +334,7 @@ case "sendmail.preview":
 	exit;
 case "sendmail.send":
 	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
+	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_show")), $matcher);
 	$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("templateid"));
 	
 	$process = new MitgliederFilterSendMailProcess($session->getStorage());
@@ -327,12 +347,13 @@ case "sendmail.send":
 	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
 	exit;
 case "export.options":
-	$filters = $session->getStorage()->getMitgliederFilterList();
+	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));
 	
 	$ui->viewMitgliederExportOptions($filters, $predefinedfields);
 	exit;
 case "export.export":
 	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
+	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_show")), $matcher);
 
 	// Headerfelder
 	$exportfields = array();
@@ -366,6 +387,7 @@ case "export.export":
 	exit;
 case "statistik.start":
 	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
+	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_show")), $matcher);
 
 	$statistik = new MitgliederStatistik($session->getStorage());
 	$statistik->setTimestamp(time());
@@ -379,13 +401,14 @@ case "statistik.start":
 	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
 	exit;
 case "setbeitrag.selectbeitrag":
-	$filters = $session->getStorage()->getMitgliederFilterList();
+	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));
 	$beitraglist = $session->getStorage()->getBeitragList();
 
 	$ui->viewMitgliederSetBeitragSelect($filters, $beitraglist);
 	exit;
 case "setbeitrag.start":
 	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
+	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_show")), $matcher);
 	$beitrag = $session->getStorage()->getBeitrag($session->getIntVariable("beitragid"));
 
 	$process = new MitgliederFilterBeitragProcess($session->getStorage());
@@ -406,7 +429,10 @@ default:
 		$filter = $session->getMitgliederFilter($session->getVariable("filterid"));
 	}
 
-	$mitgliedercount = $session->getStorage()->getMitgliederCount($filter);
+	$matcher = ($filter != null ? $filter->getMitgliederMatcher() : null);
+	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_show")), $matcher);
+
+	$mitgliedercount = $session->getStorage()->getMitgliederCount($matcher);
 	$pagesize = 20;
 	$pagecount = ceil($mitgliedercount / $pagesize);
 	$page = 0;
@@ -415,9 +441,9 @@ default:
 	}
 	$offset = $page * $pagesize;
 
-	$mitglieder = $session->getStorage()->getMitgliederList($filter, $pagesize, $offset);
-	$mitgliedtemplates = $session->getStorage()->getMitgliedTemplateList();
-	$filters = $session->getStorage()->getMitgliederFilterList();
+	$mitglieder = $session->getStorage()->getMitgliederList($matcher, $pagesize, $offset);
+	$mitgliedtemplates = $session->getStorage()->getMitgliedTemplateList($session->getAllowedGliederungIDs("mitglieder_create"));
+	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));
 	$ui->viewMitgliederList($mitglieder, $mitgliedtemplates, $filters, $filter, $page, $pagecount, $mitgliedercount);
 	exit;
 }

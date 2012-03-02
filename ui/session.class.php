@@ -62,7 +62,7 @@ class Session {
 			throw new Exception("Login failed.");
 		}
 		$gliederungen = array();
-		$gliederungChilds = array();
+		$gliederungChilds = array(NULL => array());
 		foreach ($this->getStorage()->getGliederungList() as $gliederung) {
 			$gliederungen[$gliederung->getGliederungID()] = $gliederung;
 			$this->buildGliederungChildList($gliederung, $gliederungChilds);
@@ -108,7 +108,7 @@ class Session {
 		if (!isset($this->stor["permissions"][$permission])) {
 			return array();
 		}
-		return array_keys($this->stor["permissions"][$permissionid]);
+		return array_keys($this->stor["permissions"][$permission]);
 	}
 	public function isAllowed($permission, $gliederungid = null) {
 		if ($gliederungid == null) {
