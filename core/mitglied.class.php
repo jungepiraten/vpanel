@@ -167,6 +167,8 @@ class Mitglied extends GlobalClass {
 			return date("d.m.Y", $this->getEintrittsdatum());
 		case "AUSTRITT":
 			return date("d.m.Y", $this->getAustrittsdatum());
+		case "GLIEDERUNG":
+			return $revision->getGliederung()->getLabel();
 		case "ADRESSZUSATZ":
 			return $kontakt->getAdresszusatz();
 		case "STRASSE":
@@ -194,6 +196,14 @@ class Mitglied extends GlobalClass {
 		}
 		if ($revision->isNatPerson()) {
 			$natperson = $revision->getNatPerson();
+			if (substr($keyword, 0, 5) == "ALTER") {
+				$tuple = explode(".", $keyword, 2);
+				$timestamp = time();
+				if (count($tuple) >= 2) {
+					$timestamp = mktime(0,0,0, substr($tuple[1],3,2), substr($tuple[1],5,2), substr($tuple[1],0,4));
+				}
+				return $natperson->getAlter($timestamp);
+			}
 			switch ($keyword) {
 			case "BEZEICHNUNG":
 				return $natperson->getAnrede() . " " . $natperson->getVorname() . " " . $natperson->getName();

@@ -52,6 +52,10 @@ class Graph {
 		return $this->getHeight() - $this->getPlotYAxisSize();
 	}
 
+	private function getAxisFont() {
+		return 3;
+	}
+
 	private function getXAxis() {
 		return $this->xaxis;
 	}
@@ -89,7 +93,6 @@ class Graph {
 		$img = ImageCreate($this->getWidth(), $this->getHeight());
 		$background	= ImageColorAllocate($img, 255,255,255);
 		$axiscolor	= ImageColorAllocate($img,   0,  0,  0);
-		$axisfont	= 3;
 		$dataColor = array();
 		for ($i = 0; $i < count($this->data); $i++) {
 			$dataColor[$i] = $this->getDataColor($i)->gdAllocate($img);
@@ -104,11 +107,11 @@ class Graph {
 			$label = $this->getXAxis()->getLabel($labelPosition);
 			$xPixel = $labelPosition * $this->getPlotWidth();
 			$x = $this->getPlotXOffset() + $xPixel;
-			$preXpixel = ImageFontWidth($axisfont) * strlen($label) / 2;
-			$postXpixel = ImageFontWidth($axisfont) * strlen($label) / 2;
+			$preXpixel = ImageFontWidth($this->getAxisFont()) * strlen($label) / 2;
+			$postXpixel = ImageFontWidth($this->getAxisFont()) * strlen($label) / 2;
 
 			if ($lastXpixel_label == null || $lastXpixel_label + 20 < $xPixel - $preXpixel) {
-				ImageString($img, $axisfont, $x - $preXpixel, $this->getPlotXAxisPosition(), iconv("UTF8", "ISO-8859-1", $label), $axiscolor);
+				ImageString($img, $this->getAxisFont(), $x - $preXpixel, $this->getPlotXAxisPosition(), iconv("UTF8", "ISO-8859-1", $label), $axiscolor);
 				$lastXpixel_label = $xPixel + $postXpixel;
 			}
 			if ($lastXpixel_line == null || $lastXpixel_line + 20 < $xPixel) {
@@ -127,12 +130,12 @@ class Graph {
 			$label = $this->getYAxis()->getLabel($labelPosition);
 			$yPixel = $labelPosition * $this->getPlotHeight();
 			$y = $this->getPlotYOffset() + ($this->getPlotHeight() - $yPixel);
-			$preXpixel = ImageFontWidth($axisfont) * strlen($label);
-			$preYpixel = ImageFontHeight($axisfont) / 2;
-			$postYpixel = ImageFontHeight($axisfont) / 2;
+			$preXpixel = ImageFontWidth($this->getAxisFont()) * strlen($label);
+			$preYpixel = ImageFontHeight($this->getAxisFont()) / 2;
+			$postYpixel = ImageFontHeight($this->getAxisFont()) / 2;
 
 			if ($lastYpixel_label == null || $lastYpixel_label + 20 < $yPixel - $preYpixel) {
-				ImageString($img, $axisfont, $this->getPlotYAxisPosition() - $preXpixel, $y - $preYpixel, iconv("UTF8", "ISO-8859-1", $label), $axiscolor);
+				ImageString($img, $this->getAxisFont(), $this->getPlotYAxisPosition() - $preXpixel, $y - $preYpixel, iconv("UTF8", "ISO-8859-1", $label), $axiscolor);
 				$lastYpixel_label = $yPixel + $postYpixel;
 			}
 			if ($lastYpixel_line == null || $lastYpixel_line + 20 < $yPixel) {
@@ -291,6 +294,10 @@ class Graph_DefaultAxis {
 			return 1;
 		}
 		return ($this->roundValue($val) - $this->getMinimum()) / $this->getDelta();
+	}
+
+	public function getValues() {
+		return $this->getValueList($this->getMinimum(), $this->getMaximum());
 	}
 
 	protected function getValue($pos) {

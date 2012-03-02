@@ -61,36 +61,14 @@ class MitgliederFilterStatistikProcess extends Process {
 	private $mitgliederAustritte = array();
 	private $maxMitgliederAustritte = 0;
 
-	private $mitgliederAgeCount = array();
-	private $maxMitgliederAgeCount = 1;
-
-	private $gliederungLabels = array();
-	private $mitgliederGliederungCount = array();
-
-	private $stateLabels = array();
-	private $mitgliederStateCount = array();
-
-	private $mitgliedschaftLabels = array();
-	private $mitgliederMitgliedschaftCount = array();
+	private $factors = array();
+	private $mitgliederFactorCount = array();
 
 	private function normMitgliederCountTime($value) {
 		return $this->getStatistik()->getMitgliederCountStart() + floor(($value - $this->getStatistik()->getMitgliederCountStart()) / $this->getStatistik()->getMitgliederCountScale()) * $this->getStatistik()->getMitgliederCountScale();
 	}
 
 	public function runPrepareData($progressOffset, $progress) {
-		foreach ($this->getStorage()->getGliederungList() as $gliederung) {
-			$this->gliederungLabels[$gliederung->getGliederungID()] = $gliederung->getLabel();
-			$this->mitgliederGliederungCount[$gliederung->getGliederungID()] = 0;
-		}
-		foreach ($this->getStorage()->getStateList() as $state) {
-			$this->stateLabels[$state->getStateID()] = $state->getLabel();
-			$this->mitgliederStateCount[$state->getStateID()] = 0;
-		}
-		foreach ($this->getStorage()->getMitgliedschaftList() as $mitgliedschaft) {
-			$this->mitgliedschaftLabels[$mitgliedschaft->getMitgliedschaftID()] = $mitgliedschaft->getLabel();
-			$this->mitgliederMitgliedschaftCount[$mitgliedschaft->getMitgliedschaftID()] = 0;
-		}
-		
 		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
 		$curMitgliederCount = 0;
 		while ($mitglied = $result->fetchRow()) {
@@ -121,20 +99,12 @@ class MitgliederFilterStatistikProcess extends Process {
 				if ($mitglied->getAustrittsdatum() == null || $mitglied->getAustrittsdatum() > $this->getStatistik()->getMitgliederCountEnd()) {
 					$revision = $mitglied->getLatestRevision();
 
-					$this->mitgliederGliederungCount[$revision->getGliederungID()]++;
-					$this->mitgliederStateCount[$revision->getKontakt()->getOrt()->getStateID()]++;
-					$this->mitgliederMitgliedschaftCount[$revision->getMitgliedschaftID()]++;
-
-					if ($revision->isNatPerson()) {
-						$geburtsdatum = $revision->getNatPerson()->getGeburtsdatum();
-						$age = date("Y", $this->getStatistik()->getTimestamp()) - date("Y", $geburtsdatum);
-						if (date("md", $this->getStatistik()->getTimestamp()) < date("md", $geburtsdatum)) {
-							$age--;
+					foreach ($this->factors as $i => $factorString) {
+						$mitgliedString = $mitglied->replaceText($factorString);
+						if (!isset($this->mitgliederFactorCount[$i][$mitgliedString])) {
+							$this->mitgliederFactorCount[$i][$mitgliedString] = 0;
 						}
-						if (!isset($this->mitgliederAgeCount[$age])) {
-							$this->mitgliederAgeCount[$age] = 0;
-						}
-						$this->mitgliederAgeCount[$age]++;
+						$this->mitgliederFactorCount[$i][$mitgliedString]++;
 					}
 				}
 			}
@@ -154,27 +124,6 @@ class MitgliederFilterStatistikProcess extends Process {
 			$this->maxMitgliederCount = max($this->maxMitgliederCount, $curMitgliederCount);
 		}
 
-		$this->setProgress($progressOffset + 0.9 * $progress);
-		$this->save();
-
-		for ($age = $this->getStatistik()->getMitgliederAgeMinimum(); $age <= $this->getStatistik()->getMitgliederAgeMaximum(); $age++) {
-			if (!isset($this->mitgliederAgeCount[$age])) {
-				$this->mitgliederAgeCount[$age] = 0;
-			}
-			$this->maxMitgliederAgeCount = max($this->maxMitgliederAgeCount, $this->mitgliederAgeCount[$age]);
-		}
-
-		$this->setProgress($progressOffset + 1 * $progress);
-		$this->save();
-	}
-
-	public function runGenerateAgeGraph($w, $h, $file, $progressOffset, $progress) {
-		$graph = new Graph($w, $h);
-		$graph->setXAxis(new Graph_DefaultAxis($this->getStatistik()->getMitgliederAgeMinimum(), $this->getStatistik()->getMitgliederAgeMaximum()));
-		$graph->setYAxis(new Graph_DefaultAxis(0, $this->maxMitgliederAgeCount));
-		$graph->addData(new Graph_AvgData($this->mitgliederAgeCount));
-		$graph->plot($file);
-		
 		$this->setProgress($progressOffset + 1 * $progress);
 		$this->save();
 	}
@@ -202,10 +151,12 @@ class MitgliederFilterStatistikProcess extends Process {
 		$this->save();
 	}
 
-	public function runGenerateGliederungChart($w, $h, $file, $progressOffset, $progress) {
+	public function runGenerateFactorPieChart($w, $h, $factor, $file, $progressOffset, $progress) {
 		$chart = new PieChart($w, $h);
-		foreach ($this->gliederungLabels as $i => $label) {
-			$chart->addData(new Chart_Data($this->gliederungLabels[$i], $this->mitgliederGliederungCount[$i]));
+		foreach ($this->mitgliederFactorCount[$factor] as $label => $count) {
+			if (!empty($label)) {
+				$chart->addData(new Chart_Data($label, $count));
+			}
 		}
 		$chart->plot($file);
 
@@ -213,23 +164,12 @@ class MitgliederFilterStatistikProcess extends Process {
 		$this->save();
 	}
 
-
-	public function runGenerateStateChart($w, $h, $file, $progressOffset, $progress) {
-		$chart = new PieChart($w, $h);
-		foreach ($this->stateLabels as $i => $label) {
-			$chart->addData(new Chart_Data($this->stateLabels[$i], $this->mitgliederStateCount[$i]));
-		}
-		$chart->plot($file);
-
-		$this->setProgress($progressOffset + 1 * $progress);
-		$this->save();
-	}
-
-
-	public function runGenerateMitgliedschaftChart($w, $h, $file, $progressOffset, $progress) {
-		$chart = new PieChart($w, $h);
-		foreach ($this->mitgliedschaftLabels as $i => $label) {
-			$chart->addData(new Chart_Data($this->mitgliedschaftLabels[$i], $this->mitgliederMitgliedschaftCount[$i]));
+	public function runGenerateFactorVBarChart($w, $h, $factor, $file, $progressOffset, $progress) {
+		$chart = new VBarChart($w, $h);
+		foreach ($this->mitgliederFactorCount[$factor] as $label => $count) {
+			if (!empty($label)) {
+				$chart->addData(new Chart_Data($label, $count));
+			}
 		}
 		$chart->plot($file);
 
@@ -238,6 +178,12 @@ class MitgliederFilterStatistikProcess extends Process {
 	}
 
 	public function runProcess() {
+		$this->factors = array("{GLIEDERUNG}", "{STATE}", "{MITGLIEDSCHAFT}", "{ALTER." . date("Ymd", $this->getStatistik()->getTimestamp()) . "}");
+		$this->mitgliederFactorCount[0] = array();
+		$this->mitgliederFactorCount[1] = array();
+		$this->mitgliederFactorCount[2] = array();
+		$this->mitgliederFactorCount[3] = array_fill($this->getStatistik()->getMitgliederAgeMinimum(), $this->getStatistik()->getMitgliederAgeMaximum() - $this->getStatistik()->getMitgliederAgeMinimum(), 0);
+
 		$this->runPrepareData(0, 0.7);
 
 		if ($this->getStatistik()->getAgeGraphFile() != null) {
@@ -248,7 +194,7 @@ class MitgliederFilterStatistikProcess extends Process {
 			$agegraph->save();
 			$this->getStatistik()->setAgeGraphFile($agegraph);
 		}
-		$this->runGenerateAgeGraph(600, 250, $agegraph, 0.7, 0.05);
+		$this->runGenerateFactorVBarChart(600, 250, 3, $agegraph, 0.7, 0.05);
 
 		if ($this->getStatistik()->getTimeGraphFile() != null) {
 			$timegraph = $this->getStatistik()->getTimeGraphFile();
@@ -278,7 +224,7 @@ class MitgliederFilterStatistikProcess extends Process {
 			$gliederungchart->save();
 			$this->getStatistik()->setGliederungChartFile($gliederungchart);
 		}
-		$this->runGenerateGliederungChart(450,250, $gliederungchart, 0.85, 0.05);
+		$this->runGenerateFactorPieChart(450,250, 0, $gliederungchart, 0.85, 0.05);
 
 		if ($this->getStatistik()->getStateChartFile() != null) {
 			$statechart = $this->getStatistik()->getStateChartFile();
@@ -288,7 +234,7 @@ class MitgliederFilterStatistikProcess extends Process {
 			$statechart->save();
 			$this->getStatistik()->setStateChartFile($statechart);
 		}
-		$this->runGenerateStateChart(450,250, $statechart, 0.9, 0.05);
+		$this->runGenerateFactorPieChart(450,250, 1, $statechart, 0.9, 0.05);
 
 		if ($this->getStatistik()->getMitgliedschaftChartFile() != null) {
 			$mitgliedschaftchart = $this->getStatistik()->getMitgliedschaftChartFile();
@@ -298,7 +244,7 @@ class MitgliederFilterStatistikProcess extends Process {
 			$mitgliedschaftchart->save();
 			$this->getStatistik()->setMitgliedschaftChartFile($mitgliedschaftchart);
 		}
-		$this->runGenerateMitgliedschaftChart(450,250, $mitgliedschaftchart, 0.95, 0.05);
+		$this->runGenerateFactorPieChart(450,250, 2, $mitgliedschaftchart, 0.95, 0.05);
 
 		$this->getStatistik()->save();
 	}

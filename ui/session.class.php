@@ -104,6 +104,12 @@ class Session {
 		}
 		$this->stor["permissions"][$permission->getPermission()->getLabel()][$gliederungid] = true;
 	}
+	public function getAllowedGliederungIDs($permission) {
+		if (!isset($this->stor["permissions"][$permission])) {
+			return array();
+		}
+		return array_keys($this->stor["permissions"][$permissionid]);
+	}
 	public function isAllowed($permission, $gliederungid = null) {
 		if ($gliederungid == null) {
 			return isset($this->stor["permissions"][$permission]) && count($this->stor["permissions"][$permission]) > 0;

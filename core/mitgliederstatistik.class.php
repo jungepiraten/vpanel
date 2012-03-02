@@ -65,7 +65,7 @@ class MitgliederStatistik extends StorageClass {
 	}
 
 	public function getMitgliederAgeMaximum() {
-		return 70;
+		return 100;
 	}
 
 	public function setAgeGraphFileID($fileid) {

@@ -62,6 +62,14 @@ class NatPerson extends Person {
 		return $this->geburtsdatum;
 	}
 
+	public function getAlter($timestamp) {
+		$age = date("Y", $timestamp) - date("Y", $this->getGeburtsdatum());
+		if (date("md", $timestamp) < date("md", $this->getGeburtsdatum())) {
+			$age--;
+		}
+		return $age;
+	}
+
 	public function setGeburtsdatum($geburtsdatum) {
 		$this->geburtsdatum = $geburtsdatum;
 	}
