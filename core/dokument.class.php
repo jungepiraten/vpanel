@@ -4,6 +4,7 @@ require_once(VPANEL_CORE . "/storageobject.class.php");
 
 class Dokument extends StorageClass {
 	private $dokumentid;
+	private $gliederungid;
 	private $dokumentkategorieid;
 	private $dokumentstatusid;
 	private $identifier;
@@ -12,6 +13,7 @@ class Dokument extends StorageClass {
 	private	$data;
 	private $fileid;
 
+	private $gliederung;
 	private $dokumentkategorie;
 	private $dokumentstatus;
 	private $file;
@@ -19,6 +21,7 @@ class Dokument extends StorageClass {
 	public static function factory(Storage $storage, $row) {
 		$dokument = new Dokument($storage);
 		$dokument->setDokumentID($row["dokumentid"]);
+		$dokument->setGliederungID($row["gliederungid"]);
 		$dokument->setDokumentKategorieID($row["dokumentkategorieid"]);
 		$dokument->setDokumentStatusID($row["dokumentstatusid"]);
 		$dokument->setIdentifier($row["identifier"]);
@@ -35,6 +38,29 @@ class Dokument extends StorageClass {
 
 	public function setDokumentID($dokumentid) {
 		$this->dokumentid = $dokumentid;
+	}
+
+	public function getGliederungID() {
+		return $this->gliederungid;
+	}
+
+	public function setGliederungID($gliederungid) {
+		if ($gliederungid != $this->gliederungid) {
+			$this->gliederung = null;
+		}
+		$this->gliederungid = $gliederungid;
+	}
+
+	public function getGliederung() {
+		if ($this->gliederung == null) {
+			$this->gliederung = $this->getStorage()->getGliederung($this->getGliederungID());
+		}
+		return $this->gliederung;
+	}
+
+	public function setGliederung($gliederung) {
+		$this->setGliederungID($gliederung->getGliederungID());
+		$this->gliederung = $gliederung;
 	}
 
 	public function getDokumentKategorieID() {
@@ -144,6 +170,7 @@ class Dokument extends StorageClass {
 		}
 		$this->setDokumentID( $storage->setDokument(
 			$this->getDokumentID(),
+			$this->getGliederungID(),
 			$this->getDokumentKategorieID(),
 			$this->getDokumentStatusID(),
 			$this->getIdentifier(),

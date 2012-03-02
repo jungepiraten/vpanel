@@ -166,20 +166,20 @@ interface Storage {
 	public function setProcess($processid, $type, $typedata, $progess, $queued, $started, $finished, $finishedpage);
 	public function delProcess($processid);
 
-	public function getDokumentResult($dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
-	public function getDokumentList($dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
+	public function getDokumentResult($gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
+	public function getDokumentList($gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
 	public function getDokumentByMitgliedResult($mitgliedid);
 	public function getDokumentByMitgliedList($mitgliedid);
 	public function getDokumentSearchResult($query, $limit = null, $offset = null);
 	public function getDokumentSearchList($query, $limit = null, $offset = null);
-	public function getDokumentCount($dokumentkategorieid = null, $dokumentstatus = null);
+	public function getDokumentCount($gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null);
 	public function getDokument($dokumentid);
-	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatus, $identifier, $label, $content, $data, $fileid);
+	public function setDokument($dokumentid, $gliederungid, $dokumentkategorieid, $dokumentstatus, $identifier, $label, $content, $data, $fileid);
 
-	public function getDokumentNotifyResult($dokumentkategorieid = null, $dokumentstatusid = null);
-	public function getDokumentNotifyList($dokumentkategorieid = null, $dokumentstatusid = null);
+	public function getDokumentNotifyResult($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null);
+	public function getDokumentNotifyList($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null);
 	public function getDokumentNotify($dokumentnotifyid);
-	public function setDokumentNotify($dokumentnotifyid, $dokumentkategorieid, $dokumentstatusid, $emailid);
+	public function setDokumentNotify($dokumentnotifyid, $gliederungid, $dokumentkategorieid, $dokumentstatusid, $emailid);
 
 	public function getDokumentKategorieResult();
 	public function getDokumentKategorieList();
@@ -353,8 +353,8 @@ abstract class AbstractStorage implements Storage {
 		return $this->getProcessResult()->fetchAll();
 	}
 
-	public function getDokumentList($dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
-		return $this->getDokumentResult($dokumentkategorieid, $dokumentstatusid, $limit = null, $offset = null)->fetchAll();
+	public function getDokumentList($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
+		return $this->getDokumentResult($gliederungid, $dokumentkategorieid, $dokumentstatusid, $limit = null, $offset = null)->fetchAll();
 	}
 
 	public function getDokumentByMitgliedList($mitgliedid) {
@@ -365,8 +365,8 @@ abstract class AbstractStorage implements Storage {
 		return $this->getDokumentSearchResult($query, $limit = null, $offset = null)->fetchAll();
 	}
 
-	public function getDokumentNotifyList($dokumentkategorieid = null, $dokumentstatusid = null) {
-		return $this->getDokumentNotifyResult($dokumentkategorieid, $dokumentstatusid)->fetchAll();
+	public function getDokumentNotifyList($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null) {
+		return $this->getDokumentNotifyResult($gliederungid, $dokumentkategorieid, $dokumentstatusid)->fetchAll();
 	}
 
 	public function getDokumentKategorieList() {

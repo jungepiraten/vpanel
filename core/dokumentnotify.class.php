@@ -4,16 +4,19 @@ require_once(VPANEL_CORE . "/storageobject.class.php");
 
 class DokumentNotify extends StorageClass {
 	private $dokumentnotifyid;
+	private $gliederungid;
 	private $dokumentkategorieid;
 	private $dokumentstatusid;
 	private $emailid;
 
+	private $gliederung;
 	private $dokumentkategorie;
 	private $dokumentstatus;
 	private $email;
 
 	public static function factory(Storage $storage, $row) {
 		$dokumentnotify = new DokumentNotify($storage);
+		$dokumentnotify->setGliederungID($row["gliederungid"]);
 		$dokumentnotify->setDokumentNotifyID($row["dokumentnotifyid"]);
 		$dokumentnotify->setDokumentKategorieID($row["dokumentkategorieid"]);
 		$dokumentnotify->setDokumentStatusID($row["dokumentstatusid"]);
@@ -27,6 +30,29 @@ class DokumentNotify extends StorageClass {
 
 	public function setDokumentNotifyID($dokumentnotifyid) {
 		$this->dokumentnotifyid = $dokumentnotifyid;
+	}
+
+	public function getGliederungID() {
+		return $this->gliederungid;
+	}
+
+	public function setGliederungID($gliederungid) {
+		if ($gliederungid != $this->gliederungid) {
+			$this->gliederung = null;
+		}
+		$this->gliederungid = $gliederungid;
+	}
+
+	public function getGliederung() {
+		if ($this->gliederung == null) {
+			$this->gliederung = $this->getStorage()->getGliederung($this->getGliederungID());
+		}
+		return $this->gliederung;
+	}
+
+	public function setGliederung($gliederung) {
+		$this->setGliederungID($gliederung->getGliederungID());
+		$this->gliederung = $gliederung;
 	}
 
 	public function getDokumentKategorieID() {
@@ -104,6 +130,7 @@ class DokumentNotify extends StorageClass {
 		}
 		$this->setDokumentNotifyID( $storage->setDokumentNotify(
 			$this->getDokumentNotifyID(),
+			$this->getGliederungID(),
 			$this->getDokumentKategorieID(),
 			$this->getDokumentStatusID(),
 			$this->getEMailID() ));

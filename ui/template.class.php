@@ -425,6 +425,7 @@ class Template {
 	protected function parseDokument($dokument) {
 		$row = array();
 		$row["dokumentid"] = $dokument->getDokumentID();
+		$row["gliederung"] = $this->parseGliederung($dokument->getGliederung());
 		$row["dokumentkategorie"] = $this->parseDokumentKategorie($dokument->getDokumentKategorie());
 		$row["dokumentstatus"] = $this->parseDokumentStatus($dokument->getDokumentStatus());
 		$row["identifier"] = $dokument->getIdentifier();
@@ -722,7 +723,10 @@ class Template {
 		$this->smarty->display("process.html.tpl");
 	}
 
-	public function viewDokumentList($dokumente, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount) {
+	public function viewDokumentList($dokumente, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount) {
+		if ($gliederung != null) {
+			$this->smarty->assign("gliederung", $this->parseGliederung($gliederung));
+		}
 		if ($dokumentkategorie != null) {
 			$this->smarty->assign("dokumentkategorie", $this->parseDokumentKategorie($dokumentkategorie));
 		}
@@ -732,18 +736,23 @@ class Template {
 		$this->smarty->assign("page", $page);
 		$this->smarty->assign("pagecount", $pagecount);
 		$this->smarty->assign("dokumente", $this->parseDokumente($dokumente));
+		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
 		$this->smarty->display("dokumentlist.html.tpl");
 	}
 
-	public function viewDokumentCreate($dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus) {
+	public function viewDokumentCreate($gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus) {
+		if ($gliederung != null) {
+			$this->smarty->assign("gliederung", $this->parseGliederung($gliederung));
+		}
 		if ($dokumentkategorie != null) {
 			$this->smarty->assign("dokumentkategorie", $this->parseDokumentKategorie($dokumentkategorie));
 		}
 		if ($dokumentstatus != null) {
 			$this->smarty->assign("dokumentstatus", $this->parseDokumentStatus($dokumentstatus));
 		}
+		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
 		$this->smarty->display("dokumentcreate.html.tpl");

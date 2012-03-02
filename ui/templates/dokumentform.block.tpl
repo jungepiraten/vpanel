@@ -2,6 +2,12 @@
  <fieldset>
   <table>
   <tr>
+   <th>{"Gliederung:"|__}</th>
+   <td>{if isset($dokument)}{$dokument.gliederung.label|escape:html}{else}
+    {include file=gliederungdropdown.block.tpl defaulttext="(auswählen)" selectedgliederungid=$gliederung.gliederungid}
+   {/if}</td>
+  </tr>
+  <tr>
    <th>{"Kategorie:"|__}</th>
    <td>{if isset($dokument)}
     {include file=dokumentkategoriedropdown.block.tpl defaulttext="(auswählen)" selecteddokumentkategorieid=$dokument.dokumentkategorie.dokumentkategorieid}

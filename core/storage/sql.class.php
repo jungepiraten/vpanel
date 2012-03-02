@@ -1504,7 +1504,10 @@ abstract class SQLStorage extends AbstractStorage {
 	public function parseDokument($row) {
 		return $this->parseRow($row, null, "Dokument");
 	}
-	public function getDokumentCount($dokumentkategorieid = null, $dokumentstatusid = null) {
+	public function getDokumentCount($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null) {
+		if ($gliederungid instanceof Gliederung) {
+			$gliederungid = $gliederungid->getGliederungID();
+		}
 		if ($dokumentkategorieid instanceof DokumentKategorie) {
 			$dokumentkategorieid = $dokumentkategorieid->getDokumentKategorieID();
 		}
@@ -1512,6 +1515,9 @@ abstract class SQLStorage extends AbstractStorage {
 			$dokumentstatusid = $dokumentstatusid->getDokumentStatusID();
 		}
 		$sql = "SELECT COUNT(`dokumentid`) FROM `dokument` WHERE 1=1";
+		if ($gliederungid != null) {
+			$sql .= " AND `gliederungid` = " . intval($gliederungid);
+		}
 		if ($dokumentkategorieid != null) {
 			$sql .= " AND `dokumentkategorieid` = " . intval($dokumentkategorieid);
 		}
@@ -1520,14 +1526,20 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		return reset($this->getResult($sql)->fetchRow());
 	}
-	public function getDokumentResult($dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
+	public function getDokumentResult($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
+		if ($gliederungid instanceof Gliederung) {
+			$gliederungid = $gliederungid->getGliederungID();
+		}
 		if ($dokumentkategorieid instanceof DokumentKategorie) {
 			$dokumentkategorieid = $dokumentkategorieid->getDokumentKategorieID();
 		}
 		if ($dokumentstatusid instanceof DokumentStatus) {
 			$dokumentstatusid = $dokumentstatusid->getDokumentStatusID();
 		}
-		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE 1=1";
+		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE 1=1";
+		if ($gliederungid != null) {
+			$sql .= " AND `gliederungid` = " . intval($gliederungid);
+		}
 		if ($dokumentkategorieid != null) {
 			$sql .= " AND `dokumentkategorieid` = " . intval($dokumentkategorieid);
 		}
@@ -1546,7 +1558,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parseDokument"));
 	}
 	public function getDokumentByMitgliedResult($mitgliedid) {
-		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` LEFT JOIN `mitglieddokument` USING (`dokumentid`) WHERE `mitgliedid` = " . intval($mitgliedid);
+		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` LEFT JOIN `mitglieddokument` USING (`dokumentid`) WHERE `mitgliedid` = " . intval($mitgliedid);
 		return $this->getResult($sql, array($this, "parseDokument"));
 	}
 	public function getDokumentSearchResult($querys, $limit = null, $offset = null) {
@@ -1564,7 +1576,7 @@ abstract class SQLStorage extends AbstractStorage {
 			}
 			$wordclauses[] = implode(" OR ", $clauses);
 		}
-		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE (" . implode(") AND (", $wordclauses) . ") OR `dokumentid` IN (SELECT `dokumentid` FROM `dokumentnotizen` WHERE `kommentar` LIKE '%" . implode("%' OR `kommentar` LIKE '%", $escapedwords) . "%')";
+		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE (" . implode(") AND (", $wordclauses) . ") OR `dokumentid` IN (SELECT `dokumentid` FROM `dokumentnotizen` WHERE `kommentar` LIKE '%" . implode("%' OR `kommentar` LIKE '%", $escapedwords) . "%')";
 		if ($limit !== null or $offset !== null) {
 			$sql .= " LIMIT ";
 			if ($offset !== null) {
@@ -1577,14 +1589,15 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parseDokument"));
 	}
 	public function getDokument($dokumentid) {
-		$sql = "SELECT `dokumentid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE `dokumentid` = " . intval($dokumentid);
+		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE `dokumentid` = " . intval($dokumentid);
 		return $this->getResult($sql, array($this, "parseDokument"))->fetchRow();
 	}
-	public function setDokument($dokumentid, $dokumentkategorieid, $dokumentstatusid, $identifier, $label, $content, $data, $fileid) {
+	public function setDokument($dokumentid, $gliederungid, $dokumentkategorieid, $dokumentstatusid, $identifier, $label, $content, $data, $fileid) {
 		if ($dokumentid == null) {
 			$sql = "INSERT INTO `dokument`
-				(`dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid`) VALUES
-				(" . intval($dokumentkategorieid) . ",
+				(`gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid`) VALUES
+				(" . intval($gliederungid) . ",
+				 " . intval($dokumentkategorieid) . ",
 				 " . intval($dokumentstatusid) . ",
 				 '" . $this->escape($identifier) . "',
 				 '" . $this->escape($label) . "',
@@ -1593,7 +1606,8 @@ abstract class SQLStorage extends AbstractStorage {
 				 " . intval($fileid) . ")";
 		} else {
 			$sql = "UPDATE `dokument`
-				SET	`dokumentkategorieid` = " . intval($dokumentkategorieid) . ",
+				SET	`gliederungid` = " . intval($gliederungid) . ",
+					`dokumentkategorieid` = " . intval($dokumentkategorieid) . ",
 					`dokumentstatusid` = " . intval($dokumentstatusid) . ",
 					`identifier` = '" . $this->escape($identifier) . "',
 					`label` = '" . $this->escape($label) . "',
@@ -1615,8 +1629,11 @@ abstract class SQLStorage extends AbstractStorage {
 	public function parseDokumentNotify($row) {
 		return $this->parseRow($row, null, "DokumentNotify");
 	}
-	public function getDokumentNotifyResult($dokumentkategorieid = null, $dokumentstatusid = null) {
-		$sql = "SELECT `dokumentnotifyid`, `dokumentkategorieid`, `dokumentstatusid`, `emailid` FROM `dokumentnotifies` WHERE `dokumentkategorieid` IS NULL OR `dokumentstatusid` IS NULL";
+	public function getDokumentNotifyResult($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null) {
+		$sql = "SELECT `dokumentnotifyid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `emailid` FROM `dokumentnotifies` WHERE `gliederungid` IS NULL OR `dokumentkategorieid` IS NULL OR `dokumentstatusid` IS NULL";
+		if ($gliederungid != null) {
+			$sql .= " OR `gliederungid` = " . intval($gliederungid);
+		}
 		if ($dokumentkategorieid != null) {
 			$sql .= " OR `dokumentkategorieid` = " . intval($dokumentkategorieid);
 		}
@@ -1626,14 +1643,14 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parseDokumentNotify"));
 	}
 	public function getDokumentNotify($dokumentnotifyid) {
-		$sql = "SELECT `dokumentnotifyid`, `dokumentkategorieid`, `dokumentstatusid`, `emailid` FROM `dokumentnotifies` WHERE `dokumentnotifyid` = " . intval($dokumentnotifyid);
+		$sql = "SELECT `dokumentnotifyid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `emailid` FROM `dokumentnotifies` WHERE `dokumentnotifyid` = " . intval($dokumentnotifyid);
 		return $this->getResult($sql, array($this, "parseDokumentNotify"))->fetchRow();
 	}
-	public function setDokumentNotify($dokumentnotifyid, $dokumentkategorieid, $dokumentstatusid, $emailid) {
+	public function setDokumentNotify($dokumentnotifyid, $gliederungid, $dokumentkategorieid, $dokumentstatusid, $emailid) {
 		if ($dokumentnotifyid == null) {
-			$sql = "INSERT INTO `dokumentnotifies` (`dokumentkategorieid`, `dokumentstatusid`, `emailid`) VALUES (`dokumentkategorieid` = " . ($dokumentkategorieid == null ? "NULL" : intval($dokumentkategorieid)) . ", `dokumentstatusid` = " . ($dokumentstatusid == null ? "NULL" : intval($dokumentstatusid)) . ", " . ($emailid == null ? "NULL" : intval($emailid)) . ")";
+			$sql = "INSERT INTO `dokumentnotifies` (`gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `emailid`) VALUES (" . ($gliederungid == null ? "NULL" : intval($gliederungid)) . ", " . ($dokumentkategorieid == null ? "NULL" : intval($dokumentkategorieid)) . ", " . ($dokumentstatusid == null ? "NULL" : intval($dokumentstatusid)) . ", " . ($emailid == null ? "NULL" : intval($emailid)) . ")";
 		} else {
-			$sql = "UPDATE `dokumentnotifies` SET `dokumentkategorieid` = " . ($dokumentkategorieid == null ? "NULL" : intval($dokumentkategorieid)) . ", `dokumentstatusid` = " . ($dokumentstatusid == null ? "NULL" : intval($dokumentstatusid)) . ", `emailid` = " . ($emailid == null ? "NULL" : intval($emailid)) . " WHERE `dokumentnotifyid` = " . intval($dokumentnotifyid);
+			$sql = "UPDATE `dokumentnotifies` SET `gliederungid` = " . ($gliederungid == null ? "NULL" : intval($gliederungid)) . ", `dokumentkategorieid` = " . ($dokumentkategorieid == null ? "NULL" : intval($dokumentkategorieid)) . ", `dokumentstatusid` = " . ($dokumentstatusid == null ? "NULL" : intval($dokumentstatusid)) . ", `emailid` = " . ($emailid == null ? "NULL" : intval($emailid)) . " WHERE `dokumentnotifyid` = " . intval($dokumentnotifyid);
 		}
 		$this->query($sql);
 		if ($dokumentnotifyid == null) {
