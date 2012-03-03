@@ -45,9 +45,7 @@ function parseDokumentFormular($session, &$dokument = null) {
 	$notiz->setKommentar($kommentar);
 	$notiz->save();
 
-	foreach ($session->getStorage()->getDokumentNotifyList($gliederungid, $kategorieid, $statusid) as $notify) {
-		$notify->notify($dokument, $notiz);
-	}
+	$notiz->notify();
 }
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
@@ -88,9 +86,7 @@ case "create":
 			$notiz->setKommentar($dokumenttemplate->getDokumentKommentar($session));
 			$notiz->save();
 
-			foreach ($session->getStorage()->getDokumentNotifyList($gliederungid, $kategorieid, $statusid) as $notify) {
-				$notify->notify($dokument, $notiz);
-			}
+			$notiz->notify();
 
 			$ui->redirect($session->getLink("dokumente_details", $dokument->getDokumentID()));
 		}

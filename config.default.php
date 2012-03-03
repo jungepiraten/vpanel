@@ -11,11 +11,16 @@ define("VPANEL_UI",			VPANEL_ROOT . "/ui");
 define("VPANEL_LANGUAGE",		VPANEL_UI . "/language");
 define("VPANEL_FILES",			VPANEL_ROOT . "/files");
 
-require_once(VPANEL_UI . "/session.class.php");
+require_once(VPANEL_UI . "/phpsession.class.php");
+require_once(VPANEL_UI . "/apisession.class.php");
 
 class DefaultConfig {
-	public function getSession() {
-		return new Session($this);
+	public function getSession($api = false) {
+		if ($api) {
+			return new APISession($this);
+		} else {
+			return new PHPSession($this);
+		}
 	}
 
 	/** Fuer GlobaleIDs **/

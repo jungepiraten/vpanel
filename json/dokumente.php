@@ -5,11 +5,11 @@ require_once(dirname(__FILE__) . "/../config.inc.php");
 require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
 
-if (!$session->isAllowed("dokumente_show")) {
+if (!$session->isSignedIn()) {
 	exit;
 }
 
-$dokumente = $session->getStorage()->getDokumentSearchList(explode(" ", $session->getVariable("q")), 5);
+$dokumente = $session->getStorage()->getDokumentSearchList($session->getAllowedGliederungIDs("dokumente_show"), explode(" ", $session->getVariable("q")), 5);
 $jsons = array();
 
 foreach ($dokumente AS $dokument) {

@@ -2,43 +2,66 @@
 
 require_once(VPANEL_CORE . "/user.class.php");
 require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
-require_once(VPANEL_UI . "/template.class.php");
 
-class Session {
+interface Session {
+	public function generateToken($key);
+	public function validToken($key, $token);
+
+	public function isSignedIn();
+	public function setUser($user);
+	public function getUser();
+
+	public function getAllowedGliederungIDs($permission);
+	public function isAllowed($permission, $gliederungid = null);
+
+	public function getLang();
+	public function getEncoding();
+
+	public function getDefaultDokumentKategorieID();
+	public function getDefaultDokumentStatusID();
+
+	public function addMitgliederMatcher($matcher);
+	public function getMitgliederFilter($filterid);
+	public function getMitgliederMatcher($filterid);
+
+	public function hasVariable($name);
+	public function hasFileVariable($name);
+	public function getVariable($name);
+	public function getDoubleVariable($name);
+	public function getIntVariable($name);
+	public function getBoolVariable($name);
+	public function getListVariable($name);
+	public function getFileVariable($name);
+
+	public function getLink();
+	public function getStorage();
+}
+
+abstract class AbstractSession implements Session {
 	private $config;
-	private $stor;
+	private $user;
 
 	public function __construct($config) {
-		session_start();
 		$this->config = $config;
-
-		if (!isset($_SESSION["vpanel"])) {
-			$_SESSION["vpanel"] = array();
-		}
-		$this->stor = &$_SESSION["vpanel"];
-		$this->santisize();
+		$this->initialize();
 	}
 
-	public function santisize() {
-		if (isset($this->stor["user"]) and $this->stor["user"] != null) {
-			$this->stor["user"]->setStorage($this->getStorage());
-		}
-	}
+	abstract protected function initialize();
+	abstract protected function hasSessionValue($key);
+	abstract protected function getSessionValue($key);
+	abstract protected function setSessionValue($key, $value);
 
 	public function generateToken($key) {
-		if (!isset($this->stor["tokens"])) {
-			$this->stor["tokens"] = array();
-		}
 		$token = md5($key . "-" . microtime(true) . "-" . rand(1000,9999));
-		$this->stor["tokens"][$key] = $token;
+		$this->setSessionValue("token_" . $key, $token);
 		return $token;
 	}
 	public function validToken($key, $token) {
-		return (isset($this->stor["tokens"][$key]) && $this->stor["tokens"][$key] == $token);
+		return $this->hasSessionValue("token_" . $key) && $this->getSessionValue("token_" . $key) == $token;
 	}
 
 	public function isSignedIn() {
-		return isset($this->stor["user"]) and $this->stor["user"] != null;
+		return $this->user != null;
 	}
 	private function buildGliederungChildList($gliederung, &$gliederungChilds) {
 		$gliederungid = $gliederung->getGliederungID();
@@ -56,99 +79,106 @@ class Session {
 			$this->buildGliederungChildList($gliederung->getParent(), $gliederungChilds);
 		}
 	}
-	public function login($username, $password) {
-		$user = $this->getStorage()->getUserByUsername($username);
-		if ($user == null or !$user->isValidPassword($password)) {
-			throw new Exception("Login failed.");
-		}
-		$gliederungen = array();
-		$gliederungChilds = array(NULL => array());
-		foreach ($this->getStorage()->getGliederungList() as $gliederung) {
-			$gliederungen[$gliederung->getGliederungID()] = $gliederung;
-			$this->buildGliederungChildList($gliederung, $gliederungChilds);
-		}
-		$roles = $user->getRoles();
-		$permissions = array();
-		foreach ($roles as $role) {
-			foreach ($role->getPermissions() as $permission) {
-				if ($permission->isTransitive()) {
-					foreach ($gliederungChilds[$permission->getGliederungID()] as $childid) {
-						$this->addPermission($permission, $childid);
-					}
-				}
-				$this->addPermission($permission, $permission->getGliederungID());
-			}
-		}
-		$this->setUser($user);
-		$this->setDefaultDokumentKategorieID($user->getDefaultDokumentKategorieID());
-		$this->setDefaultDokumentStatusID($user->getDefaultDokumentStatusID());
-	}
-	public function logout() {
-		$this->setUser(null);
-		$this->stor["permissions"] = array();
-	}
 	public function setUser($user) {
-		$this->stor["user"] = $user;
+		if ($user != null) {
+			$gliederungen = array();
+			$gliederungChilds = array(NULL => array());
+			foreach ($this->getStorage()->getGliederungList() as $gliederung) {
+				$gliederungen[$gliederung->getGliederungID()] = $gliederung;
+				$this->buildGliederungChildList($gliederung, $gliederungChilds);
+			}
+			$roles = $user->getRoles();
+			$permissions = array();
+			foreach ($roles as $role) {
+				foreach ($role->getPermissions() as $permission) {
+					if ($permission->isTransitive()) {
+						foreach ($gliederungChilds[$permission->getGliederungID()] as $childid) {
+							$this->addPermission($permission, $childid);
+						}
+					}
+					$this->addPermission($permission, $permission->getGliederungID());
+				}
+			}
+			$this->user = $user;
+			$this->setSessionValue("user", $user);
+			$this->setSessionValue("defaultdokumentkategorieid", $user->getDefaultDokumentKategorieID());
+			$this->setSessionValue("defaultdokumentstatusid", $user->getDefaultDokumentStatusID());
+		} else {
+			$this->clearPermissions();
+			$this->user = null;
+			$this->setSessionValue("user", null);
+			$this->setSessionValue("defaultdokumentkategorieid", null);
+			$this->setSessionValue("defaultdokumentstatusid", null);
+		}
 	}
 	public function getUser() {
-		if ($this->isSignedIn()) {
-			return $this->stor["user"];
+		if ($this->user == null) {
+			if ($this->hasSessionValue("user")) {
+				$this->user = $this->getSessionValue("user");
+				$this->user->setStorage($this->getStorage());
+			}
 		}
-		// TODO anonymous auth
-		return new User($this->getStorage());
+		return $this->user;
 	}
 
+	private function clearPermissions() {
+		$this->setSessionValue("permissions", array());
+	}
 	private function addPermission($permission, $gliederungid) {
-		if (!isset($this->stor["permissions"])) {
-			$this->stor["permissions"] = array();
+		$permissions = array();
+		if ($this->hasSessionValue("permissions")) {
+			$permissions = $this->getSessionValue("permissions");
 		}
-		$this->stor["permissions"][$permission->getPermission()->getLabel()][$gliederungid] = true;
+		$permissions[$permission->getPermission()->getLabel()][$gliederungid] = true;
+		$this->setSessionValue("permissions", $permissions);
 	}
 	public function getAllowedGliederungIDs($permission) {
-		if (!isset($this->stor["permissions"][$permission])) {
+		if (! $this->hasSessionValue("permissions") ) {
 			return array();
 		}
-		return array_keys($this->stor["permissions"][$permission]);
+		$permissions = $this->getSessionValue("permissions");
+		if (! isset($permissions[$permission])) {
+			return array();
+		}
+		return array_keys($permissions[$permission]);
 	}
 	public function isAllowed($permission, $gliederungid = null) {
 		if ($gliederungid == null) {
-			return isset($this->stor["permissions"][$permission]) && count($this->stor["permissions"][$permission]) > 0;
+			return count($this->getAllowedGliederungIDs($permission)) > 0;
 		} else {
-			return isset($this->stor["permissions"][$permission][$gliederungid]);
+			if (! $this->hasSessionValue("permissions") ) {
+				return false;
+			}
+			$permissions = $this->getSessionValue("permissions");			
+			return isset($permissions[$permission][$gliederungid]);
 		}
 	}
 
 	public function setLang($lang) {
-		$this->stor["lang"] = $lang;
+		$this->setSessionValue("lang", $lang);
 	}
 	public function getLang() {
-		if (!isset($this->stor["lang"])) {
+		if (! $this->hasSessionValue("lang")) {
 			return $this->config->getLang();
 		}
-		return $this->config->getLang($this->stor["lang"]);
+		return $this->config->getLang($this->getSessionValue("lang"));
 	}
 
-	public function setDefaultDokumentKategorieID($kategorieid) {
-		$this->stor["defaultdokumentkategorieid"] = $kategorieid;
-	}
 	public function getDefaultDokumentKategorieID() {
-		return $this->stor["defaultdokumentkategorieid"];
-	}
-	public function setDefaultDokumentStatusID($statusid) {
-		$this->stor["defaultdokumentstatusid"] = $statusid;
+		return $this->getSessionValue("defaultdokumentkategorieid");
 	}
 	public function getDefaultDokumentStatusID() {
-		return $this->stor["defaultdokumentstatusid"];
+		return $this->getSessionValue("defaultdokumentstatusid");
 	}
 
 	public function addMitgliederMatcher($matcher) {
 		$id = "custom" . substr(md5(microtime(true) . "-" . rand(1000,9999)),0,8);
-		$this->stor["mitgliederfilter"][$id] = serialize(new MitgliederFilter($id, "Userdefined #" . $id, null, $matcher));
+		$this->setSessionValue("mitgliederfilter_" . $id, new MitgliederFilter($id, "Userdefined #" . $id, null, $matcher));
 		return $this->getMitgliederFilter($id);
 	}
 	public function getMitgliederFilter($filterid) {
-		if (isset($this->stor["mitgliederfilter"][$filterid])) {
-			return unserialize($this->stor["mitgliederfilter"][$filterid]);
+		if ($this->hasSessionValue("mitgliederfilter_" . $filterid)) {
+			return $this->setSessionValue("mitgliederfilter_" . $filterid);
 		}
 		return $this->getStorage()->getMitgliederFilter($filterid);
 	}
@@ -160,6 +190,16 @@ class Session {
 		return $filter->getMatcher();
 	}
 
+	public function getLink() {
+		$params = func_get_args();
+		return call_user_func_array(array($this->config, "getLink"), $params);
+	}
+	public function getStorage() {
+		return $this->config->getStorage();
+	}
+}
+
+abstract class AbstractHTTPSession extends AbstractSession {
 	public function getEncoding() {
 		return "UTF-8";
 	}
@@ -208,20 +248,6 @@ class Session {
 		}
 		$file->save();
 		return $file;
-	}
-	public function encodeString($string) {
-		return iconv("UTF-8", $this->getEncoding(), $string);
-	}
-
-	public function getLink() {
-		$params = func_get_args();
-		return call_user_func_array(array($this->config, "getLink"), $params);
-	}
-	public function getStorage() {
-		return $this->config->getStorage();
-	}
-	public function getTemplate() {
-		return new Template($this);
 	}
 }
 

@@ -79,6 +79,30 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 
 	/**
+	 * SessionData
+	 **/
+	public function getSessionData($sessionid) {
+		$sql = "SELECT `data` FROM `sessions` WHERE `sessionid` = " . intval($sessionid);
+		return unserialize(array_shift($this->getResult($sql)->fetchRow()));
+	}
+	public function setSessionData($sessionid, $timestamp, $data) {
+		if ($sessionid == null) {
+			$sql = "INSERT INTO `sessions` (`timestamp`, `data`) VALUES ('" . date("Y-m-d H:i:s", $timestamp) . "', '" . $this->escape(serialize($data)) . "')";
+		} else {
+			$sql = "UPDATE `sessions` SET `timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "', `data` = '" . $this->escape(serialize($data)) . "' WHERE `sessionid` = " . intval($sessionid);
+		}
+		$this->query($sql);
+		if ($sessionid == null) {
+			$sessionid = $this->getInsertID();
+		}
+		return $sessionid;
+	}
+	public function delSessionDataBefore($timestamp) {
+		$sql = "DELETE FROM `sessions` WHERE `timestamp` <= '" . date("Y-m-d H:i:s", $timestamp) . "'";
+		$this->query($sql);
+	}
+
+	/**
 	 * Berechtigungen
 	 */
 	public function parsePermission($row) {
@@ -129,22 +153,22 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "User");
 	}
 	public function getUserResult() {
-		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users`";
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users`";
 		return $this->getResult($sql, array($this, "parseUser"));
 	}
 	public function getUser($userid) {
-		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` WHERE `userid` = " . intval($userid);
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` WHERE `userid` = " . intval($userid);
 		return $this->getResult($sql, array($this, "parseUser"))->fetchRow();
 	}
 	public function getUserByUsername($username) {
-		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` WHERE `username` = '" . $this->escape($username) . "'";
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` WHERE `username` = '" . $this->escape($username) . "'";
 		return $this->getResult($sql, array($this, "parseUser"))->fetchRow();
 	}
-	public function setUser($userid, $username, $password, $passwordsalt, $defaultdokumentkategorieid, $defaultdokumentstatusid) {
+	public function setUser($userid, $username, $password, $passwordsalt, $apikey, $defaultdokumentkategorieid, $defaultdokumentstatusid) {
 		if ($userid == null) {
-			$sql = "INSERT INTO `users` (`username`, `password`, `passwordsalt`, `defaultdokumentkategorieid`, `defaultdokumentstatusid`) VALUES ('" . $this->escape($username) . "', '" . $this->escape($password) . "', '" . $this->escape($passwordsalt) . "', " . ($defaultdokumentkategorieid == null ? "NULL" : intval($defaultdokumentkategorieid)) . ", " . ($defaultdokumentstatusid == null ? "NULL" : intval($defaultdokumentstatusid)) . ")";
+			$sql = "INSERT INTO `users` (`username`, `password`, `passwordsalt`, `apikey`, `defaultdokumentkategorieid`, `defaultdokumentstatusid`) VALUES ('" . $this->escape($username) . "', '" . $this->escape($password) . "', '" . $this->escape($passwordsalt) . "', " . ($apikey == null ? "NULL" : $this->escape($apikey)) . ", " . ($defaultdokumentkategorieid == null ? "NULL" : intval($defaultdokumentkategorieid)) . ", " . ($defaultdokumentstatusid == null ? "NULL" : intval($defaultdokumentstatusid)) . ")";
 		} else {
-			$sql = "UPDATE `users` SET `username` = '" . $this->escape($username) . "', `password` = '" . $this->escape($password) . "', `passwordsalt` = '" . $this->escape($passwordsalt) . "', `defaultdokumentkategorieid` = " . ($defaultdokumentkategorieid == null ? "NULL" : intval($defaultdokumentkategorieid)) . ", `defaultdokumentstatusid` = " . ($defaultdokumentstatusid == null ? "NULL" : intval($defaultdokumentstatusid)) . " WHERE `userid` = " . intval($userid);
+			$sql = "UPDATE `users` SET `username` = '" . $this->escape($username) . "', `password` = '" . $this->escape($password) . "', `passwordsalt` = '" . $this->escape($passwordsalt) . "', `apikey` = " . ($apikey == null ? "NULL" : $this->escape($apikey)) . ", `defaultdokumentkategorieid` = " . ($defaultdokumentkategorieid == null ? "NULL" : intval($defaultdokumentkategorieid)) . ", `defaultdokumentstatusid` = " . ($defaultdokumentstatusid == null ? "NULL" : intval($defaultdokumentstatusid)) . " WHERE `userid` = " . intval($userid);
 		}
 		$this->query($sql);
 		if ($userid == null) {
@@ -160,7 +184,7 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 
 	public function getRoleUserResult($roleid) {
-		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
 		return $this->getResult($sql, array($this, "parseUser"));
 	}
 	public function setRoleUserList($roleid, $userids) {

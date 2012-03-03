@@ -6,6 +6,7 @@ class User extends StorageClass {
 	private $userid;
 	private $username;
 	private $password;
+	private $apikey;
 
 	private $roles;
 	private $permissions;
@@ -16,15 +17,16 @@ class User extends StorageClass {
 		$user->setUsername($row["username"]);
 		$user->setPassword($row["password"]);
 		$user->setPasswordSalt($row["passwordsalt"]);
+		$user->setAPIKey($row["apikey"]);
 		$user->setDefaultDokumentKategorieID($row["defaultdokumentkategorieid"]);
 		$user->setDefaultDokumentStatusID($row["defaultdokumentstatusid"]);
 		return $user;
 	}
 
-	protected function generateSalt() {
+	protected function generateSalt($minlen = 3, $maxlen = 7) {
 		$str = "";
 		$chrs = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!"§$%&/()=?{[]}\\\'*+~#-.,;:<>|';
-		for ($i=0;$i<=rand(3,7);$i++) {
+		for ($i=0;$i<=rand($minlen, $maxlen);$i++) {
 			$str .= substr($chrs, rand(0,strlen($chrs)-1), 1);
 		}
 		return $str;
@@ -74,6 +76,17 @@ class User extends StorageClass {
 		$salt = $this->generateSalt();
 		$this->setPasswordSalt($salt);
 		$this->setPassword($this->hash($password));
+	}
+
+	public function getAPIKey() {
+		return $this->apikey;
+	}
+
+	public function setAPIKey($apikey = null) {
+		if ($apikey == null) {
+			$apikey = $this->generateSalt(16,16);
+		}
+		$this->apikey = $apikey;
 	}
 
 	public function getRoles() {
@@ -128,6 +141,7 @@ class User extends StorageClass {
 			$this->getUsername(),
 			$this->getPassword(),
 			$this->getPasswordSalt(),
+			$this->getAPIKey(),
 			$this->getDefaultDokumentKategorieID(),
 			$this->getDefaultDokumentStatusID() ));
 		

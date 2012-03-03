@@ -157,6 +157,12 @@ class DokumentNotiz extends StorageClass {
 			$this->getNextStatusID(),
 			$this->getKommentar() ));
 	}
+
+	public function notify() {
+		foreach ($this->getStorage()->getDokumentNotifyList($this->getDokument()->getGliederungID(), $this->getNextKategorieID(), $this->getNextStatusID()) as $notify) {
+			$notify->notify($this->getDokument(), $this);
+		}
+	}
 }
 
 ?>

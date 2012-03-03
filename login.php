@@ -2,7 +2,6 @@
 
 require_once(dirname(__FILE__) . "/config.inc.php");
 
-require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
 $ui = $session->getTemplate();
 
@@ -11,17 +10,18 @@ if ($session->getBoolVariable("login")) {
 	$username = $session->getVariable("username");
 	$password = $session->getVariable("password");
 
-	try {
-		$session->login($username, $password);
-		$ui->redirect();
-	} catch (Exception $e) {
+	$user = $session->getStorage()->getUserByUsername($username);
+	if ($user == null || !$user->isValidPassword($password)) {
 		$ui->viewLogin(true);
 		exit;
 	}
+	
+	$session->setUser($user);
+	$ui->redirect();
 }
 
 if ($session->getBoolVariable("logout")) {
-	$session->logout();
+	$session->setUser(null);
 	$ui->redirect();
 }
 
