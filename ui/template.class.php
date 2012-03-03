@@ -16,6 +16,7 @@ class Template {
 		$this->smarty->compile_dir = dirname(__FILE__) . "/templates_c";
 		$this->smarty->register_modifier("__", array($this, "translate"));
 		$this->smarty->register_modifier("___", array($this, "link"));
+		$this->smarty->register_modifier("file_size", array($this, "formatFileSize"));
 
 		$this->smarty->assign("session", $this->session);
 		$this->smarty->assign("charset", $this->session->getEncoding());
@@ -35,6 +36,18 @@ class Template {
 	public function link($name) {
 		$params = func_get_args();
 		return call_user_func_array(array($this->session, "getLink"), $params);
+	}
+	public function formatFileSize($bytes) {
+		$mb = 1024*1024;
+		if ($bytes > $mb) {
+			$output = sprintf ("%01.2f",$bytes/$mb) . " MB";
+		} elseif ( $bytes >= 1024 ) {
+			$output = sprintf ("%01.0f",$bytes/1024) . " Kb";
+		} else {
+			$output = $bytes . " bytes";
+		}
+
+		return $output;
 	}
 	
 	private function getStorage() {
@@ -439,6 +452,17 @@ class Template {
 		return array_map(array($this, 'parseDokument'), $rows);
 	}
 
+	protected function parseDokumentTemplate($template) {
+		$row = array();
+		$row["dokumenttemplateid"] = $template->getDokumentTemplateID();
+		$row["label"] = $template->getLabel();
+		return $row;
+	}
+
+	protected function parseDokumentTemplates($rows) {
+		return array_map(array($this, 'parseDokumentTemplate'), $rows);
+	}
+
 	protected function parseDokumentKategorie($kategorie) {
 		$row = array();
 		$row["dokumentkategorieid"] = $kategorie->getDokumentKategorieID();
@@ -485,6 +509,7 @@ class Template {
 		$row["fileid"] = $file->getFileID();
 		$row["exportfilename"] = $file->getExportFilename();
 		$row["mimetype"] = $file->getMimeType();
+		$row["filesize"] = $file->getFileSize();
 		return $row;
 	}
 
@@ -723,7 +748,7 @@ class Template {
 		$this->smarty->display("process.html.tpl");
 	}
 
-	public function viewDokumentList($dokumente, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount) {
+	public function viewDokumentList($dokumente, $templates, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount) {
 		if ($gliederung != null) {
 			$this->smarty->assign("gliederung", $this->parseGliederung($gliederung));
 		}
@@ -736,34 +761,34 @@ class Template {
 		$this->smarty->assign("page", $page);
 		$this->smarty->assign("pagecount", $pagecount);
 		$this->smarty->assign("dokumente", $this->parseDokumente($dokumente));
+		$this->smarty->assign("dokumenttemplates", $this->parseDokumentTemplates($templates));
 		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
 		$this->smarty->display("dokumentlist.html.tpl");
 	}
 
-	public function viewDokumentCreate($gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus) {
-		if ($gliederung != null) {
-			$this->smarty->assign("gliederung", $this->parseGliederung($gliederung));
-		}
-		if ($dokumentkategorie != null) {
-			$this->smarty->assign("dokumentkategorie", $this->parseDokumentKategorie($dokumentkategorie));
-		}
-		if ($dokumentstatus != null) {
-			$this->smarty->assign("dokumentstatus", $this->parseDokumentStatus($dokumentstatus));
-		}
+	public function viewDokumentCreate($dokumenttemplate, $gliederungen, $dokumentkategorien, $dokumentstatuslist) {
+		$this->smarty->assign("dokumenttemplate", $this->parseDokumentTemplate($dokumenttemplate));
 		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
-		$this->smarty->display("dokumentcreate.html.tpl");
+		if ($dokumenttemplate instanceof MitgliedsantragDokumentTemplate) {
+			$this->smarty->display("dokumentcreate_mitgliedsantrag.html.tpl");
+		} else if ($dokumenttemplate instanceof DefaultDokumentTemplate) {
+			$this->smarty->display("dokumentcreate_default.html.tpl");
+		} else {
+//			$this->smarty->display("dokumentcreate.html.tpl");
+		}
 	}
 
-	public function viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $dokumentkategorien, $dokumentstatuslist) {
+	public function viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $dokumentkategorien, $dokumentstatuslist, $mitgliedtemplates) {
 		$this->smarty->assign("dokument", $this->parseDokument($dokument));
 		$this->smarty->assign("dokumentnotizen", $this->parseDokumentNotizen($dokumentnotizen));
 		$this->smarty->assign("mitglieder", $this->parseMitglieder($mitglieder));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
+		$this->smarty->assign("mitgliedtemplates", $this->parseMitgliedTemplates($mitgliedtemplates));
 		$this->smarty->display("dokumentdetails.html.tpl");
 	}
 

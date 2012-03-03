@@ -13,13 +13,29 @@
 <div style="float:left; width:40%;">
 <div class="buttonbox">
  <a href="{"dokumente_mitglied"|___:$dokument.dokumentid}">Mitglied verlinken</a>
- <a href="{"dokumente_mitglied_create"|___:$dokument.dokumentid}">Mitglied anlegen</a>
+ <form action="{"dokumente_mitglied_create"|___:$dokument.dokumentid}" method="post" class="filter">
+  <fieldset>
+   <select name="mitgliedtemplateid">
+    <option value="">{"(keine Vorlage)"|__}</option>
+    {foreach from=$mitgliedtemplates item=mitgliedtemplate}<option value="{$mitgliedtemplate.mitgliedtemplateid|escape:html}" {if $dokument.data.mitgliedtemplateid == $mitgliedtemplate.mitgliedtemplateid}selected="selected"{/if}>{$mitgliedtemplate.label|escape:html}</option>{/foreach}
+   </select>
+   <input type="submit" value="{"Mitglied anlegen"|__}" />
+  </fieldset>
+ </form>
 </div>
 {if count($mitglieder) > 0}
 {include file="mitgliederlist.block.tpl" mitglieder=$mitglieder showmitglieddokumentdel=1}
 <div class="buttonbox">
  <a href="{"dokumente_mitglied"|___:$dokument.dokumentid}">Mitglied verlinken</a>
- <a href="{"dokumente_mitglied_create"|___:$dokument.dokumentid}">Mitglied anlegen</a>
+ <form action="{"dokumente_mitglied_create"|___:$dokument.dokumentid}" method="post" class="filter">
+  <fieldset>
+   <select name="mitgliedtemplateid">
+    <option value="">{"(keine Vorlage)"|__}</option>
+    {foreach from=$mitgliedtemplates item=mitgliedtemplate}<option value="{$mitgliedtemplate.mitgliedtemplateid|escape:html}" {if $dokument.data.mitgliedtemplateid == $mitgliedtemplate.mitgliedtemplateid}selected="selected"{/if}>{$mitgliedtemplate.label|escape:html}</option>{/foreach}
+   </select>
+   <input type="submit" value="{"Mitglied anlegen"|__}" />
+  </fieldset>
+ </form>
 </div>
 {/if}
 </div>

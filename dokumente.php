@@ -6,45 +6,26 @@ require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
 $ui = $session->getTemplate();
 
+if (!$session->isSignedIn()) {
+	$ui->viewLogin();
+	exit;
+}
+
 require_once(VPANEL_CORE . "/dokument.class.php");
 
 function parseDokumentFormular($session, &$dokument = null) {
-	if ($session->hasVariable("gliederungid")) {
-		$gliederungid = $session->getIntVariable("gliederungid");
-	}
 	$kategorieid = $session->getIntVariable("kategorieid");
 	$statusid = $session->getIntVariable("statusid");
-	if ($session->hasFileVariable("file")) {
-		$file = $session->getFileVariable("file");
-	}
-	if ($session->hasVariable("idkey")) {
-		$idkey = $session->getVariable("idkey");
-	}
 	$label = $session->getVariable("label");
 	$kommentar = $session->getVariable("kommentar");
 
-	$oldkategorieid = null;
-	$oldstatusid = null;
-	if ($dokument == null) {
-		if (!$session->isAllowed("dokumente_create", $gliederungid)) {
-			$ui->viewLogin();
-			exit;
-		}
+	$gliederungid = $dokument->getGliederungID();
+	$oldkategorieid = $dokument->getDokumentKategorieID();
+	$oldstatusid = $dokument->getDokumentStatusID();
 
-		$dokument = new Dokument($session->getStorage());
-		$dokument->setGliederungID($gliederungid);
-		$dokument->setFile($file);
-		$dokument->setIdentifier($idkey);
-		$dokument->setData(array());
-	} else {
-		$gliederungid = $dokument->getGliederungID();
-		$oldkategorieid = $dokument->getDokumentKategorieID();
-		$oldstatusid = $dokument->getDokumentStatusID();
-
-		if (!$session->isAllowed("dokument_modify", $gliederungid)) {
-			$ui->viewLogin();
-			exit;
-		}
+	if (!$session->isAllowed("dokument_modify", $gliederungid)) {
+		$ui->viewLogin();
+		exit;
 	}
 	$dokument->setDokumentKategorieID($kategorieid);
 	$dokument->setDokumentStatusID($statusid);
@@ -71,31 +52,54 @@ function parseDokumentFormular($session, &$dokument = null) {
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
 case "create":
-	$gliederung = null;
-	if ($session->hasVariable("gliederungid")) {
-		$gliederung = $session->getStorage()->getGliederung($session->getVariable("gliederungid"));
-	}
-
-	$dokumentkategorie = null;
-	if ($session->hasVariable("kategorieid")) {
-		$dokumentkategorie = $session->getStorage()->getDokumentKategorie($session->getVariable("kategorieid"));
-	}
-
-	$dokumentstatus = null;
-	if ($session->hasVariable("statusid")) {
-		$dokumentstatus = $session->getStorage()->getDokumentStatus($session->getVariable("statusid"));
-	}
+	$dokumenttemplate = $session->getStorage()->getDokumentTemplate($session->getVariable("dokumenttemplateid"));
 
 	if ($session->getBoolVariable("save")) {
-		parseDokumentFormular($session, &$dokument);
+		$gliederungid = $dokumenttemplate->getDokumentGliederungID($session);
+		$kategorieid = $dokumenttemplate->getDokumentKategorieID($session);
+		$statusid = $dokumenttemplate->getDokumentStatusID($session);
 
-		$ui->redirect($session->getLink("dokumente_details", $dokument->getDokumentID()));
+		$file = $dokumenttemplate->getDokumentFile($session);
+
+		if (!$session->isAllowed("dokumente_create", $gliederungid)) {
+			$ui->viewLogin();
+			exit;
+		}
+
+		if ($file == null) {
+			
+		} else {
+			$dokument = new Dokument($session->getStorage());
+			$dokument->setGliederungID($gliederungid);
+			$dokument->setDokumentKategorieID($kategorieid);
+			$dokument->setDokumentStatusID($statusid);
+			$dokument->setIdentifier($dokumenttemplate->getDokumentIdentifier($session));
+			$dokument->setLabel($dokumenttemplate->getDokumentLabel($session));
+			$dokument->setFile($file);
+			$dokument->setData($dokumenttemplate->getDokumentData($session));
+			$dokument->save();
+
+			$notiz = new DokumentNotiz($session->getStorage());
+			$notiz->setDokument($dokument);
+			$notiz->setAuthor($session->getUser());
+			$notiz->setTimestamp(time());
+			$notiz->setNextKategorieID($kategorieid);
+			$notiz->setNextStatusID($statusid);
+			$notiz->setKommentar($dokumenttemplate->getDokumentKommentar($session));
+			$notiz->save();
+
+			foreach ($session->getStorage()->getDokumentNotifyList($gliederungid, $kategorieid, $statusid) as $notify) {
+				$notify->notify($dokument, $notiz);
+			}
+
+			$ui->redirect($session->getLink("dokumente_details", $dokument->getDokumentID()));
+		}
 	}
 
 	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("dokumente_create"));
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
-	$ui->viewDokumentCreate($gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus);
+	$ui->viewDokumentCreate($dokumenttemplate, $gliederungen, $dokumentkategorien, $dokumentstatuslist);
 	exit;
 case "details":
 	$dokument = $session->getStorage()->getDokument($session->getIntVariable("dokumentid"));
@@ -116,7 +120,8 @@ case "details":
 
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
-	$ui->viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $dokumentkategorien, $dokumentstatuslist);
+	$mitgliedtemplates = $session->getStorage()->getMitgliedTemplateList($session->getAllowedGliederungIDs("mitglieder_create"));
+	$ui->viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $dokumentkategorien, $dokumentstatuslist, $mitgliedtemplates);
 	exit;
 default:
 	$gliederung = null;
@@ -146,9 +151,10 @@ default:
 
 	$dokumente = $session->getStorage()->getDokumentList($session->getAllowedGliederungIDs("dokumente_show"), $gliederung, $dokumentkategorie, $dokumentstatus, $pagesize, $offset);
 	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("dokumente_show"));
+	$templates = $session->getStorage()->getDokumentTemplateList($session->getAllowedGliederungIDs("dokumente_create"));
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
-	$ui->viewDokumentList($dokumente, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount);
+	$ui->viewDokumentList($dokumente, $templates, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount);
 	exit;
 }
 

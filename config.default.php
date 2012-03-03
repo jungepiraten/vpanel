@@ -4,6 +4,7 @@ define("VPANEL_ROOT",			dirname(__FILE__));
 define("VPANEL_CORE",			VPANEL_ROOT . "/core");
 define("VPANEL_STORAGE",		VPANEL_CORE . "/storage");
 define("VPANEL_MITGLIEDERMATCHER",	VPANEL_CORE . "/mitgliedermatcher");
+define("VPANEL_DOKUMENTTEMPLATES",	VPANEL_CORE . "/dokumenttemplates");
 define("VPANEL_SENDMAILBACKEND",	VPANEL_CORE . "/sendmailbackend");
 define("VPANEL_PROCESSES",		VPANEL_CORE . "/processes");
 define("VPANEL_UI",			VPANEL_ROOT . "/ui");

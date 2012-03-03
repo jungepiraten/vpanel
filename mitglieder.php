@@ -6,6 +6,11 @@ require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
 $ui = $session->getTemplate();
 
+if (!$session->isSignedIn()) {
+	$ui->viewLogin();
+	exit;
+}
+
 require_once(VPANEL_CORE . "/mitglied.class.php");
 require_once(VPANEL_CORE . "/mitgliednotiz.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
@@ -271,9 +276,6 @@ case "create":
 	}
 
 	$template = null;
-	if (isset($data["mitgliedtemplateid"])) {
-		$template = $session->getStorage()->getMitgliedTemplate($data["mitgliedtemplateid"]);
-	}
 	if ($session->hasVariable("mitgliedtemplateid")) {
 		$template = $session->getStorage()->getMitgliedTemplate($session->getVariable("mitgliedtemplateid"));
 	}

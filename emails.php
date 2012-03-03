@@ -6,6 +6,11 @@ require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
 $ui = $session->getTemplate();
 
+if (!$session->isSignedIn()) {
+	$ui->viewLogin();
+	exit;
+}
+
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
 case "delbounce":
 	$session->getStorage()->delEMailBounce($session->getVariable("bounceid"));

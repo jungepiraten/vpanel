@@ -27,7 +27,7 @@ class Dokument extends StorageClass {
 		$dokument->setIdentifier($row["identifier"]);
 		$dokument->setLabel($row["label"]);
 		$dokument->setContent($row["content"]);
-		$dokument->setData(json_decode($row["data"]));
+		$dokument->setData(unserialize($row["data"]));
 		$dokument->setFileID($row["fileid"]);
 		return $dokument;
 	}
@@ -176,7 +176,7 @@ class Dokument extends StorageClass {
 			$this->getIdentifier(),
 			$this->getLabel(),
 			$this->getContent(),
-			json_encode($this->getData()),
+			serialize($this->getData()),
 			$this->getFileID() ));
 	}
 }

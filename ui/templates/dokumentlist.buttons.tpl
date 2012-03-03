@@ -17,7 +17,14 @@
    </select>
   </fieldset>
  </form>
- <a href="{"dokumente_create_gliederungkategoriestatus"|___:$gliederung.gliederungid:$dokumentkategorie.dokumentkategorieid:$dokumentstatus.dokumentstatusid}">{"Neu"|__}</a>
+ <form action="{"dokumente_create"|___}" method="post" class="filter">
+  <fieldset>
+   <select name="dokumenttemplateid">
+    {foreach from=$dokumenttemplates item=dokumenttemplate}<option value="{$dokumenttemplate.dokumenttemplateid|escape:html}">{$dokumenttemplate.label|escape:html}</option>{/foreach}
+   </select>
+   <input type="submit" value="{"Neu"|__}" />
+  </fieldset>
+ </form>
 </div>
 <div class="pages">
 {if $page > 1} <a href="{"dokumente_page"|___:$dokumentkategorie.dokumentkategorieid:$dokumentstatus.dokumentstatusid:'0'}" class="pagebutton">&lt;&lt;</a>{/if}

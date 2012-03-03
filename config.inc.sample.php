@@ -41,7 +41,6 @@ $config->registerPage("dokumente", "dokumente.php");
 $config->registerPage("dokumente_page", "dokumente.php?kategorieid=%d&statusid=%d&page=%d");
 $config->registerPage("dokumente_json", "json/dokumente.php");
 $config->registerPage("dokumente_create", "dokumente.php?mode=create");
-$config->registerPage("dokumente_create_gliederungkategoriestatus", "dokumente.php?mode=create&gliederungid=%s&kategorieid=%s&statusid=%s");
 $config->registerPage("dokumente_details", "dokumente.php?mode=details&dokumentid=%d");
 $config->registerPage("dokumente_mitglied", "mitglieddokument.php?mode=add&dokumentid=%d");
 $config->registerPage("dokumente_mitglied_create", "mitglieder.php?mode=create&dokumentid=%d");

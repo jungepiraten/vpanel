@@ -40,6 +40,13 @@ class File extends StorageClass {
 		return VPANEL_FILES . "/" . $this->getFilename();
 	}
 
+	public function getFileSize() {
+		if (file_exists($this->getAbsoluteFilename())) {
+			return filesize($this->getAbsoluteFilename());
+		}
+		return 0;
+	}
+
 	public function setExportFilename($exportfilename) {
 		$this->exportfilename = $exportfilename;
 	}

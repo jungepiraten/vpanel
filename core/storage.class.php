@@ -226,6 +226,10 @@ interface Storage {
 	public function getMitgliederFilterList($gliederungids);
 	public function hasMitgliederFilter($filterid);
 	public function getMitgliederFilter($filterid);
+
+	public function getDokumentTemplateList($gliederungids);
+	public function hasDokumentTemplate($templateid);
+	public function getDokumentTemplate($templateid);
 }
 
 abstract class AbstractStorage implements Storage {
@@ -419,6 +423,30 @@ abstract class AbstractStorage implements Storage {
 	}
 	public function registerMitgliederFilter($filter) {
 		$this->mitgliederfilters[$filter->getFilterID()] = $filter;
+	}
+
+	/** DokumentTemplates **/
+	private $dokumenttemplates = array();
+	public function getDokumentTemplateList($gliederungids) {
+		$templates = array();
+		foreach ($this->dokumenttemplates as $template) {
+			if ($template->getGliederungID() == null || in_array($template->getGliederungID(), $gliederungids)) {
+				$templates[] = $template;
+			}
+		}
+		return $templates;
+	}
+	public function hasDokumentTemplate($templateid) {
+		return isset($this->dokumenttemplates[$templateid]);
+	}
+	public function getDokumentTemplate($templateid) {
+		if (!$this->hasDokumentTemplate($templateid)) {
+			return null;
+		}
+		return $this->dokumenttemplates[$templateid];
+	}
+	public function registerDokumentTemplate($template) {
+		$this->dokumenttemplates[$template->getDokumentTemplateID()] = $template;
 	}
 }
 

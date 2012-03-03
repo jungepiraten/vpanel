@@ -94,7 +94,7 @@
      <tr id="beitrag">
          <th><label for="beitrag">{"Beitrag:"|__}</label></th>
          <td><input class="beitrag" type="text" name="beitrag" size="5" value="{if isset($mitgliedrevision)}{$mitgliedrevision.beitrag|string_format:"%.2f"|escape:html}
-                                                                               {elseif isset($data.beitrag)}{$data.beitrag|string_format:"%.2f"|escape:html}
+                                                                               {elseif $data.beitrag != null}{$data.beitrag|string_format:"%.2f"|escape:html}
                                                                                {elseif isset($mitgliedtemplate)}{$mitgliedtemplate.beitrag|string_format:"%.2f"|escape:html}{/if}" /> EUR</td>
      </tr>
      {foreach from=$flags item=flag}
