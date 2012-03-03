@@ -63,7 +63,7 @@ class APISession extends AbstractHTTPSession {
 	}
 
 	protected function hasSessionValue($key) {
-		return isset($this->data[$key]);
+		return isset($this->data[$key]) && $this->getSessionValue($key) != null;
 	}
 	protected function getSessionValue($key) {
 		return $this->data[$key];

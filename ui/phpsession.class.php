@@ -12,7 +12,7 @@ class PHPSession extends AbstractHTTPSession {
 	}
 
 	protected function hasSessionValue($key) {
-		return isset($_SESSION["vpanel"][$key]) && $_SESSION["vpanel"][$key] != null;
+		return isset($_SESSION["vpanel"][$key]) && $this->getSessionValue($key) != null;
 	}
 	protected function getSessionValue($key) {
 		return unserialize($_SESSION["vpanel"][$key]);
