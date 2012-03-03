@@ -551,6 +551,24 @@ class Template {
 		$this->smarty->display("index.html.tpl");
 	}
 
+	public function viewEinstellungen($success = false, $wrongpw = false, $pwsnotequal = false, $pwtooshort = false) {
+		$errors = array();
+		if ($success) {
+			$errors[] = $this->translate("Änderungen erfolgreich");
+		}
+		if ($wrongpw) {
+			$errors[] = $this->translate("Das Passwort ist falsch");
+		}
+		if ($pwsnotequal) {
+			$errors[] = $this->translate("Die Passwörter stimmen nicht überein");
+		}
+		if ($pwtooshort) {
+			$errors[] = $this->translate("Das gewählte Passwort ist zu kurz");
+		}
+		$this->smarty->assign("errors", $errors);
+		$this->smarty->display("einstellungen.html.tpl");
+	}
+
 	public function viewLogin($loginfailed = false) {
 		$errors = array();
 		if ($loginfailed) {

@@ -21,6 +21,9 @@
 <div class="navigation">
 <ul>
 <li><a href="{"index"|___}">{"Startseite"|__}</a></li>
+{if $session->isSignedIn()}
+<li><a href="{"einstellungen"|___}">{"Einstellungen"|__}</a></li>
+{/if}
 {if $session->isAllowed("users_show")}
 <li><a href="{"users"|___}">{"Benutzerverwaltung"|__}</a></li>
 {/if}
