@@ -1560,6 +1560,16 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		return reset($this->getResult($sql)->fetchRow());
 	}
+	public function getDokumentIdentifierMaxNumber($identifierPrefix, $identifierNumberCount) {
+		$identifierPrefixEscaped = str_replace(array("/", "%", "?", "_"), array("//", "/%", "/?", "/_"), $identifierPrefix);
+		$sql = "SELECT `identifier` FROM `dokument` WHERE `identifier` LIKE '" . $this->escape($identifierPrefixEscaped) . str_repeat("_", $identifierNumberCount) . "' ESCAPE '/' ORDER BY `identifier` LIMIT 1";
+		$rslt = $this->getResult($sql);
+		if ($rslt->getCount() == 0) {
+			return 0;
+		}
+		$row = $rslt->fetchRow();
+		return intval(substr($row["identifier"], strlen($identifierPrefix)));
+	}
 	public function getDokumentResult($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
 		if (empty($gliederungids)) {
 			return new EmptyStorageResult();
@@ -1902,18 +1912,19 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "MitgliederStatistik");
 	}
 	public function getMitgliederStatistikResult() {
-		$sql = "SELECT `statistikid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`, `gliederungchartfileid`, `statechartfileid`, `mitgliedschaftchartfileid` FROM `mitgliederstatistiken`";
+		$sql = "SELECT `statistikid`, `userid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`, `gliederungchartfileid`, `statechartfileid`, `mitgliedschaftchartfileid` FROM `mitgliederstatistiken`";
 		return $this->getResult($sql, array($this, "parseMitgliederStatistik"));
 	}
 	public function getMitgliederStatistik($statistikid) {
-		$sql = "SELECT `statistikid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`, `gliederungchartfileid`, `statechartfileid`, `mitgliedschaftchartfileid` FROM `mitgliederstatistiken` WHERE `statistikid` = " . intval($statistikid);
+		$sql = "SELECT `statistikid`, `userid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`, `gliederungchartfileid`, `statechartfileid`, `mitgliedschaftchartfileid` FROM `mitgliederstatistiken` WHERE `statistikid` = " . intval($statistikid);
 		return $this->getResult($sql, array($this, "parseMitgliederStatistik"))->fetchRow();
 	}
-	public function setMitgliederStatistik($statistikid, $timestamp, $agegraphfileid, $timegraphfileid, $timebalancegraphfileid, $gliederungchartfileid, $statechartfileid, $mitgliedschaftchartfileid) {
+	public function setMitgliederStatistik($statistikid, $userid, $timestamp, $agegraphfileid, $timegraphfileid, $timebalancegraphfileid, $gliederungchartfileid, $statechartfileid, $mitgliedschaftchartfileid) {
 		if ($statistikid == null) {
 			$sql = "INSERT INTO `mitgliederstatistiken`
-				(`timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`, `gliederungchartfileid`, `statechartfileid`, `mitgliedschaftchartfileid`) VALUES
-				('" . date("Y-m-d H:i:s", $timestamp) . "',
+				(`userid`, `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`, `gliederungchartfileid`, `statechartfileid`, `mitgliedschaftchartfileid`) VALUES
+				(" . intval($userid) . ",
+				 '" . date("Y-m-d H:i:s", $timestamp) . "',
 				 " . ($agegraphfileid == null ? "NULL" : intval($agegraphfileid)) . ",
 				 " . ($timegraphfileid == null ? "NULL" : intval($timegraphfileid)) . ",
 				 " . ($timebalancegraphfileid == null ? "NULL" : intval($timebalancegraphfileid)) . ",
@@ -1922,7 +1933,8 @@ abstract class SQLStorage extends AbstractStorage {
 				 " . ($mitgliedschaftchartfileid == null ? "NULL" : intval($mitgliedschaftchartfileid)) . ")";
 		} else {
 			$sql = "UPDATE	`mitgliederstatistiken`
-				SET	`timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "',
+				SET	`userid` = " . intval($userid) . ",
+					`timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "',
 					`agegraphfileid` = " . ($agegraphfileid == null ? "NULL" : intval($agegraphfileid)) . ",
 					`timegraphfileid` = " . ($timegraphfileid == null ? "NULL" : intval($timegraphfileid)) . ",
 					`timebalancegraphfileid` = " . ($timebalancegraphfileid == null ? "NULL" : intval($timebalancegraphfileid)) . ",

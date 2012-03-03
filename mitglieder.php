@@ -99,10 +99,15 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 		$mitglied->setBeitrag($mitgliedbeitrag);
 		$mitglied->save();
 	} else {
-		if (!$session->isAllowed("mitglieder_modify", $gliederung->getGliederungID())) {
+		if (!$session->isAllowed("mitglieder_modify", $mitglied->getLatestRevision()->getGliederungID())) {
 			$ui->viewLogin();
 			exit;
-		}	
+		}
+		if ($gliederung->getGliederungID() != $mitglied->getLatestRevision()->getGliederungID()
+		 && !$session->isAllowed("mitglieder_moveto", $gliederung->getGliederungID())) {
+			$ui->viewLogin();
+			exit;
+		}
 	}
 
 	$revision = new MitgliedRevision($session->getStorage());
@@ -139,7 +144,7 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 function parseAddMitgliederNotizFormular($session, $mitglied, &$notiz) {
 	$kommentar = $session->getVariable("kommentar");
 
-	if (!$session->isAllowed("mitglieder_modify", $mitglied->getLatestRevision()->getGliederungID())) {
+	if (!$session->isAllowed("mitglieder_beitrag", $mitglied->getLatestRevision()->getGliederungID())) {
 		$ui->viewLogin();
 		exit;
 	}
@@ -392,6 +397,7 @@ case "statistik.start":
 	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_show")), $matcher);
 
 	$statistik = new MitgliederStatistik($session->getStorage());
+	$statistik->setUser($session->getUser());
 	$statistik->setTimestamp(time());
 	$statistik->save();
 

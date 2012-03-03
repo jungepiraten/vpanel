@@ -4,6 +4,7 @@ require_once(VPANEL_CORE . "/storageobject.class.php");
 
 class MitgliederStatistik extends StorageClass {
 	private $statistikid;
+	private $userid;
 	private $timestamp;
 	private $agegraphfileid;
 	private $timegraphfileid;
@@ -12,6 +13,7 @@ class MitgliederStatistik extends StorageClass {
 	private $statechartfileid;
 	private $mitgliedschaftchartfileid;
 
+	private $user;
 	private $agegraphfile;
 	private $timegraphfile;
 	private $timebalancegraphfile;
@@ -22,6 +24,7 @@ class MitgliederStatistik extends StorageClass {
 	public static function factory(Storage $storage, $row) {
 		$statistik = new MitgliederStatistik($storage);
 		$statistik->setStatistikID($row["statistikid"]);
+		$statistik->setUserID($row["userid"]);
 		$statistik->setTimestamp($row["timestamp"]);
 		$statistik->setAgeGraphFileID($row["agegraphfileid"]);
 		$statistik->setTimeGraphFileID($row["timegraphfileid"]);
@@ -38,6 +41,29 @@ class MitgliederStatistik extends StorageClass {
 
 	public function getStatistikID() {
 		return $this->statistikid;
+	}
+
+	public function setUserID($userid) {
+		if ($this->userid != $userid) {
+			$this->user = null;
+		}
+		$this->userid = $userid;
+	}
+
+	public function getUserID() {
+		return $this->userid;
+	}
+
+	public function setUser($user) {
+		$this->setUserID($user->getUserID());
+		$this->user = $user;
+	}
+
+	public function getUser() {
+		if ($this->user == null) {
+			$this->user = $this->getStorage()->getUser($this->getUserID());
+		}
+		return $this->user;
 	}
 
 	public function setTimestamp($timestamp) {
@@ -212,6 +238,7 @@ class MitgliederStatistik extends StorageClass {
 		}
 		$this->setStatistikID($storage->setMitgliederStatistik(
 			$this->getStatistikID(),
+			$this->getUserID(),
 			$this->getTimestamp(),
 			$this->getAgeGraphFileID(),
 			$this->getTimeGraphFileID(),

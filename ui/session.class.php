@@ -61,7 +61,7 @@ abstract class AbstractSession implements Session {
 	}
 
 	public function isSignedIn() {
-		return $this->user != null;
+		return $this->getUser() != null;
 	}
 	private function buildGliederungChildList($gliederung, &$gliederungChilds) {
 		$gliederungid = $gliederung->getGliederungID();
@@ -146,11 +146,7 @@ abstract class AbstractSession implements Session {
 		if ($gliederungid == null) {
 			return count($this->getAllowedGliederungIDs($permission)) > 0;
 		} else {
-			if (! $this->hasSessionValue("permissions") ) {
-				return false;
-			}
-			$permissions = $this->getSessionValue("permissions");			
-			return isset($permissions[$permission][$gliederungid]);
+			return in_array($gliederungid, $this->getAllowedGliederungIDs($permission));
 		}
 	}
 

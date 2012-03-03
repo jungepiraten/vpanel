@@ -174,6 +174,7 @@ interface Storage {
 	public function getDokumentList($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
 	public function getDokumentByMitgliedResult($mitgliedid);
 	public function getDokumentByMitgliedList($mitgliedid);
+	public function getDokumentIdentifierMaxNumber($identifierPrefix, $identifierNumberLength);
 	public function getDokumentSearchResult($gliederungids, $query, $limit = null, $offset = null);
 	public function getDokumentSearchList($gliederungids, $query, $limit = null, $offset = null);
 	public function getDokumentCount($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null);
@@ -218,7 +219,7 @@ interface Storage {
 	public function getMitgliederStatistikResult();
 	public function getMitgliederStatistikList();
 	public function getMitgliederStatistik($tempfileid);
-	public function setMitgliederStatistik($statistikid, $timestamp, $agegraphfileid, $timegraphfileid, $timebalancegraphfileid, $gliederungchartfileid, $statechartfileid, $mitgliedschaftchartfileid);
+	public function setMitgliederStatistik($statistikid, $userid, $timestamp, $agegraphfileid, $timegraphfileid, $timebalancegraphfileid, $gliederungchartfileid, $statechartfileid, $mitgliedschaftchartfileid);
 	public function delMitgliederStatistik($statistikid);
 
 	public function getMitgliedTemplateResult($gliederungids = null);
