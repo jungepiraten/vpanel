@@ -174,7 +174,7 @@ abstract class AbstractSession implements Session {
 	}
 	public function getMitgliederFilter($filterid) {
 		if ($this->hasSessionValue("mitgliederfilter_" . $filterid)) {
-			return $this->setSessionValue("mitgliederfilter_" . $filterid);
+			return $this->getSessionValue("mitgliederfilter_" . $filterid);
 		}
 		return $this->getStorage()->getMitgliederFilter($filterid);
 	}
