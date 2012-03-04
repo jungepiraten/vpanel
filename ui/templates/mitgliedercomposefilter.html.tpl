@@ -3,26 +3,29 @@
 
 {literal}
 <style type="text/css">
-.filterchooser
-	{position:absolute; z-index:7; width:200px; margin:auto; overflow:auto; background-color: white; border:2px solid black; border-radius:20px; padding:10px;}
-.hidebackground
-	{position:absolute; top:0px; left:0px; width:100%; height:100%; background-color:black; opacity:0.8;}
 .filteroptions>.delimg
 	{float:right;}
 
-.filter, .filter_wildcard
-	{border:2px solid black; margin:3px; padding:2px;}
-.filter_wildcard
+.filter, .filter_wildcard, .filter_chooser
+	{border:2px solid black; margin:0.5em; padding:0.5em;}
+.filter_chooser
 	{border-style:dashed;}
+.filter_chooser>ul
+	{list-style:none; margin:0; padding:0;}
 </style>
 {/literal}
 
+<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
+<script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
 <script type="text/javascript">
 
 var presetFilters = new Array();
 {foreach from=$filters item=filter}
 presetFilters[{$filter.filterid}] = "{$filter.label}";
 {/foreach}
+
+var umkreisMaps = new Array();
+var umkreisMapsLayer = new Array();
 
 {literal}
 function generateID() {
@@ -36,12 +39,47 @@ function generateID() {
 	return randomstring;
 }
 
-function generateFilterWildcard(id, parentID) {
-	return $("<div>").addClass("filter filter_wildcard").append($("<a>").prop("href", "javascript:showFilterChooser('"+id+"', '"+parentID+"');").append("Filter einfügen"));
+function checkUmkreisMap(id, content) {
+	if ($("#map_"+id).size() <= 0) {
+		content.append($("<div>").prop("id","map_"+id).css("width","600px").css("height","250px"));
+		umkreisMaps[id] = new L.Map("map_"+id);
+		var osm = new L.TileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{minZoom: 4, maxZoom:18, attribution: "Map data © openstreetmap contributors"});
+		umkreisMaps[id].setView(new L.LatLng(50.111667, 8.685833),6);
+		umkreisMaps[id].addLayer(osm);
+		umkreisMapsLayer[id] = new L.LayerGroup();
+		umkreisMaps[id].addLayer(umkreisMapsLayer[id]);
+		umkreisMaps[id].on("click", function(e) {
+			$('input[name="filter['+id+'][lat]"]').val(e.latlng.lat);
+			$('input[name="filter['+id+'][lng]"]').val(e.latlng.lng);
+			updateUmkreisMap(id);
+		});
+	}
+}
+
+function updateUmkreisMap(id) {
+	var lat = $('input[name="filter['+id+'][lat]"]').val();
+	var lng = $('input[name="filter['+id+'][lng]"]').val();
+	var radius = $('input[name="filter['+id+'][radius]"]').val();
+
+	var latlng = new L.LatLng(lat,lng);
+	umkreisMaps[id].panTo(latlng);
+	umkreisMapsLayer[id].clearLayers();
+	umkreisMapsLayer[id].addLayer(new L.Circle(latlng, radius * 1000, {color:'red',fillColor:'#f03',fillOpacity:0.5}));
+}
+
+function generateFilterChooser(id, parentID) {
+	return $("<div>").addClass("filter_chooser").append($("<ul>").append(
+		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'and')").append("AND")),
+		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'or')").append("OR")),
+		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'not')").append("NOT")),
+		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'preset')").append("Vordefiniert")),
+		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'search')").append("Suchen nach")),
+		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'umkreis')").append("Umkreissuche"))
+	));
 }
 
 function generateFilterBorder(id, parentID) {
-	return $("<div>").prop("id", "filter_" + id).append(generateFilterWildcard(id, parentID));
+	return $("<div>").prop("id", "filter_" + id).append(generateFilterChooser(id, parentID));
 }
 
 function generateFilter(id, parentID, type) {
@@ -68,13 +106,28 @@ function generateFilter(id, parentID, type) {
 	case "preset":
 		var dropdown = $("<select>").prop("name","filter["+id+"][filterid]");
 		presetFilters.forEach(function(value, index, filters) {
-				dropdown.append($("<option>").prop("value",index).append(value));
-			});
+			dropdown.append($("<option>").prop("value",index).append(value));
+		});
 		content.append(dropdown);
 		break;
 	case "search":
 		content.append("Suchen nach");
 		content.append($("<input>").prop("type","text").prop("name","filter["+id+"][query]"));
+		break;
+	case "umkreis":
+		content.append("Umkreissuche");
+		var input_lat = $("<input>").prop("type","text").prop("name","filter["+id+"][lat]").prop("size","8");
+		input_lat.focus(function() {checkUmkreisMap(id, content);}).blur(function() {checkUmkreisMap(id,content);}).keyup(function() {updateUmkreisMap(id);});
+		content.append(input_lat);
+
+		var input_lng = $("<input>").prop("type","text").prop("name","filter["+id+"][lng]").prop("size","8");
+		input_lng.focus(function() {checkUmkreisMap(id, content);}).blur(function() {checkUmkreisMap(id,content);}).keyup(function() {updateUmkreisMap(id);});
+		content.append(input_lng);
+
+		var input_radius = $("<input>").prop("type","text").prop("name","filter["+id+"][radius]").prop("size","4").val("25");
+		input_radius.focus(function() {checkUmkreisMap(id, content);}).blur(function() {checkUmkreisMap(id,content);}).keyup(function() {updateUmkreisMap(id);});
+		content.append(input_radius);
+		content.append("km");
 		break;
 	}
 
@@ -82,31 +135,17 @@ function generateFilter(id, parentID, type) {
 	return $("<div>").addClass("filter filter_" + type).append(filteroptions).append(content);
 }
 
-var hidebackground, filterchooser;
-
 function showFilterChooser(id, parentID) {
-	hidebackground = $("<div>").addClass("hidebackground");
-	filterchooser = $("<div>").addClass("filterchooser").append($("<ul>").append(
-				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'and')").append("AND")),
-				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'or')").append("OR")),
-				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'not')").append("NOT")),
-				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'preset')").append("Vordefiniert")),
-				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'search')").append("Suchen nach"))
-			));
-	$("body").append(hidebackground);
-	$("body").append(filterchooser.fadeIn(700));
+	setFilterPane(id, generateFilterChooser(id, parentID));
 }
 
-function hideFilterChooser() {
-	filterchooser.remove();
-	hidebackground.remove();
+function setFilterPane(id, pane) {
+	$("#filter_" + id).empty().append(pane);
 }
 
 function setFilter(id, parentID, type) {
-	hideFilterChooser();
-
 	var filter = $("#filter_" + id);
-	$("#filter_" + id).empty().append(generateFilter(id, parentID, type));
+	setFilterPane(id, generateFilter(id, parentID, type));
 	if (filter.parent().hasClass("combined")) {
 		filter.parent().append(generateFilterBorder(generateID(), parentID));
 	}
@@ -117,7 +156,7 @@ function unsetFilter(id, parentID) {
 	if (filter.parent().hasClass("combined")) {
 		filter.remove();
 	} else {
-		filter.empty().append(generateFilterWildcard(id, parentID));
+		filter.empty().append(generateFilterChooser(id, parentID));
 	}
 }
 

@@ -25,6 +25,7 @@ require_once(VPANEL_PROCESSES . "/mitgliederfilterbeitrag.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/logic.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/gliederung.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/search.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/ort.class.php");
 
 $predefinedfields = array(
 	array("label" => "Bezeichnung",		"template" => "{BEZEICHNUNG}"),
@@ -466,6 +467,11 @@ case "composefilter":
 				return null;
 			}
 			return new SearchMitgliederMatcher($filter[$id]["query"]);
+		case "umkreis":
+			if (!is_numeric($filter[$id]["lat"]) || !is_numeric($filter[$id]["lng"]) || !is_numeric($filter[$id]["radius"])) {
+				return null;
+			}
+			return new OrtDistanceMitgliederMatcher($filter[$id]["lat"], $filter[$id]["lng"], $filter[$id]["radius"]);
 		default:
 			return null;
 		}
