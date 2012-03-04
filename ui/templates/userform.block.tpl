@@ -8,7 +8,11 @@
     <tr>
         <td><label for="password">{"Passwort:"|__}</label></td>
         <td><input class="password" type="password" name="password" /></td>
+    </tr>
     <tr>
+        <td><label for="password">{"APIKey:"|__}</label></td>
+        <td><input type="radio" name="apikey" value="generate" /> {"Generieren"|__} <input type="radio" name="apikey" value="remove" /> {"Entfernen"|__}<br />{$user.apikey}</td>
+    </tr>
     <tr>
         <td><label for="defaultdokumentkategorieid">{"Standard-Dokumentenkategorie:"|__}</label></td>
         <td>{if isset($user)}
@@ -25,7 +29,7 @@
          {include file=dokumentstatusdropdown.block.tpl fieldname=defaultdokumentstatusid defaulttext="(Übersicht)"}
          {/if}</td>
     </tr>
-    </tr>
+    <tr>
         <td colspan="2"><input class="submit" type="submit" name="save" value="{"Speichern"|__}" /></td>
     </tr>
  </table>

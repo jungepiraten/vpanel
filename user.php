@@ -19,6 +19,8 @@ function parseUserFormular($session, &$user = null) {
 	$password = $session->getVariable("password");
 	$defaultdokumentkategorieid = $session->getVariable("defaultdokumentkategorieid");
 	$defaultdokumentstatusid = $session->getVariable("defaultdokumentstatusid");
+	$generateapikey = $session->hasVariable("apikey") && $session->getVariable("apikey") == "generate";
+	$removeapikey = $session->hasVariable("apikey") && $session->getVariable("apikey") == "remove";
 
 	if ($user == null) {
 		$user = new User($session->getStorage());
@@ -27,6 +29,12 @@ function parseUserFormular($session, &$user = null) {
 	$user->setUsername($username);
 	if (!empty($password)) {
 		$user->changePassword($password);
+	}
+	if ($generateapikey) {
+		$user->generateAPIKey();
+	}
+	if ($removeapikey) {
+		$user->unsetAPIKey();
 	}
 	$user->setDefaultDokumentKategorieID($defaultdokumentkategorieid);
 	$user->setDefaultDokumentStatusID($defaultdokumentstatusid);

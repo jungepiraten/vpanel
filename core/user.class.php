@@ -82,11 +82,16 @@ class User extends StorageClass {
 		return $this->apikey;
 	}
 
-	public function setAPIKey($apikey = null) {
-		if ($apikey == null) {
-			$apikey = $this->generateSalt(16,16);
-		}
+	public function setAPIKey($apikey) {
 		$this->apikey = $apikey;
+	}
+
+	public function generateAPIKey() {
+		$this->setAPIKey($this->generateSalt(16,16));
+	}
+
+	public function unsetAPIKey() {
+		$this->setAPIKey(null);
 	}
 
 	public function getRoles() {

@@ -58,6 +58,7 @@ class Template {
 		$row = array();
 		$row["userid"] = $user->getUserID();
 		$row["username"] = $user->getUsername();
+		$row["apikey"] = $user->getAPIKey();
 		$row["defaultdokumentkategorieid"] = $user->getDefaultDokumentKategorieID();
 		$row["defaultdokumentstatusid"] = $user->getDefaultDokumentStatusID();
 		return $row;
