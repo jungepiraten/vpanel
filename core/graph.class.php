@@ -287,7 +287,7 @@ class Graph_DefaultAxis {
 		if ($stepSize == 0) {
 			$stepSize = $this->getPrecision();
 		}
-		return $this->getPosition($this->ceilValue($this->getMinimum()) + $i * $stepSize);
+		return $this->getPosition(ceil($this->getMinimum() / $this->getPrecision()) * $this->getPrecision() + $i * $stepSize);
 	}
 
 	public function getPosition($val) {
