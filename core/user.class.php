@@ -6,6 +6,7 @@ class User extends StorageClass {
 	private $userid;
 	private $username;
 	private $password;
+	private $passwordsalt;
 	private $apikey;
 
 	private $roles;
