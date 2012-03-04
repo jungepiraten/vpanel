@@ -1862,7 +1862,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $fileid;
 	}
 	public function delFile($fileid) {
-		$sql = "DELETE `files` WHERE `fileid` = " . intval($fileid);
+		$sql = "DELETE FROM `files` WHERE `fileid` = " . intval($fileid);
 		return $this->query($sql);
 	}
 
@@ -1901,7 +1901,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $tempfileid;
 	}
 	public function delTempFile($tempfileid) {
-		$sql = "DELETE `tempfiles` WHERE `tempfileid` = " . intval($tempfileid);
+		$sql = "DELETE FROM `tempfiles` WHERE `tempfileid` = " . intval($tempfileid);
 		return $this->query($sql);
 	}
 
@@ -1950,7 +1950,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $statistikid;
 	}
 	public function delMitgliederStatistik($statistikid) {
-		$sql = "DELETE `mitgliederstatistiken` WHERE `statistikid` = " . intval($statistikid);
+		$sql = "DELETE FROM `mitgliederstatistiken` WHERE `statistikid` = " . intval($statistikid);
 		return $this->query($sql);
 	}
 }

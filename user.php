@@ -103,8 +103,8 @@ case "delete":
 		$ui->viewLogin();
 		exit;
 	}
-	$userid = $session->getIntVariable("userid");
-	$session->getStorage()->delUser($userid);
+	$user = $session->getStorage()->getUser($session->getIntVariable("userid"));
+	$user->delete();
 	$ui->redirect();
 	exit;
 default:

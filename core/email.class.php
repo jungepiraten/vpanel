@@ -46,6 +46,17 @@ class EMail extends StorageClass {
 			$this->getEMailID(),
 			$this->getEMail() ));
 	}
+
+	public function delete(Storage $storage = null) {
+		if ($storage == null) {
+			$storage = $this->getStorage();
+		}
+		$bounces = $storage->getEMailBounceListByEMail($this->getEMailID());
+		foreach ($bounces as $bounce) {
+			$bounce->delete($storage);
+		}
+		$storage->delEMail($this->getEMailID());
+	}
 }
 
 ?>

@@ -96,6 +96,14 @@ class TempFile extends StorageClass {
 			$this->getTimestamp(),
 			$this->getFileID()));
 	}
+
+	public function delete(Storage $storage = null) {
+		if ($storage == null) {
+			$storage = $this->getStorage();
+		}
+		$this->getFile()->delete($storage);
+		$storage->delTempFile($this->getTempFileID());
+	}
 }
 
 ?>

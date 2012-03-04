@@ -76,6 +76,13 @@ class EMailBounce extends StorageClass {
 			$this->getTimestamp(),
 			$this->getMessage() ));
 	}
+
+	public function delete(Storage $storage = null) {
+		if ($storage == null) {
+			$storage = $this->getStorage();
+		}
+		$storage->delEMailBounce($this->getBounceID());
+	}
 }
 
 ?>

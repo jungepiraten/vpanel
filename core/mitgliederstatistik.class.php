@@ -247,6 +247,31 @@ class MitgliederStatistik extends StorageClass {
 			$this->getStateChartFileID(),
 			$this->getMitgliedschaftChartFileID() ));
 	}
+
+	public function delete(Storage $storage = null) {
+		if ($storage == null) {
+			$storage = $this->getStorage();
+		}
+		if ($this->getAgeGraphFile() != null) {
+			$this->getAgeGraphFile()->delete($storage);
+		}
+		if ($this->getTimeGraphFile() != null) {
+			$this->getTimeGraphFile()->delete($storage);
+		}
+		if ($this->getTimeBalanceGraphFile() != null) {
+			$this->getTimeBalanceGraphFile()->delete($storage);
+		}
+		if ($this->getGliederungChartFile() != null) {
+			$this->getGliederungChartFile()->delete($storage);
+		}
+		if ($this->getStateChartFile() != null) {
+			$this->getStateChartFile()->delete($storage);
+		}
+		if ($this->getMitgliedschaftChartFile() != null) {
+			$this->getMitgliedschaftChartFile()->delete($storage);
+		}
+		$storage->delMitgliederStatistik($this->getStatistikID());
+	}
 }
 
 ?>

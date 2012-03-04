@@ -93,8 +93,8 @@ case "delete":
 		$ui->viewLogin();
 		exit;
 	}
-	$roleid = $session->getIntVariable("roleid");
-	$session->getStorage()->delRole($roleid);
+	$role = $session->getStorage()->getRole($session->getIntVariable("roleid"));
+	$role->delete();
 	$ui->redirect($session->getLink("roles"));
 	exit;
 default:

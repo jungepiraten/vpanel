@@ -155,6 +155,16 @@ class User extends StorageClass {
 			$this->getUserID(),
 			$this->getRoleIDs() );
 	}
+
+	public function delete(Storage $storage = null) {
+		if ($storage === null) {
+			$storage = $this->getStorage();
+		}
+		$storage->setUserRoleList(
+			$this->getUserID(),
+			array());
+		$storage->delUser($this->getUserID());
+	}
 }
 
 ?>

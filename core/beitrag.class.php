@@ -48,6 +48,14 @@ class Beitrag extends StorageClass {
 			$this->getLabel(),
 			$this->getHoehe() ));
 	}
+
+	public function delete(Storage $storage = null) {
+		if ($storage == null) {
+			$storage = $this->getStorage();
+		}
+		$storage->delMitgliederBeitragByBeitrag($this->getBeitragID());
+		$storage->delBeitrag($this->getBeitragID());
+	}
 }
 
 ?>

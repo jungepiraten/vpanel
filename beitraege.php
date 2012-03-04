@@ -68,9 +68,8 @@ case "delete":
 		$ui->viewLogin();
 		exit;
 	}
-	$beitragid = $session->getIntVariable("beitragid");
-	$session->getStorage()->delMitgliederBeitragByBeitrag($beitragid);
-	$session->getStorage()->delBeitrag($beitragid);
+	$beitrag = $session->getStorage()->getBeitrag($session->getIntVariable("beitragid"));
+	$beitrag->delete();
 	$ui->redirect($session->getLink("beitraege"));
 	exit;
 default:

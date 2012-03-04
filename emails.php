@@ -13,7 +13,8 @@ if (!$session->isSignedIn()) {
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
 case "delbounce":
-	$session->getStorage()->delEMailBounce($session->getVariable("bounceid"));
+	$bounce = $session->getStorage()->getEMailBounce($session->getVariable("bounceid"));
+	$bounce->delete();
 	$ui->redirect();
 
 	break;

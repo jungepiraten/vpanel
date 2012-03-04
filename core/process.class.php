@@ -103,6 +103,13 @@ abstract class Process extends StorageClass {
 			$this->getFinishedPage() ));
 	}
 
+	public function delete(Storage $storage = null) {
+		if ($storage == null) {
+			$storage = $this->getStorage();
+		}
+		$storage->delProcess($this->getProcessID());
+	}
+
 	public function run() {
 		$this->setStarted(time());
 		$this->save();

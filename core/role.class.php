@@ -85,6 +85,14 @@ class Role extends StorageClass {
 
 		$storage->setRolePermissionList($this->getRoleID(), $this->getPermissions());
 	}
+
+	public function delete(Storage $storage = null) {
+		if ($storage === null) {
+			$storage = $this->getStorage();
+		}
+		$storage->setRolePermissionList($this->getRoleID(), array());
+		$storage->delRole($this->getRoleID());
+	}
 }
 
 ?>

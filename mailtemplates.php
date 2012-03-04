@@ -111,9 +111,8 @@ case "delete":
 		$ui->viewLogin();
 		exit;
 	}
-	$templateid = $session->getIntVariable("templateid");
-	$session->getStorage()->delMailTemplate($templateid);
-
+	$template = $session->getStorage()->getMailTemplate($session->getIntVariable("templateid"));
+	$template->delete();
 	$ui->redirect($session->getLink("mailtemplates"));
 	exit;
 default:
