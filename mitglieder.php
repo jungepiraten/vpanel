@@ -465,8 +465,11 @@ case "composefilter":
 	}
 
 	if ($session->hasVariable("generate")) {
-		$filter = $session->addMitgliederMatcher(buildComposedMatcher($session, $session->getListVariable("filter"), "matcher"));
-		$ui->redirect($session->getLink("mitglieder_page", $filter->getFilterID(), 0));
+		$matcher = buildComposedMatcher($session, $session->getListVariable("filter"), "matcher");
+		if ($matcher != null) {
+			$filter = $session->addMitgliederMatcher($matcher);
+			$ui->redirect($session->getLink("mitglieder_page", $filter->getFilterID(), 0));
+		}
 	}
 
 	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));
