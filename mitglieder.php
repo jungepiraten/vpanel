@@ -41,7 +41,7 @@ $predefinedfields = array(
 	array("label" => "Mitgliedschaft",	"template" => "{MITGLIEDSCHAFT}")
 	);
 
-function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) {
+function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = null) {
 	global $config;
 
 	$persontyp = $session->getVariable("persontyp");
@@ -141,7 +141,7 @@ function parseMitgliederFormular($session, &$mitglied = null, $dokument = null) 
 	}
 }
 
-function parseAddMitgliederNotizFormular($session, $mitglied, &$notiz) {
+function parseAddMitgliederNotizFormular($ui, $session, $mitglied, &$notiz) {
 	$kommentar = $session->getVariable("kommentar");
 
 	if (!$session->isAllowed("mitglieder_beitrag", $mitglied->getLatestRevision()->getGliederungID())) {
@@ -159,7 +159,7 @@ function parseAddMitgliederNotizFormular($session, $mitglied, &$notiz) {
 	$notiz->save();
 }
 
-function parseMitgliederBeitraegeFormular($session, &$mitglied) {
+function parseMitgliederBeitraegeFormular($ui, $session, &$mitglied) {
 	$beitraege_hoehe = $session->getListVariable("beitraege_hoehe");
 	$beitraege_bezahlt = $session->getListVariable("beitraege_bezahlt");
 	$beitraege_neu_beitragid = $session->getVariable("beitrag_neu_beitragid");
@@ -212,7 +212,7 @@ case "beitraege":
 	}
 
 	if ($session->getBoolVariable("save")) {
-		parseMitgliederBeitraegeFormular($session, $mitglied);
+		parseMitgliederBeitraegeFormular($ui, $session, $mitglied);
 		$ui->redirect();
 	}
 
@@ -250,7 +250,7 @@ case "details":
 	$revisions = $mitglied->getRevisionList();
 
 	if ($session->getBoolVariable("save")) {
-		parseMitgliederFormular($session, $mitglied);
+		parseMitgliederFormular($ui, $session, $mitglied);
 
 		$ui->redirect($session->getLink("mitglieder_details", $mitglied->getMitgliedID()));
 	}
@@ -286,7 +286,7 @@ case "create":
 	}
 
 	if ($session->getBoolVariable("save")) {
-		parseMitgliederFormular($session, &$mitglied, $dokument);
+		parseMitgliederFormular($ui, $session, &$mitglied, $dokument);
 
 		if ($dokument != null) {
 			$ui->redirect($session->getLink("dokumente_details", $dokument->getDokumentID()));

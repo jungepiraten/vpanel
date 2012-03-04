@@ -6,11 +6,6 @@ require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
 $ui = $session->getTemplate();
 
-if (!$session->isAllowed("mitglieder_modify") || !$session->isAllowed("dokumente_modify")) {
-	$ui->viewLogin();
-	exit;
-}
-
 $mitglied = null;
 if ($session->hasVariable("mitgliedid")) {
 	$mitglied = $session->getStorage()->getMitglied($session->getVariable("mitgliedid"));
@@ -19,6 +14,16 @@ if ($session->hasVariable("mitgliedid")) {
 $dokument = null;
 if ($session->hasVariable("dokumentid")) {
 	$dokument = $session->getStorage()->getDokument($session->getVariable("dokumentid"));
+}
+
+if (isset($mitglied) && !$session->isAllowed("mitglieder_modify", $mitglied->getLatestRevision()->getGliederungID())) {
+	$ui->viewLogin();
+	exit;
+}
+
+if (isset($dokument) && !$session->isAllowed("dokumente_modify", $mitglied->getLatestRevision()->getGliederungID())) {
+	$ui->viewLogin();
+	exit;
 }
 
 if ($mitglied != null && $dokument != null) {

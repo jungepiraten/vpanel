@@ -13,7 +13,7 @@ if (!$session->isSignedIn()) {
 
 require_once(VPANEL_CORE . "/dokument.class.php");
 
-function parseDokumentFormular($session, &$dokument = null) {
+function parseDokumentFormular($ui, $session, &$dokument = null) {
 	$kategorieid = $session->getIntVariable("kategorieid");
 	$statusid = $session->getIntVariable("statusid");
 	$label = $session->getVariable("label");
@@ -106,7 +106,7 @@ case "details":
 	}
 
 	if ($session->getBoolVariable("save")) {
-		parseDokumentFormular($session, $dokument);
+		parseDokumentFormular($ui, $session, $dokument);
 		
 		$ui->redirect($session->getLink("dokumente_details", $dokument->getDokumentID()));
 	}
