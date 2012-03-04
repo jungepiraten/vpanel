@@ -465,7 +465,7 @@ case "composefilter":
 			if (empty($filter[$id]["query"])) {
 				return null;
 			}
-			return new SearchMitgliederFilter($filter[$id]["query"]);
+			return new SearchMitgliederMatcher($filter[$id]["query"]);
 		default:
 			return null;
 		}
