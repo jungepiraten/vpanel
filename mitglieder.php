@@ -461,6 +461,13 @@ case "composefilter":
 				return null;
 			}
 			return $session->getMitgliederMatcher($filter[$id]["filterid"]);
+		case "search":
+			if (empty($filter[$id]["query"])) {
+				return null;
+			}
+			return new SearchMitgliederFilter($filter[$id]["query"]);
+		default:
+			return null;
 		}
 	}
 

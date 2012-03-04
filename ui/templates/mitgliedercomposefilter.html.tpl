@@ -72,6 +72,10 @@ function generateFilter(id, parentID, type) {
 			});
 		content.append(dropdown);
 		break;
+	case "search":
+		content.append("Suchen nach");
+		content.append($("<input>").prop("type","text").prop("name","filter["+id+"][query]"));
+		break;
 	}
 
 	var filteroptions = $("<div>").addClass("filteroptions").append( $("<a>").prop("href", "javascript:unsetFilter('"+id+"', '"+parentID+"')").addClass("delimg").append("&nbsp;") );
@@ -87,6 +91,7 @@ function showFilterChooser(id, parentID) {
 				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'or')").append("OR")),
 				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'not')").append("NOT")),
 				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'preset')").append("Vordefiniert"))
+				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'search')").append("Suchen nach"))
 			));
 	$("body").append(hidebackground);
 	$("body").append(filterchooser.fadeIn(700));
