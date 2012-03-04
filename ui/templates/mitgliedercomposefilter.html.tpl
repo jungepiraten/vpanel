@@ -90,7 +90,7 @@ function showFilterChooser(id, parentID) {
 				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'and')").append("AND")),
 				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'or')").append("OR")),
 				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'not')").append("NOT")),
-				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'preset')").append("Vordefiniert"))
+				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'preset')").append("Vordefiniert")),
 				$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'search')").append("Suchen nach"))
 			));
 	$("body").append(hidebackground);
