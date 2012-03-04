@@ -8,6 +8,7 @@
    </select>
   </fieldset>
  </form>
+ <a href="{"mitglieder_composefilter"|___}">{"Neuen Filter erstellen ..."|__}</a>
  {include file="mitgliederfilter.options.tpl" filterid=$filter.filterid}
  <form action="{"mitglieder_create"|___}" method="post" class="filter">
   <fieldset>

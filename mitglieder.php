@@ -426,6 +426,52 @@ case "setbeitrag.start":
 	$process->save();
 	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
 	exit;
+case "composefilter":
+	function buildComposedMatcher($session, $filter, $id) {
+		if (!isset($filter[$id])) {
+			return null;
+		}
+		if (isset($filter[$id]["childs"])) {
+			$childs = array();
+			foreach ($filter[$id]["childs"] as $childID) {
+				$child = buildComposedMatcher($session, $filter, $childID);
+				if ($child != null) {
+					$childs[] = $child;
+				}
+			}
+		}
+		switch ($filter[$id]["type"]) {
+		case "and":
+			if (!isset($childs) || count($childs) == 0) {
+				return null;
+			}
+			return new AndMitgliederMatcher($childs);
+		case "or":
+			if (!isset($childs) || count($childs) == 0) {
+				return null;
+			}
+			return new OrMitgliederMatcher($childs);
+		case "not":
+			if (!isset($childs) || count($childs) != 1) {
+				return null;
+			}
+			return new NotMitgliederMatcher(array_shift($childs));
+		case "preset":
+			if (!isset($filter[$id]["filterid"]) || !$session->hasMitgliederMatcher($filter[$id]["filterid"])) {
+				return null;
+			}
+			return $session->getMitgliederMatcher($filter[$id]["filterid"]);
+		}
+	}
+
+	if ($session->hasVariable("generate")) {
+		$filter = $session->addMitgliederMatcher(buildComposedMatcher($session, $session->getListVariable("filter"), "matcher"));
+		$ui->redirect($session->getLink("mitglieder_page", $filter->getFilterID(), 0));
+	}
+
+	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));
+	$ui->viewMitgliederComposeFilter($filters);
+	exit;
 default:
 	$filter = null;
 

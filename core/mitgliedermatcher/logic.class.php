@@ -17,8 +17,12 @@ class FalseMitgliederMatcher extends MitgliederMatcher {
 abstract class LinkedLogicMitgliederMatcher extends MitgliederMatcher {
 	protected $filters;
 
-	public function __construct() {
-		$this->filters = func_get_args();
+	public function __construct($filters) {
+		if (is_array($filters)) {
+			$this->filters = $filters;
+		} else {
+			$this->filters = func_get_args();
+		}
 	}
 
 	public function getConditions() {

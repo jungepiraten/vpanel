@@ -22,6 +22,7 @@ interface Session {
 
 	public function addMitgliederMatcher($matcher);
 	public function getMitgliederFilter($filterid);
+	public function hasMitgliederMatcher($filterid);
 	public function getMitgliederMatcher($filterid);
 
 	public function hasVariable($name);
@@ -177,6 +178,9 @@ abstract class AbstractSession implements Session {
 			return $this->getSessionValue("mitgliederfilter_" . $filterid);
 		}
 		return $this->getStorage()->getMitgliederFilter($filterid);
+	}
+	public function hasMitgliederMatcher($filterid) {
+		return $this->getMitgliederFilter($filterid) != null;
 	}
 	public function getMitgliederMatcher($filterid) {
 		$filter = $this->getMitgliederFilter($filterid);

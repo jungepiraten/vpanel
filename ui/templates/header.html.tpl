@@ -2,7 +2,7 @@
 <head>
 <link rel="stylesheet" type="text/css" href="ui/style.css" />
 <meta http-equiv="Content-Type" content="text/html; charset={$charset}" />
-<script type="text/javascript" src="ui/jquery-1.4.4.js"></script>
+<script type="text/javascript" src="ui/jquery-1.7.1.js"></script>
 <script type="text/javascript" src="ui/jquery.progressbar.js"></script>
 <title>{$ansicht} &bull; VPanel</title>
 </head>
