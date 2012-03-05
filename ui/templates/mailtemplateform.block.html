@@ -1,10 +1,16 @@
 <form action="{if isset($mailtemplate)}{"mailtemplates_details"|___:$mailtemplate.templateid}{else}{"mailtemplates_create"|___}{/if}" method="post">
  <fieldset>
  <table>
-     <tr>
-         <th><label for="label">{"Titel:"|__}</label></th>
-         <td><input class="label" type="text" name="label" size="20" value="{if isset($mailtemplate)}{$mailtemplate.label|escape:html}{/if}" /></td>
-     </tr>
+  <tr>
+   <th>{"Gliederung:"|__}</th>
+   <td>{if isset($mailtemplate)}{$mailtemplate.gliederung.label|escape:html}{else}
+   <select name="gliederungid">{foreach from=$gliederungen item=g}<option value="{$g.gliederungid}" {if $g.gliederungid == $gliederung.gliederungid}selected="selected"{/if}>{$g.label|escape:html}</option>{/foreach}</select>
+   {/if}</td>
+  </tr>
+  <tr>
+   <th><label for="label">{"Titel:"|__}</label></th>
+   <td><input class="label" type="text" name="label" size="20" value="{if isset($mailtemplate)}{$mailtemplate.label|escape:html}{/if}" /></td>
+  </tr>
  </table>
  <table>
  <tr class="header" id="headerrowtemplate" style="display:none;">
@@ -30,7 +36,7 @@
   <td colspan="3">{if isset($mailtemplate)}{foreach from=$mailtemplate.attachments item=attachment}
    <a href="{"mailtemplateattachment_get"|___:$mailtemplate.templateid:$attachment.fileid}">{$attachment.exportfilename}</a>
    <a href="{"mailtemplateattachment_delete"|___:$mailtemplate.templateid:$attachment.fileid}" class="delimg">&nbsp;</a>
-  {/foreach} <span class="buttonbox"><a href="{"mailtemplateattachment_create"|___:$mailtemplate.templateid}">{"Hinzufügen"|__}</a></span>{/if}</td>
+  {/foreach} <span class="buttonbox"><a href="{"mailtemplateattachment_create"|___:$mailtemplate.templateid}">{"Attachment hinzufügen"|__}</a></span>{/if}</td>
  </tr>
  <tr class="body">
   <td colspan="3"><textarea name="body" rows="10" cols="70">{if isset($mailtemplate)}{$mailtemplate.body|escape:html}{/if}</textarea></td>

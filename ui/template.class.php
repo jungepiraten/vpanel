@@ -157,6 +157,7 @@ class Template {
 	protected function parseMailTemplate($template) {
 		$row = array();
 		$row["templateid"] = $template->getTemplateID();
+		$row["gliederung"] = $this->parseGliederung($template->getGliederung());
 		$row["label"] = $template->getLabel();
 		$row["body"] = $template->getBody();
 		$row["headers"] = array();
@@ -636,7 +637,11 @@ class Template {
 		$this->smarty->display("beitragdetails.html.tpl");
 	}
 
-	public function viewMailTemplateList($mailtemplates) {
+	public function viewMailTemplateList($mailtemplates, $gliederungen, $gliederung) {
+		if ($gliederung != null) {
+			$this->smarty->assign("gliederung", $this->parseGliederung($gliederung));
+		}
+		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("mailtemplates", $this->parseMailTemplates($mailtemplates));
 		$this->smarty->display("mailtemplatelist.html.tpl");
 	}
@@ -646,7 +651,11 @@ class Template {
 		$this->smarty->display("mailtemplatedetails.html.tpl");
 	}
 
-	public function viewMailTemplateCreate() {
+	public function viewMailTemplateCreate($gliederungen, $gliederung) {
+		if ($gliederung != null) {
+			$this->smarty->assign("gliederung", $this->parseGliederung($gliederung));
+		}
+		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->display("mailtemplatecreate.html.tpl");
 	}
 

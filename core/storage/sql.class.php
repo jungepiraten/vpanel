@@ -1385,19 +1385,22 @@ abstract class SQLStorage extends AbstractStorage {
 	public function parseMailTemplate($row) {
 		return $this->parseRow($row, null, "MailTemplate");
 	}
-	public function getMailTemplateResult() {
-		$sql = "SELECT `templateid`, `label`, `body` FROM `mailtemplates`";
+	public function getMailTemplateResult($gliederungid) {
+		$sql = "SELECT `templateid`, `gliederungid`, `label`, `body` FROM `mailtemplates`";
+		if ($gliederungid != null) {
+			$sql .= " WHERE `gliederungid` " . (is_array($gliederungid) ? " IN (" . implode(",", array_map("intval", $gliederungid)) . ")" : " = " . intval($gliederungid));
+		}
 		return $this->getResult($sql, array($this, "parseMailTemplate"));
 	}
 	public function getMailTemplate($mailtemplateid) {
-		$sql = "SELECT `templateid`, `label`, `body` FROM `mailtemplates` WHERE `templateid` = " . intval($mailtemplateid);
+		$sql = "SELECT `templateid`, `gliederungid`, `label`, `body` FROM `mailtemplates` WHERE `templateid` = " . intval($mailtemplateid);
 		return $this->getResult($sql, array($this, "parseMailTemplate"))->fetchRow();
 	}
-	public function setMailTemplate($templateid, $label, $body) {
+	public function setMailTemplate($templateid, $gliederungid, $label, $body) {
 		if ($templateid == null) {
-			$sql = "INSERT INTO `mailtemplates` (`label`, `body`) VALUES ('" . $this->escape($label) . "', '" . $this->escape($body) . "')";
+			$sql = "INSERT INTO `mailtemplates` (`gliederungid`, `label`, `body`) VALUES (" . intval($gliederungid) . ", '" . $this->escape($label) . "', '" . $this->escape($body) . "')";
 		} else {
-			$sql = "UPDATE `mailtemplates` SET `body` = '" . $this->escape($body) . "', `label` = '" . $this->escape($label) . "' WHERE `templateid` = " . intval($templateid);
+			$sql = "UPDATE `mailtemplates` SET `gliederungid` = " . intval($gliederungid) . ", `body` = '" . $this->escape($body) . "', `label` = '" . $this->escape($label) . "' WHERE `templateid` = " . intval($templateid);
 		}
 		$this->query($sql);
 		if ($templateid == null) {

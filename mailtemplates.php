@@ -11,19 +11,28 @@ if (!$session->isSignedIn()) {
 	exit;
 }
 
-if (!$session->isAllowed("mailtemplates_show")) {
-	$ui->viewLogin();
-	exit;
-}
-
 require_once(VPANEL_CORE . "/mailtemplate.class.php");
 
-function parseMailTemplateFormular($session, &$template = null) {
+function parseMailTemplateFormular($ui, $session, &$template = null) {
 	$label = stripslashes($_POST["label"]);
 	$body = stripslashes($_POST["body"]);
 
 	if ($template == null) {
+		$gliederung = $session->getStorage()->getGliederung($session->getVariable("gliederungid"));
+		if (!$session->isAllowed("mailtemplates_create", $gliederung->getGliederungID())) {
+			$ui->viewLogin();
+			exit;
+		}
+
 		$template = new MailTemplate($session->getStorage());
+		$template->setGliederung($gliederung);
+	} else {
+		$gliederung = $template->getGliederung();
+
+		if (!$session->isAllowed("mailtemplates_modify", $gliederung->getGliederungID())) {
+			$ui->viewLogin();
+			exit;
+		}
 	}
 	$template->setLabel($label);
 	$template->setBody($body);
@@ -49,11 +58,11 @@ function parseMailTemplateFormular($session, &$template = null) {
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
 case "createattachment":
-	if (!$session->isAllowed("mailtemplates_modify")) {
+	$template = $session->getStorage()->getMailTemplate($session->getIntVariable("templateid"));
+	if (!$session->isAllowed("mailtemplates_modify", $template->getGliederungID())) {
 		$ui->viewLogin();
 		exit;
 	}
-	$template = $session->getStorage()->getMailTemplate($session->getIntVariable("templateid"));
 
 	if ($session->getBoolVariable("save")) {
 		$file = $session->getFileVariable("attachment");
@@ -69,6 +78,10 @@ case "createattachment":
 	exit;
 case "deleteattachment":
 	$template = $session->getStorage()->getMailTemplate($session->getIntVariable("templateid"));
+	if (!$session->isAllowed("mailtemplates_modify", $template->getGliederungID())) {
+		$ui->viewLogin();
+		exit;
+	}
 	
 	$template->delAttachment($session->getIntVariable("fileid"));
 	$template->save();
@@ -80,12 +93,7 @@ case "details":
 	$template = $session->getStorage()->getMailTemplate($templateid);
 
 	if ($session->getBoolVariable("save")) {
-		if (!$session->isAllowed("mailtemplates_modify")) {
-			$ui->viewLogin();
-			exit;
-		}
-
-		parseMailTemplateFormular($session, $template);
+		parseMailTemplateFormular($ui, $session, $template);
 
 		//$ui->redirect($session->getLink("mailtemplates_details", $template->getTemplateID()));
 	}
@@ -93,31 +101,46 @@ case "details":
 	$ui->viewMailTemplateDetails($template);
 	exit;
 case "create":
-	if ($session->getBoolVariable("save")) {
-		if (!$session->isAllowed("mailtemplates_create")) {
-			$ui->viewLogin();
-			exit;
-		}
+	$gliederung = null;
+	if ($session->hasVariable("gliederungid")) {
+		$gliederung = $session->getStorage()->getGliederung($session->getVariable("gliederungid"));
+	}
 
-		parseMailTemplateFormular($session, &$template);
+	if ($session->getBoolVariable("save")) {
+		parseMailTemplateFormular($ui, $session, &$template);
 
 		$ui->redirect($session->getLink("mailtemplates_details", $template->getTemplateID()));
 	}
 
-	$ui->viewMailTemplateCreate();
+	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("mailtemplates_create"));
+	$ui->viewMailTemplateCreate($gliederungen, $gliederung);
 	exit;
 case "delete":
-	if (!$session->isAllowed("mailtemplates_delete")) {
+	$template = $session->getStorage()->getMailTemplate($session->getIntVariable("templateid"));
+	if (!$session->isAllowed("mailtemplates_delete", $template->getGliederungID())) {
 		$ui->viewLogin();
 		exit;
 	}
-	$template = $session->getStorage()->getMailTemplate($session->getIntVariable("templateid"));
 	$template->delete();
 	$ui->redirect($session->getLink("mailtemplates"));
 	exit;
 default:
-	$templates = $session->getStorage()->getMailTemplateList();
-	$ui->viewMailTemplateList($templates);
+	$gliederung = null;
+	if ($session->hasVariable("gliederungid")) {
+		if (!$session->isAllowed("mailtemplates_show", $session->getVariable("gliederungid"))) {
+			$ui->viewLogin();
+			exit;
+		}
+
+		$gliederungid = $session->getVariable("gliederungid");
+		$gliederung = $session->getStorage()->getGliederung($gliederungid);
+	} else {
+		$gliederungid = $session->getAllowedGliederungIDs("mailtemplates_show");
+	}
+
+	$templates = $session->getStorage()->getMailTemplateList($gliederungid);
+	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("mailtemplates_show"));
+	$ui->viewMailTemplateList($templates, $gliederungen, $gliederung);
 	exit;
 }
 

@@ -6,18 +6,21 @@ require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
 
 class MailTemplate extends StorageClass {
 	private $templateid;
+	private $gliederungid;
 	private $label;
 	private $body;
 
+	private $gliederung;
 	private $headers;
 	private $attachments;
 
 	public static function factory(Storage $storage, $row) {
-		$kontakt = new MailTemplate($storage);
-		$kontakt->setTemplateID($row["templateid"]);
-		$kontakt->setLabel($row["label"]);
-		$kontakt->setBody($row["body"]);
-		return $kontakt;
+		$mailtemplate = new MailTemplate($storage);
+		$mailtemplate->setTemplateID($row["templateid"]);
+		$mailtemplate->setGliederungID($row["gliederungid"]);
+		$mailtemplate->setLabel($row["label"]);
+		$mailtemplate->setBody($row["body"]);
+		return $mailtemplate;
 	}
 
 	public function getTemplateID() {
@@ -26,6 +29,29 @@ class MailTemplate extends StorageClass {
 
 	public function setTemplateID($templateid) {
 		$this->templateid = $templateid;
+	}
+
+	public function getGliederungID() {
+		return $this->gliederungid;
+	}
+
+	public function setGliederungID($gliederungid) {
+		if ($this->gliederungid != $gliederungid) {
+			$this->gliederung = null;
+		}
+		$this->gliederungid = $gliederungid;
+	}
+
+	public function getGliederung() {
+		if ($this->gliederung == null) {
+			$this->gliederung = $this->getStorage()->getGliederung($this->getGliederungID());
+		}
+		return $this->gliederung;
+	}
+
+	public function setGliederung($gliederung) {
+		$this->setGliederungID($gliederung->getGliederungID());
+		$this->gliederung = $gliederung;
 	}
 
 	public function getLabel() {
@@ -50,6 +76,7 @@ class MailTemplate extends StorageClass {
 		}
 		$this->setTemplateID( $storage->setMailTemplate(
 			$this->getTemplateID(),
+			$this->getGliederungID(),
 			$this->getLabel(),
 			$this->getBody() ));
 

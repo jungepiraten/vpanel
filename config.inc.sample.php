@@ -91,6 +91,7 @@ $config->registerPage("beitraege_del", "beitraege.php?mode=delete&beitragid=%d")
 
 $config->registerPage("mailtemplates", "mailtemplates.php");
 $config->registerPage("mailtemplates_create", "mailtemplates.php?mode=create");
+$config->registerPage("mailtemplates_create_gliederungid", "mailtemplates.php?mode=create&gliederungid=%d");
 $config->registerPage("mailtemplates_details", "mailtemplates.php?mode=details&templateid=%d");
 $config->registerPage("mailtemplates_del", "mailtemplates.php?mode=delete&templateid=%d");
 

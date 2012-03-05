@@ -152,10 +152,10 @@ interface Storage {
 	public function delJurPerson($jurpersonid);
 	public function searchJurPerson($firma);
 
-	public function getMailTemplateResult();
-	public function getMailTemplateList();
+	public function getMailTemplateResult($gliederungid);
+	public function getMailTemplateList($gliederungids);
 	public function getMailTemplate($mailtemplateid);
-	public function setMailTemplate($mailtemplateid, $label, $body);
+	public function setMailTemplate($mailtemplateid, $gliederungid, $label, $body);
 	public function delMailTemplate($mailtemplateid);
 	public function getMailTemplateHeaderResult($mailtemplateid);
 	public function getMailTemplateHeaderList($mailtemplateid);
@@ -346,8 +346,8 @@ abstract class AbstractStorage implements Storage {
 		return $this->getMitgliedschaftResult()->fetchAll();
 	}
 
-	public function getMailTemplateList() {
-		return $this->getMailTemplateResult()->fetchAll();
+	public function getMailTemplateList($gliederungid) {
+		return $this->getMailTemplateResult($gliederungid)->fetchAll();
 	}
 
 	public function getMailTemplateHeaderList($mailtemplateid) {
