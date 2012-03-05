@@ -9,7 +9,7 @@
    </select>
   </fieldset>
  </form>
- <a href="{"mailtemplates_create"|___:$gliederung.gliederungid}" class="neuset">{"Neue Mailvorlage"|__}</a>
+ <a href="{"mailtemplates_create_gliederungid"|___:$gliederung.gliederungid}" class="neuset">{"Neue Mailvorlage"|__}</a>
 </div>
 <ul class="entrylist">
 {foreach from=$mailtemplates item=template}
@@ -32,6 +32,6 @@
    </select>
   </fieldset>
  </form>
- <a href="{"mailtemplates_create"|___:$gliederung.gliederungid}" class="neuset">{"Neue Mailvorlage"|__}</a>
+ <a href="{"mailtemplates_create_gliederungid"|___:$gliederung.gliederungid}" class="neuset">{"Neue Mailvorlage"|__}</a>
 </div>
 {include file="footer.html.tpl"}
