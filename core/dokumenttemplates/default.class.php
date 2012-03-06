@@ -1,19 +1,17 @@
 <?php
 
-require_once(VPANEL_CORE . "/dokumenttemplate.class.php");
+require_once(VPANEL_DOKUMENTTEMPLATES . "/identifier.class.php");
 
-class DefaultDokumentTemplate extends DokumentTemplate {
+class DefaultDokumentTemplate extends IdentifierDokumentTemplate {
 	private $kategorieid;
 	private $statusid;
 	private $identifierPrefix;
-	private $identifierNumberLength;
 
 	public function __construct($templateid, $label, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $identifierNumberLength = 3) {
-		parent::__construct($templateid, $label, $gliederungid);
+		parent::__construct($templateid, $label, $gliederungid, $identifierNumberLength);
 		$this->kategorieid = $kategorieid;
 		$this->statusid = $statusid;
 		$this->identifierPrefix = $identifierPrefix;
-		$this->identifierNumberLength = $identifierNumberLength;
 	}
 
 	public function getDokumentKategorieID($session) {
@@ -24,13 +22,8 @@ class DefaultDokumentTemplate extends DokumentTemplate {
 		return $this->statusid;
 	}
 
-	public function getDokumentIdentifier($session) {
-		$i = "";
-		do {
-			$number = $session->getStorage()->getDokumentIdentifierMaxNumber($this->identifierPrefix . $i, $this->identifierNumberLength) + 1;
-			$i = intval($i) + 1;
-		} while (strlen($number) > $this->identifierNumberLength);
-		return $this->identifierPrefix . $i . str_pad($number, $this->identifierNumberLength, "0", STR_PAD_LEFT);
+	protected function getIdentifierPrefix($session) {
+		return $this->identifierPrefix;
 	}
 
 	public function getDokumentLabel($session) {

@@ -808,6 +808,8 @@ class Template {
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
 		if ($dokumenttemplate instanceof MitgliedsantragDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_mitgliedsantrag.html.tpl");
+		} else if ($dokumenttemplate instanceof DefaultDateDokumentTemplate) {
+			$this->smarty->display("dokumentcreate_defaultdate.html.tpl");
 		} else if ($dokumenttemplate instanceof DefaultDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_default.html.tpl");
 		} else {
@@ -840,6 +842,12 @@ class Template {
 		$this->smarty->assign("file", $this->parseFile($file));
 		$this->smarty->assign("token", $token);
 		$this->smarty->display("fileimagepreview.html.tpl");
+	}
+
+	public function viewFileTextPreview($file, $token) {
+		$this->smarty->assign("file", $this->parseFile($file));
+		$this->smarty->assign("content", $file->getContent());
+		$this->smarty->display("filetextpreview.html.tpl");
 	}
 
 	public function viewFilePDFPreview($file, $token) {

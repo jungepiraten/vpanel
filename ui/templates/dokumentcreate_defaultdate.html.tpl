@@ -5,6 +5,10 @@
   <input type="hidden" name="dokumenttemplateid" value="{$dokumenttemplate.dokumenttemplateid|escape:html}" />
   <table>
   <tr>
+   <th>{"Eingang:"|__}</th>
+   <td><input type="text" name="timestamp" value="{$smarty.now|date_format:"%d.%m.%Y"}" /></td>
+  </tr>
+  <tr>
    <th>{"Datei:"|__}</th>
    <td><input type="file" name="file" /></td>
   </tr>

@@ -1,18 +1,12 @@
 <?php
 
-require_once(VPANEL_CORE . "/dokumenttemplate.class.php");
+require_once(VPANEL_DOKUMENTTEMPLATES . "/default.class.php");
 
-class MitgliedsantragDokumentTemplate extends DokumentTemplate {
-	private $kategorieid;
-	private $statusid;
-	private $identifierPrefix;
+class MitgliedsantragDokumentTemplate extends DefaultDokumentTemplate {
 	private $mitgliedschaftid;
 
 	public function __construct($templateid, $label, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $mitgliedschaftid = null) {
-		parent::__construct($templateid, $label, $gliederungid);
-		$this->kategorieid = $kategorieid;
-		$this->statusid = $statusid;
-		$this->identifierPrefix = $identifierPrefix;
+		parent::__construct($templateid, $label, $gliederungid, $kategorieid, $statusid, $identifierPrefix, 1);
 		$this->mitgliedschaftid = $mitgliedschaftid;
 	}
 
@@ -72,20 +66,12 @@ class MitgliedsantragDokumentTemplate extends DokumentTemplate {
 		return $session->getVariable("beitrag");
 	}
 
-	public function getDokumentKategorieID($session) {
-		return $this->kategorieid;
-	}
-
-	public function getDokumentStatusID($session) {
-		return $this->statusid;
-	}
-
 	private function formatIdentifierName($value) {
 		return strtoupper(substr(str_replace(array('ä', 'ö', 'ü', 'ß'), array('ae', 'oe', 'ue', 'ss'), strtolower($value)), 0, 3));
 	}
 
-	public function getDokumentIdentifier($session) {
-		return $this->identifierPrefix . "M_" . $this->formatIdentifierName($this->getName($session)) . "_" . $this->formatIdentifierName($this->getVorname($session)) . "_" . date("Ymd", $this->getGeburtsdatum($session));
+	protected function getIdentifierPrefix($session) {
+		return parent::getIdentifierPrefix($session) . "M_" . $this->formatIdentifierName($this->getName($session)) . "_" . $this->formatIdentifierName($this->getVorname($session)) . "_" . date("Ymd", $this->getGeburtsdatum($session));
 	}
 
 	public function getDokumentLabel($session) {

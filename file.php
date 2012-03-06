@@ -77,6 +77,10 @@ case "view":
 		$ui->viewFileImagePreview($file, $token);
 		exit;
 	}
+	if (substr($file->getMimeType(),0,4) == "text") {
+		$ui->viewFileTextPreview($file, $token);
+		exit;
+	}
 	if ($file->getMimeType() == "application/pdf") {
 		$ui->viewFilePDFPreview($file, $token);
 		exit;
