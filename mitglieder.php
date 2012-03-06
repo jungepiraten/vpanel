@@ -326,7 +326,7 @@ case "delete":
 case "sendmail":
 case "sendmail.select":
 	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));
-	$templates = $session->getStorage()->getMailTemplateList();
+	$templates = $session->getStorage()->getMailTemplateList($session->getAllowedGliederungIDs("mitglieder_show"));
 
 	$ui->viewMitgliederSendMailForm($filters, $templates);
 	exit;
