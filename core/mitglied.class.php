@@ -160,6 +160,19 @@ class Mitglied extends GlobalClass {
 
 		$revision = $this->getLatestRevision();
 		$kontakt = $revision->getKontakt();
+
+		if (substr($keyword,0,7) == "BEITRAG") {
+			$tuple = explode(".", $keyword, 2);
+			if (isset($tuple[1])) {
+				foreach ($this->getBeitragList() as $beitrag) {
+					if ($beitrag->getBeitrag()->getLabel() == $tuple[1]) {
+						return $beitrag->getHoehe();
+					}
+				}
+			} else {
+				return $revision->getBeitrag();
+			}
+		}
 		switch ($keyword) {
 		case "MITGLIEDID":
 			return $this->getMitgliedID();
@@ -191,8 +204,6 @@ class Mitglied extends GlobalClass {
 			return $kontakt->getEMail()->getEMail();
 		case "MITGLIEDSCHAFT":
 			return $revision->getMitgliedschaft()->getLabel();
-		case "BEITRAG":
-			return $revision->getBeitrag();
 		}
 		if ($revision->isNatPerson()) {
 			$natperson = $revision->getNatPerson();
