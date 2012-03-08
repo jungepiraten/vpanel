@@ -298,7 +298,7 @@ case "create":
 
 	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("mitglieder_create"));
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
-	$mailtemplates = $session->getStorage()->getMailTemplateList();
+	$mailtemplates = $session->getStorage()->getMailTemplateList($session->getAllowedGliederungIDs("mitglieder_create"));
 	$mitgliederflags = $session->getStorage()->getMitgliedFlagList();
 	$mitgliedertextfields = $session->getStorage()->getMitgliedTextFieldList();
 	$states = $session->getStorage()->getStateList();
