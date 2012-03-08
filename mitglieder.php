@@ -257,7 +257,8 @@ case "details":
 	}
 
 	if ($session->getBoolVariable("addnotiz")) {
-		parseAddMitgliederNotizFormular($session, $mitglied, $notiz);
+		$notiz = null;
+		parseAddMitgliederNotizFormular($ui, $session, $mitglied, $notiz);
 	}
 	
 	$notizen = $session->getStorage()->getMitgliedNotizList($mitglied->getMitgliedID());
