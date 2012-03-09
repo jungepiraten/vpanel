@@ -37,6 +37,7 @@
   {foreach from=$permissions_local item=permission}
   <tr class="permissionrow">
    <td><input type="checkbox" name="permissions[]" value="{$permission.permissionid|escape:html}-{$gliederung.gliederungid}" {foreach from=$rolepermissions item=rolepermission}{if $gliederung.gliederungid == $rolepermission.gliederung.gliederungid and $permission.permissionid == $rolepermission.permission.permissionid}checked="checked"{/if}{/foreach} /></td>
+   <td><input type="checkbox" name="transitive_perms[]" value="{$permission.permissionid|escape:html}-{$gliederung.gliederungid}" {foreach from=$rolepermissions item=rolepermission}{if $gliederung.gliederungid == $rolepermission.gliederung.gliederungid and $permission.permissionid == $rolepermission.permission.permissionid and $rolepermission.transitive}checked="checked"{/if}{/foreach} /></td>
    <th>{$permission.label|__|escape:html}</th>
   </tr>
   {/foreach}
