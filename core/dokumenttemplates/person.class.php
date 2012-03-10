@@ -3,11 +3,17 @@
 require_once(VPANEL_DOKUMENTTEMPLATES . "/default.class.php");
 
 class PersonDokumentTemplate extends DefaultDokumentTemplate {
+	private $labelPrefix;
 	private $mitgliedschaftid;
 
-	public function __construct($templateid, $label, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $mitgliedschaftid = null) {
+	public function __construct($templateid, $label, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $labelPrefix, $mitgliedschaftid = null) {
 		parent::__construct($templateid, $label, $gliederungid, $kategorieid, $statusid, $identifierPrefix, 1);
+		$this->labelPrefix = $labelPrefix;
 		$this->mitgliedschaftid = $mitgliedschaftid;
+	}
+
+	private function getLabelPrefix($session) {
+		return $this->labelPrefix;
 	}
 
 	private function getAnrede($session) {
@@ -75,7 +81,7 @@ class PersonDokumentTemplate extends DefaultDokumentTemplate {
 	}
 
 	public function getDokumentLabel($session) {
-		return "Mitgliedsantrag " . $this->getVorname($session) . " " . $this->getName($session);
+		return $this->getLabelPrefix($session) . " " . $this->getVorname($session) . " " . $this->getName($session);
 	}
 
 	public function getDokumentFile($session) {
