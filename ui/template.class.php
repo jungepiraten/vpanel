@@ -806,12 +806,15 @@ class Template {
 		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
-		if ($dokumenttemplate instanceof MitgliedsantragDokumentTemplate) {
-			$this->smarty->display("dokumentcreate_mitgliedsantrag.html.tpl");
+		if ($dokumenttemplate instanceof PersonDokumentTemplate) {
+			$this->smarty->display("dokumentcreate_person.html.tpl");
 		} else if ($dokumenttemplate instanceof DefaultDateDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_defaultdate.html.tpl");
 		} else if ($dokumenttemplate instanceof DefaultDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_default.html.tpl");
+		} else if ($dokumenttemplate instanceof SelectPrefixDateDokumentTemplate) {
+			$this->smarty->assign("options", $dokumenttemplate->getPrefixOptions());
+			$this->smarty->display("dokumentcreate_selectprefixdate.html.tpl");
 		} else {
 //			$this->smarty->display("dokumentcreate.html.tpl");
 		}

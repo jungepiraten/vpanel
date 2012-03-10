@@ -2,7 +2,7 @@
 
 require_once(VPANEL_DOKUMENTTEMPLATES . "/default.class.php");
 
-class MitgliedsantragDokumentTemplate extends DefaultDokumentTemplate {
+class PersonDokumentTemplate extends DefaultDokumentTemplate {
 	private $mitgliedschaftid;
 
 	public function __construct($templateid, $label, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $mitgliedschaftid = null) {
