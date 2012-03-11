@@ -30,7 +30,6 @@
         <div class="span3">
           <div class="well sidebar-nav">
             <ul class="nav nav-list">
-{/if}
 {if $session->isAllowed("users_show")}
 <li><a href="{"users"|___}">{"Benutzerverwaltung"|__}</a></li>
 {/if}
