@@ -1,28 +1,35 @@
 <html>
 <head>
+<link href="ui/bootstrap/css/bootstrap.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="ui/style.css" />
 <meta http-equiv="Content-Type" content="text/html; charset={$charset}" />
 <script type="text/javascript" src="ui/jquery-1.7.1.js"></script>
 <script type="text/javascript" src="ui/jquery.progressbar.js"></script>
+<script type="text/javascript" src="ui/bootstrap/js/bootstrap.js"></script>
 <title>{$ansicht} &bull; VPanel</title>
 </head>
 <body>
-<div class="header">
-<span class="logo"><span style="color:#ff8d00; font-weight:bolder; font-size:125%;">V</span>Panel</span>
-<div class="login">
-{if not $session->isSignedIn()}
- <a href="{"login"|___}">{"Anmelden"|__}</a>
-{else}
- <a href="{"logout"|___}" class="logout">{"Abmelden"|__}</a>
-{/if}
+<div class="container-fluid">
+	<div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="brand" href="{"index"|___}"><span style="color:#ff8d00; font-weight:bolder;">V</span>Panel</a>
+          <ul class="nav pull-right">
+            <li><a href="{"einstellungen"|___}">{"Einstellungen"|__}</a></li>
+            <li class="divider-vertical"></li>
+            <li>{if not $session->isSignedIn()}<a href="{"login"|___}">{"Anmelden"|__}</a>{else} <a href="{"logout"|___}">{"Abmelden"|__}</a>{/if}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+<div class="page-header">
+<h1>{$ansicht}</h1>
 </div>
-</div>
-<div id="sidebar">
-<div class="navigation">
-<ul>
-<li><a href="{"index"|___}">{"Startseite"|__}</a></li>
 {if $session->isSignedIn()}
-<li><a href="{"einstellungen"|___}">{"Einstellungen"|__}</a></li>
+<div class="row-fluid">
+        <div class="span3">
+          <div class="well sidebar-nav">
+            <ul class="nav nav-list">
 {/if}
 {if $session->isAllowed("users_show")}
 <li><a href="{"users"|___}">{"Benutzerverwaltung"|__}</a></li>
@@ -44,10 +51,13 @@
 {/if}
 {if $session->isAllowed("statistik_show")}
 <li><a href="{"statistik"|___}">{"Mitgliederstatistik"|__}</a></li>
-{/if}
-</ul>
-</div>
-{if isset($sidebar)}<div class="sidebar">{include file=$sidebar}</div>{/if}
-</div>
 
+{if isset($sidebar)}{include file=$sidebar}{/if}
+</ul>
+</div><!--/.well -->
+        </div><!--/span-->
+        <div class="span9">
+{else}
 <div class="content">
+{/if}
+
