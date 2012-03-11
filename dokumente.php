@@ -138,7 +138,7 @@ default:
 	}
 
 	$pagesize = 20;
-	$pagecount = ceil($session->getStorage()->getDokumentCount($session->getAllowedGliederungIDs("dokumente_show"), $dokumentkategorie, $dokumentstatus) / $pagesize);
+	$pagecount = ceil($session->getStorage()->getDokumentCount($session->getAllowedGliederungIDs("dokumente_show"), $gliederung, $dokumentkategorie, $dokumentstatus) / $pagesize);
 	$page = 0;
 	if ($session->hasVariable("page") and $session->getVariable("page") >= 0 and $session->getVariable("page") < $pagecount) {
 		$page = intval($session->getVariable("page"));
