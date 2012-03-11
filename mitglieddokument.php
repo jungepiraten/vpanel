@@ -21,7 +21,7 @@ if (isset($mitglied) && !$session->isAllowed("mitglieder_modify", $mitglied->get
 	exit;
 }
 
-if (isset($dokument) && !$session->isAllowed("dokumente_modify", $mitglied->getLatestRevision()->getGliederungID())) {
+if (isset($dokument) && !$session->isAllowed("dokumente_modify", $dokument->getGliederungID())) {
 	$ui->viewLogin();
 	exit;
 }
