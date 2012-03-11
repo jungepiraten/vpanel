@@ -29,7 +29,7 @@ class SelectPrefixDateDokumentTemplate extends IdentifierDokumentTemplate {
 	}
 
 	protected function getIdentifierPrefix($session) {
-		return parent::getIdentifierPrefix($session) . $this->getSelectedPrefix($session) . date($this->dateFormat, $this->getTimestamp($session));
+		return $this->getSelectedPrefix($session) . date($this->dateFormat, $this->getTimestamp($session));
 	}
 
 	public function getDokumentKategorieID($session) {
