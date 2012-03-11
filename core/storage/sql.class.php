@@ -1683,16 +1683,19 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "DokumentNotify");
 	}
 	public function getDokumentNotifyResult($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null) {
-		$sql = "SELECT `dokumentnotifyid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `emailid` FROM `dokumentnotifies` WHERE `gliederungid` IS NULL OR `dokumentkategorieid` IS NULL OR `dokumentstatusid` IS NULL";
+		$sql_gliederungid = "`gliederungid` = NULL";
 		if ($gliederungid != null) {
-			$sql .= " OR `gliederungid` = " . intval($gliederungid);
+			$sql_gliederungid .= " OR `gliederungid` = " . intval($gliederungid);
 		}
+		$sql_dokumentkategorieid = "`dokumentkategorieid` IS NULL";
 		if ($dokumentkategorieid != null) {
-			$sql .= " OR `dokumentkategorieid` = " . intval($dokumentkategorieid);
+			$sql_dokumentkategorieid .= " OR `dokumentkategorieid` = " . intval($dokumentkategorieid);
 		}
+		$sql_dokumentstatusid = "`dokumentstatusid` IS NULL";
 		if ($dokumentstatusid != null) {
-			$sql .= " OR `dokumentstatusid` = " . intval($dokumentstatusid);
+			$sql_dokumentstatusid .= " OR `dokumentstatusid` = " . intval($dokumentstatusid);
 		}
+		$sql = "SELECT `dokumentnotifyid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `emailid` FROM `dokumentnotifies` WHERE (" . $sql_gliederungid . ") AND (" . $sql_dokumentkategorieid . ") AND (" . $sql_dokumentstatusid . ")";
 		return $this->getResult($sql, array($this, "parseDokumentNotify"));
 	}
 	public function getDokumentNotify($dokumentnotifyid) {
