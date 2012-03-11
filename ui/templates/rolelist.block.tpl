@@ -1,15 +1,56 @@
-<ul class="entrylist">
-{foreach from=$roles item=role}
-<li class="entry{cycle values="odd,even"}">
-{if $showroledel}
- <a style="float:right; margin-top:7px;margin-right:7px;" href="{"roles_del"|___:$role.roleid}" class="delimg" title="Rolle löschen" onClick="return confirm('Rolle wirklich löschen?');">&nbsp;</a>
-{/if}
-{if $showuserdel}
- <a style="float:right; margin-top:7px;margin-right:7px;" href="{"roles_deluser"|___:$role.roleid:$userid}" class="delimg" title="Benutzer von Rolle löschen" onClick="return confirm('Benutzer von Rolle wirklich löschen?');">&nbsp;</a>
-{/if}
-<div style="float:left; margin-left:10px;"><a href="{"roles_details"|___:$role.roleid}" class="label">{$role.label}</a><br>
-<span class="description">{$role.description}</span></div>
-<div style="clear:both;"></div>
-</li>
-{/foreach}
-</ul>
+<table class="table table-condensed table-striped table-bordered">
+	<thead>
+		<tr>
+			<th>
+				#
+			</th>
+			<th>
+				{"Name"|__}
+			</th>
+		</tr>
+	</thead>
+	{foreach from=$roles item=role}
+		<tr onclick="doNav('{"roles_details"|___:$role.roleid}')">
+			<td>{$role.roleid}</td>
+			<td>
+				{$role.label}
+				{if $showroledel}
+				<span class="close" id="{$user.userid}">&times;</span>
+				<a id="delLink" style="display:none;" href="{"roles_del"|___:$role.roleid}">Soll die Rolle wirklich gelöscht werden?</a>
+				{/if}
+				{if $showuserdel}
+				<span class="close" id="{$user.userid}">&times;</span>
+				<a id="delLink" style="display:none;" href="{"users_delrole"|___:$user.userid}">Soll der Benutzer wirklich aus der Rolle gelöscht werden?</a>
+				{/if}
+				<p class="description">{$role.description}</p>
+			</td>
+		</tr>
+	{/foreach}
+</table>
+
+<div class="modal fade" id="delRoleModal">
+		  <div class="modal-header">
+		    <a class="close" data-dismiss="modal">×</a>
+		    <h3>Achtung:</h3>
+		  </div>
+		  <div class="modal-body">
+		    <p></p>
+		  </div>
+		  <div class="modal-footer">
+		    <a class="btn btn-danger" id="delRole">Löschen</a>
+		    <a class="btn"  data-dismiss="modal">Abbrechen</a>
+		  </div>
+</div>
+<script type="text/javascript">
+{literal}
+	$("span.close").click(function() {
+		event.stopImmediatePropagation();
+		var textString = $("a#delLink").html()
+		$("#delRoleModal").children(".modal-body").children("p").text(textString);
+		$("#delRoleModal").modal();
+	});
+	$("#delRole").click(function() {
+		document.location.href = $("a#delLink").attr("href");
+	});
+{/literal}
+</script>

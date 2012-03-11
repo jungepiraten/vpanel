@@ -6,6 +6,11 @@
 <script type="text/javascript" src="ui/jquery-1.7.1.js"></script>
 <script type="text/javascript" src="ui/jquery.progressbar.js"></script>
 <script type="text/javascript" src="ui/bootstrap/js/bootstrap.js"></script>
+{literal}<script type="text/javascript">
+function doNav(url) {
+  document.location.href = url;
+}
+</script>{/literal}
 <title>{$ansicht} &bull; VPanel</title>
 </head>
 <body>
@@ -27,7 +32,7 @@
 </div>
 {if $session->isSignedIn()}
 <div class="row-fluid">
-        <div class="span3">
+        <div class="span2">
           <div class="well sidebar-nav">
             <ul class="nav nav-list">
 {if $session->isAllowed("users_show")}
@@ -50,12 +55,12 @@
 {/if}
 {if $session->isAllowed("statistik_show")}
 <li><a href="{"statistik"|___}">{"Mitgliederstatistik"|__}</a></li>
-
+{/if}
 {if isset($sidebar)}{include file=$sidebar}{/if}
 </ul>
 </div><!--/.well -->
         </div><!--/span-->
-        <div class="span9">
+        <div class="span10">
 {else}
 <div class="content">
 {/if}

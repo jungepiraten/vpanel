@@ -3,6 +3,10 @@ body {
     padding-top:50px;
 }
 
+.span {
+	min-width:200px;
+}
+
 .sidebar-nav {
     padding: 9px 0;
 }
@@ -13,4 +17,11 @@ body {
 
 .buttonbox {
     margin-bottom:10px;
+}
+
+.description {
+	color:#999;
+	font-size:75%;
+	padding:0px;
+	margin:0px;
 }
