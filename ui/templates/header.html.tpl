@@ -1,3 +1,4 @@
+<!DOCTYPE html> 
 <html>
 <head>
 <link href="ui/bootstrap/css/bootstrap.css" rel="stylesheet">
@@ -11,7 +12,7 @@ function doNav(url) {
   document.location.href = url;
 }
 </script>{/literal}
-<title>{$ansicht} &bull; VPanel</title>
+<title>{$ansicht|strip_tags:false} &bull; VPanel</title>
 </head>
 <body>
 <div class="container-fluid">
@@ -36,25 +37,25 @@ function doNav(url) {
           <div class="well sidebar-nav">
             <ul class="nav nav-list">
 {if $session->isAllowed("users_show")}
-<li><a href="{"users"|___}">{"Benutzerverwaltung"|__}</a></li>
+<li {if $menupunkt == "user"}class="active"{/if}><a href="{"users"|___}">{"Benutzerverwaltung"|__}</a></li>
 {/if}
 {if $session->isAllowed("roles_show")}
-<li><a href="{"roles"|___}">{"Rollenverwaltung"|__}</a></li>
+<li {if $menupunkt == "role"}class="active"{/if}><a href="{"roles"|___}">{"Rollenverwaltung"|__}</a></li>
 {/if}
 {if $session->isAllowed("dokumente_show")}
-<li><a href="{"dokumente"|___}">{"Dokumentenverwaltung"|__}</a></li>
+<li {if $menupunkt == "dokument"}class="active"{/if}><a href="{"dokumente"|___}">{"Dokumentenverwaltung"|__}</a></li>
 {/if}
 {if $session->isAllowed("mitglieder_show")}
-<li><a href="{"mitglieder"|___}">{"Mitgliederverwaltung"|__}</a></li>
+<li {if $menupunkt == "mitglied"}class="active"{/if}><a href="{"mitglieder"|___}">{"Mitgliederverwaltung"|__}</a></li>
 {/if}
 {if $session->isAllowed("beitraege_show")}
-<li><a href="{"beitraege"|___}">{"Beitragsverwaltung"|__}</a></li>
+<li {if $menupunkt == "beitrag"}class="active"{/if}><a href="{"beitraege"|___}">{"Beitragsverwaltung"|__}</a></li>
 {/if}
 {if $session->isAllowed("mailtemplates_show")}
-<li><a href="{"mailtemplates"|___}">{"Mailverwaltung"|__}</a></li>
+<li {if $menupunkt == "mail"}class="active"{/if}><a href="{"mailtemplates"|___}">{"Mailverwaltung"|__}</a></li>
 {/if}
 {if $session->isAllowed("statistik_show")}
-<li><a href="{"statistik"|___}">{"Mitgliederstatistik"|__}</a></li>
+<li {if $menupunkt == "statistik"}class="active"{/if}><a href="{"statistik"|___}">{"Mitgliederstatistik"|__}</a></li>
 {/if}
 {if isset($sidebar)}{include file=$sidebar}{/if}
 </ul>

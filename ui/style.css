@@ -11,7 +11,7 @@ body {
     padding: 9px 0;
 }
 
-.close {
+td .close {
 	float:right;
 }
 
@@ -24,4 +24,9 @@ body {
 	font-size:75%;
 	padding:0px;
 	margin:0px;
+}
+
+input[type="text"] {
+	display:inline-block;
+	margin-bottom:9px;
 }

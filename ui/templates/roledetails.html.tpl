@@ -1,4 +1,4 @@
-{include file="header.html.tpl" ansicht="Rolle bearbeiten"}
+{include file="header.html.tpl" ansicht="Rolle bearbeiten" menupunkt="role"}
 <div>
 <p class="pagetitle">Rolle &quot;{if isset($role)}{$role.label|escape:html}{/if}&quot; bearbeiten</p>
 <div class="mainform">

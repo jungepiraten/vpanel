@@ -1,4 +1,4 @@
-<form action="{if isset($user)}{"users_details"|___:$user.userid}{else}{"user_create"|___}{/if}" method="post" class="form-horizontal">
+<form action="{if isset($user)}{"users_details"|___:$user.userid}{else}{"users_create"|___}{/if}" method="post" class="form-horizontal">
  <fieldset>
 <div class="control-group">
     <label class="control-label" for="username">{"Username:"|__}</label>
@@ -9,7 +9,7 @@
 <div class="control-group">
     <label class="control-label" for="password">{"Passwort:"|__}</label>
     <div class="controls">
-        <input class="password" type="password" name="password" />
+        <input class="password" type="password" name="password" id="password"/><span class="help-inline" style="opacity:0;">{"Bitte ein Passwort angeben."|__}</span>
     </div>
 </div>
 <div class="control-group">
@@ -41,7 +41,7 @@
     </div>
 </div>
 <div class="form-actions">
-    <button class="btn btn-primary" type="submit" name="save">{"Speichern"|__}</button>
+    <button class="btn btn-primary submit" type="submit" name="save" value="1">{"Speichern"|__}</button>
     <button class="btn">{"Abbrechen"|__}</button>
 </div>
 </fieldset>

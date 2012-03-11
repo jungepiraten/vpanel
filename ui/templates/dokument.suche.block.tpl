@@ -1,3 +1,5 @@
+<li class="nav-header">Dokumentensuche</li>
+<li>
 {literal}
 <script type="text/javascript">
 
@@ -158,7 +160,8 @@ $(function() {
 {/literal}
 <form action="" class="suche">
  <fieldset class="suche">
-  <input type="text" id="dokumentsuche" name="dokumentsuche" autocomplete="off" {if isset($smarty.request.dokumentsuche)}value="{$smarty.request.dokumentsuche|escape:html}"{/if} />
+  <input type="text" id="dokumentsuche" name="dokumentsuche" autocomplete="off" {if isset($smarty.request.dokumentsuche)}value="{$smarty.request.dokumentsuche|escape:html}"{/if} class="span2"/>
   <div id="dropdowndokumentsuche"><ul></ul></div>
  </fieldset>
 </form>
+</li>

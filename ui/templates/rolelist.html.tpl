@@ -1,4 +1,4 @@
-{include file="header.html.tpl" ansicht="Rollenverwaltung"}
+{include file="header.html.tpl" ansicht="Rollenverwaltung" menupunkt="role"}
 <div class="buttonbox">
  <a href="{"roles_create"|___}" class="btn btn-primary">{"Neue Rolle"|__}</a>
 </div>

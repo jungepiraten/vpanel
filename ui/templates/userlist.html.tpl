@@ -1,4 +1,4 @@
-{include file="header.html.tpl" ansicht="Benutzerverwaltung"}
+{include file="header.html.tpl" ansicht="Benutzerverwaltung" menupunkt="user"}
 <div class="buttonbox">
  <a href="{"users_create"|___}" class="btn btn-primary">{"Neuen Benutzer anlegen"|__}</a>
 </div>

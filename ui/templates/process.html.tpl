@@ -1,9 +1,7 @@
 {include file="header.html.tpl" ansicht="Prozessfortschritt"}
-<p class="pagetitle">Prozessfortschritt</p>
 <script type="text/javascript">
 {literal}
 $(document).ready(function () {
-	$("#progressbar").progressBar({ barImage: "ui/images/progressbg.gif", boxImage: "ui/images/progressbar.gif", width: 300, height:30 });
 });
 
 var finished = false;
@@ -45,7 +43,7 @@ function updateBar(data) {
 	if (data["iswaiting"]) {
 		$("#progresstest").html("Warte auf Prozessbeginn");
 	}
-	$("#progressbar").progressBar(100 * data["progress"]);
+	$(".bar").css("width", ((100 * data["progress"]) + "%");
 	if (data["eta"]) {
 		eta = data["eta"];
 	} else {
@@ -66,7 +64,9 @@ setInterval(queryProgress, 5000);
 setInterval(countdownETA, 500);
 {/literal}
 </script>
-<div id="progressbar">{$process.progress*100}%</div>
+<div class="progress progress-success progress-striped active">
+  <div class="bar" style="width: 0%;"></div>
+</div>
 <p id="eta"></p>
 <p id="progresstext">{if $process.iswaiting}Warte ...{/if}</p>
 {include file="footer.html.tpl"}

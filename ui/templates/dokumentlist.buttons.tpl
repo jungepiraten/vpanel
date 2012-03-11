@@ -1,5 +1,4 @@
 <div class="buttonbox">
-&nbsp;
 <div class="create">
  <form action="{"dokumente"|___}" method="post" class="filter">
   <fieldset>

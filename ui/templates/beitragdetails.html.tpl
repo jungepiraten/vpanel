@@ -1,5 +1,7 @@
-{include file="header.html.tpl" ansicht="Beitrag bearbeiten"}
-<p class="pagetitle">{"Beitrag \"%s\" bearbeiten"|__:$beitrag.label}</p>
+{capture assign="ansicht" menupunkt="mitglied"}
+Beitrag <em>&raquo;{$beitrag.label}&laquo;</em> bearbeiten
+{/capture}
+{include file="header.html.tpl" ansicht=$ansicht}
 {if $beitrag.hoehe != null}
 {include file="beitragform.block.tpl" beitrag=$beitrag}
 {/if}
