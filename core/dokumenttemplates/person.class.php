@@ -77,7 +77,7 @@ class PersonDokumentTemplate extends DefaultDokumentTemplate {
 	}
 
 	protected function getIdentifierPrefix($session) {
-		return parent::getIdentifierPrefix($session) . "M_" . $this->formatIdentifierName($this->getName($session)) . "_" . $this->formatIdentifierName($this->getVorname($session)) . "_" . date("Ymd", $this->getGeburtsdatum($session));
+		return parent::getIdentifierPrefix($session) . $this->formatIdentifierName($this->getName($session)) . "_" . $this->formatIdentifierName($this->getVorname($session)) . "_" . date("Ymd", $this->getGeburtsdatum($session));
 	}
 
 	public function getDokumentLabel($session) {
