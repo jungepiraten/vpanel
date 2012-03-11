@@ -138,7 +138,7 @@ class DokumentNotify extends StorageClass {
 
 	public function notify($dokument, $notiz) {
 		global $config;
-		if ($this->getMail() != null) {
+		if ($this->getEMail() != null) {
 			$mail = $config->createMail($this->getEMail());
 			$mail->setHeader("Subject", "[VPanel] Dokument");
 			$mail->setBody(<<<EOT
