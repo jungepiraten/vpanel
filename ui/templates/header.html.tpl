@@ -50,7 +50,7 @@
 {/if}
 {if $session->isAllowed("statistik_show")}
 <li><a href="{"statistik"|___}">{"Mitgliederstatistik"|__}</a></li>
-
+{/if}
 {if isset($sidebar)}{include file=$sidebar}{/if}
 </ul>
 </div><!--/.well -->
