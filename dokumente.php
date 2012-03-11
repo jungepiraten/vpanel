@@ -23,7 +23,7 @@ function parseDokumentFormular($ui, $session, &$dokument = null) {
 	$oldkategorieid = $dokument->getDokumentKategorieID();
 	$oldstatusid = $dokument->getDokumentStatusID();
 
-	if (!$session->isAllowed("dokument_modify", $gliederungid)) {
+	if (!$session->isAllowed("dokumente_modify", $gliederungid)) {
 		$ui->viewLogin();
 		exit;
 	}
