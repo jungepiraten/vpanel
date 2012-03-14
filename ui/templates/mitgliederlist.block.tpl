@@ -14,7 +14,7 @@
 				<a class="delLink" style="display:none;" href="{"mitglieder_del"|___:$mitglied.filterid}">Soll das Mitglied wirklich gelöscht werden?</a>
 				{/if}
 				{if $showmitglieddokumentdel and isset($dokument)}
-				<a href="{"mitglieddokument_delete"|___:$mitglied.mitgliedid:$dokument.dokumentid}" class="close">&times;</span>
+				<a href="{"mitglieddokument_delete"|___:$mitglied.mitgliedid:$dokument.dokumentid}" class="close">&times;</a>
 				{/if}
 				{include file=mitgliederlist.item.tpl mitglied=$mitglied}
 			</td>
