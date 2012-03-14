@@ -1,22 +1,24 @@
-{include file="header.html.tpl" ansicht="Benutzer bearbeiten"}
-<div>
-<p class="pagetitle">Benutzer &quot;{if isset($user)}{$user.username|escape:html}{/if}&quot; bearbeiten</p>
-<div class="mainform">
-{include file="userform.block.tpl" user=$user}
-</div>
-<div class="sideinfo">
-<span class="sideinfoheader">Rollen:</span>
-{include file="rolelist.block.tpl" showuserdel=1 userid=$user.userid roles=$userroles}
-<form action="{"users_addrole"|___:$user.userid}" method="post" class="useraddrole">
- <fieldset>
-  <input type="hidden" name="redirect" value="{$smarty.server.REQUEST_URI}" />
-  <select name="roleid">
-   {foreach from=$roles item=role}<option value="{$role.roleid|escape:html}">{$role.label|escape:html}</option>{/foreach}
-  </select>
-  <input class="submit" type="submit" name="do" value="{"Hinzufuegen"|__}" />
- </fieldset>
-</form>
-</div>
-<div style="clear:both;">&nbsp;</div>
+{capture assign="ansicht"}Benutzer <em>&raquo;{$user.username|escape:html}&laquo;</em> bearbeiten{/capture}
+{include file="header.html.tpl" ansicht=$ansicht menupunkt=user}
+<div class="row-fluid">
+	<div class="span6">
+		<h2>{"Benutzerdaten"|__}</h2>
+		{include file="userform.block.tpl" user=$user}
+	</div>
+	<div class="span6">
+		<h2>Rollen</h2>
+		{include file="rolelist.block.tpl" showuserdel=1 userid=$user.userid roles=$userroles}
+		<div class="btn-group">
+			<a class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="#">
+				{"Rolle hinzufügen"|__}
+				<span class="caret"></span>
+			</a>
+			<ul class="dropdown-menu">
+			{foreach from=$roles item=role}
+				<li><a href="{"users_addrole"|___:$user.userid:$role.roleid}">{$role.label|escape:html}</a></li>
+			{/foreach}
+			</ul>
+		</div>
+	</div>
 </div>
 {include file="footer.html.tpl"}

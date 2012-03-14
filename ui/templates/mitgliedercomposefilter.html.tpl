@@ -1,6 +1,4 @@
-{include file="header.html.tpl" ansicht="Filter erstellen"}
-<p class="pagetitle">Filter erstellen</p>
-
+{include file="header.html.tpl" ansicht="Filter erstellen" menupunkt="mitglied"}
 {literal}
 <style type="text/css">
 .filteroptions>.delimg

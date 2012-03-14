@@ -3,14 +3,35 @@ body {
     padding-top:50px;
 }
 
+.span {
+	min-width:200px;
+}
+
 .sidebar-nav {
     padding: 9px 0;
 }
 
-.close {
+td .close {
 	float:right;
 }
 
 .buttonbox {
     margin-bottom:10px;
+}
+
+.description {
+	color:#999;
+	font-size:75%;
+	padding:0px;
+	margin:0px;
+}
+
+input[type="text"] {
+	display:inline-block;
+	margin-bottom:9px;
+}
+
+.loading {
+	background-image:url(images/loading.gif);
+	background-repeat:no-repeat;background-position:center right;
 }

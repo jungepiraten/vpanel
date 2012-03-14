@@ -1,37 +1,59 @@
-{include file="header.html.tpl" ansicht="Mailvorlagen verwalten"}
-<p class="pagetitle">{"Mailvorlagen verwalten"|__}</p>
-<div class="buttonbox">
- <form action="{"mailtemplates"|___}" method="post" class="filter">
-  <fieldset>
-   <select name="gliederungid" onChange="this.form.submit()">
-    <option value="">{"(alle Gliederungen)"|__}</option>
-    {foreach from=$gliederungen item=item_gliederung}<option value="{$item_gliederung.gliederungid|escape:html}" {if $gliederung.gliederungid==$item_gliederung.gliederungid}selected="selected"{/if}>{$item_gliederung.label|escape:html}</option>{/foreach}
-   </select>
-  </fieldset>
- </form>
- <a href="{"mailtemplates_create_gliederungid"|___:$gliederung.gliederungid}" class="neuset">{"Neue Mailvorlage"|__}</a>
+{include file="header.html.tpl" ansicht="Mailvorlagen verwalten" menupunkt="mail"}
+<div class="btn-toolbar">
+	<div class="btn-group">
+		<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+			{$gliederung.label|default:"(alle Gliederungen)"|escape:html}
+			<span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="{"mailtemplates"|___}">{"(alle Gliederungen)"}</a></li>
+			<li class="divider"></li>
+		{foreach from=$gliederungen item=item_gliederung}
+			<li><a href="{"mailtemplates_gliederungid"|___:$item_gliederung.gliederungid}">{$item_gliederung.label|escape:html}</a></li>
+		{/foreach}
+		</ul>
+	</div>
+	<div class="btn-group">
+		<button class="btn btn-success" onclick="doNav('{"mailtemplates_create_gliederungid"|___:$gliederung.gliederungid}');">
+			{"Neue Mailvorlage"|__}
+		</button>
+	</div>
 </div>
-<ul class="entrylist">
-{foreach from=$mailtemplates item=template}
-<li class="entry{cycle values="odd,even"}">
-<div style="float:right; margin-top:7px;margin-right:7px;">
- <a href="{"mailtemplates_del"|___:$template.templateid}" class="delimg" title="{"Mailtemplate entfernen"|__}" onClick="return confirm('{"Mailtemplate wirklich entfernen?"|__}');">&nbsp;</a>
-</div>
-<div style="float:left; margin-left:10px;"><a href="{"mailtemplates_details"|___:$template.templateid}">{$template.label|escape:html}</a><br>
-<span class="description">&nbsp;</span></div>
-<div style="clear:both;"></div>
-</li>
-{/foreach}
-</ul>
-<div class="buttonbox">
- <form action="{"mailtemplates"|___}" method="post" class="filter">
-  <fieldset>
-   <select name="gliederungid" onChange="this.form.submit()">
-    <option value="">{"(alle Gliederungen)"|__}</option>
-    {foreach from=$gliederungen item=item_gliederung}<option value="{$item_gliederung.gliederungid|escape:html}" {if $gliederung.gliederungid==$item_gliederung.gliederungid}selected="selected"{/if}>{$item_gliederung.label|escape:html}</option>{/foreach}
-   </select>
-  </fieldset>
- </form>
- <a href="{"mailtemplates_create_gliederungid"|___:$gliederung.gliederungid}" class="neuset">{"Neue Mailvorlage"|__}</a>
+<table class="table table-striped table-bordered table-condensed">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Name</th>
+		</tr>
+	</thead>
+	{foreach from=$mailtemplates item=template}
+		<tr onclick="doNav('{"mailtemplates_details"|___:$template.templateid}');">
+			<td>{$template.templateid}</td>
+			<td>
+				<a href="{"mailtemplates_del"|___:$template.templateid}" class="close">&times;</a>
+				{$template.label|escape:html}
+			</td>
+		</tr>
+	{/foreach}
+</table>
+<div class="btn-toolbar">
+	<div class="btn-group">
+		<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+			{$gliederung.label|default:"(alle Gliederungen)"|escape:html}
+			<span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="{"mailtemplates"|___}">{"(alle Gliederungen)"}</a></li>
+			<li class="divider"></li>
+		{foreach from=$gliederungen item=item_gliederung}
+			<li><a href="{"mailtemplates_gliederungid"|___:$item_gliederung.gliederungid}">{$item_gliederung.label|escape:html}</a></li>
+		{/foreach}
+		</ul>
+	</div>
+	<div class="btn-group">
+		<button class="btn btn-success" onclick="doNav('{"mailtemplates_create_gliederungid"|___:$gliederung.gliederungid}');">
+			{"Neue Mailvorlage"|__}
+		</button>
+	</div>
 </div>
 {include file="footer.html.tpl"}

@@ -1,29 +1,36 @@
-{include file="header.html.tpl" ansicht="Neuen Mitgliedsantrag anlegen"}
-<p class="pagetitle">Neuen Mitgliedsantrag anlegen</p>
-<form action="{"dokumente_create"|___}" method="post" enctype="multipart/form-data">
+{capture assign=ansicht}{$dokumenttemplate.label|escape:html} anlegen{/capture}
+{include file="header.html.tpl" ansicht=$ansicht menupunkt="dokument"}
+<form action="{"dokumente_create"|___}" method="post" enctype="multipart/form-data" class="form-horizontal">
  <fieldset>
   <input type="hidden" name="dokumenttemplateid" value="{$dokumenttemplate.dokumenttemplateid|escape:html}" />
-  <table>
-  <tr>
-   <th>{"Datei:"|__}</th>
-   <td><input type="file" name="file" /></td>
-  </tr>
-  <tr>
-   <th>{"Name:"|__}</th>
-   <td><input type="text" name="vorname" size="20" /> <input type="text" name="name" size="20" /></td>
-  </tr>
-  <tr>
-   <th>{"Geburtsdatum:"|__}</th>
-   <td><input type="text" name="geburtsdatum" size="20" /></td>
-  </tr>
-  <tr>
-   <th>{"Kommentar:"|__}</th>
-   <td><textarea name="kommentar" cols="40" rows="10"></textarea></td>
-  </tr>
-  <tr>
-   <td colspan="2"><input type="submit" class="submit" name="save" value="{"Speichern"|__}" /></td>
-  </tr>
-  </table>
+<div class="control-group">
+    <label class="control-label" for="file">{"Datei:"|__}</label>
+    <div class="controls">
+        <input type="file" name="file" />
+    </div>
+</div>
+<div class="control-group">
+    <label class="control-label" for="vorname">{"Name:"|__}</label>
+    <div class="controls">
+        <input type="text" name="vorname" size="20" /> <input type="text" name="name" size="20" />
+    </div>
+</div>
+<div class="control-group">
+    <label class="control-label" for="geburtsdatum">{"Geburtsdatum:"|__}</label>
+    <div class="controls">
+        <input type="text" name="geburtsdatum" size="20" />
+    </div>
+</div>
+<div class="control-group">
+    <label class="control-label" for="kommentar">{"Kommentar:"|__}</label>
+    <div class="controls">
+        <textarea name="kommentar" cols="40" rows="10"></textarea>
+    </div>
+</div>
+<div class="form-actions">
+    <button class="btn btn-primary submit" type="submit" name="save" value="1">{"Speichern"|__}</button>
+    <button class="btn">{"Abbrechen"|__}</button>
+</div>
  </fieldset>
 </form>
 {include file="footer.html.tpl"}

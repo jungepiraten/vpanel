@@ -1,3 +1,3 @@
 <div class="buttonbox">
- <a href="{"beitraege_create"|___}">{"Neu"|__}</a>
+ <a href="{"beitraege_create"|___}" class="btn btn-primary">{"Neuen Beitrag anlegen"|__}</a>
 </div>

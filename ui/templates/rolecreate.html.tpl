@@ -1,4 +1,3 @@
-{include file="header.html.tpl" ansicht="Neue Rolle erstellen"}
-<p class="pagetitle">Neue Rolle erstellen</p>
+{include file="header.html.tpl" ansicht="Neue Rolle erstellen" menupunkt="role"}
 {include file="roleform.block.tpl"}
 {include file="footer.html.tpl"}

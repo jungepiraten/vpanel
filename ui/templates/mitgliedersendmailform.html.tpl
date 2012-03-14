@@ -1,5 +1,4 @@
-{include file="header.html.tpl" ansicht="Mail verschicken"}
-<p class="pagetitle">Mail verschicken</p>
+{include file="header.html.tpl" ansicht="Mail verschicken" menupunkt="mitglied"}
 <form action="{"mitglieder_sendmail.preview"|___}" method="post">
  <fieldset>
   {if isset($smarty.request.filterid)}<input type="hidden" name="filterid" value="{$smarty.request.filterid|escape:html}" />{/if}

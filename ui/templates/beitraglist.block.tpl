@@ -1,10 +1,19 @@
-<ul class="entrylist">
-{foreach from=$beitraege item=beitrag}
-<li class="entry{cycle values="odd,even"}">
-<a style="float:right; margin-top:7px;margin-right:7px;" href="{"beitraege_del"|___:$beitrag.beitragid}" class="delimg" title="{"Beitrag loeschen"|__}" onClick="return confirm('{"Beitrag wirklich löschen?"|__}');">&nbsp;</a>
-<div style="float:left; margin-left:10px"><a href="{"beitraege_details"|___:$beitrag.beitragid}">{$beitrag.label}</a><br />
-<span class="description">&nbsp;</span></div>
-<div style="clear:both;"></div>
-</li>
-{/foreach}
-</ul>
+<table class="table table-striped table-condensed table-bordered">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Name</th>
+		</tr>
+	</thead>
+	{foreach from=$beitraege item=beitrag}
+		<tr onclick="doNav('{"beitraege_details"|___:$beitrag.beitragid}')">
+			<td>{$beitrag.beitragid}</td>
+			<td>
+				{$beitrag.label}
+				<span class="close closePopupTrigger" id="{$beitrag.beitragid}">&times;</span>
+				<a class="delLink" style="display:none;" href="{"beitraege_del"|___:$beitrag.beitragid}">Soll der Beitrag wirklich gelöscht werden?</a>
+			</td>
+		</tr>
+	{/foreach}
+</table>
+{include file="deleteModal.block.tpl"}

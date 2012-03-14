@@ -1,3 +1,5 @@
+<li class="nav-header">Mitgliedersuche</li>
+<li>
 {literal}
 <script type="text/javascript">
 
@@ -56,7 +58,7 @@ VPanel_DropdownMitgliederSuche.prototype = {
 	},
 	onBlur: function() {
 		this._cancel();
-		this._close();
+//		this._close();
 	},
 
 	onChange: function() {
@@ -102,7 +104,7 @@ VPanel_DropdownMitgliederSuche.prototype = {
 		this.data = data;
 		for(i in data) {
 			$('<li></li>').append(
-				$('<a></a>').text(data[i].label).attr('href',data[i].label)
+				$('<a></a>').text(data[i].label).attr('href',data[i].location)
 			).appendTo( this.list );
 		}
 	},
@@ -158,7 +160,8 @@ $(function() {
 {/literal}
 <form action="" class="suche">
  <fieldset class="suche">
-  <input type="text" id="mitgliedersuche" name="mitgliedersuche" autocomplete="off" {if isset($smarty.request.mitgliedersuche)}value="{$smarty.request.mitgliedersuche|escape:html}"{/if} />
+  <input type="text" id="mitgliedersuche" name="mitgliedersuche" autocomplete="off" {if isset($smarty.request.mitgliedersuche)}value="{$smarty.request.mitgliedersuche|escape:html}"{/if} class="span2" />
   <div id="dropdownmitgliedersuche"><ul></ul></div>
  </fieldset>
 </form>
+</li>

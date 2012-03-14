@@ -1,5 +1,4 @@
-{include file="header.html.tpl" ansicht="Mitgliederdaten exportieren"}
-<p class="pagetitle">Mitgliederdaten exportieren</p>
+{include file="header.html.tpl" ansicht="Mitgliederdaten exportieren" menupunkt="mitglied"}
 <form action="{"mitglieder_export.export"|___}" method="post">
  <fieldset>
   {if isset($smarty.request.filterid)}

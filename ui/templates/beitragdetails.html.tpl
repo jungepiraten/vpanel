@@ -1,22 +1,34 @@
-{include file="header.html.tpl" ansicht="Beitrag bearbeiten"}
-<p class="pagetitle">{"Beitrag \"%s\" bearbeiten"|__:$beitrag.label}</p>
+{capture assign="ansicht"}Beitrag <em>&raquo;{$beitrag.label}&laquo;</em> bearbeiten{/capture}
+{include file="header.html.tpl" ansicht=$ansicht menupunkt="beitrag"}
 {if $beitrag.hoehe != null}
 {include file="beitragform.block.tpl" beitrag=$beitrag}
 {/if}
 {if $session->isAllowed("mitglieder_show")}
 {include file="beitragdetails.buttons.tpl" page=$mitgliederbeitraglist_page pagecount=$mitgliederbeitraglist_pagecount}
-<ul class="entrylist">
-{foreach from=$mitgliederbeitraglist item=mitgliederbeitrag}
-<li class="entry{cycle values="odd,even"}" {if isset($mitgliederbeitrag.mitglied.austritt)}id="ex"{/if}>
-<a style="float:right; margin-top:7px;margin-right:7px;" href="{"mitglieder_beitraege_del"|___:$mitgliederbeitrag.mitglied.mitgliedid:$beitrag.beitragid}" class="delimg">&nbsp;</a>
-<span style="float:right; margin-top:7px;margin-right:7px; width:50px;">{$mitgliederbeitrag.hoehe-$mitgliederbeitrag.bezahlt|string_format:"%.2f"}</span>
-<span style="float:right; margin-top:7px;margin-right:7px; width:50px;">{$mitgliederbeitrag.bezahlt|string_format:"%.2f"}</span>
-<span style="float:right; margin-top:7px;margin-right:7px; width:50px;">{$mitgliederbeitrag.hoehe|string_format:"%.2f"}</span>
-{include file="mitgliederlist.item.tpl" mitglied=$mitgliederbeitrag.mitglied}
-<div style="clear:both;"></div>
-</li>
-{/foreach}
-</ul>
+<table class="table table-striped table-bordered table-condensed">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Name</th>
+			<th>Beitrag</th>
+			<th>Bezahlt</th>
+			<th>Offen</th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+	{foreach from=$mitgliederbeitraglist item=mitgliederbeitrag}
+		<tr onclick="doNav('{"mitglieder_details"|___:$mitgliederbeitrag.mitglied.mitgliedid}');" {if isset($mitgliederbeitrag.mitglied.austritt)}id="ex"{/if}>
+			<td>{$mitgliederbeitrag.mitglied.mitgliedid|escape:html}</td>
+			<td>
+				{include file="mitgliederlist.item.tpl" mitglied=$mitgliederbeitrag.mitglied}
+			</td>
+			<td>{$mitgliederbeitrag.hoehe|string_format:"%.2f"}</td>
+			<td>{$mitgliederbeitrag.bezahlt|string_format:"%.2f"}</td>
+			<td>{$mitgliederbeitrag.hoehe-$mitgliederbeitrag.bezahlt|string_format:"%.2f"}</td>
+			<td><a class="close" href="{"mitglieder_beitraege_del"|___:$mitgliederbeitrag.mitglied.mitgliedid:$beitrag.beitragid}">&times;</a></td>
+		</tr>
+	{/foreach}
+</table>
 {include file="beitragdetails.buttons.tpl" page=$mitgliederbeitraglist_page pagecount=$mitgliederbeitraglist_pagecount}
 {/if}
 {include file="footer.html.tpl"}

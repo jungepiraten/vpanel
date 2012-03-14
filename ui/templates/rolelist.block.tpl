@@ -1,15 +1,25 @@
-<ul class="entrylist">
-{foreach from=$roles item=role}
-<li class="entry{cycle values="odd,even"}">
-{if $showroledel}
- <a style="float:right; margin-top:7px;margin-right:7px;" href="{"roles_del"|___:$role.roleid}" class="delimg" title="Rolle löschen" onClick="return confirm('Rolle wirklich löschen?');">&nbsp;</a>
-{/if}
-{if $showuserdel}
- <a style="float:right; margin-top:7px;margin-right:7px;" href="{"roles_deluser"|___:$role.roleid:$userid}" class="delimg" title="Benutzer von Rolle löschen" onClick="return confirm('Benutzer von Rolle wirklich löschen?');">&nbsp;</a>
-{/if}
-<div style="float:left; margin-left:10px;"><a href="{"roles_details"|___:$role.roleid}" class="label">{$role.label}</a><br>
-<span class="description">{$role.description}</span></div>
-<div style="clear:both;"></div>
-</li>
-{/foreach}
-</ul>
+<table class="table table-condensed table-striped table-bordered">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>{"Name"|__}</th>
+		</tr>
+	</thead>
+	{foreach from=$roles item=role}
+		<tr onclick="doNav('{"roles_details"|___:$role.roleid}')">
+			<td>{$role.roleid}</td>
+			<td>
+				{$role.label}
+				{if $showroledel}
+				<span class="close closePopupTrigger" id="{$user.userid}">&times;</span>
+				<a class="delLink" style="display:none;" href="{"roles_del"|___:$role.roleid}">Soll die Rolle wirklich gelöscht werden?</a>
+				{/if}
+				{if $showuserdel}
+				<a class="close" href="{"users_delrole"|___:$user.userid:$role.roleid}">&times;</a>
+				{/if}
+			</td>
+		</tr>
+	{/foreach}
+</table>
+
+{include file="deleteModal.block.tpl"}

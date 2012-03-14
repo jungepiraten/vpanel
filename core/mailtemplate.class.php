@@ -99,7 +99,7 @@ class MailTemplate extends StorageClass {
 		if ($storage === null) {
 			$storage = $this->getStorage();
 		}
-		$storage->setMailTemplateHeaderList($this->getTemplateID(), array());
+		$storage->setMailTemplateHeaderList($this->getTemplateID(), array(), array());
 		$storage->setMailTemplateAttachmentList($this->getTemplateID(), array());
 		$storage->delMailTemplate($this->getTemplateID());
 	}

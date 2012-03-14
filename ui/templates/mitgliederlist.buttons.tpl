@@ -1,55 +1,70 @@
-<div class="buttonbox">
-&nbsp;
- <form action="{"mitglieder"|___}" method="post" class="filter">
-  <fieldset>
-   <select name="filterid" onChange="this.form.submit()">
-    <option value="">{"(kein Filter)"|__}</option>
-    {foreach from=$filters item=item_filter}<option value="{$item_filter.filterid|escape:html}" {if $filter.filterid==$item_filter.filterid}selected="selected"{/if}>{$item_filter.label|escape:html}</option>{/foreach}
-   </select>
-  </fieldset>
- </form>
- <a href="{"mitglieder_composefilter"|___}">{"Neuen Filter erstellen ..."|__}</a>
- {include file="mitgliederfilter.options.tpl" filterid=$filter.filterid}
- <form action="{"mitglieder_create"|___}" method="post" class="filter">
-  <fieldset>
-   <select name="mitgliedtemplateid">
-    <option value="">{"(keine Vorlage)"|__}</option>
-    {foreach from=$mitgliedtemplates item=mitgliedtemplate}<option value="{$mitgliedtemplate.mitgliedtemplateid|escape:html}">{$mitgliedtemplate.label|escape:html}</option>{/foreach}
-   </select>
-   <input type="submit" value="{"Anlegen"|__}" />
-  </fieldset>
- </form>
-<div class="pages">
-{if $page > 1} <a href="{"mitglieder_page"|___:$filter.filterid:'0'}" class="pagebutton">&lt;&lt;</a>{/if}
-{if $page > 0} <a href="{"mitglieder_page"|___:$filter.filterid:$page-1}">&lt;</a>{/if}
-{if $page > 3}
-{section name=pages loop=$pagecount start=0 max=2}
- <a href="{"mitglieder_page"|___:$filter.filterid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a>
-{/section}
- <span class="pagingsep">...</span>
-{section name=pages loop=$pagecount start=$page-1 max=1}
- <a href="{"mitglieder_page"|___:$filter.filterid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a>
-{/section}
-{else}
-{section name=pages loop=$pagecount start=0 max=$page}
- <a href="{"mitglieder_page"|___:$filter.filterid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a>
-{/section}
-{/if}
- <a href="{"mitglieder_page"|___:$filter.filterid:$page}"class="curpage">{$page+1}</a>
-{if $pagecount-$page > 3}
-{section name=pages loop=$pagecount start=$page+1 max=1}
- <a href="{"mitglieder_page"|___:$filter.filterid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a>
-{/section}
- <span class="pagingsep">...</span>
-{section name=pages loop=$pagecount start=$pagecount-2 max=2}
- <a href="{"mitglieder_page"|___:$filter.filterid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a>
-{/section}
-{else}
-{section name=pages loop=$pagecount start=$page+1 max=$pagecount-$page-1}
- <a href="{"mitglieder_page"|___:$filter.filterid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a>
-{/section}
-{/if}
-{if $page < $pagecount-1} <a href="{"mitglieder_page"|___:$filter.filterid:$page+1}">&gt;</a>{/if}
-{if $page < $pagecount-2} <a href="{"mitglieder_page"|___:$filter.filterid:$pagecount-1}">&gt;&gt;</a>{/if}
-</div>
-</div>
+        <div class="btn-toolbar span8">
+		<div class="btn-group">
+			<button class="btn" onclick="doNav('{"mitglieder_composefilter"|___}');">{"Filtern"|__}</button>
+			<button class="btn dropdown-toggle" data-toggle="dropdown">
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu">
+			{foreach from=$filters item=item_filter}
+				<li><a href="{"mitglieder_page"|___:$item_filter.filterid:0}">{$item_filter.label|escape:html}</a></li>
+			{/foreach}
+			</ul>
+		</div>
+		{include file="mitgliederfilter.options.tpl" filterid=$filter.filterid}
+		<div class="btn-group">
+			<a class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="#">
+				{"Neues Mitglied anlegen"|__}
+				<span class="caret"></span>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a href="{"mitglieder_create"|___:-1}">{"(keine Vorlage)"|__}</a></li>
+				<li class="divider"></li>
+			{foreach from=$mitgliedtemplates item=mitgliedtemplate}
+				<li><a href="{"mitglieder_create"|___:$mitgliedtemplate.mitgliedtemplateid}">{$mitgliedtemplate.label|escape:html}</a></li>
+			{/foreach}
+			</ul>
+		</div>
+	</div>
+	<div class="pagination pagination-right span4">
+		<ul>
+			{if $page > 1}
+			<li><a href="{"mitglieder_page"|___:$filter.filterid:'0'}">&lt;&lt;</a></li>
+			{/if}
+			{if $page > 0}
+			<li><a href="{"mitglieder_page"|___:$filter.filterid:$page-1}">&lt;</a></li>
+			{/if}
+			{if $page > 3}
+				{section name=pages loop=$pagecount start=0 max=2}
+				<li><a href="{"mitglieder_page"|___:$filter.filterid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
+				{/section}
+				<li class="disabled"><a>...</a></li>
+				{section name=pages loop=$pagecount start=$page-1 max=1}
+				<li><a href="{"mitglieder_page"|___:$filter.filterid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
+				{/section}
+			{else}
+				{section name=pages loop=$pagecount start=0 max=$page}
+				<li><a href="{"mitglieder_page"|___:$filter.filterid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
+				{/section}
+			{/if}
+			<li class="active"><a href="{"mitglieder_page"|___:$filter.filterid:$page}">{$page+1}</a></li>
+			{if $pagecount-$page > 3}
+				{section name=pages loop=$pagecount start=$page+1 max=1}
+				<li><a href="{"mitglieder_page"|___:$filter.filterid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
+				{/section}
+				<li class="disabled"><a>...</a></li>
+				{section name=pages loop=$pagecount start=$pagecount-2 max=2}
+				<li><a href="{"mitglieder_page"|___:$filter.filterid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
+				{/section}
+			{else}
+				{section name=pages loop=$pagecount start=$page+1 max=$pagecount-$page-1}
+				<li><a href="{"mitglieder_page"|___:$filter.filterid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
+				{/section}
+			{/if}
+			{if $page < $pagecount-1}
+			<li><a href="{"mitglieder_page"|___:$filter.filterid:$page+1}">&gt;</a></li>
+			{/if}
+			{if $page < $pagecount-2}
+			<li><a href="{"mitglieder_page"|___:$filter.filterid:$pagecount-1}">&gt;&gt;</a></li>
+			{/if}
+		</ul>
+	</div>

@@ -1,12 +1,20 @@
-<ul class="entrylist">
-{foreach from=$dokumente item=dokument}
-<li class="entry{cycle values="odd,even"}">
-{if $showmitglieddokumentdel && isset($mitglied)}
- <a style="float:right; margin-top:7px;margin-right:7px;" href="{"mitglieddokument_delete"|___:$mitglied.mitgliedid:$dokument.dokumentid}" class="delimg">&nbsp;</a>
-{/if}
-<div style="float:left; margin-left:10px;"><a href="{"dokumente_details"|___:$dokument.dokumentid}">{$dokument.label}</a><br>
-<span class="description">{$dokument.file.mimetype|escape:html}, {$dokument.file.filesize|file_size}</span></div>
-<div style="clear:both;"></div>
-</li>
-{/foreach}
-</ul>
+<table class="table table-striped table-bordered table-condensed">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Name</th>
+		</tr>
+	</thead>
+	{foreach from=$dokumente item=dokument}
+		<tr class="dokumentTr" onclick="doNav('{"dokumente_details"|___:$dokument.dokumentid}')">
+			<td>{$dokument.identifier|escape:html}</td>
+			<td>
+				{$dokument.label|escape:html}
+				{if $showmitglieddokumentdel && isset($mitglied)}
+				<a href="{"mitglieddokument_delete"|___:$mitglied.mitgliedid:$dokument.dokumentid}" class="close">&times;</a>
+				{/if}
+				<span class="description">{$dokument.file.mimetype|escape:html}, {$dokument.file.filesize|file_size}</span></div>
+			</td>
+		</tr>
+	{/foreach}
+</table>
