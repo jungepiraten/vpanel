@@ -36,7 +36,7 @@ function doNav(url) {
 	</div>
 	{if $session->isSignedIn()}
 	<div class="row-fluid">
-		<div class="span2">
+		<div class="span3">
 			<div class="well sidebar-nav">
 				<ul class="nav nav-list">
 					{if $session->isAllowed("users_show")}
@@ -69,7 +69,7 @@ function doNav(url) {
 				</ul>
 			</div>
 		</div>
-		<div class="span10">
+		<div class="span9">
 	{else}
 	<div class="content">
 	{/if}
