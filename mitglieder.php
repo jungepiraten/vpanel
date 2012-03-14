@@ -283,6 +283,9 @@ case "create":
 	}
 
 	$template = null;
+	if (isset($data["mitgliedtemplateid"])) {
+		$template = $session->getStorage()->getMitgliedTemplate($data["mitgliedtemplateid"]);
+	}
 	if ($session->hasVariable("mitgliedtemplateid")) {
 		$template = $session->getStorage()->getMitgliedTemplate($session->getVariable("mitgliedtemplateid"));
 	}
