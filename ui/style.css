@@ -1,6 +1,6 @@
 body {
-    margin-bottom:50px;
-    padding-top:50px;
+	margin-bottom:50px;
+	padding-top:50px;
 }
 
 .span {
@@ -8,15 +8,11 @@ body {
 }
 
 .sidebar-nav {
-    padding: 9px 0;
+	padding: 9px 0;
 }
 
 td .close {
 	float:right;
-}
-
-.buttonbox {
-    margin-bottom:10px;
 }
 
 .description {
@@ -24,11 +20,6 @@ td .close {
 	font-size:75%;
 	padding:0px;
 	margin:0px;
-}
-
-input[type="text"] {
-	display:inline-block;
-	margin-bottom:9px;
 }
 
 .loading {

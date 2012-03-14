@@ -89,6 +89,7 @@
     <div class="controls">
         <input type="text" name="strasse" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.strasse|escape:html}{else}{$data.strasse|escape:html}{/if}" />
         <input type="text" name="hausnummer" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.hausnummer|escape:html}{else}{$data.hausnummer|escape:html}{/if}" class="span1" />
+    </div>
 </div>
 
 <div class="control-group">
