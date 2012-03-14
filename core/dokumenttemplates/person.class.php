@@ -4,12 +4,10 @@ require_once(VPANEL_DOKUMENTTEMPLATES . "/default.class.php");
 
 class PersonDokumentTemplate extends DefaultDokumentTemplate {
 	private $labelPrefix;
-	private $mitgliedtemplateid;
 
-	public function __construct($templateid, $label, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $labelPrefix, $mitgliedtemplateid = null) {
+	public function __construct($templateid, $label, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $labelPrefix) {
 		parent::__construct($templateid, $label, $gliederungid, $kategorieid, $statusid, $identifierPrefix, 1);
 		$this->labelPrefix = $labelPrefix;
-		$this->mitgliedtemplateid = $mitgliedtemplateid;
 	}
 
 	private function getLabelPrefix($session) {
@@ -90,7 +88,6 @@ class PersonDokumentTemplate extends DefaultDokumentTemplate {
 
 	public function getDokumentData($session) {
 		return array(	"gliederungid"		=> $this->getDokumentGliederungID($session),
-				"mitgliedtemplateid"	=> $this->mitgliedtemplateid,
 				"natperson"		=> true,
 				"anrede"		=> $this->getAnrede($session),
 				"vorname"		=> $this->getVorname($session),
