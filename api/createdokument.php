@@ -6,6 +6,7 @@ $session = $config->getSession(true);
 $api = $session->getTemplate();
 
 if (!$session->isSignedIn()) {
+	$api->output(array("failed" => "AUTH_MISSING"));
 	exit;
 }
 
