@@ -1,8 +1,8 @@
 {capture assign=ansicht}{$dokumenttemplate.label} anlegen{/capture}
 {include file="header.html.tpl" ansicht=$ansicht menupunkt="dokument"}
-<form action="{"dokumente_create"|___}" method="post" class="filter" enctype="multipart/form-data" class="form-horizontal">
+
+<form action="{"dokumente_create"|___:$dokumenttemplate.dokumenttemplateid}" method="post" class="filter" enctype="multipart/form-data" class="form-horizontal">
  <fieldset>
-  <input type="hidden" name="dokumenttemplateid" value="{$dokumenttemplate.dokumenttemplateid|escape:html}" />
 <div class="control-group">
     <label class="control-label" for="timestamp">{"Eingang:"|__}</label>
     <div class="controls">
