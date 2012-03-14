@@ -11,12 +11,11 @@
 			<td>
 				{$user.username}
 				{if $showuserdel}
-				<span class="close" id="{$user.userid}">&times;</span>
+				<span class="close closePopupTrigger" id="{$user.userid}">&times;</span>
 				<a class="delLink" style="display:none;" href="{"users_del"|___:$user.userid}">Soll der Benutzer wirklich gelöscht werden?</a>
 				{/if}
 				{if $showroledel}
-				<span class="close" id="{$user.userid}">&times;</span>
-				<a class="delLink" style="display:none;" href="{"users_delrole"|___:$user.userid}">Soll der Benutzer wirklich aus der Rolle gelöscht werden?</a>
+				<a href="{"users_delrole"|___:$user.userid:$role.roleid}" class="close">&times;</a>
 				{/if}
 				<div style="clear:both;"></div>
 			</td>

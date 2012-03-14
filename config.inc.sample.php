@@ -28,7 +28,7 @@ $config->registerPage("users", "user.php");
 $config->registerPage("users_create", "user.php?mode=create");
 $config->registerPage("users_details", "user.php?mode=details&userid=%d");
 $config->registerPage("users_del", "user.php?mode=delete&userid=%d");
-$config->registerPage("users_addrole", "user.php?mode=addrole&userid=%d");
+$config->registerPage("users_addrole", "user.php?mode=addrole&userid=%d&roleid=%d");
 $config->registerPage("users_delrole", "user.php?mode=delrole&userid=%d&roleid=%d");
 
 $config->registerPage("roles", "roles.php");
@@ -39,12 +39,12 @@ $config->registerPage("roles_adduser", "user.php?mode=addrole&roleid=%d");
 $config->registerPage("roles_deluser", "user.php?mode=delrole&roleid=%d&userid=%d");
 
 $config->registerPage("dokumente", "dokumente.php");
-$config->registerPage("dokumente_page", "dokumente.php?kategorieid=%d&statusid=%d&page=%d");
+$config->registerPage("dokumente_page", "dokumente.php?gliederungid=%d&kategorieid=%d&statusid=%d&page=%d");
 $config->registerPage("dokumente_json", "json/dokumente.php");
-$config->registerPage("dokumente_create", "dokumente.php?mode=create");
+$config->registerPage("dokumente_create", "dokumente.php?mode=create&dokumenttemplateid=%d");
 $config->registerPage("dokumente_details", "dokumente.php?mode=details&dokumentid=%d");
 $config->registerPage("dokumente_mitglied", "mitglieddokument.php?mode=add&dokumentid=%d");
-$config->registerPage("dokumente_mitglied_create", "mitglieder.php?mode=create&dokumentid=%d");
+$config->registerPage("dokumente_mitglied_create", "mitglieder.php?mode=create&dokumentid=%d&mitgliedtemplateid=%d");
 $config->registerPage("dokumente_get", "file.php?mode=get&dokumentid=%d");
 $config->registerPage("dokumente_view", "file.php?mode=view&dokumentid=%d");
 
@@ -56,7 +56,7 @@ $config->registerPage("orte_json", "json/orte.php");
 $config->registerPage("mitglieder", "mitglieder.php");
 $config->registerPage("mitglieder_json", "json/mitglieder.php");
 $config->registerPage("mitglieder_page", "mitglieder.php?filterid=%s&page=%d");
-$config->registerPage("mitglieder_create", "mitglieder.php?mode=create");
+$config->registerPage("mitglieder_create", "mitglieder.php?mode=create&mitgliedtemplateid=%d");
 $config->registerPage("mitglieder_details", "mitglieder.php?mode=details&mitgliedid=%d");
 $config->registerPage("mitglieder_details_revision", "mitglieder.php?mode=details&revisionid=%d");
 $config->registerPage("mitglieder_bouncelist", "emails.php?mode=listbounces&mitgliederrevisionid=%d");
@@ -90,6 +90,7 @@ $config->registerPage("beitraege_details_page", "beitraege.php?mode=details&beit
 $config->registerPage("beitraege_del", "beitraege.php?mode=delete&beitragid=%d");
 
 $config->registerPage("mailtemplates", "mailtemplates.php");
+$config->registerPage("mailtemplates_gliederungid", "mailtemplates.php?gliederungid=%d");
 $config->registerPage("mailtemplates_create", "mailtemplates.php?mode=create");
 $config->registerPage("mailtemplates_create_gliederungid", "mailtemplates.php?mode=create&gliederungid=%d");
 $config->registerPage("mailtemplates_details", "mailtemplates.php?mode=details&templateid=%d");

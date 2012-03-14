@@ -1,7 +1,5 @@
-{capture assign="ansicht" menupunkt="mitglied"}
-Benutzer <em>&raquo;{$user.username|escape:html}&laquo;</em> bearbeiten.
-{/capture}
-{include file="header.html.tpl" ansicht=$ansicht}
+{capture assign="ansicht"}Benutzer <em>&raquo;{$user.username|escape:html}&laquo;</em> bearbeiten{/capture}
+{include file="header.html.tpl" ansicht=$ansicht menupunkt=user}
 <div class="row-fluid">
 	<div class="span6">
 		<h2>{"Benutzerdaten"|__}</h2>
@@ -10,17 +8,17 @@ Benutzer <em>&raquo;{$user.username|escape:html}&laquo;</em> bearbeiten.
 	<div class="span6">
 		<h2>Rollen</h2>
 		{include file="rolelist.block.tpl" showuserdel=1 userid=$user.userid roles=$userroles}
-		<form class="form-inline" action="{"users_addrole"|___:$user.userid}" method="post" class="useraddrole">
-			<fieldset>
-		 		<input type="hidden" name="redirect" value="{$smarty.server.REQUEST_URI}" />
-		 		<select name="roleid">
-				{foreach from=$roles item=role}
-					<option value="{$role.roleid|escape:html}">{$role.label|escape:html}</option>
-				{/foreach}
-		  		</select>
-		  		<button class="btn btn-primary" type="submit" name="do" value="{"Hinzufuegen"|__}" />{"Hinzufuegen"|__}</button>
-			</fieldset>
-		</form>
+		<div class="btn-group">
+			<a class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="#">
+				{"Rolle hinzufügen"|__}
+				<span class="caret"></span>
+			</a>
+			<ul class="dropdown-menu">
+			{foreach from=$roles item=role}
+				<li><a href="{"users_addrole"|___:$user.userid:$role.roleid}">{$role.label|escape:html}</a></li>
+			{/foreach}
+			</ul>
+		</div>
 	</div>
 </div>
 {include file="footer.html.tpl"}

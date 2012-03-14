@@ -9,7 +9,6 @@
     <div class="control-group">
         <label class="control-label" for="description">{"Beschreibung:"|__}</label>
         <div class="controls">
-            
             <textarea name="description" cols="50" rows="6">{if isset($role)}{$role.description|escape:html}{/if}</textarea>
         </div>
     </div>

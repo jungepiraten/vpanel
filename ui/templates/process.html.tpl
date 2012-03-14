@@ -43,7 +43,7 @@ function updateBar(data) {
 	if (data["iswaiting"]) {
 		$("#progresstest").html("Warte auf Prozessbeginn");
 	}
-	$(".bar").css("width", ((100 * data["progress"]) + "%");
+	$(".bar").css("width", (100 * data["progress"]) + "%");
 	if (data["eta"]) {
 		eta = data["eta"];
 	} else {

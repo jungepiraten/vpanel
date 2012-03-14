@@ -8,6 +8,8 @@ class Ort extends StorageClass {
 	private $plz;
 	private $label;
 	private $stateid;
+	private $latitude;
+	private $longitude;
 
 	private $state;
 

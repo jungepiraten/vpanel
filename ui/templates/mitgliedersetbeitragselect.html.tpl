@@ -1,5 +1,4 @@
-{include file="header.html.tpl" ansicht="Beitrag setzen"}
-<p class="pagetitle">{"Beitrag setzen"|__}</p>
+{include file="header.html.tpl" ansicht="Beitrag setzen" menupunkt="mitglied"}
 <form action="{"mitglieder_setbeitrag.start"|___}" method="post">
  <fieldset>
   <input type="hidden" name="redirect" value="{if isset($smarty.post.redirect)}{$smarty.post.redirect|stripslashes|escape:html}{else}{$smarty.server.HTTP_REFERER|escape:html}{/if}" />

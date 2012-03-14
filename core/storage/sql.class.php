@@ -511,12 +511,12 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		$sql = "SELECT	COUNT(`r`.`revisionid`) as `count`
 			FROM	`mitgliederrevisions` `r`
-			LEFT JOIN `mitglieder` `m` ON (`m`.`mitgliedid` = `r`.`mitgliedid`)
-			LEFT JOIN `natperson` `n` ON (`n`.`natpersonid` = `r`.`natpersonid`)
-			LEFT JOIN `jurperson` `j` ON (`j`.`jurpersonid` = `r`.`jurpersonid`)
-			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
-			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
-			LEFT JOIN `emails` `e` ON (`e`.`emailid` = `k`.`emailid`)
+			LEFT JOIN `mitglieder` `m` USING (`mitgliedid`)
+			LEFT JOIN `natperson` `n` USING (`natpersonid`)
+			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
+			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
+			LEFT JOIN `orte` `o` USING (`ortid`)
+			LEFT JOIN `emails` `e` USING (`emailid`)
 			WHERE	`r`.`timestamp` = (
 				SELECT	MAX(`rmax`.`timestamp`)
 				FROM	`mitgliederrevisions` `rmax`
@@ -525,7 +525,10 @@ abstract class SQLStorage extends AbstractStorage {
 		return reset($this->getResult($sql)->fetchRow());
 	}
 	public function parseMitglied($row) {
-		$o = $this->parseRow($row, null, array("r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => 'Ort', "e" => 'EMail', "m" => 'Mitglied'));
+		$o = $this->parseRow($row, null, array(	"r" => 'MitgliedRevision', "g" => 'Gliederung', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => 'Ort',
+							"s" => 'State', "c" => 'Country', "e" => 'EMail', "m" => 'Mitglied', "t" => 'Mitgliedschaft', "u" => 'User'));
+		$o["s"]->setCountry($o["c"]);
+		$o["o"]->setState($o["s"]);
 		$o["k"]->setOrt($o["o"]);
 		$o["k"]->setEMail($o["e"]);
 		if ($o["r"]->getNatPersonID() !== null) {
@@ -535,6 +538,9 @@ abstract class SQLStorage extends AbstractStorage {
 			$o["r"]->setJurPerson($o["j"]);
 		}
 		$o["r"]->setKontakt($o["k"]);
+		$o["r"]->setGliederung($o["g"]);
+		$o["r"]->setMitgliedschaft($o["t"]);
+		$o["r"]->setUser($o["u"]);
 		$o["m"]->setLatestRevision($o["r"]);
 		return $o["m"];
 	}
@@ -582,18 +588,43 @@ abstract class SQLStorage extends AbstractStorage {
 				`o`.`label` AS `o_label`,
 				`o`.`latitude` AS `o_latitude`,
 				`o`.`longitude` AS `o_longitude`,
-				`o`.`stateid` AS `o_stateid`
+				`o`.`stateid` AS `o_stateid`,
+				`s`.`stateid` AS `s_stateid`,
+				`s`.`label` AS `s_label`,
+				`s`.`population` AS `s_population`,
+				`s`.`countryid` AS `s_countryid`,
+				`c`.`countryid` AS `c_countryid`,
+				`c`.`label` AS `c_label`,
+				`g`.`gliederungsid` AS `g_gliederungsid`,
+				`g`.`label` AS `g_label`,
+				`g`.`parentid` AS `g_parentid`,
+				`t`.`mitgliedschaftid` AS `t_mitgliedschaftid`,
+				`t`.`label` AS `t_label`,
+				`t`.`description` AS `t_description`,
+				`u`.`userid` AS `u_userid`,
+				`u`.`username` AS `u_username`,
+				`u`.`password` AS `u_password`,
+				`u`.`passwordsalt` AS `u_passwordsalt`,
+				`u`.`apikey` AS `u_apikey`,
+				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
+				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
 			FROM	`mitglieder` `m`
 			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
-			LEFT JOIN `mitgliederrevisions` `rmax` USING (`mitgliedid`)
-			LEFT JOIN `natperson` `n` ON (`n`.`natpersonid` = `r`.`natpersonid`)
-			LEFT JOIN `jurperson` `j` ON (`j`.`jurpersonid` = `r`.`jurpersonid`)
-			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
-			LEFT JOIN `emails` `e` ON (`e`.`emailid` = `k`.`emailid`)
-			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
-			WHERE " . $this->parseMitgliederMatcher($matcher) . "
-			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
-			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
+			LEFT JOIN `natperson` `n` USING (`natpersonid`)
+			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
+			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
+			LEFT JOIN `emails` `e` USING (`emailid`)
+			LEFT JOIN `orte` `o` USING (`ortid`)
+			LEFT JOIN `states` `s` USING (`stateid`)
+			LEFT JOIN `countries` `c` USING (`countryid`)
+			LEFT JOIN `gliederungen` `g` USING (`gliederungsid`)
+			LEFT JOIN `mitgliedschaften` `t` USING (`mitgliedschaftid`)
+			LEFT JOIN `users` `u` USING (`userid`)
+			WHERE	`r`.`timestamp` = (
+				SELECT	MAX(`rmax`.`timestamp`)
+				FROM	`mitgliederrevisions` `rmax`
+				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)
+					AND " . $this->parseMitgliederMatcher($matcher) . "
 			ORDER BY `m`.`eintritt`";
 		if ($limit !== null or $offset !== null) {
 			$sql .= " LIMIT ";
@@ -647,19 +678,44 @@ abstract class SQLStorage extends AbstractStorage {
 				`o`.`label` AS `o_label`,
 				`o`.`latitude` AS `o_latitude`,
 				`o`.`longitude` AS `o_longitude`,
-				`o`.`stateid` AS `o_stateid`
+				`o`.`stateid` AS `o_stateid`,
+				`s`.`stateid` AS `s_stateid`,
+				`s`.`label` AS `s_label`,
+				`s`.`population` AS `s_population`,
+				`s`.`countryid` AS `s_countryid`,
+				`c`.`countryid` AS `c_countryid`,
+				`c`.`label` AS `c_label`,
+				`g`.`gliederungsid` AS `g_gliederungsid`,
+				`g`.`label` AS `g_label`,
+				`g`.`parentid` AS `g_parentid`,
+				`t`.`mitgliedschaftid` AS `t_mitgliedschaftid`,
+				`t`.`label` AS `t_label`,
+				`t`.`description` AS `t_description`,
+				`u`.`userid` AS `u_userid`,
+				`u`.`username` AS `u_username`,
+				`u`.`password` AS `u_password`,
+				`u`.`passwordsalt` AS `u_passwordsalt`,
+				`u`.`apikey` AS `u_apikey`,
+				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
+				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
 			FROM	`mitglieddokument`
 			LEFT JOIN `mitglieder` `m` USING (`mitgliedid`)
 			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
-			LEFT JOIN `mitgliederrevisions` `rmax` USING (`mitgliedid`)
 			LEFT JOIN `natperson` `n` ON (`n`.`natpersonid` = `r`.`natpersonid`)
 			LEFT JOIN `jurperson` `j` ON (`j`.`jurpersonid` = `r`.`jurpersonid`)
 			LEFT JOIN `kontakte` `k` ON (`k`.`kontaktid` = `r`.`kontaktid`)
-			LEFT JOIN `emails` `e` ON (`e`.`emailid` = `k`.`emailid`)
-			LEFT JOIN `orte` `o` ON (`o`.`ortid` = `k`.`ortid`)
-			WHERE	`dokumentid` = " . intval($dokumentid) . "
-			GROUP BY `m`.`mitgliedid`, `r`.`timestamp`
-			HAVING	`r`.`timestamp` = MAX(`rmax`.`timestamp`)
+			LEFT JOIN `emails` `e` USING (`emailid`)
+			LEFT JOIN `orte` `o` USING (`ortid`)
+			LEFT JOIN `states` `s` USING (`stateid`)
+			LEFT JOIN `countries` `c` USING (`countryid`)
+			LEFT JOIN `gliederungen` `g` USING (`gliederungsid`)
+			LEFT JOIN `mitgliedschaften` `t` USING (`mitgliedschaftid`)
+			LEFT JOIN `users` `u` USING (`userid`)
+			WHERE	`r`.`timestamp` = (
+				SELECT	MAX(`rmax`.`timestamp`)
+				FROM	`mitgliederrevisions` `rmax`
+				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)
+					AND	`dokumentid` = " . intval($dokumentid) . "
 			ORDER BY `m`.`eintritt`";
 		return $this->getResult($sql, array($this, "parseMitglied"));
 	}
@@ -836,12 +892,18 @@ abstract class SQLStorage extends AbstractStorage {
 	 * MitgliederRevisions
 	 **/
 	public function parseMitgliederRevision($row) {
-		$o = $this->parseRow($row, null, array("r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => "Ort", "e" => "EMail"));
+		$o = $this->parseRow($row, null, array(	"r" => 'MitgliedRevision', "n" => 'NatPerson', "j" => 'JurPerson', "k" => 'Kontakt', "o" => "Ort", "s" => "State", "c" => "Country",
+							"g" => "Gliederung", "e" => "EMail", "t" => "Mitgliedschaft", "u" => "User"));
+		$o["s"]->setCountry($o["c"]);
+		$o["o"]->setState($o["s"]);
 		$o["k"]->setOrt($o["o"]);
 		$o["k"]->setEMail($o["e"]);
 		$o["r"]->setNatPerson($o["n"]);
 		$o["r"]->setJurPerson($o["j"]);
 		$o["r"]->setKontakt($o["k"]);
+		$o["r"]->setGliederung($o["g"]);
+		$o["r"]->setMitgliedschaft($o["t"]);
+		$o["r"]->setUser($o["u"]);
 		return $o["r"];
 	}
 	public function getMitgliederRevisionResult() {
@@ -880,13 +942,37 @@ abstract class SQLStorage extends AbstractStorage {
 				`o`.`label` AS `o_label`,
 				`o`.`latitude` AS `o_latitude`,
 				`o`.`longitude` AS `o_longitude`,
-				`o`.`stateid` AS `o_stateid`
+				`o`.`stateid` AS `o_stateid`,
+				`s`.`stateid` AS `s_stateid`,
+				`s`.`label` AS `s_label`,
+				`s`.`population` AS `s_population`,
+				`s`.`countryid` AS `s_countryid`,
+				`c`.`countryid` AS `c_countryid`,
+				`c`.`label` AS `c_label`,
+				`g`.`gliederungsid` AS `g_gliederungsid`,
+				`g`.`label` AS `g_label`,
+				`g`.`parentid` AS `g_parentid`,
+				`t`.`mitgliedschaftid` AS `t_mitgliedschaftid`,
+				`t`.`label` AS `t_label`,
+				`t`.`description` AS `t_description`,
+				`u`.`userid` AS `u_userid`,
+				`u`.`username` AS `u_username`,
+				`u`.`password` AS `u_password`,
+				`u`.`passwordsalt` AS `u_passwordsalt`,
+				`u`.`apikey` AS `u_apikey`,
+				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
+				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
 			FROM	`mitgliederrevisions` `r`
 			LEFT JOIN `natperson` `n` USING (`natpersonid`)
 			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
 			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
 			LEFT JOIN `orte` `o` USING (`ortid`)
+			LEFT JOIN `states` `s` USING (`stateid`)
+			LEFT JOIN `countries` `c` USING (`countryid`)
+			LEFT JOIN `gliederungen` `g` USING (`gliederungsid`)
 			LEFT JOIN `emails` `e` USING (`emailid`)
+			LEFT JOIN `mitgliedschaften` `t` USING (`mitgliedschaftid`)
+			LEFT JOIN `users` `u` USING (`userid`)
 			ORDER BY `r`.`timestamp`";
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
 	}
@@ -926,13 +1012,37 @@ abstract class SQLStorage extends AbstractStorage {
 				`o`.`label` AS `o_label`,
 				`o`.`latitude` AS `o_latitude`,
 				`o`.`longitude` AS `o_longitude`,
-				`o`.`stateid` AS `o_stateid`
+				`o`.`stateid` AS `o_stateid`,
+				`s`.`stateid` AS `s_stateid`,
+				`s`.`label` AS `s_label`,
+				`s`.`population` AS `s_population`,
+				`s`.`countryid` AS `s_countryid`,
+				`c`.`countryid` AS `c_countryid`,
+				`c`.`label` AS `c_label`,
+				`g`.`gliederungsid` AS `g_gliederungsid`,
+				`g`.`label` AS `g_label`,
+				`g`.`parentid` AS `g_parentid`,
+				`t`.`mitgliedschaftid` AS `t_mitgliedschaftid`,
+				`t`.`label` AS `t_label`,
+				`t`.`description` AS `t_description`,
+				`u`.`userid` AS `u_userid`,
+				`u`.`username` AS `u_username`,
+				`u`.`password` AS `u_password`,
+				`u`.`passwordsalt` AS `u_passwordsalt`,
+				`u`.`apikey` AS `u_apikey`,
+				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
+				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
 			FROM	`mitgliederrevisions` `r`
 			LEFT JOIN `natperson` `n` USING (`natpersonid`)
 			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
 			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
 			LEFT JOIN `orte` `o` USING (`ortid`)
+			LEFT JOIN `states` `s` USING (`stateid`)
+			LEFT JOIN `countries` `c` USING (`countryid`)
+			LEFT JOIN `gliederungen` `g` USING (`gliederungsid`)
 			LEFT JOIN `emails` `e` USING (`emailid`)
+			LEFT JOIN `mitgliedschaften` `t` USING (`mitgliedschaftid`)
+			LEFT JOIN `users` `u` USING (`userid`)
 			WHERE `r`.`mitgliedid` = " . intval($mitgliedid) . "
 			ORDER BY `r`.`timestamp`";
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
@@ -973,13 +1083,37 @@ abstract class SQLStorage extends AbstractStorage {
 				`o`.`label` AS `o_label`,
 				`o`.`latitude` AS `o_latitude`,
 				`o`.`longitude` AS `o_longitude`,
-				`o`.`stateid` AS `o_stateid`
+				`o`.`stateid` AS `o_stateid`,
+				`s`.`stateid` AS `s_stateid`,
+				`s`.`label` AS `s_label`,
+				`s`.`population` AS `s_population`,
+				`s`.`countryid` AS `s_countryid`,
+				`c`.`countryid` AS `c_countryid`,
+				`c`.`label` AS `c_label`,
+				`g`.`gliederungsid` AS `g_gliederungsid`,
+				`g`.`label` AS `g_label`,
+				`g`.`parentid` AS `g_parentid`,
+				`t`.`mitgliedschaftid` AS `t_mitgliedschaftid`,
+				`t`.`label` AS `t_label`,
+				`t`.`description` AS `t_description`,
+				`u`.`userid` AS `u_userid`,
+				`u`.`username` AS `u_username`,
+				`u`.`password` AS `u_password`,
+				`u`.`passwordsalt` AS `u_passwordsalt`,
+				`u`.`apikey` AS `u_apikey`,
+				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
+				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
 			FROM	`mitgliederrevisions` `r`
 			LEFT JOIN `natperson` `n` USING (`natpersonid`)
 			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
 			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
 			LEFT JOIN `orte` `o` USING (`ortid`)
+			LEFT JOIN `states` `s` USING (`stateid`)
+			LEFT JOIN `countries` `c` USING (`countryid`)
+			LEFT JOIN `gliederungen` `g` USING (`gliederungsid`)
 			LEFT JOIN `emails` `e` USING (`emailid`)
+			LEFT JOIN `mitgliedschaften` `t` USING (`mitgliedschaftid`)
+			LEFT JOIN `users` `u` USING (`userid`)
 			WHERE	`r`.`revisionid` = " . intval($revisionid);
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"))->fetchRow();
 	}

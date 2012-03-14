@@ -30,3 +30,8 @@ input[type="text"] {
 	display:inline-block;
 	margin-bottom:9px;
 }
+
+.loading {
+	background-image:url(images/loading.gif);
+	background-repeat:no-repeat;background-position:center right;
+}

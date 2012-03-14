@@ -1,4 +1,4 @@
-{include file="header.html.tpl" ansicht="Neuen Benutzer anlegen"}
+{include file="header.html.tpl" ansicht="Neuen Benutzer anlegen" menupunkt="user"}
 {include file="userform.block.tpl"}
 {literal}
 <script type="text/javascript">

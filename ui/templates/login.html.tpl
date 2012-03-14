@@ -23,8 +23,9 @@
         </div>
     </div>
 
-    <div class="form-action">
-        <button class="btn btn-primary" type="submit" name="login" value="1" />{"Anmelden"|__}</button>
+    <div class="form-actions">
+        <button class="btn btn-primary submit" type="submit" name="login" value="1" />{"Anmelden"|__}</button>
+        <button class="btn">{"Abbrechen"|__}</button>
     </div>
  </fieldset>
 </form>

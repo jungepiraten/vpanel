@@ -58,7 +58,7 @@ VPanel_DropdownDokumentSuche.prototype = {
 	},
 	onBlur: function() {
 		this._cancel();
-		this._close();
+//		this._close();
 	},
 
 	onChange: function() {
@@ -104,7 +104,7 @@ VPanel_DropdownDokumentSuche.prototype = {
 		this.data = data;
 		for(i in data) {
 			$('<li></li>').append(
-				$('<a></a>').text(data[i].label).attr('href',data[i].label)
+				$('<a></a>').text(data[i].label).attr('href',data[i].location)
 			).appendTo( this.list );
 		}
 	},
