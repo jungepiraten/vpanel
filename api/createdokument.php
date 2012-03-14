@@ -51,7 +51,7 @@ if ($file == null) {
 
 	$notiz->notify();
 
-	$ui->redirect($session->getLink("dokumente_details", $dokument->getDokumentID()));
+	$api->output(array("success" => "1"));
 }
 
 ?>
