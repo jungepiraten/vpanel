@@ -1,7 +1,7 @@
 {capture assign="ansicht"}{$dokumenttemplate.label} anlegen{/capture}
 {include file="header.html.tpl" ansicht=$ansicht menupunkt="dokument"}
 
-<form action="{"dokumente_create"|___:$dokumenttemplate.dokumenttemplateid}" method="post" class="filter" enctype="multipart/form-data" class="form-horizontal">
+<form action="{"dokumente_create"|___:$dokumenttemplate.dokumenttemplateid}" method="post" enctype="multipart/form-data" class="form-horizontal">
  <fieldset>
 <div class="control-group">
     <label class="control-label" for="file">{"Datei:"|__}</label>
