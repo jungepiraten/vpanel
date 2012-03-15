@@ -1,4 +1,4 @@
-        <div class="btn-toolbar span8">
+        <div class="btn-toolbar span6">
 		<div class="btn-group">
 			<button class="btn" onclick="doNav('{"mitglieder_composefilter"|___}');">{"Filtern"|__}</button>
 			<button class="btn dropdown-toggle" data-toggle="dropdown">
@@ -25,7 +25,7 @@
 			</ul>
 		</div>
 	</div>
-	<div class="pagination pagination-right span4">
+	<div class="pagination pagination-right span6">
 		<ul>
 			{if $page > 1}
 			<li><a href="{"mitglieder_page"|___:$filter.filterid:'0'}">&lt;&lt;</a></li>
