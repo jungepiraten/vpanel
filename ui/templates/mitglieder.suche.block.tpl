@@ -149,7 +149,8 @@ $(function() {
 </script>
 <style type="text/css">
 .suche
-	{z-index:5;}
+	{z-index:5;
+		margin-bottom:0px;}
 .suche ul
 	{list-style:none; padding:0px;}
 .suche ul li
