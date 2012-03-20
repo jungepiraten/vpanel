@@ -6,7 +6,7 @@
 	<ul class="dropdown-menu">
 		<li>
 		 <a class="closePopupTrigger">{"Löschen"|__}</a>
-		 <a class="delLink" style="display:none;" href="{"mitglieder_del"|___:$mitglied.filterid}">Soll der Benutzer wirklich gelöscht werden?</a>
+		 <a class="delLink" style="display:none;" href="{"mitglieder_del"|___:$filterid}">Soll der Benutzer wirklich gelöscht werden?</a>
 		</li>
 		<li><a href="{"mitglieder_sendmail.select"|___:$filterid}">{"Mails verschicken"|__}</a></li>
 		<li><a href="{"mitglieder_export.options"|___:$filterid}">{"Exportieren"|__}</a></li>
