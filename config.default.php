@@ -24,7 +24,7 @@ class DefaultConfig {
 	}
 
 	/** Fuer GlobaleIDs **/
-	protected function getHostPart() {
+	public function getHostPart() {
 		return "example.org";
 	}
 	public function generateGlobalID() {
