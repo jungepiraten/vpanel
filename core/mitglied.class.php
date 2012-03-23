@@ -179,6 +179,9 @@ class Mitglied extends GlobalClass {
 		case "EINTRITT":
 			return date("d.m.Y", $this->getEintrittsdatum());
 		case "AUSTRITT":
+			if ($this->getAustrittsdatum() == null) {
+				return "";
+			}
 			return date("d.m.Y", $this->getAustrittsdatum());
 		case "GLIEDERUNG":
 			return $revision->getGliederung()->getLabel();
