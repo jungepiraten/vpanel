@@ -57,7 +57,7 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 	$hausnummer = $session->getVariable("hausnummer");
 	$plz = $session->getVariable("plz");
 	$ortname = $session->getVariable("ort");
-	$stateid = (is_numeric($session->getVariable("stateid")) ? $session->getVariable("stateid") : null;
+	$stateid = is_numeric($session->getVariable("stateid")) ? $session->getVariable("stateid") : null;
 	$telefon = $session->getVariable("telefon");
 	$handy = $session->getVariable("handy");
 	$email = $session->getVariable("email");
