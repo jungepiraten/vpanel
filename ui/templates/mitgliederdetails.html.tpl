@@ -46,7 +46,7 @@
 			<div class="controls">
 				<textarea cols="35" rows="2" name="kommentar"></textarea>
 			</div>
-			<button class="btn btn-success submit" type="submit" name="save" value="1">{"Hinzufügen"|__}</button>
+			<button class="btn btn-success submit" type="submit" name="addnotiz" value="1">{"Hinzufügen"|__}</button>
 		</fieldset>
 	</form>
 	<div class="btn-toolbar">

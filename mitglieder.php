@@ -57,11 +57,11 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 	$hausnummer = $session->getVariable("hausnummer");
 	$plz = $session->getVariable("plz");
 	$ortname = $session->getVariable("ort");
-	$stateid = is_numeric($_POST["stateid"]) ? $_POST["stateid"] : null;
+	$stateid = (is_numeric($session->getVariable("stateid")) ? $session->getVariable("stateid") : null;
 	$telefon = $session->getVariable("telefon");
 	$handy = $session->getVariable("handy");
 	$email = $session->getVariable("email");
-	$gliederungid = intval($_POST["gliederungid"]);
+	$gliederungid = intval($session->getVariable("gliederungid"));
 	$gliederung = $session->getStorage()->getGliederung($gliederungid);
 	$mitgliedschaftid = $session->getIntVariable("mitgliedschaftid");
 	$mitgliedschaft = $session->getStorage()->getMitgliedschaft($mitgliedschaftid);
