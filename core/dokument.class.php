@@ -179,6 +179,10 @@ class Dokument extends StorageClass {
 			serialize($this->getData()),
 			$this->getFileID() ));
 	}
+
+	public function getFirstNotiz() {
+		return first($this->getStorage()->getDokumentNotizList($this->getDokumentID()));
+	}
 }
 
 ?>

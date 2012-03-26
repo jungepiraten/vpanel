@@ -1930,6 +1930,7 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($dokumentid != null) {
 			$sql .= " AND `dokumentid` = " . intval($dokumentid);
 		}
+		$sql .= " ORDER BY `timestamp` ASC";
 		return $this->getResult($sql, array($this, "parseDokumentNotiz"));
 	}
 	public function getDokumentNotiz($dokumentnotizid) {
