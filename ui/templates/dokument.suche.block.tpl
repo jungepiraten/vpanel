@@ -12,7 +12,7 @@ Function.prototype.createDelegate = function(scope) {
 function VPanel_DropdownDokumentSuche() {
 	this.inputq = $('#dokumentsuche{/literal}{$rand}{literal}');
 	this.overlay = $('#dropdowndokumentsuche{/literal}{$rand}{literal}');
-	this.list = $('#dropdowndokumentsuche{/literal}{$rand}{literal ul');
+	this.list = $('#dropdowndokumentsuche{/literal}{$rand}{literal} ul');
 	this.data = [];
 	this.current = -1;
 	this.active = false;
