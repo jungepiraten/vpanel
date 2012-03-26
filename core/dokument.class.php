@@ -181,7 +181,7 @@ class Dokument extends StorageClass {
 	}
 
 	public function getFirstNotiz() {
-		return first($this->getStorage()->getDokumentNotizList($this->getDokumentID()));
+		return reset($this->getStorage()->getDokumentNotizList($this->getDokumentID()));
 	}
 }
 
