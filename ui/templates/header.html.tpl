@@ -61,10 +61,12 @@ function doNav(url) {
 						<li {if $menupunkt == "statistik"}class="active"{/if}><a href="{"statistik"|___}">{"Mitgliederstatistik"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("dokumente_show")}
-						{include file="dokument.suche.block.tpl"}
+						<li class="nav-header">Dokumentensuche</li>
+						<li>{include file="dokument.suche.block.tpl"}</li>
 					{/if}
 					{if $session->isAllowed("mitglieder_show")}
-						{include file="mitglieder.suche.block.tpl"}
+						<li class="nav-header">Mitgliedersuche</li>
+						<li>{include file="mitglieder.suche.block.tpl"}</li>
 					{/if}
 				</ul>
 			</div>

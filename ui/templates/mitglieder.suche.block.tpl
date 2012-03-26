@@ -1,5 +1,4 @@
-<li class="nav-header">Mitgliedersuche</li>
-<li>
+{assign var='rand' value=1|rand:20}
 {literal}
 <script type="text/javascript">
 
@@ -11,9 +10,9 @@ Function.prototype.createDelegate = function(scope) {
 }
 
 function VPanel_DropdownMitgliederSuche() {
-	this.inputq = $('#mitgliedersuche');
-	this.overlay = $('#dropdownmitgliedersuche');
-	this.list = $('#dropdownmitgliedersuche ul');
+	this.inputq = $('#mitgliedersuche{/literal}{$rand}{literal}');
+	this.overlay = $('#dropdownmitgliedersuche{/literal}{$rand}{literal}');
+	this.list = $('#dropdownmitgliedersuche{/literal}{$rand}{literal} ul');
 	this.data = [];
 	this.current = -1;
 	this.active = false;
@@ -161,8 +160,8 @@ $(function() {
 {/literal}
 <form action="" class="suche">
  <fieldset class="suche">
-  <input type="text" id="mitgliedersuche" name="mitgliedersuche" autocomplete="off" {if isset($smarty.request.mitgliedersuche)}value="{$smarty.request.mitgliedersuche|escape:html}"{/if} class="span2" />
-  <div id="dropdownmitgliedersuche"><ul></ul></div>
+  <input type="text" id="mitgliedersuche{$rand}" name="mitgliedersuche" autocomplete="off" {if isset($smarty.request.mitgliedersuche)}value="{$smarty.request.mitgliedersuche|escape:html}"{/if} class="span2" />
+  <div id="dropdownmitgliedersuche{$rand}"><ul></ul></div>
  </fieldset>
 </form>
 </li>

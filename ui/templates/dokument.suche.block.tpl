@@ -1,5 +1,4 @@
-<li class="nav-header">Dokumentensuche</li>
-<li>
+{assign var='rand' value=1|rand:20}
 {literal}
 <script type="text/javascript">
 
@@ -11,9 +10,9 @@ Function.prototype.createDelegate = function(scope) {
 }
 
 function VPanel_DropdownDokumentSuche() {
-	this.inputq = $('#dokumentsuche');
-	this.overlay = $('#dropdowndokumentsuche');
-	this.list = $('#dropdowndokumentsuche ul');
+	this.inputq = $('#dokumentsuche{/literal}{$rand}{literal}');
+	this.overlay = $('#dropdowndokumentsuche{/literal}{$rand}{literal}');
+	this.list = $('#dropdowndokumentsuche{/literal}{$rand}{literal ul');
 	this.data = [];
 	this.current = -1;
 	this.active = false;
@@ -160,8 +159,7 @@ $(function() {
 {/literal}
 <form action="" class="suche">
  <fieldset class="suche">
-  <input type="text" id="dokumentsuche" name="dokumentsuche" autocomplete="off" {if isset($smarty.request.dokumentsuche)}value="{$smarty.request.dokumentsuche|escape:html}"{/if} class="span2"/>
-  <div id="dropdowndokumentsuche"><ul></ul></div>
+  <input type="text" id="dokumentsuche{$rand}" name="dokumentsuche" autocomplete="off" {if isset($smarty.request.dokumentsuche)}value="{$smarty.request.dokumentsuche|escape:html}"{/if} class="span2"/>
+  <div id="dropdowndokumentsuche{$rand}"><ul></ul></div>
  </fieldset>
 </form>
-</li>
