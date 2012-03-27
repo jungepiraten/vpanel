@@ -62,11 +62,11 @@ function doNav(url) {
 					{/if}
 					{if $session->isAllowed("dokumente_show")}
 						<li class="nav-header">Dokumentensuche</li>
-						<li>{include file="dokument.suche.block.tpl"}</li>
+						<li><form action="{"dokumente"|___}">{include file="dokument.suche.block.tpl"}</form></li>
 					{/if}
 					{if $session->isAllowed("mitglieder_show")}
 						<li class="nav-header">Mitgliedersuche</li>
-						<li>{include file="mitglieder.suche.block.tpl"}</li>
+						<li><form action="{"mitglieder"|___}">{include file="mitglieder.suche.block.tpl"}</form></li>
 					{/if}
 				</ul>
 			</div>

@@ -496,7 +496,11 @@ default:
 	$filter = null;
 
 	if ($session->hasVariable("mitgliedersuche")) {
-		$filter = $session->addMitgliederMatcher(new SearchMitgliederMatcher($session->getVariable("mitgliedersuche")));
+		$term = $session->getVariable("mitgliedersuche");
+		if (is_numeric($term)) {
+			$ui->redirect($session->getLink("mitglieder_details", $term));
+		}
+		$filter = $session->addMitgliederMatcher(new SearchMitgliederMatcher($term));
 	}
 	
 	if ($session->hasVariable("filterid")) {
