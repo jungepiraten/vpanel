@@ -158,6 +158,13 @@ class DokumentNotiz extends StorageClass {
 			$this->getKommentar() ));
 	}
 
+	public function delete(Storage $storage = null) {
+		if ($storage === null) {
+			$storage = $this->getStorage();
+		}
+		$storage->delDokumentNotiz($this->getDokumentNotizID());
+	}
+
 	public function notify() {
 		foreach ($this->getStorage()->getDokumentNotifyList($this->getDokument()->getGliederungID(), $this->getNextKategorieID(), $this->getNextStatusID()) as $notify) {
 			$notify->notify($this->getDokument(), $this);
