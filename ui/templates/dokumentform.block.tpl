@@ -64,7 +64,7 @@
 </div>
 <div class="form-actions">
     <button class="btn btn-primary submit" type="submit" name="save" value="1">{"Speichern"|__}</button>
-    <button class="btn">{"Abbrechen"|__}</button>
+    {if isset($dokument)}<a class="btn btn-danger delete" href="{"dokumente_del"|___:$dokument.dokumentid}">{"Löschen"|__}</a>{/if}
 </div>
  </fieldset>
 </form>

@@ -1809,6 +1809,10 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		return $dokumentid;
 	}
+	public function delDokument($dokumentid) {
+		$sql = "DELETE FROM `dokument` WHERE `dokumentid` = " . intval($dokumentid);
+		return $this->query($sql);
+	}
 
 	/**
 	 * DokumentNotify

@@ -10,10 +10,8 @@
 			<td>{$beitrag.beitragid}</td>
 			<td>
 				{$beitrag.label}
-				<span class="close closePopupTrigger" id="{$beitrag.beitragid}">&times;</span>
-				<a class="delLink" style="display:none;" href="{"beitraege_del"|___:$beitrag.beitragid}">Soll der Beitrag wirklich gelöscht werden?</a>
+				<a class="close delete"  href="{"beitraege_del"|___:$beitrag.beitragid}">&times;</a>
 			</td>
 		</tr>
 	{/foreach}
 </table>
-{include file="deleteModal.block.tpl"}

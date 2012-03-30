@@ -180,6 +180,21 @@ class Dokument extends StorageClass {
 			$this->getFileID() ));
 	}
 
+	public function delete(Storage $storage = null) {
+		if ($storage === null) {
+			$storage = $this->getStorage();
+		}
+		$notizen = $storage->getDokumentNotizList($this->getDokumentID());
+		foreach ($notizen as $notiz) {
+			$notiz->delete($storage);
+		}
+		$mitglieder = $storage->getMitgliederByDokumentList($this->getDokumentID());
+		foreach ($mitglieder as $mitglied) {
+			$storage->delMitgliedDokument($mitglied->getMitgliedID(), $this->getDokumentID());
+		}
+		$storage->delDokument($this->getDokumentID());
+	}
+
 	public function getFirstNotiz() {
 		return reset($this->getStorage()->getDokumentNotizList($this->getDokumentID()));
 	}

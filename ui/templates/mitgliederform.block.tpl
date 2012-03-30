@@ -179,7 +179,6 @@
 
 <div class="form-actions">
     <button class="btn btn-primary submit" type="submit" name="save" value="1">{"Speichern"|__}</button>
-    <button class="btn">{"Abbrechen"|__}</button>
 </div>
 
  </fieldset>

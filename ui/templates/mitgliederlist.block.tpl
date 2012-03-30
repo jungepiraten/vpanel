@@ -10,8 +10,7 @@
 			<td>{$mitglied.mitgliedid|escape:html}</td>
 			<td>
 				{if $showmitglieddel and ! isset($mitglied.austritt)}
-				<span class="close closePopupTrigger">&times;</span>
-				<a class="delLink" style="display:none;" href="{"mitglieder_del"|___:$mitglied.filterid}">Soll das Mitglied wirklich gelöscht werden?</a>
+				<a class="close delete" href="{"mitglieder_del"|___:$mitglied.filterid}">&times;</a>
 				{/if}
 				{if $showmitglieddokumentdel and isset($dokument)}
 				<a href="{"mitglieddokument_delete"|___:$mitglied.mitgliedid:$dokument.dokumentid}" class="close">&times;</a>

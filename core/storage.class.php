@@ -57,6 +57,7 @@ interface Storage {
 	public function setMitgliederBeitragByBeitragList($beitragid, $mitgliedids, $hoehelist, $bezahltlist);
 	public function delMitgliederBeitragByBeitrag($beitragid);
 	public function getMitgliederBeitrag($mitgliedid, $beitragid);
+
 	public function addMitgliedDokument($mitgliedid, $dokumentid);
 	public function delMitgliedDokument($mitgliedid, $dokumentid);
 
@@ -180,6 +181,7 @@ interface Storage {
 	public function getDokumentCount($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null);
 	public function getDokument($dokumentid);
 	public function setDokument($dokumentid, $gliederungid, $dokumentkategorieid, $dokumentstatus, $identifier, $label, $content, $data, $fileid);
+	public function delDokument($dokumentid);
 
 	public function getDokumentNotifyResult($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null);
 	public function getDokumentNotifyList($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null);

@@ -40,6 +40,7 @@ $config->registerPage("roles_deluser", "user.php?mode=delrole&roleid=%d&userid=%
 
 $config->registerPage("dokumente", "dokumente.php");
 $config->registerPage("dokumente_page", "dokumente.php?gliederungid=%d&kategorieid=%d&statusid=%d&page=%d");
+$config->registerPage("dokumente_del", "dokumente.php?mode=delete&dokumentid=%d");
 $config->registerPage("dokumente_json", "json/dokumente.php");
 $config->registerPage("dokumente_create", "dokumente.php?mode=create&dokumenttemplateid=%d");
 $config->registerPage("dokumente_details", "dokumente.php?mode=details&dokumentid=%d");

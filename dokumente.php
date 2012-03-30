@@ -64,9 +64,7 @@ case "create":
 			exit;
 		}
 
-		if ($file == null) {
-			
-		} else {
+		if ($file != null) {
 			$dokument = new Dokument($session->getStorage());
 			$dokument->setGliederungID($gliederungid);
 			$dokument->setDokumentKategorieID($kategorieid);
@@ -118,6 +116,17 @@ case "details":
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
 	$mitgliedtemplates = $session->getStorage()->getMitgliedTemplateList($session->getAllowedGliederungIDs("mitglieder_create"));
 	$ui->viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $dokumentkategorien, $dokumentstatuslist, $mitgliedtemplates);
+	exit;
+case "delete":
+	if (!$session->isAllowed("dokumente_delete")) {
+		$ui->viewLogin();
+		exit;
+	}
+
+	$dokument = $session->getStorage()->getDokument($session->getVariable("dokumentid"));
+	$dokument->delete();
+
+	$ui->redirect();
 	exit;
 default:
 	$gliederung = null;
