@@ -625,7 +625,7 @@ abstract class SQLStorage extends AbstractStorage {
 				FROM	`mitgliederrevisions` `rmax`
 				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)
 					AND " . $this->parseMitgliederMatcher($matcher) . "
-			ORDER BY `m`.`eintritt`";
+			ORDER BY `m`.`mitgliedid`";
 		if ($limit !== null or $offset !== null) {
 			$sql .= " LIMIT ";
 			if ($offset !== null) {
@@ -716,7 +716,7 @@ abstract class SQLStorage extends AbstractStorage {
 				FROM	`mitgliederrevisions` `rmax`
 				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)
 					AND	`dokumentid` = " . intval($dokumentid) . "
-			ORDER BY `m`.`eintritt`";
+			ORDER BY `m`.`mitgliedid`";
 		return $this->getResult($sql, array($this, "parseMitglied"));
 	}
 	public function getMitglied($mitgliedid) {		
