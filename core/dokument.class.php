@@ -192,6 +192,7 @@ class Dokument extends StorageClass {
 		foreach ($mitglieder as $mitglied) {
 			$storage->delMitgliedDokument($mitglied->getMitgliedID(), $this->getDokumentID());
 		}
+		$this->getFile()->delete();
 		$storage->delDokument($this->getDokumentID());
 	}
 
