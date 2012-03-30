@@ -8,4 +8,36 @@ class AusgetretenMitgliederMatcher extends MitgliederMatcher {
 	}
 }
 
+class EintrittsdatumAfterMitgliederMatcher extends MitgliederMatcher {
+	private $timestamp;
+
+	public function __construct($timestamp) {
+		$this->timestamp = $timestamp;
+	}
+
+	public function getTimestamp() {
+		return $this->timestamp;
+	}
+
+	public function match(Mitglied $mitglied) {
+		return $mitglied->getEintrittsdatum() >= $this->timestamp;
+	}
+}
+
+class AustrittsdatumAfterMitgliederMatcher extends MitgliederMatcher {
+	private $timestamp;
+
+	public function __construct($timestamp) {
+		$this->timestamp = $timestamp;
+	}
+
+	public function getTimestamp() {
+		return $this->timestamp;
+	}
+
+	public function match(Mitglied $mitglied) {
+		return $mitglied->getAustrittsdatum() >= $this->timestamp;
+	}
+}
+
 ?>

@@ -24,6 +24,7 @@ require_once(VPANEL_PROCESSES . "/mitgliederfilterstatistik.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterbeitrag.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/logic.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/gliederung.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/ausgetreten.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/search.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/ort.class.php");
 
@@ -466,6 +467,12 @@ case "composefilter":
 				return null;
 			}
 			return $session->getMitgliederMatcher($filter[$id]["filterid"]);
+		case "eintrittafter":
+			$timestamp = strtotime($filter[$id]["timestamp"]);
+			return new EintrittsdatumAfterMitgliederMatcher($timestamp);
+		case "austrittafter":
+			$timestamp = strtotime($filter[$id]["timestamp"]);
+			return new AustrittsdatumAfterMitgliederMatcher($timestamp);
 		case "search":
 			if (empty($filter[$id]["query"])) {
 				return null;

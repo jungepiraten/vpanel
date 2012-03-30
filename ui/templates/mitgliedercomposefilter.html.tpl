@@ -71,6 +71,8 @@ function generateFilterChooser(id, parentID) {
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'or')").append("OR")),
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'not')").append("NOT")),
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'preset')").append("Vordefiniert")),
+		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'eintrittafter')").append("Eingetreten nach")),
+		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'austrittafter')").append("Ausgetreten nach")),
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'search')").append("Suchen nach")),
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'umkreis')").append("Umkreissuche"))
 	));
@@ -107,6 +109,14 @@ function generateFilter(id, parentID, type) {
 			dropdown.append($("<option>").prop("value",index).append(value));
 		});
 		content.append(dropdown);
+		break;
+	case "eintrittafter":
+		content.append("Eingetreten nach");
+		content.append($("<input>").prop("type","text").prop("name","filter["+id+"][timestamp]"));
+		break;
+	case "austrittafter":
+		content.append("Ausgetreten nach");
+		content.append($("<input>").prop("type","text").prop("name","filter["+id+"][timestamp]"));
 		break;
 	case "search":
 		content.append("Suchen nach");
