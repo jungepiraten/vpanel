@@ -98,6 +98,7 @@
         <input type="text" name="plz" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.plz|escape:html}{else}{$data.plz|escape:html}{/if}" autocomplete="off" class="span1" />
         <input type="text" name="ort" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.label|escape:html}{else}{$data.ort|escape:html}{/if}" autocomplete="off" />
         <select name="stateid">
+         <option value="">&nbsp;</option>
          {foreach from=$states item=state}
           <option value="{$state.stateid|escape:html}" id="state{$state.stateid|escape:html}"
            {if (isset($mitgliedrevision.kontakt) and $mitgliedrevision.kontakt.ort.state.stateid == $state.stateid) or $state.stateid == $data.stateid}selected="selected"{/if}>

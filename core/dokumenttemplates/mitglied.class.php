@@ -40,11 +40,11 @@ class MitgliedDokumentTemplate extends NatPersonDokumentTemplate {
 	}
 
 	private function getFlags($session) {
-		return array_keys($session->getVariable("flags"));
+		return array_keys($session->getListVariable("flags"));
 	}
 
 	private function getTextFields($session) {
-		return $session->getVariable("textfields");
+		return $session->getListVariable("textfields");
 	}
 
 	public function getDokumentData($session) {
