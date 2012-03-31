@@ -2,7 +2,7 @@
 
 require_once(VPANEL_DOKUMENTTEMPLATES . "/default.class.php");
 
-class PersonDokumentTemplate extends DefaultDokumentTemplate {
+class NatPersonDokumentTemplate extends DefaultDokumentTemplate {
 	private $labelPrefix;
 
 	public function __construct($templateid, $label, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $labelPrefix) {
@@ -34,42 +34,6 @@ class PersonDokumentTemplate extends DefaultDokumentTemplate {
 		return $session->getVariable("nationalitaet");
 	}
 
-	private function getAdresszusatz($session) {
-		return $session->getVariable("adresszusatz");
-	}
-
-	private function getStrasse($session) {
-		return $session->getVariable("strasse");
-	}
-
-	private function getHausnummer($session) {
-		return $session->getVariable("hausnummer");
-	}
-
-	private function getPLZ($session) {
-		return $session->getVariable("plz");
-	}
-
-	private function getOrt($session) {
-		return $session->getVariable("ort");
-	}
-
-	private function getTelefonnummer($session) {
-		return $session->getVariable("telefon");
-	}
-
-	private function getHandynummer($session) {
-		return $session->getVariable("handy");
-	}
-
-	private function getEMailAdresse($session) {
-		return $session->getVariable("email");
-	}
-
-	private function getBeitrag($session) {
-		return $session->getVariable("beitrag");
-	}
-
 	private function formatIdentifierName($value) {
 		return strtoupper(substr(str_replace(array('ä', 'ö', 'ü', 'ß'), array('ae', 'oe', 'ue', 'ss'), strtolower($value)), 0, 3));
 	}
@@ -93,16 +57,7 @@ class PersonDokumentTemplate extends DefaultDokumentTemplate {
 				"vorname"		=> $this->getVorname($session),
 				"name"			=> $this->getName($session),
 				"nationalitaet"		=> $this->getNationalitaet($session),
-				"geburtsdatum"		=> date("d.m.Y", $this->getGeburtsdatum($session)),
-				"adresszusatz"		=> $this->getAdresszusatz($session),
-				"strasse"		=> $this->getStrasse($session),
-				"hausnummer"		=> $this->getHausnummer($session),
-				"plz"			=> $this->getPLZ($session),
-				"ort"			=> $this->getOrt($session),
-				"telefon"		=> $this->getTelefonnummer($session),
-				"handy"			=> $this->getHandynummer($session),
-				"email"			=> $this->getEMailAdresse($session),
-				"beitrag"		=> $this->getBeitrag($session) );
+				"geburtsdatum"		=> date("d.m.Y", $this->getGeburtsdatum($session)) );
 	}
 
 	public function getDokumentKommentar($session) {
