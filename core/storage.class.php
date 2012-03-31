@@ -365,7 +365,7 @@ abstract class AbstractStorage implements Storage {
 	}
 
 	public function getDokumentList($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
-		return $this->getDokumentResult($gliederungids, $gliederungid, $dokumentkategorieid, $dokumentstatusid, $limit = null, $offset = null)->fetchAll();
+		return $this->getDokumentResult($gliederungids, $gliederungid, $dokumentkategorieid, $dokumentstatusid, $limit, $offset)->fetchAll();
 	}
 
 	public function getDokumentByMitgliedList($mitgliedid) {
