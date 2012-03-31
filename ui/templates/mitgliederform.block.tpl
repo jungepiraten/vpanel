@@ -143,10 +143,11 @@
 
 {foreach from=$flags item=flag}
 {assign var=flagid value=$flag.flagid}
+{assign var=datafield value=flags-$flagid}
 <div class="control-group">
     <label class="control-label" for="flags[{$flag.flagid}]">{$flag.label|escape:html}</label>
     <div class="controls">
-        <input type="checkbox" name="flags[{$flag.flagid}]" {if isset($mitgliedrevision.flags.$flagid) or isset($data.flags-$flagid)}checked="checked"{/if} />
+        <input type="checkbox" name="flags[{$flag.flagid}]" {if isset($mitgliedrevision.flags.$flagid) or isset($data.$datafield)}checked="checked"{/if} />
     </div>
 </div>
 {/foreach}
@@ -154,11 +155,12 @@
 {foreach from=$textfields item=textfield}
 {assign var=textfieldid value=$textfield.textfieldid}
 {assign var=revisiontextfield value=$mitgliedrevision.textfields.$textfieldid}
+{assign var=datafield value=textfields-$textfieldid}
 <div class="control-group">
     <label class="control-label" for="textfields[{$textfield.textfieldid}]">{$textfield.label|escape:html}</label>
     <div class="controls">
         <input type="text" name="textfields[{$textfield.textfieldid}]" value="{if isset($mitgliedrevision.textfields.$textfieldid)}{$revisiontextfield.value|escape:html}
-                                                                              {elseif isset($data.textfields-$textfieldid)}{$data.textfields-$textfieldid}{/if}" />
+                                                                              {elseif isset($data.$datafield)}{$data.$datafield}{/if}" />
     </div>
 </div>
 {/foreach}
