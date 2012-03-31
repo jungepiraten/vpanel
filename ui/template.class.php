@@ -806,7 +806,7 @@ class Template {
 		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
-		if ($dokumenttemplate instanceof PersonDokumentTemplate) {
+		if ($dokumenttemplate instanceof NatPersonDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_person.html.tpl");
 		} else if ($dokumenttemplate instanceof DefaultDateDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_defaultdate.html.tpl");
