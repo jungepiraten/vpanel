@@ -146,7 +146,7 @@
 <div class="control-group">
     <label class="control-label" for="flags[{$flag.flagid}]">{$flag.label|escape:html}</label>
     <div class="controls">
-        <input type="checkbox" name="flags[{$flag.flagid}]" {if isset($mitgliedrevision.flags.$flagid) or isset($data.flags.$flagid)}checked="checked"{/if} />
+        <input type="checkbox" name="flags[{$flag.flagid}]" {if isset($mitgliedrevision.flags.$flagid) or isset($data.flags-$flagid)}checked="checked"{/if} />
     </div>
 </div>
 {/foreach}
@@ -158,7 +158,7 @@
     <label class="control-label" for="textfields[{$textfield.textfieldid}]">{$textfield.label|escape:html}</label>
     <div class="controls">
         <input type="text" name="textfields[{$textfield.textfieldid}]" value="{if isset($mitgliedrevision.textfields.$textfieldid)}{$revisiontextfield.value|escape:html}
-                                                                              {elseif isset($data.textfields.$textfieldid)}{$data.textfields.$textfieldid}{/if}" />
+                                                                              {elseif isset($data.textfields-$textfieldid)}{$data.textfields-$textfieldid}{/if}" />
     </div>
 </div>
 {/foreach}
