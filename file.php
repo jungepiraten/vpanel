@@ -91,7 +91,7 @@ case "get":
 	}
 
 	header("Content-Type: " . $file->getMimeType());
-	header("Content-Disposition: attachment; filename=\"" . addcslashes($file->getExportFilename(), '"') . "\"");
+	header("Content-Disposition: inline; filename=\"" . addcslashes($file->getExportFilename(), '"') . "\"");
 
 	readfile($file->getAbsoluteFilename());
 	exit;
