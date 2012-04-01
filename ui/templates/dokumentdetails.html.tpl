@@ -3,7 +3,7 @@
 <div>
 <div class="row-fluid">
 	<div class="span6">
-		<iframe src="{"dokumente_view"|___:$dokument.dokumentid}" width="100%" height="350px"></iframe>
+		<button class="btn" onclick="$(this).parent().html($('<iframe>').attr('src','{"dokumente_view"|___:$dokument.dokumentid}').attr('width','100%').attr('height','350px'));">Vorschau anzeigen</button>
 	</div>
 	<div class="span6">
 		{include file="dokumentform.block.tpl" dokument=$dokument dokumentkategorien=$dokumentkategorien dokumentstatuslist=$dokumentstatuslist}
