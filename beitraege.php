@@ -46,8 +46,9 @@ case "details":
 	}
 	$offset = $page * $pagesize;
 	$mitgliederbeitraglist = $session->getStorage()->getMitgliederBeitragByBeitragList($beitrag->getBeitragID(), $pagesize, $offset);
+	$mailtemplates = $session->getStorage()->getMailTemplateList($session->getAllowedGliederungIDs("beitrag_modify"));
 
-	$ui->viewBeitragDetails($beitrag, $mitgliederbeitraglist, $page, $pagecount);
+	$ui->viewBeitragDetails($beitrag, $mitgliederbeitraglist, $page, $pagecount, $mailtemplates);
 	exit;
 case "create":
 	if ($session->getBoolVariable("save")) {
@@ -60,8 +61,9 @@ case "create":
 		
 		$ui->redirect($session->getLink("beitraege_details", $beitrag->getBeitragID()));
 	}
+	$mailtemplates = $session->getStorage()->getMailTemplateList($session->getAllowedGliederungIDs("beitrag_create"));
 
-	$ui->viewBeitragCreate();
+	$ui->viewBeitragCreate($mailtemplates);
 	exit;
 case "delete":
 	if (!$session->isAllowed("beitraege_delete")) {

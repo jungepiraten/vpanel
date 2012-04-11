@@ -478,22 +478,52 @@ abstract class SQLStorage extends AbstractStorage {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID()).")";
 		}
 		if ($matcher instanceof BeitragPaidMitgliederMatcher) {
-			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID())." AND `hoehe` - `bezahlt` <= 0)";
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM 
+			                            (SELECT `mitgliedid`, `mitgliederbeitrag`.`hoehe`
+			                                   FROM `mitgliederbeitrag` LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
+			                                   WHERE `mitgliederbeitrag`.`beitragid` = ".intval($matcher->getBeitragID())."
+			                                   GROUP BY `mitgliederbeitrag`.`mitgliederbeitragid`
+			                                   HAVING `mitgliederbeitrag`.`hoehe` - IFNULL(SUM(`buchung`.`hoehe`),0) <= 0) AS `tmp`)";
 		}
 		if ($matcher instanceof BeitragPaidBelowMitgliederMatcher) {
-			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` GROUP BY `mitgliedid` HAVING SUM(`bezahlt`) <= " . floatval($matcher->getBeitragMark()) . ")";
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid`
+			                                   FROM `mitglieder`
+			                                   LEFT JOIN `mitgliederbeitrag` USING (`mitgliedid`)
+			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
+			                                   GROUP BY `mitglieder`.`mitgliedid`
+			                                   HAVING IFNULL(SUM(`buchung`.`hoehe`),0) <= " . floatval($matcher->getBeitragMark()) . ")";
 		}
 		if ($matcher instanceof BeitragPaidAboveMitgliederMatcher) {
-			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` GROUP BY `mitgliedid` HAVING SUM(`bezahlt`) > " . floatval($matcher->getBeitragMark()) . ")";
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid`
+			                                   FROM `mitglieder`
+			                                   LEFT JOIN `mitgliederbeitrag` USING (`mitgliedid`)
+			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
+			                                   GROUP BY `mitglieder`.`mitgliedid`
+			                                   HAVING IFNULL(SUM(`buchung`.`hoehe`),0) > " . floatval($matcher->getBeitragMark()) . ")";
 		}
 		if ($matcher instanceof BeitragMissingMitgliederMatcher) {
-			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` WHERE `beitragid` = ".intval($matcher->getBeitragID())." AND `hoehe` - `bezahlt` > 0)";
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM 
+			                            (SELECT `mitgliedid`, `mitgliederbeitrag`.`hoehe`
+			                                   FROM `mitgliederbeitrag` LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
+			                                   WHERE `mitgliederbeitrag`.`beitragid` = ".intval($matcher->getBeitragID())."
+			                                   GROUP BY `mitgliederbeitrag`.`mitgliederbeitragid`
+			                                   HAVING `mitgliederbeitrag`.`hoehe` - IFNULL(SUM(`buchung`.`hoehe`),0) > 0) AS `tmp`)";
 		}
 		if ($matcher instanceof BeitragMissingBelowMitgliederMatcher) {
-			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` GROUP BY `mitgliedid` HAVING SUM(`hoehe` - `bezahlt`) <= " . floatval($matcher->getBeitragMark()) . ")";
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM 
+			                            (SELECT `mitgliedid`, `mitgliederbeitrag`.`hoehe` - IFNULL(SUM(`buchung`.`hoehe`),0) AS `missing`
+			                                   FROM `mitgliederbeitrag`
+			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
+			                                   GROUP BY `mitgliederbeitrag`.`mitgliedid`) AS `tmp`
+			                             WHERE `tmp`.`missing` <= " . floatval($matcher->getBeitragMark()) . ")";
 		}
 		if ($matcher instanceof BeitragMissingAboveMitgliederMatcher) {
-			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliederbeitrag` GROUP BY `mitgliedid` HAVING SUM(`hoehe` - `bezahlt`) > " . floatval($matcher->getBeitragMark()) . ")";
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM 
+			                            (SELECT `mitgliedid`, `mitgliederbeitrag`.`hoehe` - IFNULL(SUM(`buchung`.`hoehe`),0) AS `missing`
+			                                   FROM `mitgliederbeitrag`
+			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
+			                                   GROUP BY `mitgliederbeitrag`.`mitgliedid`) AS `tmp`
+			                             WHERE `tmp`.`missing` > " . floatval($matcher->getBeitragMark()) . ")";
 		}
 		if ($matcher instanceof EintrittsdatumAfterMitgliederMatcher) {
 			return "`m`.`eintritt` >= '" . $this->escape(date("Y-m-d", $matcher->getTimestamp())) . "'";

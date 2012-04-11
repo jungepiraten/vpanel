@@ -657,15 +657,17 @@ class Template {
 		$this->smarty->display("beitraglist.html.tpl");
 	}
 
-	public function viewBeitragCreate() {
+	public function viewBeitragCreate($mailtemplates) {
+		$this->smarty->assign("mailtemplates", $this->parseMailTemplates($mailtemplates));
 		$this->smarty->display("beitragcreate.html.tpl");
 	}
 
-	public function viewBeitragDetails($beitrag, $mitgliederbeitraglist, $page, $pagecount) {
+	public function viewBeitragDetails($beitrag, $mitgliederbeitraglist, $page, $pagecount, $mailtemplates) {
 		$this->smarty->assign("beitrag", $this->parseBeitrag($beitrag));
 		$this->smarty->assign("mitgliederbeitraglist", $this->parseMitgliedBeitragList($mitgliederbeitraglist));
 		$this->smarty->assign("mitgliederbeitraglist_page", $page);
 		$this->smarty->assign("mitgliederbeitraglist_pagecount", $pagecount);
+		$this->smarty->assign("mailtemplates", $this->parseMailTemplates($mailtemplates));
 		$this->smarty->display("beitragdetails.html.tpl");
 	}
 

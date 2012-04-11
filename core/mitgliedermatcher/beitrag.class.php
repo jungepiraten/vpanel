@@ -122,7 +122,7 @@ class BeitragMissingAboveMitgliederMatcher extends MitgliederMatcher {
 	public function match(Mitglied $mitglied) {
 		$beitragmissing = 0;
 		foreach ($mitglied->getBeitragList() as $beitrag) {
-			$beitragmissing += $beitrag->getHoehe() - $beitrag->getBezahlt();
+			$beitragmissing += abs($beitrag->getHoehe() - $beitrag->getBezahlt());
 		}
 		return $beitragmissing > $this->getBeitragMark();
 	}
@@ -142,7 +142,7 @@ class BeitragMissingBelowMitgliederMatcher extends MitgliederMatcher {
 	public function match(Mitglied $mitglied) {
 		$beitragmissing = 0;
 		foreach ($mitglied->getBeitragList() as $beitrag) {
-			$beitragmissing += $beitrag->getHoehe() - $beitrag->getBezahlt();
+			$beitragmissing += abs($beitrag->getHoehe() - $beitrag->getBezahlt());
 		}
 		return $beitragmissing <= $this->getBeitragMark();
 	}
