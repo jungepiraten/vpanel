@@ -5,6 +5,8 @@
 <link rel="stylesheet" type="text/css" href="ui/style.css" />
 <meta http-equiv="Content-Type" content="text/html; charset={$charset}" />
 <script type="text/javascript" src="ui/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="ui/jquery.timeago.js"></script>
+<script type="text/javascript" src="ui/jquery.timeago.de.js"></script>
 <script type="text/javascript" src="ui/bootstrap/js/bootstrap.js"></script>
 {literal}<script type="text/javascript">
 function doNav(url) {

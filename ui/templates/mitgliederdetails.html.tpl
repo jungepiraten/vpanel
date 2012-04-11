@@ -66,6 +66,7 @@
 			{foreach from=$mitgliednotizen item=notiz}
 				<div class="well">
 					<span class="meta">{if isset($notiz.author)}{"Von %s"|__:$notiz.author.username}{/if}</span>
+					{include file="timestamp.tpl" timestamp=$notiz.timestamp}
 					<div class="kommentar">{$notiz.kommentar}</div>
 				</div>
 			{/foreach}
@@ -202,11 +203,11 @@ $(function () {
 							<button onClick="showMitgliederBeitraegePane('overview');" class="btn"><i class="icon-arrow-left"></i> Übersicht</button>
 						</div>
 						<div class="btn-group">
-							<a data-toggle="modal" href="#buchung-add" class="btn btn-primary">Buchung hinzufügen</a>
+							<a data-toggle="modal" href="#beitrag{$beitrag.mitgliederbeitragid}-buchung-add" class="btn btn-primary">Buchung hinzufügen</a>
 						</div>
 					</div>
 					<h2>{$beitrag.beitrag.label|escape:html}</h2>
-					<form action="{"mitglieder_beitraege_buchungen"|___:$beitrag.mitgliederbeitragid}" method="post" class="form-horizontal modal" id="buchung-add" style="display:none;">
+					<form action="{"mitglieder_beitraege_buchungen"|___:$beitrag.mitgliederbeitragid}" method="post" class="form-horizontal modal" id="beitrag{$beitrag.mitgliederbeitragid}-buchung-add" style="display:none;">
 						<div class="modal-header">
 							<a class="close" data-dismiss="modal">×</a>
 							<h3>Buchung hinzufügen</h3>

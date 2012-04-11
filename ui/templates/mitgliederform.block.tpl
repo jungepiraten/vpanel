@@ -130,7 +130,9 @@
     <label class="control-label" for="email">{"EMail-Adresse:"|__}</label>
     <div class="controls">
         <input type="text" name="email" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.email.email|escape:html}{else}{$data.email|escape:html}{/if}" />
-        {if isset($mitgliedrevision.kontakt) && count($mitgliedrevision.kontakt.email.bounces) > 0} <a href="{"mitglieder_bouncelist"|___:$mitgliedrevision.revisionid}" class="bouncecount">{$mitgliedrevision.kontakt.email.bounces|@count} Bounces</a>{/if}
+        {if isset($mitgliedrevision.kontakt) && count($mitgliedrevision.kontakt.email.bounces) > 0}
+          <a href="{"mitglieder_bouncelist"|___:$mitgliedrevision.revisionid}'" class="btn btn-info">{$mitgliedrevision.kontakt.email.bounces|@count} Bounces</a>
+        {/if}
     </div>
 </div>
 

@@ -50,10 +50,12 @@
 	<div class="span6">
 		{foreach from=$dokumentnotizen item=notiz}
 		<div class="well">
-		 <span class="meta">{"Von %s"|__:$notiz.author.username}</span>
-		 {if isset($notiz.nextkategorie)}<span class="nextkategorie">{"Unter %s abgelegt"|__:$notiz.nextkategorie.label}</span>{/if}
-		 {if isset($notiz.nextstatus)}<span class="nextstatus">{"Als %s markiert"|__:$notiz.nextstatus.label}</span>{/if}
-		 <div class="kommentar">{$notiz.kommentar}</div>
+			<span class="meta">{"Von %s"|__:$notiz.author.username}</span>
+			{include file="timestamp.tpl" timestamp=$notiz.timestamp}
+			<time datetime="{$notiz.timestamp|date_format:%FT%T%z}" class="timestamp">{$notiz.timestamp|date_format:"%d.%m.%Y %H:%M:%S"}</time>
+			{if isset($notiz.nextkategorie)}<span class="nextkategorie">{"Unter %s abgelegt"|__:$notiz.nextkategorie.label}</span>{/if}
+			{if isset($notiz.nextstatus)}<span class="nextstatus">{"Als %s markiert"|__:$notiz.nextstatus.label}</span>{/if}
+			<div class="kommentar">{$notiz.kommentar}</div>
 		</div>
 		{/foreach}
 	</div>

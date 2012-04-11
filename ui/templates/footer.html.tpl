@@ -43,6 +43,7 @@ $(".delete").click(function() {
 	$("#delModal").modal();
 	return false;
 });
+$(".timestamp").timeago();
 </script>
 {/literal}
 </body>
