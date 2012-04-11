@@ -18,6 +18,9 @@ class Template {
 		$this->smarty->register_modifier("___", array($this, "link"));
 		$this->smarty->register_modifier("file_size", array($this, "formatFileSize"));
 
+		if ($this->session->getUser() != null) {
+			$this->smarty->assign("sessionUser", $this->parseUser($this->session->getUser()));
+		}
 		$this->smarty->assign("session", $this->session);
 		$this->smarty->assign("charset", $this->session->getEncoding());
 		$this->smarty->assign("sidebars", array());
@@ -59,6 +62,7 @@ class Template {
 		$row["userid"] = $user->getUserID();
 		$row["username"] = $user->getUsername();
 		$row["apikey"] = $user->getAPIKey();
+		$row["defaultgliederungid"] = $user->getDefaultGliederungID();
 		$row["defaultdokumentkategorieid"] = $user->getDefaultDokumentKategorieID();
 		$row["defaultdokumentstatusid"] = $user->getDefaultDokumentStatusID();
 		return $row;
@@ -177,6 +181,9 @@ class Template {
 		$row["beitragid"] = $beitrag->getBeitragID();
 		$row["label"] = $beitrag->getLabel();
 		$row["hoehe"] = $beitrag->getHoehe();
+		if ($beitrag->getMailTemplate() != null) {
+			$row["mailtemplate"] = $this->parseMailTemplate($beitrag->getMailTemplate());
+		}
 		return $row;
 	}
 
@@ -189,15 +196,38 @@ class Template {
 		if ($mitglied == null) {
 			$mitglied = $this->parseMitglied($mitgliedbeitrag->getMitglied());
 		}
+		$row["mitgliederbeitragid"] = $mitgliedbeitrag->getMitgliederBeitragID();
 		$row["mitglied"] = $mitglied;
 		$row["beitrag"] = $this->parseBeitrag($mitgliedbeitrag->getBeitrag());
 		$row["hoehe"] = $mitgliedbeitrag->getHoehe();
-		$row["bezahlt"] = $mitgliedbeitrag->getBezahlt();
+		$row["buchungen"] = $this->parseMitgliedBeitragBuchungList($mitgliedbeitrag->getBuchungen());
+		$row["bezahlt"] = 0;
+		foreach ($row["buchungen"] as $buchung) {
+			$row["bezahlt"] += $buchung["hoehe"];
+		}
 		return $row;
 	}
 
 	protected function parseMitgliedBeitragList($rows, &$mitglied = null) {
 		return array_map(array($this, 'parseMitgliedBeitrag'), $rows, count($rows) > 0 ? array_fill(0, count($rows), $mitglied) : array());
+	}
+
+	protected function parseMitgliedBeitragBuchung($buchung) {
+		$row = array();
+		$row["buchungid"] = $buchung->getBuchungID();
+		$row["gliederung"] = $this->parseGliederung($buchung->getGliederung());
+		if ($buchung->getUser() != null) {
+			$row["user"] = $this->parseUser($buchung->getUser());
+		}
+		if ($buchung->getTimestamp() != null) {
+			$row["timestamp"] = $buchung->getTimestamp();
+		}
+		$row["hoehe"] = $buchung->getHoehe();
+		return $row;
+	}
+
+	protected function parseMitgliedBeitragBuchungList($rows) {
+		return array_map(array($this, 'parseMitgliedBeitragBuchung'), $rows);
 	}
 
 	protected function parseMitgliederFilter($filter) {
@@ -223,9 +253,9 @@ class Template {
 		$row["beitraege"] = $this->parseMitgliedBeitragList($mitglied->getBeitragList(), $row);
 		$row["beitraege_hoehe"] = 0;
 		$row["beitraege_bezahlt"] = 0;
-		foreach ($mitglied->getBeitragList() as $beitrag) {
-			$row["beitraege_hoehe"] += $beitrag->getHoehe();
-			$row["beitraege_bezahlt"] += $beitrag->getBezahlt();
+		foreach ($row["beitraege"] as $beitrag) {
+			$row["beitraege_hoehe"] += $beitrag["hoehe"];
+			$row["beitraege_bezahlt"] += $beitrag["bezahlt"];
 		}
 		$row["latest"] = $this->parseMitgliedRevision($mitglied->getLatestRevision());
 		return $row;
@@ -585,16 +615,18 @@ class Template {
 		$this->smarty->display("userlist.html.tpl");
 	}
 
-	public function viewUserDetails($user, $roles, $dokumentkategorien, $dokumentstatuslist) {
+	public function viewUserDetails($user, $roles, $gliederungen, $dokumentkategorien, $dokumentstatuslist) {
 		$this->smarty->assign("user", $this->parseUser($user));
 		$this->smarty->assign("userroles", $this->parseRoles($user->getRoles()));
+		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
 		$this->smarty->assign("roles", $this->parseRoles($roles));
 		$this->smarty->display("userdetails.html.tpl");
 	}
 
-	public function viewUserCreate($dokumentkategorien, $dokumentstatuslist) {
+	public function viewUserCreate($gliederungen, $dokumentkategorien, $dokumentstatuslist) {
+		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
 		$this->smarty->display("usercreate.html.tpl");
@@ -682,7 +714,7 @@ class Template {
 		$this->smarty->display("mitgliederlist.html.tpl");
 	}
 
-	public function viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields, $beitraege) {
+	public function viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $mailtemplates, $states, $mitgliederflags, $mitgliedertextfields, $beitraege) {
 		$this->smarty->assign("mitglied", $this->parseMitglied($mitglied));
 		$this->smarty->assign("mitgliedrevisions", $this->parseMitgliedRevisions($revisions));
 		$this->smarty->assign("mitgliedrevision", $this->parseMitgliedRevision($revision));
@@ -690,6 +722,7 @@ class Template {
 		$this->smarty->assign("dokumente", $this->parseDokumente($dokumente));
 		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
+		$this->smarty->assign("mailtemplates", $this->parseMailTemplates($mailtemplates));
 		$this->smarty->assign("states", $this->parseStates($states));
 		$this->smarty->assign("flags", $this->parseMitgliederFlags($mitgliederflags));
 		$this->smarty->assign("textfields", $this->parseMitgliederTextFields($mitgliedertextfields));

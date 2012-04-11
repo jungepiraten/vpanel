@@ -9,8 +9,10 @@
         {if isset($mitgliedtemplate) && isset($mitgliedtemplate.gliederung)}
          <input type="hidden" name="gliederungid" value="{$mitgliedtemplate.gliederung.gliederungid}" />
          {$mitgliedtemplate.gliederung.label|escape:html}
-        {else}
+        {elseif isset($mitgliedrevision.gliederung)}
          {include file=gliederungdropdown.block.tpl defaulttext="(auswählen)" selectedgliederungid=$mitgliedrevision.gliederung.gliederungid}
+        {else}
+         {include file=gliederungdropdown.block.tpl defaulttext="(auswählen)" selectedgliederungid=$session->getDefaultGliederungID()}
         {/if}
     </div>
 </div>

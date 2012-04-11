@@ -97,10 +97,9 @@ class Mitglied extends GlobalClass {
 
 	public function getBeitragList() {
 		if ($this->beitraglist === null) {
-			$beitraglist = $this->getStorage()->getMitgliederBeitragByMitgliedList($this->getMitgliedID());
 			$this->beitraglist = array();
-			foreach ($beitraglist as $beitrag) {
-				$this->setBeitrag($beitrag);
+			foreach ($this->getStorage()->getMitgliederBeitragByMitgliedList($this->getMitgliedID()) as $beitrag) {
+				$this->beitraglist[$beitrag->getBeitragID()] = $beitrag;
 			}
 		}
 		return $this->beitraglist;
@@ -109,21 +108,11 @@ class Mitglied extends GlobalClass {
 	public function getBeitrag($beitragid) {
 		$this->getBeitragList();
 		if (!isset($this->beitraglist[$beitragid])) {
-			return null;
+			$this->beitraglist[$beitragid] = new MitgliedBeitrag($this->getStorage());
+			$this->beitraglist[$beitragid]->setMitglied($this);
+			$this->beitraglist[$beitragid]->setBeitragID($beitragid);
 		}
 		return $this->beitraglist[$beitragid];
-	}
-
-	public function setBeitrag($beitrag, $hoehe = null, $bezahlt = null) {
-		if ($beitrag instanceof Beitrag) {
-			$mitgliedbeitrag = new MitgliedBeitrag($this->getStorage());
-			$mitgliedbeitrag->setBeitrag($beitrag);
-			$mitgliedbeitrag->setHoehe($hoehe);
-			$mitgliedbeitrag->setBezahlt($bezahlt);
-			$beitrag = $mitgliedbeitrag;
-		}
-		$this->getBeitragList();
-		$this->beitraglist[$beitrag->getBeitragID()] = $beitrag;
 	}
 
 	public function delBeitrag($beitragid) {
@@ -143,15 +132,9 @@ class Mitglied extends GlobalClass {
 		// TODO revisions speichern ?
 
 		if ($this->beitraglist !== null) {
-			$beitragids = array();
-			$hoehelist = array();
-			$bezahltlist = array();
-			foreach ($this->getBeitragList() as $mitgliedbeitrag) {
-				$beitragids[] = $mitgliedbeitrag->getBeitragID();
-				$hoehelist[] = $mitgliedbeitrag->getHoehe();
-				$bezahltlist[] = $mitgliedbeitrag->getBezahlt();
+			foreach ($this->beitraglist as $beitrag) {
+				$beitrag->save($storage);
 			}
-			$storage->setMitgliederBeitragByMitgliedList($this->getMitgliedID(), $beitragids, $hoehelist, $bezahltlist);
 		}
 	}
 	

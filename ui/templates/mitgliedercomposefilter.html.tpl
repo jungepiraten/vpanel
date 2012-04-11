@@ -1,9 +1,6 @@
 {include file="header.html.tpl" ansicht="Filter erstellen" menupunkt="mitglied"}
 {literal}
 <style type="text/css">
-.filteroptions>.delimg
-	{float:right;}
-
 .filter, .filter_wildcard, .filter_chooser
 	{border:2px solid black; margin:0.5em; padding:0.5em;}
 .filter_chooser
@@ -139,7 +136,7 @@ function generateFilter(id, parentID, type) {
 		break;
 	}
 
-	var filteroptions = $("<div>").addClass("filteroptions").append( $("<a>").prop("href", "javascript:unsetFilter('"+id+"', '"+parentID+"')").addClass("delimg").append("&nbsp;") );
+	var filteroptions = $("<div>").addClass("filteroptions").append( $("<a>").prop("href", "javascript:unsetFilter('"+id+"', '"+parentID+"')").addClass("close").append("&times;") );
 	return $("<div>").addClass("filter filter_" + type).append(filteroptions).append(content);
 }
 

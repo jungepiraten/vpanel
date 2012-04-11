@@ -14,6 +14,8 @@ if (!$session->isSignedIn()) {
 require_once(VPANEL_CORE . "/mitglied.class.php");
 require_once(VPANEL_CORE . "/mitgliednotiz.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
+require_once(VPANEL_CORE . "/mitgliedbeitrag.class.php");
+require_once(VPANEL_CORE . "/mitgliedbeitragbuchung.class.php");
 require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
 require_once(VPANEL_CORE . "/mitgliederstatistik.class.php");
@@ -94,11 +96,14 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 		$mitglied->setAustrittsdatum(null);
 		$mitglied->save();
 
-		$mitgliedbeitrag = new MitgliedBeitrag($session->getStorage());
-		$mitgliedbeitrag->setMitglied($mitglied);
-		$mitgliedbeitrag->setBeitrag($session->getStorage()->searchBeitrag(date("Y"), null));
-		$mitgliedbeitrag->setHoehe($beitrag);
-		$mitglied->setBeitrag($mitgliedbeitrag);
+		$beitrag = $session->getStorage()->searchBeitrag(date("Y",time()));
+		if ($beitrag != null) {
+			$mitgliedbeitrag = new MitgliedBeitrag($session->getStorage());
+			$mitgliedbeitrag->setMitglied($mitglied);
+			$mitgliedbeitrag->setBeitrag($beitrag);
+			$mitgliedbeitrag->setHoehe($beitrag);
+			$mitglied->setBeitrag($mitgliedbeitrag);
+		}
 		$mitglied->save();
 	} else {
 		if (!$session->isAllowed("mitglieder_modify", $mitglied->getLatestRevision()->getGliederungID())) {
@@ -143,7 +148,7 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 	}
 }
 
-function parseAddMitgliederNotizFormular($ui, $session, $mitglied, &$notiz) {
+function parseAddMitgliederNotizFormular($ui, $session, $mitglied) {
 	$kommentar = $session->getVariable("kommentar");
 
 	if (!$session->isAllowed("mitglieder_beitrag", $mitglied->getLatestRevision()->getGliederungID())) {
@@ -151,9 +156,7 @@ function parseAddMitgliederNotizFormular($ui, $session, $mitglied, &$notiz) {
 		exit;
 	}
 
-	if ($notiz == null) {
-		$notiz = new MitgliedNotiz($session->getStorage());
-	}
+	$notiz = new MitgliedNotiz($session->getStorage());
 	$notiz->setMitglied($mitglied);
 	$notiz->setAuthor($session->getUser());
 	$notiz->setTimestamp(time());
@@ -163,10 +166,6 @@ function parseAddMitgliederNotizFormular($ui, $session, $mitglied, &$notiz) {
 
 function parseMitgliederBeitraegeFormular($ui, $session, &$mitglied) {
 	$beitraege_hoehe = $session->getListVariable("beitraege_hoehe");
-	$beitraege_bezahlt = $session->getListVariable("beitraege_bezahlt");
-	$beitraege_neu_beitragid = $session->getVariable("beitrag_neu_beitragid");
-	$beitraege_neu_hoehe = $session->getDoubleVariable("beitrag_neu_hoehe");
-	$beitraege_neu_bezahlt = $session->getDoubleVariable("beitrag_neu_bezahlt");
 
 	if (!$session->isAllowed("mitglieder_modify", $mitglied->getLatestRevision()->getGliederungID())) {
 		$ui->viewLogin();
@@ -174,20 +173,7 @@ function parseMitgliederBeitraegeFormular($ui, $session, &$mitglied) {
 	}
 
 	foreach ($beitraege_hoehe as $beitragid => $hoehe) {
-		$beitrag = $session->getStorage()->getBeitrag($beitragid);
-		$bezahlt = $beitraege_bezahlt[$beitragid];
-		$mitglied->setBeitrag($beitrag, $hoehe, $bezahlt);
-	}
-
-	if (is_numeric($beitraege_neu_beitragid)) {
-		$beitrag = $session->getStorage()->getBeitrag($beitraege_neu_beitragid);
-		if ($beitraege_neu_hoehe == null) {
-			$beitraege_neu_hoehe = $beitrag->getHoehe();
-		}
-		if ($beitraege_neu_hoehe == null) {
-			$beitraege_neu_hoehe = $mitglied->getLatestRevision()->getBeitrag();
-		}
-		$mitglied->setBeitrag($beitrag, $beitraege_neu_hoehe, $beitraege_neu_bezahlt);
+		$mitglied->getBeitrag($beitragid)->setHoehe($hoehe);
 	}
 
 	$mitglied->save();
@@ -215,22 +201,89 @@ case "beitraege":
 
 	if ($session->getBoolVariable("save")) {
 		parseMitgliederBeitraegeFormular($ui, $session, $mitglied);
-		$ui->redirect();
 	}
 
+	if ($session->getBoolVariable("neu")) {
+		$beitraege_neu_beitragid = $session->getVariable("beitrag_neu_beitragid");
+		$beitraege_neu_hoehe = $session->getDoubleVariable("beitrag_neu_hoehe");
+		$beitrag = $session->getStorage()->getBeitrag($beitraege_neu_beitragid);
+
+		if ($beitrag != null) {
+			if ($beitraege_neu_hoehe == null) {
+				$beitraege_neu_hoehe = $beitrag->getHoehe();
+			}
+			if ($beitraege_neu_hoehe == null) {
+				$beitraege_neu_hoehe = $mitglied->getLatestRevision()->getBeitrag();
+			}
+			if ($beitraege_neu_hoehe != null) {
+				$beitrag = $mitglied->getBeitrag($beitraege_neu_beitragid);
+				$beitrag->setHoehe($beitraege_neu_hoehe);
+				$beitrag->save();
+			}
+		}
+	}
+
+	$ui->redirect();
 	break;
 case "beitragdelete":
-	$mitglied = $session->getStorage()->getMitglied($session->getIntVariable("mitgliedid"));
-	$beitrag = $session->getStorage()->getBeitrag($session->getIntVariable("beitragid"));
+	$beitrag = $session->getStorage()->getMitgliederBeitrag($session->getIntVariable("mitgliedbeitragid"));
 
-	if (!$session->isAllowed("mitglieder_modify", $mitglied->getLatestRevision()->getGliederungID())) {
+	if (!$session->isAllowed("mitglieder_modify", $beitrag->getMitglied()->getLatestRevision()->getGliederungID())) {
 		$ui->viewLogin();
 		exit;
 	}
 
-	$mitglied->delBeitrag($beitrag->getBeitragID());
-	$mitglied->save();
+	$beitrag->delete();
 	
+	$ui->redirect();
+	break;
+case "beitraege_buchungen":
+	$beitrag = $session->getStorage()->getMitgliederBeitrag($session->getIntVariable("mitgliedbeitragid"));
+	$buchungen = $beitrag->getBuchungen();
+	
+	if ($session->getBoolVariable("add")) {
+		$timestamp = strtotime($session->getVariable("timestamp"));
+		$gliederung = $session->getStorage()->getGliederung($session->getIntVariable("gliederungid"));
+		$vermerk = $session->getVariable("vermerk");
+		$hoehe = $session->getDoubleVariable("hoehe");
+
+		if ($gliederung != null) {
+			if (!$session->isAllowed("mitglieder_modify", $beitrag->getMitglied()->getLatestRevision()->getGliederungID())) {
+				$ui->viewLogin();
+				exit;
+			}
+
+			$buchung = new MitgliedBeitragBuchung($session->getStorage());
+			$buchung->setMitgliederBeitrag($beitrag);
+			$buchung->setGliederung($gliederung);
+			$buchung->setUser($session->getUser());
+			$buchung->setTimestamp($timestamp);
+			$buchung->setVermerk($vermerk);
+			$buchung->setHoehe($hoehe);
+			$buchung->save();
+
+			if ($session->hasVariable("mailtemplateid")) {
+				$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("mailtemplateid"));
+				if ($mailtemplate != null) {
+					$mail = $mailtemplate->generateMail($beitrag->getMitglied());
+					$config->getSendMailBackend()->send($mail);
+				}
+			}
+			$ui->redirect();
+		}
+	}
+
+	$ui->redirect();
+	break;
+case "beitraege_buchungen_delete":
+	$buchung = $session->getStorage()->getMitgliederBeitragBuchung($session->getIntVariable("buchungid"));
+
+	if (!$session->isAllowed("mitglieder_show", $buchung->getMitgliederBeitrag()->getMitglied()->getLatestRevision()->getGliederungID())) {
+		$ui->viewLogin();
+		exit;
+	}
+
+	$buchung->delete();
 	$ui->redirect();
 	break;
 case "details":
@@ -258,8 +311,9 @@ case "details":
 	}
 
 	if ($session->getBoolVariable("addnotiz")) {
-		$notiz = null;
-		parseAddMitgliederNotizFormular($ui, $session, $mitglied, $notiz);
+		parseAddMitgliederNotizFormular($ui, $session, $mitglied);
+
+		$ui->redirect();
 	}
 	
 	$notizen = $session->getStorage()->getMitgliedNotizList($mitglied->getMitgliedID());
@@ -269,10 +323,11 @@ case "details":
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
 	$mitgliederflags = $session->getStorage()->getMitgliedFlagList();
 	$mitgliedertextfields = $session->getStorage()->getMitgliedTextFieldList();
+	$mailtemplates = $session->getStorage()->getMailTemplateList($session->getAllowedGliederungIDs("mitglieder_show"));
 	$states = $session->getStorage()->getStateList();
 	$beitraege = $session->getStorage()->getBeitragList();
 
-	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $states, $mitgliederflags, $mitgliedertextfields, $beitraege);
+	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $mailtemplates, $states, $mitgliederflags, $mitgliedertextfields, $beitraege);
 	exit;
 case "create":
 	$data = array();

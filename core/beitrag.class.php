@@ -6,12 +6,16 @@ class Beitrag extends StorageClass {
 	private $beitragid;
 	private $label;
 	private $hoehe;
+	private $mailtemplateid;
+
+	private $mailtemplate;
 
 	public static function factory(Storage $storage, $row) {
 		$beitrag = new Beitrag($storage);
 		$beitrag->setBeitragID($row["beitragid"]);
 		$beitrag->setLabel($row["label"]);
 		$beitrag->setHoehe($row["hoehe"]);
+		$beitrag->setMailTemplateID($row["mailtemplateid"]);
 		return $beitrag;
 	}
 
@@ -39,6 +43,29 @@ class Beitrag extends StorageClass {
 		$this->hoehe = $hoehe;
 	}
 
+	public function getMailTemplateID() {
+		return $this->mailtemplateid;
+	}
+
+	public function setMailTemplateID($mailtemplateid) {
+		if ($mailtemplateid != $this->mailtemplateid) {
+			$this->mailtemplate = null;
+		}
+		$this->mailtemplateid = $mailtemplateid;
+	}
+
+	public function getMailTemplate() {
+		if ($this->mailtemplate == null && $this->getMailTemplateID() != null) {
+			$this->mailtemplate = $this->getStorage()->getMailTemplate($this->getMailTemplateID());
+		}
+		return $this->mailtemplate;
+	}
+
+	public function setMailTemplate($mailtemplate) {
+		$this->setMailTemplateID($mailtemplate->getTemplateID());
+		$this->mailtemplate = $mailtemplate;
+	}
+
 	public function save(Storage $storage = null) {
 		if ($storage == null) {
 			$storage = $this->getStorage();
@@ -46,14 +73,17 @@ class Beitrag extends StorageClass {
 		$this->setBeitragID( $storage->setBeitrag(
 			$this->getBeitragID(),
 			$this->getLabel(),
-			$this->getHoehe() ));
+			$this->getHoehe(),
+			$this->getMailTemplateID() ));
 	}
 
 	public function delete(Storage $storage = null) {
 		if ($storage == null) {
 			$storage = $this->getStorage();
 		}
-		$storage->delMitgliederBeitragByBeitrag($this->getBeitragID());
+		foreach ($storage->getMitgliederBeitragBuchungByBeitragList($this->getBeitragID()) as $mitgliederbeitrag) {
+			$mitgliederbeitrag->delete();
+		}
 		$storage->delBeitrag($this->getBeitragID());
 	}
 }

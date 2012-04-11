@@ -21,6 +21,16 @@
     </div>
 </div>
 <div class="control-group">
+    <label class="control-label" for="defaultgliederungid">{"Standard-Gliederung:"|__}</label>
+    <div class="controls">
+        {if isset($user)}
+            {include file=gliederungdropdown.block.tpl fieldname=defaultgliederungid defaulttext="(Keine)" selectedgliederungid=$user.defaultgliederungid}
+        {else}
+            {include file=gliederungdropdown.block.tpl fieldname=defaultgliederungid defaulttext="(Keine)"}
+        {/if}
+    </div>
+</div>
+<div class="control-group">
     <label class="control-label" for="defaultdokumentkategorieid">{"Standard-Dokumentenkategorie:"|__}</label>
     <div class="controls">
         {if isset($user)}
@@ -30,7 +40,7 @@
         {/if}
     </div>
 </div>
- <div class="control-group">
+<div class="control-group">
     <label class="control-label" for="defaultdokumentstatusid">{"Standard-Dokumentenstatus:"|__}</label>
     <div class="controls">
         {if isset($user)}

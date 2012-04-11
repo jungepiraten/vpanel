@@ -17,7 +17,7 @@ interface Storage {
 	public function getUserList();
 	public function getUser($userid);
 	public function getUserByUsername($username);
-	public function setUser($userid, $username, $password, $passwordsalt, $apikey, $defaultdokumentkategorieid, $defaultdokumentstatusid);
+	public function setUser($userid, $username, $password, $passwordsalt, $apikey, $defaultgliederungid, $defaultdokumentkategorieid, $defaultdokumentstatusid);
 	public function delUser($userid);
 	public function getUserRoleResult($userid);
 	public function getUserRoleList($userid);
@@ -43,20 +43,24 @@ interface Storage {
 	public function getBeitragResult();
 	public function getBeitragList();
 	public function getBeitrag($beitragid);
-	public function setBeitrag($beitragid, $label, $hoehe);
-	public function searchBeitrag($label, $hoehe);
+	public function setBeitrag($beitragid, $label, $hoehe, $mailtemplateid);
+	public function searchBeitrag($label);
 	public function delBeitrag($beitragid);
 
 	public function getMitgliederBeitragByMitgliedResult($mitgliedid);
 	public function getMitgliederBeitragByMitgliedList($mitgliedid);
-	public function setMitgliederBeitragByMitgliedList($mitgliedid, $beitragid, $hoehelist, $bezahltlist);
-	public function delMitgliederBeitragByMitglied($mitgliedid);
 	public function getMitgliederBeitragByBeitragCount($beitragid);
 	public function getMitgliederBeitragByBeitragResult($beitragid, $pagesize = null, $offset = null);
 	public function getMitgliederBeitragByBeitragList($beitragid, $pagesize = null, $offset = null);
-	public function setMitgliederBeitragByBeitragList($beitragid, $mitgliedids, $hoehelist, $bezahltlist);
-	public function delMitgliederBeitragByBeitrag($beitragid);
-	public function getMitgliederBeitrag($mitgliedid, $beitragid);
+	public function getMitgliederBeitrag($beitragid);
+	public function setMitgliederBeitrag($beitragid, $mitgliedid, $beitragid, $hoehe);
+	public function delMitgliederBeitrag($beitragid);
+
+	public function getMitgliederBeitragBuchungByMitgliederBeitragResult($beitragid);
+	public function getMitgliederBeitragBuchungByMitgliederBeitragList($beitragid);
+	public function getMitgliederBeitragBuchung($buchungid);
+	public function setMitgliederBeitragBuchung($buchungid, $beitragid, $gliederungid, $userid, $timestamp, $vermerk, $hoehe);
+	public function delMitgliederBeitragBuchung($buchungid);
 
 	public function addMitgliedDokument($mitgliedid, $dokumentid);
 	public function delMitgliedDokument($mitgliedid, $dokumentid);
@@ -286,6 +290,10 @@ abstract class AbstractStorage implements Storage {
 
 	public function getMitgliederBeitragByBeitragList($beitragid, $pagesize = null, $offset = null) {
 		return $this->getMitgliederBeitragByBeitragResult($beitragid, $pagesize, $offset)->fetchAll();
+	}
+
+	public function getMitgliederBeitragBuchungByMitgliederBeitragList($beitragid) {
+		return $this->getMitgliederBeitragBuchungByMitgliederBeitragResult($beitragid)->fetchAll();
 	}
 
 	public function getMitgliederList($filter = null, $limit = null, $offset = null) {

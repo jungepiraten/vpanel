@@ -17,6 +17,7 @@ interface Session {
 	public function getLang();
 	public function getEncoding();
 
+	public function getDefaultGliederungID();
 	public function getDefaultDokumentKategorieID();
 	public function getDefaultDokumentStatusID();
 
@@ -102,12 +103,14 @@ abstract class AbstractSession implements Session {
 			}
 			$this->user = $user;
 			$this->setSessionValue("user", $user);
+			$this->setSessionValue("defaultgliederungid", $user->getDefaultGliederungID());
 			$this->setSessionValue("defaultdokumentkategorieid", $user->getDefaultDokumentKategorieID());
 			$this->setSessionValue("defaultdokumentstatusid", $user->getDefaultDokumentStatusID());
 		} else {
 			$this->clearPermissions();
 			$this->user = null;
 			$this->setSessionValue("user", null);
+			$this->setSessionValue("defaultgliederungid", null);
 			$this->setSessionValue("defaultdokumentkategorieid", null);
 			$this->setSessionValue("defaultdokumentstatusid", null);
 		}
@@ -161,6 +164,9 @@ abstract class AbstractSession implements Session {
 		return $this->config->getLang($this->getSessionValue("lang"));
 	}
 
+	public function getDefaultGliederungID() {
+		return $this->getSessionValue("defaultgliederungid");
+	}
 	public function getDefaultDokumentKategorieID() {
 		return $this->getSessionValue("defaultdokumentkategorieid");
 	}

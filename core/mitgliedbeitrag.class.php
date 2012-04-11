@@ -3,21 +3,29 @@
 require_once(VPANEL_CORE . "/storageobject.class.php");
 
 class MitgliedBeitrag extends StorageClass {
+	private $mitgliederbeitragid;
 	private $mitgliedid;
 	private $beitragid;
 	private $hoehe;
-	private $bezahlt;
 
 	private $mitglied;
 	private $beitrag;
 
 	public static function factory(Storage $storage, $row) {
 		$mitgliedbeitrag = new MitgliedBeitrag($storage);
+		$mitgliedbeitrag->setMitgliederBeitragID($row["mitgliederbeitragid"]);
 		$mitgliedbeitrag->setMitgliedID($row["mitgliedid"]);
 		$mitgliedbeitrag->setBeitragID($row["beitragid"]);
 		$mitgliedbeitrag->setHoehe($row["hoehe"]);
-		$mitgliedbeitrag->setBezahlt($row["bezahlt"]);
 		return $mitgliedbeitrag;
+	}
+
+	public function getMitgliederBeitragID() {
+		return $this->mitgliederbeitragid;
+	}
+
+	public function setMitgliederBeitragID($mitgliederbeitragid) {
+		$this->mitgliederbeitragid = $mitgliederbeitragid;
 	}
 
 	public function getMitgliedID() {
@@ -74,12 +82,29 @@ class MitgliedBeitrag extends StorageClass {
 		$this->hoehe = $hoehe;
 	}
 
-	public function getBezahlt() {
-		return $this->bezahlt;
+	public function getBuchungen() {
+		return $this->getStorage()->getMitgliederBeitragBuchungByMitgliederBeitragList($this->getMitgliederBeitragID());
 	}
 
-	public function setBezahlt($bezahlt) {
-		$this->bezahlt = $bezahlt;
+	public function save(Storage $storage = null) {
+		if ($storage == null) {
+			$storage = $this->getStorage();
+		}
+		$this->setMitgliederBeitragID( $storage->setMitgliederBeitrag(
+			$this->getMitgliederBeitragID(),
+			$this->getMitgliedID(),
+			$this->getBeitragID(),
+			$this->getHoehe() ));
+	}
+
+	public function delete(Storage $storage = null) {
+		if ($storage == null) {
+			$storage = $this->getStorage();
+		}
+		foreach ($this->getBuchungen() as $buchung) {
+			$buchung->delete($storage);
+		}
+		$storage->delMitgliederBeitrag($this->getMitgliederBeitragID());
 	}
 }
 

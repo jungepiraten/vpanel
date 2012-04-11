@@ -12,6 +12,7 @@ require_once(VPANEL_CORE . "/mitgliedrevisiontextfield.class.php");
 require_once(VPANEL_CORE . "/mitgliednotiz.class.php");
 require_once(VPANEL_CORE . "/beitrag.class.php");
 require_once(VPANEL_CORE . "/mitgliedbeitrag.class.php");
+require_once(VPANEL_CORE . "/mitgliedbeitragbuchung.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/mitgliedschaft.class.php");
 require_once(VPANEL_CORE . "/natperson.class.php");
@@ -153,22 +154,22 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "User");
 	}
 	public function getUserResult() {
-		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users`";
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users`";
 		return $this->getResult($sql, array($this, "parseUser"));
 	}
 	public function getUser($userid) {
-		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` WHERE `userid` = " . intval($userid);
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` WHERE `userid` = " . intval($userid);
 		return $this->getResult($sql, array($this, "parseUser"))->fetchRow();
 	}
 	public function getUserByUsername($username) {
-		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` WHERE `username` = '" . $this->escape($username) . "'";
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` WHERE `username` = '" . $this->escape($username) . "'";
 		return $this->getResult($sql, array($this, "parseUser"))->fetchRow();
 	}
-	public function setUser($userid, $username, $password, $passwordsalt, $apikey, $defaultdokumentkategorieid, $defaultdokumentstatusid) {
+	public function setUser($userid, $username, $password, $passwordsalt, $apikey, $defaultgliederungid, $defaultdokumentkategorieid, $defaultdokumentstatusid) {
 		if ($userid == null) {
-			$sql = "INSERT INTO `users` (`username`, `password`, `passwordsalt`, `apikey`, `defaultdokumentkategorieid`, `defaultdokumentstatusid`) VALUES ('" . $this->escape($username) . "', '" . $this->escape($password) . "', '" . $this->escape($passwordsalt) . "', " . ($apikey == null ? "NULL" : "'" . $this->escape($apikey) . "'") . ", " . ($defaultdokumentkategorieid == null ? "NULL" : intval($defaultdokumentkategorieid)) . ", " . ($defaultdokumentstatusid == null ? "NULL" : intval($defaultdokumentstatusid)) . ")";
+			$sql = "INSERT INTO `users` (`username`, `password`, `passwordsalt`, `apikey`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid`) VALUES ('" . $this->escape($username) . "', '" . $this->escape($password) . "', '" . $this->escape($passwordsalt) . "', " . ($apikey == null ? "NULL" : "'" . $this->escape($apikey) . "'") . ", " . ($defaultgliederungid == null ? "NULL" : intval($defaultgliederungid)) . ", " . ($defaultdokumentkategorieid == null ? "NULL" : intval($defaultdokumentkategorieid)) . ", " . ($defaultdokumentstatusid == null ? "NULL" : intval($defaultdokumentstatusid)) . ")";
 		} else {
-			$sql = "UPDATE `users` SET `username` = '" . $this->escape($username) . "', `password` = '" . $this->escape($password) . "', `passwordsalt` = '" . $this->escape($passwordsalt) . "', `apikey` = " . ($apikey == null ? "NULL" : "'" . $this->escape($apikey) . "'") . ", `defaultdokumentkategorieid` = " . ($defaultdokumentkategorieid == null ? "NULL" : intval($defaultdokumentkategorieid)) . ", `defaultdokumentstatusid` = " . ($defaultdokumentstatusid == null ? "NULL" : intval($defaultdokumentstatusid)) . " WHERE `userid` = " . intval($userid);
+			$sql = "UPDATE `users` SET `username` = '" . $this->escape($username) . "', `password` = '" . $this->escape($password) . "', `passwordsalt` = '" . $this->escape($passwordsalt) . "', `apikey` = " . ($apikey == null ? "NULL" : "'" . $this->escape($apikey) . "'") . ", `defaultgliederungid` = " . ($defaultgliederungid == null ? "NULL" : intval($defaultgliederungid)) . ", `defaultdokumentkategorieid` = " . ($defaultdokumentkategorieid == null ? "NULL" : intval($defaultdokumentkategorieid)) . ", `defaultdokumentstatusid` = " . ($defaultdokumentstatusid == null ? "NULL" : intval($defaultdokumentstatusid)) . " WHERE `userid` = " . intval($userid);
 		}
 		$this->query($sql);
 		if ($userid == null) {
@@ -184,7 +185,7 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 
 	public function getRoleUserResult($roleid) {
-		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
 		return $this->getResult($sql, array($this, "parseUser"));
 	}
 	public function setRoleUserList($roleid, $userids) {
@@ -290,18 +291,18 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "Beitrag");
 	}
 	public function getBeitragResult() {
-		$sql = "SELECT `beitragid`, `label`, `hoehe` FROM `beitraege`";
+		$sql = "SELECT `beitragid`, `label`, `hoehe`, `mailtemplateid` FROM `beitraege`";
 		return $this->getResult($sql, array($this, "parseBeitrag"));
 	}
 	public function getBeitrag($beitragid) {
-		$sql = "SELECT `beitragid`, `label`, `hoehe` FROM `beitraege` WHERE `beitragid` = " . intval($beitragid);
+		$sql = "SELECT `beitragid`, `label`, `hoehe`, `mailtemplateid` FROM `beitraege` WHERE `beitragid` = " . intval($beitragid);
 		return $this->getResult($sql, array($this, "parseBeitrag"))->fetchRow();
 	}
-	public function setBeitrag($beitragid, $label, $hoehe) {
+	public function setBeitrag($beitragid, $label, $hoehe, $mailtemplateid) {
 		if ($beitragid == null) {
-			$sql = "INSERT INTO `beitraege` (`label`, `hoehe`) VALUES ('" . $this->escape($label) . "', " . ($hoehe == null ? "NULL" : floatval($hoehe)) . ")";
+			$sql = "INSERT INTO `beitraege` (`label`, `hoehe`, `mailtemplateid`) VALUES ('" . $this->escape($label) . "', " . ($hoehe == null ? "NULL" : floatval($hoehe)) . ", " . ($mailtemplateid == null ? "NULL" : intval($mailtemplateid)) . ")";
 		} else {
-			$sql = "UPDATE `beitraege` SET `label` = '" . $this->escape($label) . "', `hoehe` = " . ($hoehe == null ? "NULL" : doubleval($hoehe)) . " WHERE `beitragid` = " . intval($beitragid);
+			$sql = "UPDATE `beitraege` SET `label` = '" . $this->escape($label) . "', `hoehe` = " . ($hoehe == null ? "NULL" : doubleval($hoehe)) . ", `mailtemplateid` = " . ($mailtemplateid == null ? "NULL" : intval($mailtemplateid)) . " WHERE `beitragid` = " . intval($beitragid);
 		}
 		$this->query($sql);
 		if ($beitragid == null) {
@@ -309,17 +310,13 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		return $beitragid;
 	}
-	public function searchBeitrag($label, $hoehe) {
-		$sql = "SELECT `beitragid`, `label`, `hoehe` FROM `beitraege` WHERE `label` = '" . $this->escape($label) . "' AND `hoehe` " . ($hoehe == NULL ? "IS NULL" : "= " . floatval($hoehe));
+	public function searchBeitrag($label) {
+		$sql = "SELECT `beitragid`, `label`, `hoehe`, `mailtemplateid` FROM `beitraege` WHERE `label` = '" . $this->escape($label) . "'";
 		$result = $this->getResult($sql, array($this, "parseBeitrag"));
 		if ($result->getCount() > 0) {
 			return $result->fetchRow();
 		}
-		$beitrag = new Beitrag($this);
-		$beitrag->setLabel($label);
-		$beitrag->setHoehe($hoehe);
-		$beitrag->save();
-		return $beitrag;
+		return null;
 	}
 	public function delBeitrag($beitragid) {
 		$sql = "DELETE FROM `beitraege` WHERE `beitragid` = " . intval($beitragid);
@@ -335,7 +332,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $o["mb"];
 	}
 	public function getMitgliederBeitragByMitgliedResult($mitgliedid) {
-		$sql = "SELECT `mb`.`mitgliedid` AS `mb_mitgliedid`, `mb`.`beitragid` AS `mb_beitragid`, `mb`.`hoehe` AS `mb_hoehe`, `mb`.`bezahlt` AS `mb_bezahlt`, `b`.`beitragid` as `b_beitragid`, `b`.`label` AS `b_label`, `b`.`hoehe` AS `b_hoehe` FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`mitgliedid` = " . intval($mitgliedid);
+		$sql = "SELECT `mb`.`mitgliederbeitragid` AS `mb_mitgliederbeitragid`, `mb`.`mitgliedid` AS `mb_mitgliedid`, `mb`.`beitragid` AS `mb_beitragid`, `mb`.`hoehe` AS `mb_hoehe`, `b`.`beitragid` as `b_beitragid`, `b`.`label` AS `b_label`, `b`.`hoehe` AS `b_hoehe`, `b`.`mailtemplateid` AS `b_mailtemplateid` FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`mitgliedid` = " . intval($mitgliedid);
 		return $this->getResult($sql, array($this, "parseMitgliedBeitrag"));
 	}
 	public function getMitgliederBeitragByBeitragCount($beitragid) {
@@ -343,7 +340,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return reset($this->getResult($sql)->fetchRow());
 	}
 	public function getMitgliederBeitragByBeitragResult($beitragid, $limit = null, $offset = null) {
-		$sql = "SELECT `mb`.`mitgliedid` AS `mb_mitgliedid`, `mb`.`beitragid` AS `mb_beitragid`, `mb`.`hoehe` AS `mb_hoehe`, `mb`.`bezahlt` AS `mb_bezahlt`, `b`.`beitragid` as `b_beitragid`, `b`.`label` AS `b_label`, `b`.`hoehe` AS `b_hoehe` FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`beitragid` = " . intval($beitragid);
+		$sql = "SELECT `mb`.`mitgliederbeitragid` AS `mb_mitgliederbeitragid`, `mb`.`mitgliedid` AS `mb_mitgliedid`, `mb`.`beitragid` AS `mb_beitragid`, `mb`.`hoehe` AS `mb_hoehe`, `b`.`beitragid` as `b_beitragid`, `b`.`label` AS `b_label`, `b`.`hoehe` AS `b_hoehe`, `b`.`mailtemplateid` AS `b_mailtemplateid` FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`beitragid` = " . intval($beitragid);
 		if ($limit !== null or $offset !== null) {
 			$sql .= " LIMIT ";
 			if ($offset !== null) {
@@ -355,47 +352,56 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		return $this->getResult($sql, array($this, "parseMitgliedBeitrag"));
 	}
-	public function setMitgliederBeitragByMitgliedList($mitgliedid, $beitragids, $hoehelist, $bezahltlist) {
-		$this->delMitgliederBeitragByMitglied($mitgliedid);
-		$insertsql = array();
-		while (count($beitragids) > 0) {
-			$beitragid = array_shift($beitragids);
-			$hoehe = array_shift($hoehelist);
-			$bezahlt = array_shift($bezahltlist);
-			$insertsql[] = "(" . intval($mitgliedid) . ", " . intval($beitragid) . ", " . floatval($hoehe) . ", " . floatval($bezahlt) . ")";
-		}
-		if (count($insertsql) > 0) {
-			$sql = "INSERT INTO `mitgliederbeitrag` (`mitgliedid`, `beitragid`, `hoehe`, `bezahlt`) VALUES " . implode(",", $insertsql);
-			$this->query($sql);
-		}
-		return true;
-	}
-	public function setMitgliederBeitragByBeitragList($beitragid, $mitgliedids, $hoehelist, $bezahltlist) {
-		$this->delMitgliederBeitragByBeitrag($beitragid);
-		$insertsql = array();
-		while (count($mitgliedids) > 0) {
-			$mitgliedid = array_shift($mitgliedids);
-			$hoehe = array_shift($hoehelist);
-			$bezahlt = array_shift($bezahltlist);
-			$insertsql[] = "(" . intval($mitgliedid) . ", " . intval($beitragid) . ", " . floatval($hoehe) . ", " . floatval($bezahlt) . ")";
-		}
-		if (count($insertsql) > 0) {
-			$sql = "INSERT INTO `mitgliederbeitrag` (`mitgliedid`, `beitragid`, `hoehe`, `bezahlt`) VALUES " . implode(",", $insertsql);
-			$this->query($sql);
-		}
-		return true;
-	}
-	public function delMitgliederBeitragByMitglied($mitgliedid) {
-		$sql = "DELETE FROM `mitgliederbeitrag` WHERE `mitgliedid` = " . intval($mitgliedid);
-		return $this->query($sql);
-	}
-	public function delMitgliederBeitragByBeitrag($beitragid) {
-		$sql = "DELETE FROM `mitgliederbeitrag` WHERE `beitragid` = " . intval($beitragid);
-		return $this->query($sql);
-	}
-	public function getMitgliederBeitrag($mitgliedid, $beitagid) {
-		$sql = "SELECT `mb`.`mitgliedid` AS `mb_mitgliedid`, `mb`.`beitragid` AS `mb_beitragid`, `mb`.`hoehe` AS `mb_hoehe`, `mb`.`bezahlt` AS `mb_bezahlt`, `b`.`beitragid`, `b`.`label` AS `b_label`, `b`.`hoehe` AS `b_hoehe` FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`mitgliedid` = " . intval($mitgliedid) . " AND `mb`.`beitragid` = " . intval($beitragid);
+	public function getMitgliederBeitrag($beitragid) {
+		$sql = "SELECT `mb`.`mitgliederbeitragid` AS `mb_mitgliederbeitragid`, `mb`.`mitgliedid` AS `mb_mitgliedid`, `mb`.`beitragid` AS `mb_beitragid`, `mb`.`hoehe` AS `mb_hoehe`, `b`.`beitragid` AS `b_beitragid`, `b`.`label` AS `b_label`, `b`.`hoehe` AS `b_hoehe`, `b`.`mailtemplateid` AS `b_mailtemplateid` FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`mitgliederbeitragid` = " . intval($beitragid);
 		return $this->getResult($sql, array($this, "parseMitgliedBeitrag"))->fetchRow();
+	}
+	public function setMitgliederBeitrag($mitgliederbeitragid, $mitgliedid, $beitragid, $hoehe) {
+		if ($mitgliederbeitragid == null) {
+			$sql = "INSERT INTO `mitgliederbeitrag` (`mitgliedid`, `beitragid`, `hoehe`) VALUES (" . intval($mitgliedid) . ", " . intval($beitragid) . ", " . floatval($hoehe) . ")";
+		} else {
+			$sql = "UPDATE `mitgliederbeitrag` SET `mitgliedid` = " . intval($mitgliedid) . ", `beitragid` = " . intval($beitragid) . ", `hoehe` = " . floatval($hoehe) . " WHERE `mitgliederbeitragid` = " . intval($mitgliederbeitragid);
+		}
+		$this->query($sql);
+		if ($mitgliederbeitragid == null) {
+			$mitgliederbeitragid = $this->getInsertID();
+		}
+		return $mitgliederbeitragid;
+	}
+	public function delMitgliederBeitrag($beitragid) {
+		$sql = "DELETE FROM `mitgliederbeitrag` WHERE `mitgliederbeitragid` = " . intval($beitragid);
+		return $this->query($sql);
+	}
+
+	/**
+	 * MitgliederBeitragBuchung
+	 **/
+	public function parseMitgliederBeitragBuchung($row) {
+		return $this->parseRow($row, null, "MitgliedBeitragBuchung");
+	}
+	public function getMitgliederBeitragBuchungByMitgliederBeitragResult($mitgliederbeitragid) {
+		$sql = "SELECT `buchungid`, `beitragid`, `gliederungid`, `userid`, `timestamp`, `vermerk`, `hoehe` FROM `mitgliederbeitragbuchung` WHERE `beitragid` = " . intval($mitgliederbeitragid) . " ORDER BY `timestamp`";
+		return $this->getResult($sql, array($this, "parseMitgliederBeitragBuchung"));
+	}
+	public function getMitgliederBeitragBuchung($buchungid) {
+		$sql = "SELECT `buchungid`, `beitragid`, `gliederungid`, `userid`, `timestamp`, `vermerk`, `hoehe` FROM `mitgliederbeitragbuchung` WHERE `buchungid` = " . intval($buchungid) . " ORDER BY `timestamp`";
+		return $this->getResult($sql, array($this, "parseMitgliederBeitragBuchung"))->fetchRow();
+	}
+	public function setMitgliederBeitragBuchung($buchungid, $beitragid, $gliederungid, $userid, $timestamp, $vermerk, $hoehe) {
+		if ($buchungid == null) {
+			$sql = "INSERT INTO `mitgliederbeitragbuchung` (`beitragid`, `gliederungid`, `userid`, `timestamp`, `vermerk`, `hoehe`) VALUES (" . intval($beitragid) . ", " . intval($gliederungid) . ", " . intval($userid) . ", '" . date("Y-m-d", $timestamp) . "', '" . $this->escape($vermerk) . "', " . floatval($hoehe) . ")";
+		} else {
+			$sql = "UPDATE `mitgliederbeitragbuchung` SET `beitragid` = " . intval($beitragid) . ", `gliederungid` = " . intval($gliederungid) . ", `userid` = " . intval($userid) . ", `timestamp` = '" . date("Y-m-d", $timestamp) . "', `vermerk` = '" . $this->escape($vermerk) . "', `hoehe` = " . floatval($hoehe) . " WHERE `buchungid` = " . intval($buchungid);
+		}
+		$this->query($sql);
+		if ($buchungid == null) {
+			$buchungid = $this->getInsertID();
+		}
+		return $buchungid;
+	}
+	public function delMitgliederBeitragBuchung($buchungid) {
+		$sql = "DELETE FROM `mitgliederbeitragbuchung` WHERE `buchungid` = " . intval($buchungid);
+		return $this->query($sql);
 	}
 
 	/**
@@ -612,6 +618,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`u`.`password` AS `u_password`,
 				`u`.`passwordsalt` AS `u_passwordsalt`,
 				`u`.`apikey` AS `u_apikey`,
+				`u`.`defaultgliederungid` AS `u_defaultgliederungid`,
 				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
 				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
 			FROM	`mitglieder` `m`
@@ -702,6 +709,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`u`.`password` AS `u_password`,
 				`u`.`passwordsalt` AS `u_passwordsalt`,
 				`u`.`apikey` AS `u_apikey`,
+				`u`.`defaultgliederungid` AS `u_defaultgliederungid`,
 				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
 				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
 			FROM	`mitglieddokument`
@@ -966,6 +974,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`u`.`password` AS `u_password`,
 				`u`.`passwordsalt` AS `u_passwordsalt`,
 				`u`.`apikey` AS `u_apikey`,
+				`u`.`defaultgliederungid` AS `u_defaultgliederungid`,
 				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
 				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
 			FROM	`mitgliederrevisions` `r`
@@ -1036,6 +1045,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`u`.`password` AS `u_password`,
 				`u`.`passwordsalt` AS `u_passwordsalt`,
 				`u`.`apikey` AS `u_apikey`,
+				`u`.`defaultgliederungid` AS `u_defaultgliederungid`,
 				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
 				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
 			FROM	`mitgliederrevisions` `r`
@@ -1107,6 +1117,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`u`.`password` AS `u_password`,
 				`u`.`passwordsalt` AS `u_passwordsalt`,
 				`u`.`apikey` AS `u_apikey`,
+				`u`.`defaultgliederungid` AS `u_defaultgliederungid`,
 				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
 				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
 			FROM	`mitgliederrevisions` `r`

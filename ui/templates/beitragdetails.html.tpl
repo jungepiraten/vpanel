@@ -25,7 +25,7 @@
 			<td>{$mitgliederbeitrag.hoehe|string_format:"%.2f"}</td>
 			<td>{$mitgliederbeitrag.bezahlt|string_format:"%.2f"}</td>
 			<td>{$mitgliederbeitrag.hoehe-$mitgliederbeitrag.bezahlt|string_format:"%.2f"}</td>
-			<td><a class="close" href="{"mitglieder_beitraege_del"|___:$mitgliederbeitrag.mitglied.mitgliedid:$beitrag.beitragid}">&times;</a></td>
+			<td><a class="close delete" href="{"mitglieder_beitraege_del"|___:$mitgliederbeitrag.mitgliederbeitragid}">&times;</a></td>
 		</tr>
 	{/foreach}
 </table>

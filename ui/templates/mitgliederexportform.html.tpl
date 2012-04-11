@@ -29,12 +29,12 @@
   <tr class="fields" id="fieldtemplate" style="display:none;">
    <th><input type="text" name="exportfields[]" {literal}onKeyUp="if(this.value!=''){var l=document.getElementsByName('exportfields[]');for (var i=0;i<l.length;i++) {if (i>0 && l[i].value == '') {return;}} $(this.parentNode.parentNode).after($('<tr class=\'fields\'>').append($('#fieldtemplate').html()));}"{/literal} value="" />
    <td><input type="text" name="exportvalues[]" value="" />
-   <td><a class="delimg" href="javascript:void()" onClick="this.parentNode.parentNode.getElementsByTagName('input')[0].value='';this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)">&nbsp;</a></td>
+   <td><a class="close" href="javascript:void()" onClick="this.parentNode.parentNode.getElementsByTagName('input')[0].value='';this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)">&times;</a></td>
   </tr>
   <tr class="fields">
    <th><input type="text" name="exportfields[]" value="" {literal}onKeyUp="if(this.value!=''){var l=document.getElementsByName('exportfields[]');for (var i=0;i<l.length;i++) {if (i>0 && l[i].value == '') {return;}} $(this.parentNode.parentNode).after($('<tr class=\'fields\'>').append($('#fieldtemplate').html()));}"{/literal} />
    <td><input type="text" name="exportvalues[]" value="" />
-   <td><a class="delimg" href="javascript:void()" onClick="this.parentNode.parentNode.getElementsByTagName('input')[0].value='';this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)">&nbsp;</a></td>
+   <td><a class="close" href="javascript:void()" onClick="this.parentNode.parentNode.getElementsByTagName('input')[0].value='';this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)">&times;</a></td>
   </tr>
   </table>
 

@@ -17,6 +17,7 @@ require_once(VPANEL_CORE . "/role.class.php");
 function parseUserFormular($session, &$user = null) {
 	$username = $session->getVariable("username");
 	$password = $session->getVariable("password");
+	$defaultgliederungid = $session->getVariable("defaultgliederungid");
 	$defaultdokumentkategorieid = $session->getVariable("defaultdokumentkategorieid");
 	$defaultdokumentstatusid = $session->getVariable("defaultdokumentstatusid");
 	$generateapikey = $session->hasVariable("apikey") && $session->getVariable("apikey") == "generate";
@@ -36,6 +37,7 @@ function parseUserFormular($session, &$user = null) {
 	if ($removeapikey) {
 		$user->unsetAPIKey();
 	}
+	$user->setDefaultGliederungID($defaultgliederungid);
 	$user->setDefaultDokumentKategorieID($defaultdokumentkategorieid);
 	$user->setDefaultDokumentStatusID($defaultdokumentstatusid);
 	$user->save();
@@ -77,10 +79,11 @@ case "details":
 		parseUserFormular($session, $user);
 	}
 	$roles = $session->getStorage()->getRoleList();
+	$gliederungen = $session->getStorage()->getGliederungList();
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
 
-	$ui->viewUserDetails($user, $roles, $dokumentkategorien, $dokumentstatuslist);
+	$ui->viewUserDetails($user, $roles, $gliederungen, $dokumentkategorien, $dokumentstatuslist);
 	exit;
 case "create":
 	if ($session->getBoolVariable("save")) {
@@ -93,10 +96,11 @@ case "create":
 
 		$ui->redirect($session->getLink("users_details", $user->getUserID()));
 	}
+	$gliederungen = $session->getStorage()->getGliederungList();
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
 
-	$ui->viewUserCreate($dokumentkategorien, $dokumentstatuslist);
+	$ui->viewUserCreate($gliederungen, $dokumentkategorien, $dokumentstatuslist);
 	exit;
 case "delete":
 	if (!$session->isAllowed("users_delete")) {
