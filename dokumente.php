@@ -129,9 +129,10 @@ case "delete":
 	$ui->redirect();
 	exit;
 default:
-	$gliederung = null;
 	if ($session->hasVariable("gliederungid")) {
 		$gliederung = $session->getStorage()->getGliederung($session->getVariable("gliederungid"));
+	} else {
+		$gliederung = $session->getStorage()->getGliederung($session->getDefaultGliederungID());
 	}
 
 	if ($session->hasVariable("kategorieid")) {
