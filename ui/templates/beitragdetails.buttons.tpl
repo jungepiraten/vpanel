@@ -11,7 +11,7 @@
 				{section name=pages loop=$pagecount start=0 max=2}
 					<li><a href="{"beitraege_details_page"|___:$beitrag.beitragid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
 				{/section}
-				<span class="pagingsep">...</span>
+				<li class="disabled"><a>...</a></span>
 				{section name=pages loop=$pagecount start=$page-1 max=1}
 					<li><a href="{"beitraege_details_page"|___:$beitrag.beitragid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
 				{/section}
@@ -25,7 +25,7 @@
 				{section name=pages loop=$pagecount start=$page+1 max=1}
 					<li><a href="{"beitraege_details_page"|___:$beitrag.beitragid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
 				{/section}
-				<span class="pagingsep">...</span>
+				<li class="disabled"><a>...</a></span>
 				{section name=pages loop=$pagecount start=$pagecount-2 max=2}
 					<li><a href="{"beitraege_details_page"|___:$beitrag.beitragid:$smarty.section.pages.index}">{$smarty.section.pages.index+1}</a></li>
 				{/section}
