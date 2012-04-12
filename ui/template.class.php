@@ -216,6 +216,7 @@ class Template {
 		$row = array();
 		$row["buchungid"] = $buchung->getBuchungID();
 		$row["gliederung"] = $this->parseGliederung($buchung->getGliederung());
+		$row["vermerk"] = $buchung->getVermerk();
 		if ($buchung->getUser() != null) {
 			$row["user"] = $this->parseUser($buchung->getUser());
 		}
