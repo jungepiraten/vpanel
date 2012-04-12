@@ -96,12 +96,12 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 		$mitglied->setAustrittsdatum(null);
 		$mitglied->save();
 
-		$beitrag = $session->getStorage()->searchBeitrag(date("Y",time()));
-		if ($beitrag != null) {
+		$beitragobj = $session->getStorage()->searchBeitrag(date("Y",time()));
+		if ($beitragobj != null) {
 			$mitgliedbeitrag = new MitgliedBeitrag($session->getStorage());
 			$mitgliedbeitrag->setMitglied($mitglied);
-			$mitgliedbeitrag->setBeitrag($beitrag);
-			$mitgliedbeitrag->setHoehe($beitrag);
+			$mitgliedbeitrag->setBeitrag($beitragobj);
+			$mitgliedbeitrag->setHoehe($beitragobj->getHoehe() == null ? $beitrag : $beitragobj->getHoehe());
 			$mitgliedbeitrag->save();
 		}
 	} else {
@@ -122,7 +122,8 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 	$revision->setUser($session->getUser());
 	$revision->setMitglied($mitglied);
 	$revision->setMitgliedschaft($mitgliedschaft);
-	$revision->setGliederung($gliederung);	$revision->setBeitrag($beitrag);
+	$revision->setGliederung($gliederung);
+	$revision->setBeitrag($beitrag);
 	$revision->setNatPerson($natperson);
 	$revision->setJurPerson($jurperson);
 	$revision->setKontakt($kontakt);
