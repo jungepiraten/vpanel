@@ -154,22 +154,22 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "User");
 	}
 	public function getUserResult() {
-		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users`";
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `aktiv`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users`";
 		return $this->getResult($sql, array($this, "parseUser"));
 	}
 	public function getUser($userid) {
-		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` WHERE `userid` = " . intval($userid);
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `aktiv`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` WHERE `userid` = " . intval($userid);
 		return $this->getResult($sql, array($this, "parseUser"))->fetchRow();
 	}
 	public function getUserByUsername($username) {
-		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` WHERE `username` = '" . $this->escape($username) . "'";
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `aktiv`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` WHERE `username` = '" . $this->escape($username) . "'";
 		return $this->getResult($sql, array($this, "parseUser"))->fetchRow();
 	}
-	public function setUser($userid, $username, $password, $passwordsalt, $apikey, $defaultgliederungid, $defaultdokumentkategorieid, $defaultdokumentstatusid) {
+	public function setUser($userid, $username, $password, $passwordsalt, $apikey, $aktiv, $defaultgliederungid, $defaultdokumentkategorieid, $defaultdokumentstatusid) {
 		if ($userid == null) {
-			$sql = "INSERT INTO `users` (`username`, `password`, `passwordsalt`, `apikey`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid`) VALUES ('" . $this->escape($username) . "', '" . $this->escape($password) . "', '" . $this->escape($passwordsalt) . "', " . ($apikey == null ? "NULL" : "'" . $this->escape($apikey) . "'") . ", " . ($defaultgliederungid == null ? "NULL" : intval($defaultgliederungid)) . ", " . ($defaultdokumentkategorieid == null ? "NULL" : intval($defaultdokumentkategorieid)) . ", " . ($defaultdokumentstatusid == null ? "NULL" : intval($defaultdokumentstatusid)) . ")";
+			$sql = "INSERT INTO `users` (`username`, `password`, `passwordsalt`, `apikey`, `aktiv`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid`) VALUES ('" . $this->escape($username) . "', '" . $this->escape($password) . "', '" . $this->escape($passwordsalt) . "', " . ($apikey == null ? "NULL" : "'" . $this->escape($apikey) . "'") . ", " . ($aktiv ? "1" : "0") . ", " . ($defaultgliederungid == null ? "NULL" : intval($defaultgliederungid)) . ", " . ($defaultdokumentkategorieid == null ? "NULL" : intval($defaultdokumentkategorieid)) . ", " . ($defaultdokumentstatusid == null ? "NULL" : intval($defaultdokumentstatusid)) . ")";
 		} else {
-			$sql = "UPDATE `users` SET `username` = '" . $this->escape($username) . "', `password` = '" . $this->escape($password) . "', `passwordsalt` = '" . $this->escape($passwordsalt) . "', `apikey` = " . ($apikey == null ? "NULL" : "'" . $this->escape($apikey) . "'") . ", `defaultgliederungid` = " . ($defaultgliederungid == null ? "NULL" : intval($defaultgliederungid)) . ", `defaultdokumentkategorieid` = " . ($defaultdokumentkategorieid == null ? "NULL" : intval($defaultdokumentkategorieid)) . ", `defaultdokumentstatusid` = " . ($defaultdokumentstatusid == null ? "NULL" : intval($defaultdokumentstatusid)) . " WHERE `userid` = " . intval($userid);
+			$sql = "UPDATE `users` SET `username` = '" . $this->escape($username) . "', `password` = '" . $this->escape($password) . "', `passwordsalt` = '" . $this->escape($passwordsalt) . "', `apikey` = " . ($apikey == null ? "NULL" : "'" . $this->escape($apikey) . "'") . ", `aktiv` = " . ($aktiv ? "1" : "0") . ", `defaultgliederungid` = " . ($defaultgliederungid == null ? "NULL" : intval($defaultgliederungid)) . ", `defaultdokumentkategorieid` = " . ($defaultdokumentkategorieid == null ? "NULL" : intval($defaultdokumentkategorieid)) . ", `defaultdokumentstatusid` = " . ($defaultdokumentstatusid == null ? "NULL" : intval($defaultdokumentstatusid)) . " WHERE `userid` = " . intval($userid);
 		}
 		$this->query($sql);
 		if ($userid == null) {
@@ -178,14 +178,12 @@ abstract class SQLStorage extends AbstractStorage {
 		return $userid;
 	}
 	public function delUser($userid) {
-		$sql = "DELETE FROM `userroles` WHERE `userid` = " . intval($userid);
-		$this->query($sql);
 		$sql = "DELETE FROM `users` WHERE `userid` = " . intval($userid);
 		return $this->query($sql);
 	}
 
 	public function getRoleUserResult($roleid) {
-		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
+		$sql = "SELECT `userid`, `username`, `password`, `passwordsalt`, `apikey`, `aktiv`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid` FROM `users` LEFT JOIN `userroles` USING (`userid`) WHERE `roleid` = " . intval($roleid);
 		return $this->getResult($sql, array($this, "parseUser"));
 	}
 	public function setRoleUserList($roleid, $userids) {
@@ -650,6 +648,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`u`.`password` AS `u_password`,
 				`u`.`passwordsalt` AS `u_passwordsalt`,
 				`u`.`apikey` AS `u_apikey`,
+				`u`.`aktiv` AS `u_aktiv`,
 				`u`.`defaultgliederungid` AS `u_defaultgliederungid`,
 				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
 				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
@@ -741,6 +740,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`u`.`password` AS `u_password`,
 				`u`.`passwordsalt` AS `u_passwordsalt`,
 				`u`.`apikey` AS `u_apikey`,
+				`u`.`aktiv` AS `u_aktiv`,
 				`u`.`defaultgliederungid` AS `u_defaultgliederungid`,
 				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
 				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
@@ -1006,6 +1006,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`u`.`password` AS `u_password`,
 				`u`.`passwordsalt` AS `u_passwordsalt`,
 				`u`.`apikey` AS `u_apikey`,
+				`u`.`aktiv` AS `u_aktiv`,
 				`u`.`defaultgliederungid` AS `u_defaultgliederungid`,
 				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
 				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
@@ -1077,6 +1078,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`u`.`password` AS `u_password`,
 				`u`.`passwordsalt` AS `u_passwordsalt`,
 				`u`.`apikey` AS `u_apikey`,
+				`u`.`aktiv` AS `u_aktiv`,
 				`u`.`defaultgliederungid` AS `u_defaultgliederungid`,
 				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
 				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
@@ -1149,6 +1151,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`u`.`password` AS `u_password`,
 				`u`.`passwordsalt` AS `u_passwordsalt`,
 				`u`.`apikey` AS `u_apikey`,
+				`u`.`aktiv` AS `u_aktiv`,
 				`u`.`defaultgliederungid` AS `u_defaultgliederungid`,
 				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
 				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`

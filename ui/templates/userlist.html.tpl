@@ -3,7 +3,7 @@
 	<a href="{"users_create"|___}" class="btn btn-success">{"Neuen Benutzer anlegen"|__}</a>
 </div>
 {if count(users) > 0}
-	{include file="userlist.block.tpl" users=$users showuserdel=1}
+	{include file="userlist.block.tpl" users=$users}
 	{if count(users) > 10}
 		<div class="buttonbox">
 			<a href="{"users_create"|___}" class="btn btn-success">{"Neuen Benutzer anlegen"|__}</a>

@@ -8,7 +8,6 @@ $config->registerPage("einstellungen", "einstellungen.php");
 $config->registerPage("users", "user.php");
 $config->registerPage("users_create", "user.php?mode=create");
 $config->registerPage("users_details", "user.php?mode=details&userid=%d");
-$config->registerPage("users_del", "user.php?mode=delete&userid=%d");
 $config->registerPage("users_addrole", "user.php?mode=addrole&userid=%d&roleid=%d");
 $config->registerPage("users_delrole", "user.php?mode=delrole&userid=%d&roleid=%d");
 

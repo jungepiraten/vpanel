@@ -62,6 +62,7 @@ class Template {
 		$row["userid"] = $user->getUserID();
 		$row["username"] = $user->getUsername();
 		$row["apikey"] = $user->getAPIKey();
+		$row["aktiv"] = $user->isAktiv();
 		$row["defaultgliederungid"] = $user->getDefaultGliederungID();
 		$row["defaultdokumentkategorieid"] = $user->getDefaultDokumentKategorieID();
 		$row["defaultdokumentstatusid"] = $user->getDefaultDokumentStatusID();

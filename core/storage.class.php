@@ -17,7 +17,7 @@ interface Storage {
 	public function getUserList();
 	public function getUser($userid);
 	public function getUserByUsername($username);
-	public function setUser($userid, $username, $password, $passwordsalt, $apikey, $defaultgliederungid, $defaultdokumentkategorieid, $defaultdokumentstatusid);
+	public function setUser($userid, $username, $password, $passwordsalt, $apikey, $aktiv, $defaultgliederungid, $defaultdokumentkategorieid, $defaultdokumentstatusid);
 	public function delUser($userid);
 	public function getUserRoleResult($userid);
 	public function getUserRoleList($userid);

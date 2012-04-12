@@ -17,6 +17,7 @@ require_once(VPANEL_CORE . "/role.class.php");
 function parseUserFormular($session, &$user = null) {
 	$username = $session->getVariable("username");
 	$password = $session->getVariable("password");
+	$aktiv = $session->getBoolVariable("aktiv");
 	$defaultgliederungid = $session->getVariable("defaultgliederungid");
 	$defaultdokumentkategorieid = $session->getVariable("defaultdokumentkategorieid");
 	$defaultdokumentstatusid = $session->getVariable("defaultdokumentstatusid");
@@ -37,6 +38,7 @@ function parseUserFormular($session, &$user = null) {
 	if ($removeapikey) {
 		$user->unsetAPIKey();
 	}
+	$user->setAktiv($aktiv);
 	$user->setDefaultGliederungID($defaultgliederungid);
 	$user->setDefaultDokumentKategorieID($defaultdokumentkategorieid);
 	$user->setDefaultDokumentStatusID($defaultdokumentstatusid);
@@ -101,15 +103,6 @@ case "create":
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
 
 	$ui->viewUserCreate($gliederungen, $dokumentkategorien, $dokumentstatuslist);
-	exit;
-case "delete":
-	if (!$session->isAllowed("users_delete")) {
-		$ui->viewLogin();
-		exit;
-	}
-	$user = $session->getStorage()->getUser($session->getIntVariable("userid"));
-	$user->delete();
-	$ui->redirect();
 	exit;
 default:
 	$users = $session->getStorage()->getUserList();

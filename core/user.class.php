@@ -8,6 +8,7 @@ class User extends StorageClass {
 	private $password;
 	private $passwordsalt;
 	private $apikey;
+	private $aktiv;
 	private $defaultgliederungid;
 	private $defaultdokumentkategorieid;
 	private $defaultdokumentstatusid;
@@ -22,6 +23,7 @@ class User extends StorageClass {
 		$user->setPassword($row["password"]);
 		$user->setPasswordSalt($row["passwordsalt"]);
 		$user->setAPIKey($row["apikey"]);
+		$user->setAktiv($row["aktiv"]);
 		$user->setDefaultGliederungID($row["defaultgliederungid"]);
 		$user->setDefaultDokumentKategorieID($row["defaultdokumentkategorieid"]);
 		$user->setDefaultDokumentStatusID($row["defaultdokumentstatusid"]);
@@ -99,6 +101,14 @@ class User extends StorageClass {
 		$this->setAPIKey(null);
 	}
 
+	public function isAktiv() {
+		return $this->aktiv;
+	}
+
+	public function setAktiv($aktiv) {
+		$this->aktiv = $aktiv;
+	}
+
 	public function getRoles() {
 		if ($this->roles === null) {
 			$roles = $this->getStorage()->getUserRoleList($this->getUserID());
@@ -160,6 +170,7 @@ class User extends StorageClass {
 			$this->getPassword(),
 			$this->getPasswordSalt(),
 			$this->getAPIKey(),
+			$this->isAktiv(),
 			$this->getDefaultGliederungID(),
 			$this->getDefaultDokumentKategorieID(),
 			$this->getDefaultDokumentStatusID() ));

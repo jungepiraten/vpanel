@@ -11,7 +11,7 @@ if ($session->getBoolVariable("login")) {
 	$password = $session->getVariable("password");
 
 	$user = $session->getStorage()->getUserByUsername($username);
-	if ($user == null || !$user->isValidPassword($password)) {
+	if ($user == null || !$user->isValidPassword($password) || !$user->isAktiv()) {
 		$ui->viewLogin(true);
 		exit;
 	}

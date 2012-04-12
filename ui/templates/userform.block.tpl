@@ -21,6 +21,12 @@
     </div>
 </div>
 <div class="control-group">
+    <label class="control-label" for="aktiv">{"Aktiv:"|__}</label>
+    <div class="controls">
+        <input type="checkbox" name="aktiv" {if !isset($user) || $user.aktiv}checked="checked"{/if} />
+    </div>
+</div>
+<div class="control-group">
     <label class="control-label" for="defaultgliederungid">{"Standard-Gliederung:"|__}</label>
     <div class="controls">
         {if isset($user)}
