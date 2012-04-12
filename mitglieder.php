@@ -102,9 +102,8 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 			$mitgliedbeitrag->setMitglied($mitglied);
 			$mitgliedbeitrag->setBeitrag($beitrag);
 			$mitgliedbeitrag->setHoehe($beitrag);
-			$mitglied->setBeitrag($mitgliedbeitrag);
+			$mitgliedbeitrag->save();
 		}
-		$mitglied->save();
 	} else {
 		if (!$session->isAllowed("mitglieder_modify", $mitglied->getLatestRevision()->getGliederungID())) {
 			$ui->viewLogin();
