@@ -16,12 +16,14 @@ require_once(VPANEL_CORE . "/beitrag.class.php");
 function parseBeitragFormular($session, &$beitrag = null) {
 	$label = $session->getVariable("label");
 	$hoehe = $session->getDoubleVariable("hoehe");
+	$mailtemplateid = $session->getIntVariable("mailtemplateid");
 
 	if ($beitrag == null) {
 		$beitrag = new Beitrag($session->getStorage());
 	}
 	$beitrag->setLabel($label);
 	$beitrag->setHoehe($hoehe);
+	$beitrag->setMailTemplateID($mailtemplateid);
 	$beitrag->save();
 }
 

@@ -381,8 +381,14 @@ case "delete":
 	$process->setFinishedPage($session->getLink("mitglieder_page", $session->getVariable("filterid"), 0));
 	$process->save();
 
-	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
-	exit;
+	if ($session->getStorage()->getMitgliederCount($matcher) < 5) {
+		$process->run();
+		$ui->redirect($session->getLink("mitglieder_page", $session->getVariable("filterid"), 0));
+		exit;
+	} else {
+		$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
+		exit;
+	}
 case "sendmail":
 case "sendmail.select":
 	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));

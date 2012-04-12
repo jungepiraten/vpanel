@@ -20,7 +20,7 @@
 					<option value="">(Keine)</option>
 					{foreach from=$mailtemplates item=mailtemplate}
 						<option value="{$mailtemplate.templateid|escape:html}"
-						        {if $smarty.request.mailtemplateid == $mailtemplate.templateid}selected="selected"{/if}>
+						        {if isset($beitrag.mailtemplate) && $beitrag.mailtemplate.templateid == $mailtemplate.templateid}selected="selected"{/if}>
 							{$mailtemplate.label|escape:html}
 						</option>
 					{/foreach}
