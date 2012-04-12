@@ -30,7 +30,7 @@
 		<tr onclick="doNav('{"mailtemplates_details"|___:$template.templateid}');">
 			<td>{$template.templateid}</td>
 			<td>
-				<a href="{"mailtemplates_del"|___:$template.templateid}" class="close">&times;</a>
+				<a href="{"mailtemplates_del"|___:$template.templateid}" class="close delete">&times;</a>
 				{$template.label|escape:html}
 			</td>
 		</tr>

@@ -29,10 +29,10 @@
 <script type="text/javascript">
 $("tr").hover(
 	function() {
-		$(this).find("span.close").stop().animate({"opacity": "0.5"}, "medium");
+		$(this).find(".close").stop().animate({"opacity": "0.5"}, "medium");
 	},
 	function() {
-		$(this).find("span.close").stop().animate({"opacity": "0.2"}, "medium");
+		$(this).find(".close").stop().animate({"opacity": "0.2"}, "medium");
 	});
 $(".delete").click(function() {
 	event.stopImmediatePropagation();
