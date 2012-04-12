@@ -1,7 +1,6 @@
-<form action="{if isset($mitglied)}{"mitglieder_details"|___:$mitglied.mitgliedid}{else}{"mitglieder_create"|___:$mitgliedschaft.mitgliedschaftid}{/if}" method="post" class="form-horizontal">
+<form action="{if isset($mitglied)}{"mitglieder_details"|___:$mitglied.mitgliedid}{else}{"mitglieder_create"|___:$mitgliedtemplate.mitgliedtemplateid}{/if}" method="post" class="form-horizontal">
  <fieldset>
  {if isset($dokument)}<input type="hidden" name="dokumentid" value="{$dokument.dokumentid}" />{/if}
- {if isset($mitgliedtemplate)}<input type="hidden" name="mitgliedtemplateid" value="{$mitgliedtemplate.mitgliedtemplateid}" />{/if}
 
 <div class="control-group">
     <label class="control-label" for="gliederungid">{"Gliederung:"|__}</label>
