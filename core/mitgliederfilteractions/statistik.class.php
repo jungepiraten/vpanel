@@ -9,7 +9,7 @@ class StatistikMitgliederFilterAction extends MitgliederFilterAction {
 	}
 
 	public function getPermission() {
-		return "mitglieder_delete";
+		return "mitglieder_show";
 	}
 
 	public function execute($config, $session, $filter, $matcher) {
