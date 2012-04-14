@@ -1,18 +1,16 @@
 <?php
 
-require_once(VPANEL_CORE . "/process.class.php");
+require_once(VPANEL_PROCESSES . "/mitgliederfilter.class.php");
 
-class MitgliederFilterSendMailProcess extends Process {
+class MitgliederFilterSendMailProcess extends MitgliederFilterProcess {
 	private $templateid;
 
 	private $backend;
-	private $matcher;
 	private $template;
 
 	public static function factory(Storage $storage, $row) {
-		$process = new MitgliederFilterSendMailProcess($storage);
+		$process = parent::factory($storage, $row);
 		$process->setBackend($row["backend"]);
-		$process->setMatcher($row["matcher"]);
 		$process->setTemplateID($row["templateid"]);
 		return $process;
 	}
@@ -23,14 +21,6 @@ class MitgliederFilterSendMailProcess extends Process {
 
 	public function setBackend($backend) {
 		$this->backend = $backend;
-	}
-
-	public function getMatcher() {
-		return $this->matcher;
-	}
-
-	public function setMatcher($matcher) {
-		$this->matcher = $matcher;
 	}
 
 	public function getTemplateID() {
@@ -57,27 +47,15 @@ class MitgliederFilterSendMailProcess extends Process {
 	}
 	
 	protected function getData() {
-		return array("backend" => $this->getBackend(), "matcher" => $this->getMatcher(), "templateid" => $this->getTemplateID());
+		$data = parent::getData();
+		$data["backend"] = $this->getBackend();
+		$data["templateid"] = $this->getTemplateID();
+		return $data;
 	}
 
-	public function runProcess() {
-		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
-		$max = $result->getCount();
-		$i = 0;
-		$stepwidth = max(1, ceil($max / 100));
-
-		while ($mitglied = $result->fetchRow()) {
-			$mail = $this->getTemplate()->generateMail($mitglied);
-			$this->getBackend()->send($mail);
-			
-			if ((++$i % $stepwidth) == 0) {
-				$this->setProgress($i / $max);
-				$this->save();
-			}
-		}
-		
-		$this->setProgress(1);
-		$this->save();
+	protected function runProcessStep($mitglied) {
+		$mail = $this->getTemplate()->generateMail($mitglied);
+		$this->getBackend()->send($mail);
 	}
 }
 

@@ -51,7 +51,10 @@ class MitgliedRevision extends GlobalClass {
 	}
 
 	public function fork() {
+		global $config;
+
 		$r = new MitgliedRevision($this->getStorage());
+		$r->setGlobalID($config->generateGlobalID());
 		$r->setMitgliedID($this->getMitgliedID());
 		$r->setMitgliedschaftID($this->getMitgliedschaftID());
 		$r->setGliederungID($this->getGliederungID());

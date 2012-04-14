@@ -1,59 +1,89 @@
 <?php
 
-require_once(VPANEL_CORE . "/process.class.php");
+require_once(VPANEL_PROCESSES . "/mitgliederfilter.class.php");
 
 require_once(VPANEL_CORE . "/graph.class.php");
 require_once(VPANEL_CORE . "/chart.class.php");
 
-class MitgliederFilterStatistikProcess extends Process {
-	private $statistikid;
-
-	private $matcher;
-	private $statistik;
+class MitgliederFilterStatistikProcess extends MitgliederFilterProcess {
+	private $timestamp;
+	private $mitgliederagemin = 0;
+	private $mitgliederagemax = 100;
+	private $tempfileids = array();
 
 	public static function factory(Storage $storage, $row) {
-		$process = new MitgliederFilterStatistikProcess($storage);
-		$process->setMatcher($row["matcher"]);
-		$process->setStatistikID($row["statistikid"]);
+		$process = parent::factory($storage, $row);
+		$process->setTimestamp($row["timestamp"]);
+		$process->setMitgliederAgeRange($row["mitgliederagemin"], $row["mitgliederagemax"]);
+		$process->setTempFileIDs($row["tempfileids"]);
 		return $process;
 	}
 
-	public function getMatcher() {
-		return $this->matcher;
+	public function getTimestamp() {
+		return $this->timestamp;
 	}
 
-	public function setMatcher($matcher) {
-		$this->matcher = $matcher;
+	public function setTimestamp($timestamp) {
+		$this->timestamp = $timestamp;
 	}
 
-	public function getStatistikID() {
-		return $this->statistikid;
+	public function getMitgliederAgeMin() {
+		return $this->mitgliederagemin;
 	}
 
-	public function setStatistikID($statistikid) {
-		if ($statistikid != $this->statistikid) {
-			$this->statistik = null;
-		}
-		$this->statistikid = $statistikid;
+	public function getMitgliederAgeMax() {
+		return $this->mitgliederagemax;
 	}
 
-	public function getStatistik() {
-		if ($this->statistik == null) {
-			$this->statistik = $this->getStorage()->getMitgliederStatistik($this->getStatistikID());
-		}
-		return $this->statistik;
+	public function setMitgliederAgeRange($min, $max) {
+		$this->mitgliederagemin = $min;
+		$this->mitgliederagemax = $max;
 	}
 
-	public function setStatistik($statistik) {
-		$this->setStatistikID($statistik->getStatistikID());
-		$this->statistik = $statistik;
+	public function getMitgliederCountScale() {
+		return 24*60*60;
+	}
+
+	public function getMitgliederCountStart() {
+		return $this->getMitgliederCountEnd() - 5*365*24*60*60;
+	}
+
+	public function getMitgliederCountEnd() {
+		return floor($this->getTimestamp() / $this->getMitgliederCountScale()) * $this->getMitgliederCountScale();
+	}
+
+	public function getTempFileIDs() {
+		return $this->tempfileids;
+	}
+
+	public function setTempFileIDs($tempfileids) {
+		$this->tempfileids = $tempfileids;
+	}
+
+	private function generateTempFile() {
+		$tempfile = new TempFile($this->getStorage());
+		$file = new File($this->getStorage());
+		$file->setExportFilename("vpanel-chart-" . date("Y-m-d"));
+		$file->save();
+		$tempfile->setFile($file);
+		$tempfile->setTimestamp(time());
+		$tempfile->setUserID($this->getUserID());
+		$tempfile->save();
+		$this->tempfileids[] = $tempfile->getTempFileID();
+		return $tempfile;
 	}
 
 	protected function getData() {
-		return array("matcher" => $this->getMatcher(), "statistikid" => $this->getStatistikID());
+		$data = parent::getData();
+		$data["timestamp"] = $this->getTimestamp();
+		$data["mitgliederagemin"] = $this->getMitgliederAgeMin();
+		$data["mitgliederagemax"] = $this->getMitgliederAgeMax();
+		$data["tempfileids"] = $this->getTempFileIDs();
+		return $data;
 	}
 
 	private $mitgliederCount = array();
+	private $curMitgliederCount = 0;
 	private $maxMitgliederCount = 1;
 
 	private $mitgliederEintritte = array();
@@ -64,94 +94,96 @@ class MitgliederFilterStatistikProcess extends Process {
 	private $factors = array();
 	private $mitgliederFactorCount = array();
 
-	private function normMitgliederCountTime($value) {
-		return $this->getStatistik()->getMitgliederCountStart() + floor(($value - $this->getStatistik()->getMitgliederCountStart()) / $this->getStatistik()->getMitgliederCountScale()) * $this->getStatistik()->getMitgliederCountScale();
+	public function initProcess() {
+		$this->factors[0] = "{GLIEDERUNG}";
+		$this->mitgliederFactorCount[0] = array();
+
+		$this->factors[1] = "{STATE}";
+		$this->mitgliederFactorCount[1] = array();
+
+		$this->factors[2] = "{MITGLIEDSCHAFT}";
+		$this->mitgliederFactorCount[2] = array();
+
+		$this->factors[3] = "{ALTER." . date("Ymd", $this->getTimestamp()) . "}";
+		$this->mitgliederFactorCount[3] = array_fill($this->getMitgliederAgeMin(), $this->getMitgliederAgeMax() - $this->getMitgliederAgeMin(), 0);
 	}
 
-	public function runPrepareData($progressOffset, $progress) {
-		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
-		$curMitgliederCount = 0;
-		while ($mitglied = $result->fetchRow()) {
-			if ($mitglied->getEintrittsdatum() <= $this->getStatistik()->getTimestamp()) {
-				$eintritt = $this->normMitgliederCountTime($mitglied->getEintrittsdatum());
-				if ($eintritt < $this->getStatistik()->getMitgliederCountStart()) {
-					$curMitgliederCount ++;
+	public function runProcessStep($mitglied) {
+		if ($mitglied->getEintrittsdatum() <= $this->getTimestamp()) {
+			$eintritt = $this->normMitgliederCountTime($mitglied->getEintrittsdatum());
+			if ($eintritt < $this->getMitgliederCountStart()) {
+				$this->curMitgliederCount ++;
+			} else {
+				$this->santizeArray($this->mitgliederEintritte, $eintritt);
+				$this->mitgliederEintritte[$eintritt] ++;
+				$this->maxMitgliederEintritte = max($this->maxMitgliederEintritte, $this->mitgliederEintritte[$eintritt]);
+			}
+			if ($mitglied->getAustrittsdatum() != null) {
+				$austritt = $this->normMitgliederCountTime($mitglied->getAustrittsdatum());
+				if ($austritt < $this->getMitgliederCountStart()) {
+					$this->curMitgliederCount --;
 				} else {
-					if (!isset($this->mitgliederEintritte[$eintritt])) {
-						$this->mitgliederEintritte[$eintritt] = 0;
-					}
-					$this->mitgliederEintritte[$eintritt] ++;
-					$this->maxMitgliederEintritte = max($this->maxMitgliederEintritte, $this->mitgliederEintritte[$eintritt]);
+					$this->santizeArray($this->mitgliederAustritte, $austritt);
+					$this->mitgliederAustritte[$austritt] ++;
+					$this->maxMitgliederAustritte = max($this->maxMitgliederAustritte, $this->mitgliederAustritte[$austritt]);
 				}
-
-				if ($mitglied->getAustrittsdatum() != null) {
-					$austritt = $this->normMitgliederCountTime($mitglied->getAustrittsdatum());
-					if ($austritt < $this->getStatistik()->getMitgliederCountStart()) {
-						$curMitgliederCount --;
-					} else {
-						if (!isset($this->mitgliederAustritte[$austritt])) {
-							$this->mitgliederAustritte[$austritt] = 0;
-						}
-						$this->mitgliederAustritte[$austritt] ++;
-						$this->maxMitgliederAustritte = max($this->maxMitgliederAustritte, $this->mitgliederAustritte[$austritt]);
-					}
-				}
-				if ($mitglied->getAustrittsdatum() == null || $mitglied->getAustrittsdatum() > $this->getStatistik()->getMitgliederCountEnd()) {
-					$revision = $mitglied->getLatestRevision();
-
-					foreach ($this->factors as $i => $factorString) {
-						$mitgliedString = $mitglied->replaceText($factorString);
-						if (!isset($this->mitgliederFactorCount[$i][$mitgliedString])) {
-							$this->mitgliederFactorCount[$i][$mitgliedString] = 0;
-						}
-						$this->mitgliederFactorCount[$i][$mitgliedString]++;
-					}
+			}
+			// Bis zum Ende des Graphen noch nicht Ausgetreten
+			if ($mitglied->getAustrittsdatum() == null || $mitglied->getAustrittsdatum() > $this->getMitgliederCountEnd()) {
+				$revision = $mitglied->getLatestRevision();
+				foreach ($this->factors as $i => $factorString) {
+					$mitgliedString = $mitglied->replaceText($factorString);
+					$this->santizeArray($this->mitgliederFactorCount[$i], $mitgliedString);
+					$this->mitgliederFactorCount[$i][$mitgliedString] ++;
 				}
 			}
 		}
-
-		$this->setProgress($progressOffset + 0.6 * $progress);
-		$this->save();
-
-		for ($time = $this->getStatistik()->getMitgliederCountStart(); $time <= $this->getStatistik()->getMitgliederCountEnd(); $time += $this->getStatistik()->getMitgliederCountScale()) {
-			if (!isset($this->mitgliederEintritte[$time])) {
-				$this->mitgliederEintritte[$time] = 0;
-			}
-			if (!isset($this->mitgliederAustritte[$time])) {
-				$this->mitgliederAustritte[$time] = 0;
-			}
-			$this->mitgliederCount[$time] = $curMitgliederCount = $curMitgliederCount + $this->mitgliederEintritte[$time] - $this->mitgliederAustritte[$time];
-			$this->maxMitgliederCount = max($this->maxMitgliederCount, $curMitgliederCount);
-		}
-
-		$this->setProgress($progressOffset + 1 * $progress);
-		$this->save();
 	}
 
-	public function runGenerateTimeGraph($w, $h, $file, $progressOffset, $progress) {
+	public function finalizeProcess() {
+		for ($time = $this->getMitgliederCountStart(); $time <= $this->getMitgliederCountEnd(); $time += $this->getMitgliederCountScale()) {
+			$this->santizeArray($this->mitgliederEintritte, $time);
+			$this->santizeArray($this->mitgliederAustritte, $time);
+			$this->mitgliederCount[$time] = $this->curMitgliederCount = $this->curMitgliederCount + $this->mitgliederEintritte[$time] - $this->mitgliederAustritte[$time];
+			$this->maxMitgliederCount = max($this->maxMitgliederCount, $this->curMitgliederCount);
+		}
+
+		$this->runGenerateTimeGraph(600, 250, $this->generateTempFile()->getFile());
+		$this->runGenerateBalanceTimeGraph(600, 250, $this->generateTempFile()->getFile());
+		$this->runGenerateFactorPieChart(450,250, 0, $this->generateTempFile()->getFile());
+		$this->runGenerateFactorPieChart(450,250, 1, $this->generateTempFile()->getFile());
+		$this->runGenerateFactorPieChart(450,250, 2, $this->generateTempFile()->getFile());
+		$this->runGenerateFactorVBarChart(600, 250, 3, $this->generateTempFile()->getFile());
+	}
+
+	private function normMitgliederCountTime($value) {
+		return $this->getMitgliederCountStart() + floor(($value - $this->getMitgliederCountStart()) / $this->getMitgliederCountScale()) * $this->getMitgliederCountScale();
+	}
+
+	private function santizeArray(&$array, $key) {
+		if (!isset($array[$key])) {
+			$array[$key] = 0;
+		}
+	}
+
+	private function runGenerateTimeGraph($w, $h, $file) {
 		$graph = new Graph($w, $h);
-		$graph->setXAxis(new Graph_TimestampAxis($this->getStatistik()->getMitgliederCountStart(), $this->getStatistik()->getMitgliederCountEnd(), "d.m.Y", $this->getStatistik()->getMitgliederCountScale()));
+		$graph->setXAxis(new Graph_TimestampAxis($this->getMitgliederCountStart(), $this->getMitgliederCountEnd(), "d.m.Y", $this->getMitgliederCountScale()));
 		$graph->setYAxis(new Graph_DefaultAxis(0, 1.1 * $this->maxMitgliederCount));
 		$graph->addData(new Graph_AvgData($this->mitgliederCount));
 		$graph->plot($file);
-
-		$this->setProgress($progressOffset + 1 * $progress);
-		$this->save();
 	}
 
-	public function runGenerateBalanceTimeGraph($w, $h, $file, $progressOffset, $progress) {
+	private function runGenerateBalanceTimeGraph($w, $h, $file) {
 		$graph = new Graph($w, $h);
-		$graph->setXAxis(new Graph_TimestampAxis($this->getStatistik()->getMitgliederCountStart(), $this->getStatistik()->getMitgliederCountEnd(), "d.m.Y", $this->getStatistik()->getMitgliederCountScale()));
+		$graph->setXAxis(new Graph_TimestampAxis($this->getMitgliederCountStart(), $this->getMitgliederCountEnd(), "d.m.Y", $this->getMitgliederCountScale()));
 		$graph->setYAxis(new Graph_DefaultAxis(-1.05 * $this->maxMitgliederAustritte, 1.05 * $this->maxMitgliederEintritte));
 		$graph->addData(new Graph_SumData($this->mitgliederEintritte, 0,  1, new Graph_Color( 30,240, 30)));
 		$graph->addData(new Graph_SumData($this->mitgliederAustritte, 0, -1, new Graph_Color(255,  0,  0)));
 		$graph->plot($file);
-
-		$this->setProgress($progressOffset + 1 * $progress);
-		$this->save();
 	}
 
-	public function runGenerateFactorPieChart($w, $h, $factor, $file, $progressOffset, $progress) {
+	private function runGenerateFactorPieChart($w, $h, $factor, $file) {
 		$chart = new PieChart($w, $h);
 		foreach ($this->mitgliederFactorCount[$factor] as $label => $count) {
 			if (!empty($label)) {
@@ -159,12 +191,9 @@ class MitgliederFilterStatistikProcess extends Process {
 			}
 		}
 		$chart->plot($file);
-
-		$this->setProgress($progressOffset + 1 * $progress);
-		$this->save();
 	}
 
-	public function runGenerateFactorVBarChart($w, $h, $factor, $file, $progressOffset, $progress) {
+	private function runGenerateFactorVBarChart($w, $h, $factor, $file) {
 		$chart = new VBarChart($w, $h);
 		foreach ($this->mitgliederFactorCount[$factor] as $label => $count) {
 			if (!empty($label)) {
@@ -172,81 +201,6 @@ class MitgliederFilterStatistikProcess extends Process {
 			}
 		}
 		$chart->plot($file);
-
-		$this->setProgress($progressOffset + 1 * $progress);
-		$this->save();
-	}
-
-	public function runProcess() {
-		$this->factors = array("{GLIEDERUNG}", "{STATE}", "{MITGLIEDSCHAFT}", "{ALTER." . date("Ymd", $this->getStatistik()->getTimestamp()) . "}");
-		$this->mitgliederFactorCount[0] = array();
-		$this->mitgliederFactorCount[1] = array();
-		$this->mitgliederFactorCount[2] = array();
-		$this->mitgliederFactorCount[3] = array_fill($this->getStatistik()->getMitgliederAgeMinimum(), $this->getStatistik()->getMitgliederAgeMaximum() - $this->getStatistik()->getMitgliederAgeMinimum(), 0);
-
-		$this->runPrepareData(0, 0.7);
-
-		if ($this->getStatistik()->getAgeGraphFile() != null) {
-			$agegraph = $this->getStatistik()->getAgeGraphFile();
-		} else {
-			$agegraph = new File($this->getStorage());
-			$agegraph->setExportFilename("vpanel-agegraph-" . date("Y-m-d"));
-			$agegraph->save();
-			$this->getStatistik()->setAgeGraphFile($agegraph);
-		}
-		$this->runGenerateFactorVBarChart(600, 250, 3, $agegraph, 0.7, 0.05);
-
-		if ($this->getStatistik()->getTimeGraphFile() != null) {
-			$timegraph = $this->getStatistik()->getTimeGraphFile();
-		} else {
-			$timegraph = new File($this->getStorage());
-			$timegraph->setExportFilename("vpanel-timegraph-" . date("Y-m-d"));
-			$timegraph->save();
-			$this->getStatistik()->setTimeGraphFile($timegraph);
-		}
-		$this->runGenerateTimeGraph(600, 250, $timegraph, 0.75, 0.05);
-
-		if ($this->getStatistik()->getTimeBalanceGraphFile() != null) {
-			$timebalancegraph = $this->getStatistik()->getTimeBalanceGraphFile();
-		} else {
-			$timebalancegraph = new File($this->getStorage());
-			$timebalancegraph->setExportFilename("vpanel-timebalancegraph-" . date("Y-m-d"));
-			$timebalancegraph->save();
-			$this->getStatistik()->setTimeBalanceGraphFile($timebalancegraph);
-		}
-		$this->runGenerateBalanceTimeGraph(600, 250, $timebalancegraph, 0.8, 0.05);
-
-		if ($this->getStatistik()->getGliederungChartFile() != null) {
-			$gliederungchart = $this->getStatistik()->getGliederungChartFile();
-		} else {
-			$gliederungchart = new File($this->getStorage());
-			$gliederungchart->setExportFilename("vpanel-gliederungchart-" . date("Y-m-d"));
-			$gliederungchart->save();
-			$this->getStatistik()->setGliederungChartFile($gliederungchart);
-		}
-		$this->runGenerateFactorPieChart(450,250, 0, $gliederungchart, 0.85, 0.05);
-
-		if ($this->getStatistik()->getStateChartFile() != null) {
-			$statechart = $this->getStatistik()->getStateChartFile();
-		} else {
-			$statechart = new File($this->getStorage());
-			$statechart->setExportFilename("vpanel-statechart-" . date("Y-m-d"));
-			$statechart->save();
-			$this->getStatistik()->setStateChartFile($statechart);
-		}
-		$this->runGenerateFactorPieChart(450,250, 1, $statechart, 0.9, 0.05);
-
-		if ($this->getStatistik()->getMitgliedschaftChartFile() != null) {
-			$mitgliedschaftchart = $this->getStatistik()->getMitgliedschaftChartFile();
-		} else {
-			$mitgliedschaftchart = new File($this->getStorage());
-			$mitgliedschaftchart->setExportFilename("vpanel-gliederungchart-" . date("Y-m-d"));
-			$mitgliedschaftchart->save();
-			$this->getStatistik()->setMitgliedschaftChartFile($mitgliedschaftchart);
-		}
-		$this->runGenerateFactorPieChart(450,250, 2, $mitgliedschaftchart, 0.95, 0.05);
-
-		$this->getStatistik()->save();
 	}
 }
 

@@ -1,8 +1,6 @@
 {include file="header.html.tpl" ansicht="Prozessfortschritt"}
 <script type="text/javascript">
 {literal}
-$(document).ready(function () {
-});
 
 var finished = false;
 
@@ -33,15 +31,15 @@ function countdownETA() {
 
 function updateBar(data) {
 	if (data["isfinished"] && data["finishedpage"]) {
-		$("#progresstest").html("Fertiggestellt");
+		$("#progresstext").html("Fertiggestellt");
 		location.href = data["finishedpage"];
 		finished = true;
 	}
 	if (data["isrunning"]) {
-		$("#progresstest").html("Prozess läuft");
+		$("#progresstext").html("Prozess läuft");
 	}
 	if (data["iswaiting"]) {
-		$("#progresstest").html("Warte auf Prozessbeginn");
+		$("#progresstext").html("Warte auf Prozessbeginn");
 	}
 	$(".bar").css("width", (100 * data["progress"]) + "%");
 	if (data["eta"]) {

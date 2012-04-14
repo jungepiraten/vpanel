@@ -19,11 +19,4 @@ foreach ($tempfiles as $tempfile) {
 	}
 }
 
-$statistiken = $storage->getMitgliederStatistikList();
-foreach ($statistiken as $statistik) {
-	if ($statistik->getTimestamp() < time() - 24*60*60) {
-		$statistik->delete();
-	}
-}
-
 ?>

@@ -5,6 +5,7 @@ require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 
 interface Session {
 	public function generateToken($key);
+	public function getFileTokenKey($file);
 	public function validToken($key, $token);
 
 	public function isSignedIn();
@@ -57,6 +58,9 @@ abstract class AbstractSession implements Session {
 		$token = md5($key . "-" . microtime(true) . "-" . rand(1000,9999));
 		$this->setSessionValue("token_" . $key, $token);
 		return $token;
+	}
+	public function getFileTokenKey($file) {
+		return "file" . $file->getFileID();
 	}
 	public function validToken($key, $token) {
 		return $this->hasSessionValue("token_" . $key) && $this->getSessionValue("token_" . $key) == $token;

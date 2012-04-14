@@ -10,6 +10,11 @@ require_once(VPANEL_MITGLIEDERMATCHER . "/mitgliedschaft.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/natperson.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/jurperson.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/ausgetreten.class.php");
+require_once(VPANEL_MITGLIEDERFILTERACTIONS . "/delete.class.php");
+require_once(VPANEL_MITGLIEDERFILTERACTIONS . "/sendmail.class.php");
+require_once(VPANEL_MITGLIEDERFILTERACTIONS . "/export.class.php");
+require_once(VPANEL_MITGLIEDERFILTERACTIONS . "/statistik.class.php");
+require_once(VPANEL_MITGLIEDERFILTERACTIONS . "/setbeitrag.class.php");
 
 class MyConfig extends DefaultConfig {}
 
@@ -44,5 +49,11 @@ $config->getStorage()->registerMitgliederFilter(new MitgliederFilter(6, "Momenta
 	new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()) ));
 $config->getStorage()->registerMitgliederFilter(new MitgliederFilter(7, "Ausgetretene Mitglieder", null,
 	new AusgetretenMitgliederMatcher() ));
+
+$config->getStorage()->registerMitgliederFilterAction(new DeleteMitgliederFilterAction(1));
+$config->getStorage()->registerMitgliederFilterAction(new SendMailMitgliederFilterAction(2));
+$config->getStorage()->registerMitgliederFilterAction(new ExportMitgliederFilterAction(3, new CSVTempFileExportStreamHandler()));
+$config->getStorage()->registerMitgliederFilterAction(new StatistikMitgliederFilterAction(4));
+$config->getStorage()->registerMitgliederFilterAction(new SetBeitragMitgliederFilterAction(5));
 
 ?>

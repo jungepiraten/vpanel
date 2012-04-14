@@ -168,7 +168,7 @@ class Template {
 		$row["headers"] = array();
 		foreach ($template->getHeaders() as $header) {
 			$row["headers"][$header->getField()] = $header->getValue();
-	}
+		}
 		$row["attachments"] = $this->parseFiles($template->getAttachments());
 		return $row;
 	}
@@ -241,6 +241,18 @@ class Template {
 
 	protected function parseMitgliederFilters($rows) {
 		return array_map(array($this, 'parseMitgliederFilter'), $rows);
+	}
+
+	protected function parseMitgliederFilterAction($action) {
+		$row = array();
+		$row["actionid"] = $action->getActionID();
+		$row["label"] = $action->getLabel();
+		$row["permission"] = $action->getPermission();
+		return $row;
+	}
+
+	protected function parseMitgliederFilterActions($rows) {
+		return array_map(array($this, 'parseMitgliederFilterAction'), $rows);
 	}
 
 	protected function parseMitglied($mitglied) {
@@ -551,33 +563,15 @@ class Template {
 		return array_map(array($this, 'parseFile'), $rows);
 	}
 
-	protected function parseMitgliederStatistik($statistik) {
+	protected function parseTempFile($tempfile) {
 		$row = array();
-		$row["statistikid"] = $statistik->getStatistikID();
-		$row["timestamp"] = $statistik->getTimestamp();
-		if ($statistik->getAgeGraphFile() != null) {
-			$row["agegraphfile"] = $this->parseFile($statistik->getAgeGraphFile());
-		}
-		if ($statistik->getTimeGraphFile() != null) {
-			$row["timegraphfile"] = $this->parseFile($statistik->getTimeGraphFile());
-		}
-		if ($statistik->getTimeBalanceGraphFile() != null) {
-			$row["timebalancegraphfile"] = $this->parseFile($statistik->getTimeBalanceGraphFile());
-		}
-		if ($statistik->getGliederungChartFile() != null) {
-			$row["gliederungchartfile"] = $this->parseFile($statistik->getGliederungChartFile());
-		}
-		if ($statistik->getStateChartFile() != null) {
-			$row["statechartfile"] = $this->parseFile($statistik->getStateChartFile());
-		}
-		if ($statistik->getMitgliedschaftChartFile() != null) {
-			$row["mitgliedschaftchartfile"] = $this->parseFile($statistik->getMitgliedschaftChartFile());
-		}
+		$row["tempfileid"] = $tempfile->getTempFileID();
+		$row["file"] = $this->parseFile($tempfile->getFile());
 		return $row;
 	}
 
-	protected function parseMitgliederStatistiken($rows) {
-		return array_map(array($this, 'parseMitgliederStatistik'), $rows);
+	protected function parseTempFiles($rows) {
+		return array_map(array($this, 'parseTempFile'), $rows);
 	}
 
 
@@ -705,7 +699,7 @@ class Template {
 		$this->smarty->display("mitgliedercomposefilter.html.tpl");
 	}
 
-	public function viewMitgliederList($mitglieder, $mitgliedtemplates, $filters, $filter, $page, $pagecount, $mitgliedercount) {
+	public function viewMitgliederList($mitglieder, $mitgliedtemplates, $filteractions, $filters, $filter, $page, $pagecount, $mitgliedercount) {
 		if ($filter != null) {
 			$this->smarty->assign("filter", $this->parseMitgliederFilter($filter));
 		}
@@ -715,10 +709,11 @@ class Template {
 		$this->smarty->assign("mitglieder", $this->parseMitglieder($mitglieder));
 		$this->smarty->assign("mitgliedtemplates", $this->parseMitgliedTemplates($mitgliedtemplates));
 		$this->smarty->assign("filters", $this->parseMitgliederFilters($filters));
+		$this->smarty->assign("filteractions", $this->parseMitgliederFilterActions($filteractions));
 		$this->smarty->display("mitgliederlist.html.tpl");
 	}
 
-	public function viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $mailtemplates, $states, $mitgliederflags, $mitgliedertextfields, $beitraege) {
+	public function viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $mailtemplates, $filteractions, $states, $mitgliederflags, $mitgliedertextfields, $beitraege) {
 		$this->smarty->assign("mitglied", $this->parseMitglied($mitglied));
 		$this->smarty->assign("mitgliedrevisions", $this->parseMitgliedRevisions($revisions));
 		$this->smarty->assign("mitgliedrevision", $this->parseMitgliedRevision($revision));
@@ -727,6 +722,7 @@ class Template {
 		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
 		$this->smarty->assign("mailtemplates", $this->parseMailTemplates($mailtemplates));
+		$this->smarty->assign("filteractions", $this->parseMitgliederFilterActions($filteractions));
 		$this->smarty->assign("states", $this->parseStates($states));
 		$this->smarty->assign("flags", $this->parseMitgliederFlags($mitgliederflags));
 		$this->smarty->assign("textfields", $this->parseMitgliederTextFields($mitgliedertextfields));
@@ -753,43 +749,53 @@ class Template {
 		$this->smarty->display("mitgliedercreate.html.tpl");
 	}
 
-	public function viewMitgliederSendMailForm($filters, $templates) {
-		$this->smarty->assign("filters", $this->parseMitgliederFilters($filters));
-		$this->smarty->assign("mailtemplates", $this->parseMailTemplates($templates));
-		$this->smarty->display("mitgliedersendmailform.html.tpl");
-	}
-
-	public function viewMitgliederSendMailPreview($mail, $filter, $mailtemplate) {
+	public function viewMitgliederFilterAction($action, $filter, $matcher, $result) {
+		if (isset($result["redirect"])) {
+			return $this->redirect($result["redirect"]);
+		}
+		$this->smarty->assign("action", $this->parseMitgliederFilterAction($action));
 		if ($filter != null) {
 			$this->smarty->assign("filterid", $filter->getFilterID());
 			$this->smarty->assign("filter", $this->parseMitgliederFilter($filter));
 		} else {
 			$this->smarty->assign("filterid", null);
 		}
-		$this->smarty->assign("mail", $this->parseMail($mail));
-		$this->smarty->assign("mailtemplate", $this->parseMailTemplate($mailtemplate));
-		$this->smarty->display("mitgliedersendmailpreview.html.tpl");
-	}
-
-	public function viewMitgliederSendMailSend($filter, $mailtemplate, $process) {
-		if ($filter != null) {
-			$this->smarty->assign("filter", $this->parseMitgliederFilter($filter));
+		if ($action instanceof SendMailMitgliederFilterAction) {
+			switch ($result["sendmail"]) {
+			case "select":
+				$this->smarty->assign("mailtemplates", $this->parseMailTemplates($result["templates"]));
+				$this->smarty->display("mitgliedersendmailform.html.tpl");
+				return;
+			case "preview":
+				$this->smarty->assign("mail", $this->parseMail($result["mail"]));
+				$this->smarty->assign("mailtemplate", $this->parseMailTemplate($result["mailtemplate"]));
+				$this->smarty->display("mitgliedersendmailpreview.html.tpl");
+				return;
+			}
 		}
-		$this->smarty->assign("mailtemplate", $this->parseMailTemplate($mailtemplate));
+		if ($action instanceof ExportMitgliederFilterAction) {
+			$this->smarty->assign("predefinedfields", $result["predefinedfields"]);
+			$this->smarty->display("mitgliederexportform.html.tpl");
+			return;
+		}
+		if ($action instanceof SetBeitragMitgliederFilterAction) {
+			$this->smarty->assign("beitraglist", $this->parseBeitragList($result["beitraglist"]));
+			$this->smarty->display("mitgliedersetbeitragselect.html.tpl");
+			return;
+		}
+	}
+
+	public function viewMitgliederFilterProcess($action, $process, $result) {
+		if (isset($result["redirect"])) {
+			return $this->redirect($result["redirect"]);
+		}
+		$this->smarty->assign("action", $this->parseMitgliederFilterAction($action));
 		$this->smarty->assign("process", $this->parseProcess($process));
-		$this->smarty->display("mitgliedersendmailsend.html.tpl");
-	}
-
-	public function viewMitgliederExportOptions($filters, $predefinedfields) {
-		$this->smarty->assign("filters", $this->parseMitgliederFilters($filters));
-		$this->smarty->assign("predefinedfields", $predefinedfields);
-		$this->smarty->display("mitgliederexportform.html.tpl");
-	}
-
-	public function viewMitgliederSetBeitragSelect($filters, $beitraglist) {
-		$this->smarty->assign("filters", $this->parseMitgliederFilters($filters));
-		$this->smarty->assign("beitraglist", $this->parseBeitragList($beitraglist));
-		$this->smarty->display("mitgliedersetbeitragselect.html.tpl");
+		if ($action instanceof StatistikMitgliederFilterAction) {
+			$this->smarty->assign("tempfiles", $this->parseTempFiles($result["tempfiles"]));
+			$this->smarty->display("mitgliederstatistik.html.tpl");
+			return;
+		}
 	}
 
 	public function viewStatistik($mitgliedercount, $mitgliedschaften, $states) {
@@ -894,11 +900,6 @@ class Template {
 		$this->smarty->assign("file", $this->parseFile($file));
 		$this->smarty->assign("token", $token);
 		$this->smarty->display("filepdfpreview.html.tpl");
-	}
-
-	public function viewMitgliederStatistik($statistik) {
-		$this->smarty->assign("statistik", $this->parseMitgliederStatistik($statistik));
-		$this->smarty->display("mitgliederstatistik.html.tpl");
 	}
 
 	public function viewEMailBounceList($bounces) {

@@ -16,6 +16,8 @@ class Mail {
 	}
 
 	public function setRecipient($mail) {
+		$this->unsetHeader("To");
+		$this->setHeader("To", $mail->getEMail());
 		$this->recipient = $mail;
 	}
 
@@ -29,6 +31,10 @@ class Mail {
 
 	public function getBounceAddress() {
 		return $this->bounceaddress;
+	}
+
+	public function unsetHeader($field) {
+		unset($this->headers[$field]);
 	}
 
 	public function setHeader($field, $value) {
@@ -89,6 +95,7 @@ class Mail {
 		foreach ($headers as $key => $value) {
 			$raw .= $key . ": " . mb_encode_mimeheader($value, $charset) . "\n";
 		}
+		$raw .= "To: " . $this->getRecipient()->getEMail() . "\n";
 		$raw .= "\n";
 		
 		if ($this->isMultipart()) {

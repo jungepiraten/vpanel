@@ -172,7 +172,7 @@ interface Storage {
 	public function getProcessResult();
 	public function getProcessList();
 	public function getProcess($processid);
-	public function setProcess($processid, $type, $typedata, $progess, $queued, $started, $finished, $finishedpage);
+	public function setProcess($processid, $userid, $type, $typedata, $progess, $queued, $started, $finished, $finishedpage);
 	public function delProcess($processid);
 
 	public function getDokumentResult($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
@@ -222,12 +222,6 @@ interface Storage {
 	public function setTempFile($tempfileid, $userid, $timestamp, $fileid);
 	public function delTempFile($tempfileid);
 
-	public function getMitgliederStatistikResult();
-	public function getMitgliederStatistikList();
-	public function getMitgliederStatistik($tempfileid);
-	public function setMitgliederStatistik($statistikid, $userid, $timestamp, $agegraphfileid, $timegraphfileid, $timebalancegraphfileid, $gliederungchartfileid, $statechartfileid, $mitgliedschaftchartfileid);
-	public function delMitgliederStatistik($statistikid);
-
 	public function getMitgliedTemplateResult($gliederungids = null);
 	public function getMitgliedTemplateList($gliederungids = null);
 	public function getMitgliedTemplate($templateid);
@@ -237,6 +231,10 @@ interface Storage {
 	public function getMitgliederFilterList($gliederungids);
 	public function hasMitgliederFilter($filterid);
 	public function getMitgliederFilter($filterid);
+
+	public function getMitgliederFilterActionList();
+	public function hasMitgliederFilterAction($actionid);
+	public function getMitgliederFilterAction($actionid);
 
 	public function getDokumentTemplateList($gliederungids);
 	public function hasDokumentTemplate($templateid);
@@ -408,10 +406,6 @@ abstract class AbstractStorage implements Storage {
 		return $this->getTempFileResult()->fetchAll();
 	}
 
-	public function getMitgliederStatistikList() {
-		return $this->getMitgliederStatistikResult()->fetchAll();
-	}
-
 	public function getMitgliedTemplateList($gliederungids = null) {
 		return $this->getMitgliedTemplateResult($gliederungids)->fetchAll();
 	}
@@ -438,6 +432,24 @@ abstract class AbstractStorage implements Storage {
 	}
 	public function registerMitgliederFilter($filter) {
 		$this->mitgliederfilters[$filter->getFilterID()] = $filter;
+	}
+
+	/** FilterAction **/
+	private $mitgliederfilteractions = array();
+	public function getMitgliederFilterActionList() {
+		return $this->mitgliederfilteractions;
+	}
+	public function hasMitgliederFilterAction($actionid) {
+		return isset($this->mitgliederfilteractions[$actionid]);
+	}
+	public function getMitgliederFilterAction($actionid) {
+		if (!$this->hasMitgliederFilterAction($actionid)) {
+			return null;
+		}
+		return $this->mitgliederfilteractions[$actionid];
+	}
+	public function registerMitgliederFilterAction($action) {
+		$this->mitgliederfilteractions[$action->getActionID()] = $action;
 	}
 
 	/** DokumentTemplates **/

@@ -38,40 +38,14 @@ if ($session->hasVariable("tempfileid")) {
 	$file = $session->getStorage()->getFile($session->getVariable("fileid"));
 	$token = $session->getVariable("token");
 	
-	if (!$session->validToken("file" . $file->getFileID(), $token)) {
+	if (!$session->validToken($session->getFileTokenKey($file), $token)) {
 		die("<h1>403 Forbidden</h1>");
-	}
-} elseif ($session->hasVariable("statistikid") && $session->hasVariable("part")) {
-	$statistik = $session->getStorage()->getMitgliederStatistik($session->getVariable("statistikid"));
-
-	if ($statistik->getUserID() != $session->getUser()->getUserID()) {
-		die("<h1>403 Forbidden</h1>");
-	}
-	switch ($session->getVariable("part")) {
-	case "agegraph":
-		$file = $statistik->getAgeGraphFile();
-		break;
-	case "timegraph":
-		$file = $statistik->getTimeGraphFile();
-		break;
-	case "timebalancegraph":
-		$file = $statistik->getTimeBalanceGraphFile();
-		break;
-	case "gliederungchart":
-		$file = $statistik->getGliederungChartFile();
-		break;
-	case "statechart":
-		$file = $statistik->getStateChartFile();
-		break;
-	case "mitgliedschaftchart":
-		$file = $statistik->getMitgliedschaftChartFile();
-		break;
 	}
 }
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
 case "view":
-	$token = $session->generateToken("file" . $file->getFileID());
+	$token = $session->generateToken($session->getFileTokenKey($file));
 	
 	if (substr($file->getMimeType(),0,5) == "image") {
 		$ui->viewFileImagePreview($file, $token);

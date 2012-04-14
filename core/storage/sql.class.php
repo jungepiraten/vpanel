@@ -30,7 +30,6 @@ require_once(VPANEL_CORE . "/dokumentstatus.class.php");
 require_once(VPANEL_CORE . "/dokumentnotiz.class.php");
 require_once(VPANEL_CORE . "/file.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
-require_once(VPANEL_CORE . "/mitgliederstatistik.class.php");
 require_once(VPANEL_CORE . "/mitgliedtemplate.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/mitglied.class.php");
 
@@ -1678,18 +1677,19 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "Process");
 	}
 	public function getProcessResult() {
-		$sql = "SELECT `processid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished`, `finishedpage` FROM `processes`";
+		$sql = "SELECT `processid`, `userid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished`, `finishedpage` FROM `processes`";
 		return $this->getResult($sql, array($this, "parseProcess"));
 	}
 	public function getProcess($processid) {
-		$sql = "SELECT `processid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished`, `finishedpage` FROM `processes` WHERE `processid` = " . intval($processid);
+		$sql = "SELECT `processid`, `userid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished`, `finishedpage` FROM `processes` WHERE `processid` = " . intval($processid);
 		return $this->getResult($sql, array($this, "parseProcess"))->fetchRow();
 	}
-	public function setProcess($processid, $type, $typedata, $progress, $queued, $started, $finished, $finishedpage) {
+	public function setProcess($processid, $userid, $type, $typedata, $progress, $queued, $started, $finished, $finishedpage) {
 		if ($processid == null) {
 			$sql = "INSERT INTO `processes`
-				(`type`, `typedata`, `progress`, `queued`, `started`, `finished`, `finishedpage`) VALUES
-				('" . $this->escape($type) . "',
+				(`userid`, `type`, `typedata`, `progress`, `queued`, `started`, `finished`, `finishedpage`) VALUES
+				(" . ($userid == null ? "NULL" : intval($userid)) . ",
+				 '" . $this->escape($type) . "',
 				 '" . $this->escape($typedata) . "',
 				 " . doubleval($progress) . ",
 				 '" . date("Y-m-d H:i:s", $queued) . "',
@@ -1698,7 +1698,8 @@ abstract class SQLStorage extends AbstractStorage {
 				 '" . $this->escape($finishedpage) . "')";
 		} else {
 			$sql = "UPDATE	`processes`
-				SET	`type` = '" . $this->escape($type) . "',
+				SET	`userid` = " . ($userid == null ? "NULL" : intval($userid)) . ",
+					`type` = '" . $this->escape($type) . "',
 					`typedata` = '" . $this->escape($typedata) . "',
 					`progress` = '" . doubleval($progress) . "',
 					`queued` = '" . date("Y-m-d H:i:s", $queued) . "',
@@ -2099,55 +2100,6 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 	public function delTempFile($tempfileid) {
 		$sql = "DELETE FROM `tempfiles` WHERE `tempfileid` = " . intval($tempfileid);
-		return $this->query($sql);
-	}
-
-	/**
-	 * MitgliederStatistik
-	 **/
-	public function parseMitgliederStatistik($row) {
-		return $this->parseRow($row, null, "MitgliederStatistik");
-	}
-	public function getMitgliederStatistikResult() {
-		$sql = "SELECT `statistikid`, `userid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`, `gliederungchartfileid`, `statechartfileid`, `mitgliedschaftchartfileid` FROM `mitgliederstatistiken`";
-		return $this->getResult($sql, array($this, "parseMitgliederStatistik"));
-	}
-	public function getMitgliederStatistik($statistikid) {
-		$sql = "SELECT `statistikid`, `userid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`, `gliederungchartfileid`, `statechartfileid`, `mitgliedschaftchartfileid` FROM `mitgliederstatistiken` WHERE `statistikid` = " . intval($statistikid);
-		return $this->getResult($sql, array($this, "parseMitgliederStatistik"))->fetchRow();
-	}
-	public function setMitgliederStatistik($statistikid, $userid, $timestamp, $agegraphfileid, $timegraphfileid, $timebalancegraphfileid, $gliederungchartfileid, $statechartfileid, $mitgliedschaftchartfileid) {
-		if ($statistikid == null) {
-			$sql = "INSERT INTO `mitgliederstatistiken`
-				(`userid`, `timestamp`, `agegraphfileid`, `timegraphfileid`, `timebalancegraphfileid`, `gliederungchartfileid`, `statechartfileid`, `mitgliedschaftchartfileid`) VALUES
-				(" . intval($userid) . ",
-				 '" . date("Y-m-d H:i:s", $timestamp) . "',
-				 " . ($agegraphfileid == null ? "NULL" : intval($agegraphfileid)) . ",
-				 " . ($timegraphfileid == null ? "NULL" : intval($timegraphfileid)) . ",
-				 " . ($timebalancegraphfileid == null ? "NULL" : intval($timebalancegraphfileid)) . ",
-				 " . ($gliederungchartfileid == null ? "NULL" : intval($gliederungchartfileid)) . ",
-				 " . ($statechartfileid == null ? "NULL" : intval($statechartfileid)) . ",
-				 " . ($mitgliedschaftchartfileid == null ? "NULL" : intval($mitgliedschaftchartfileid)) . ")";
-		} else {
-			$sql = "UPDATE	`mitgliederstatistiken`
-				SET	`userid` = " . intval($userid) . ",
-					`timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "',
-					`agegraphfileid` = " . ($agegraphfileid == null ? "NULL" : intval($agegraphfileid)) . ",
-					`timegraphfileid` = " . ($timegraphfileid == null ? "NULL" : intval($timegraphfileid)) . ",
-					`timebalancegraphfileid` = " . ($timebalancegraphfileid == null ? "NULL" : intval($timebalancegraphfileid)) . ",
-					`gliederungchartfileid` = " . ($gliederungchartfileid == null ? "NULL" : intval($gliederungchartfileid)) . ",
-					`statechartfileid` = " . ($statechartfileid == null ? "NULL" : intval($statechartfileid)) . ",
-					`mitgliedschaftchartfileid` = " . ($mitgliedschaftchartfileid == null ? "NULL" : intval($mitgliedschaftchartfileid)) . "
-				WHERE `statistikid` = " . intval($statistikid);
-		}
-		$this->query($sql);
-		if ($statistikid == null) {
-			$statistikid = $this->getInsertID();
-		}
-		return $statistikid;
-	}
-	public function delMitgliederStatistik($statistikid) {
-		$sql = "DELETE FROM `mitgliederstatistiken` WHERE `statistikid` = " . intval($statistikid);
 		return $this->query($sql);
 	}
 }

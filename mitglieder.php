@@ -17,33 +17,11 @@ require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/mitgliedbeitrag.class.php");
 require_once(VPANEL_CORE . "/mitgliedbeitragbuchung.class.php");
 require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
-require_once(VPANEL_CORE . "/tempfile.class.php");
-require_once(VPANEL_CORE . "/mitgliederstatistik.class.php");
-require_once(VPANEL_PROCESSES . "/mitgliederfilterdelete.class.php");
-require_once(VPANEL_PROCESSES . "/mitgliederfiltersendmail.class.php");
-require_once(VPANEL_PROCESSES . "/mitgliederfilterexport.class.php");
-require_once(VPANEL_PROCESSES . "/mitgliederfilterstatistik.class.php");
-require_once(VPANEL_PROCESSES . "/mitgliederfilterbeitrag.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/logic.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/gliederung.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/ausgetreten.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/search.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/ort.class.php");
-
-$predefinedfields = array(
-	array("label" => "Bezeichnung",		"template" => "{BEZEICHNUNG}"),
-	array("label" => "Anschrift",		"template" => "{STRASSE} {HAUSNUMMER}"),
-	array("label" => "Adresszusatz",	"template" => "{ADRESSZUSATZ}"),
-	array("label" => "PLZ",			"template" => "{PLZ}"),
-	array("label" => "Ort",			"template" => "{ORT}"),
-	array("label" => "Bundesland",		"template" => "{STATE}"),
-	array("label" => "Telefonnummer",	"template" => "{TELEFONNUMMER}"),
-	array("label" => "Handynummer",		"template" => "{HANDYNUMMER}"),
-	array("label" => "E-Mail",		"template" => "{EMAIL}"),
-	array("label" => "Beitrag",		"template" => "{BEITRAG}"),
-	array("label" => "Gliederung",		"template" => "{GLIEDERUNG}"),
-	array("label" => "Mitgliedschaft",	"template" => "{MITGLIEDSCHAFT}")
-	);
 
 function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = null) {
 	global $config;
@@ -186,9 +164,10 @@ case "statistik":
 		exit;
 	}
 
-	$statistik = $session->getStorage()->getMitgliederStatistik($session->getVariable("statistikid"));
-
-	$ui->viewMitgliederStatistik($statistik);
+	$process = $session->getStorage()->getProcess($session->getVariable("processid"));
+	if ($process instanceof MitgliederFilterStatistikProcess) {
+		$ui->viewMitgliederStatistik($process);
+	}
 	break;
 case "beitraege":
 	$mitgliedid = intval($session->getVariable("mitgliedid"));
@@ -324,10 +303,11 @@ case "details":
 	$mitgliederflags = $session->getStorage()->getMitgliedFlagList();
 	$mitgliedertextfields = $session->getStorage()->getMitgliedTextFieldList();
 	$mailtemplates = $session->getStorage()->getMailTemplateList($session->getAllowedGliederungIDs("mitglieder_show"));
+	$filteractions = $session->getStorage()->getMitgliederFilterActionList();
 	$states = $session->getStorage()->getStateList();
 	$beitraege = $session->getStorage()->getBeitragList();
 
-	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $mailtemplates, $states, $mitgliederflags, $mitgliedertextfields, $beitraege);
+	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $mailtemplates, $filteractions, $states, $mitgliederflags, $mitgliedertextfields, $beitraege);
 	exit;
 case "create":
 	$data = array();
@@ -365,133 +345,31 @@ case "create":
 
 	$ui->viewMitgliedCreate($template, $dokument, $data, $gliederungen, $mitgliedschaften, $mailtemplates, $states, $mitgliederflags, $mitgliedertextfields);
 	exit;
-case "delete":
-	if (!$session->isAllowed("mitglieder_delete")) {
+case "filteraction":
+	$filteraction = $session->getStorage()->getMitgliederFilterAction($session->getVariable("actionid"));
+
+	if (!$session->isAllowed($filteraction->getPermission())) {
 		$ui->viewLogin();
 		exit;
 	}
 
-	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
-	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_delete")), $matcher);
-
-	$process = new MitgliederFilterDeleteProcess($session->getStorage());
-	$process->setMatcher($matcher);
-	$process->setUserID($session->getUser()->getUserID());
-	$process->setTimestamp(time());
-	$process->setFinishedPage($session->getLink("mitglieder_page", $session->getVariable("filterid"), 0));
-	$process->save();
-
-	if ($session->getStorage()->getMitgliederCount($matcher) < 5) {
-		$process->run();
-		$ui->redirect($session->getLink("mitglieder_page", $session->getVariable("filterid"), 0));
-		exit;
-	} else {
-		$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
-		exit;
-	}
-case "sendmail":
-case "sendmail.select":
-	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));
-	$templates = $session->getStorage()->getMailTemplateList($session->getAllowedGliederungIDs("mitglieder_show"));
-
-	$ui->viewMitgliederSendMailForm($filters, $templates);
-	exit;
-case "sendmail.preview":
 	$filter = $session->getMitgliederFilter($session->getVariable("filterid"));
-	$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("mailtemplateid"));
+	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs($filteraction->getPermission())), ($filter == null ? null : $filter->getMatcher()));
 
-	$mitgliedercount = $session->getStorage()->getMitgliederCount($filter);
-	$mitglied = array_shift($session->getStorage()->getMitgliederList($filter, 1, rand(0,$mitgliedercount-1)));
-	$mail = $mailtemplate->generateMail($mitglied);
-
-	$ui->viewMitgliederSendMailPreview($mail, $filter, $mailtemplate);
+	$result = $filteraction->execute($config, $session, $filter, $matcher);
+	$ui->viewMitgliederFilterAction($filteraction, $filter, $matcher, $result);
 	exit;
-case "sendmail.send":
-	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
-	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_show")), $matcher);
-	$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("templateid"));
-	
-	$process = new MitgliederFilterSendMailProcess($session->getStorage());
-	$process->setBackend($config->getSendMailBackend());
-	$process->setMatcher($matcher);
-	$process->setTemplate($mailtemplate);
-	$process->setFinishedPage($session->getLink("mitglieder_page", $session->getVariable("filterid"), 0));
-	$process->save();
+case "filterprocess":
+	$filteraction = $session->getStorage()->getMitgliederFilterAction($session->getVariable("actionid"));
+	$process = $session->getStorage()->getProcess($session->getVariable("processid"));
 
-	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
-	exit;
-case "export.options":
-	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));
-	
-	$ui->viewMitgliederExportOptions($filters, $predefinedfields);
-	exit;
-case "export.export":
-	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
-	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_show")), $matcher);
-
-	// Headerfelder
-	$exportfields = array();
-	foreach ($session->getListVariable("simpleexportfields") as $fieldid) {
-		$predefinedfield = $predefinedfields[$fieldid];
-		$exportfields[$predefinedfield["label"]] = $predefinedfield["template"];
+	if (!$session->isAllowed($filteraction->getPermission())) {
+		$ui->viewLogin();
+		exit;
 	}
 
-	$exportfieldfields = $session->getListVariable("exportfields");
-	$exportfieldvalues = $session->getListVariable("exportvalues");
-	$exportfields = array_merge($exportfields, array_combine($exportfieldfields, $exportfieldvalues));
-	unset($exportfields[""]);
-
-	$tempfile = new TempFile($session->getStorage());
-	$tempfile->setUser($session->getUser());
-	$tempfile->setTimestamp(time());
-	$file = new File($session->getStorage());
-	$file->setExportFilename("vpanel-export-" . date("Y-m-d"));
-	$file->save();
-	$tempfile->setFile($file);
-	$tempfile->save();
-
-	$process = new MitgliederFilterExportCSVProcess($session->getStorage());
-	$process->setMatcher($matcher);
-	$process->setFile($tempfile);
-	$process->setFields($exportfields);
-	$process->setFinishedPage($session->getLink("tempfile_get", $tempfile->getTempFileID()));
-	$process->save();
-
-	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
-	exit;
-case "statistik.start":
-	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
-	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_show")), $matcher);
-
-	$statistik = new MitgliederStatistik($session->getStorage());
-	$statistik->setUser($session->getUser());
-	$statistik->setTimestamp(time());
-	$statistik->save();
-
-	$process = new MitgliederFilterStatistikProcess($session->getStorage());
-	$process->setMatcher($matcher);
-	$process->setStatistik($statistik);
-	$process->setFinishedPage($session->getLink("mitglieder_statistik", $statistik->getStatistikID()));
-	$process->save();
-	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
-	exit;
-case "setbeitrag.selectbeitrag":
-	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));
-	$beitraglist = $session->getStorage()->getBeitragList();
-
-	$ui->viewMitgliederSetBeitragSelect($filters, $beitraglist);
-	exit;
-case "setbeitrag.start":
-	$matcher = $session->getMitgliederMatcher($session->getVariable("filterid"));
-	$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_show")), $matcher);
-	$beitrag = $session->getStorage()->getBeitrag($session->getIntVariable("beitragid"));
-
-	$process = new MitgliederFilterBeitragProcess($session->getStorage());
-	$process->setMatcher($matcher);
-	$process->setBeitrag($beitrag);
-	$process->setFinishedPage($ui->getRedirectURL());
-	$process->save();
-	$ui->redirect($session->getLink("processes_view", $process->getProcessID()));
+	$result = $filteraction->show($config, $session, $process);
+	$ui->viewMitgliederFilterProcess($filteraction, $process, $result);
 	exit;
 case "composefilter":
 	function buildComposedMatcher($session, $filter, $id) {
@@ -590,7 +468,9 @@ default:
 	$mitglieder = $session->getStorage()->getMitgliederList($matcher, $pagesize, $offset);
 	$mitgliedtemplates = $session->getStorage()->getMitgliedTemplateList($session->getAllowedGliederungIDs("mitglieder_create"));
 	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));
-	$ui->viewMitgliederList($mitglieder, $mitgliedtemplates, $filters, $filter, $page, $pagecount, $mitgliedercount);
+	$filteractions = $session->getStorage()->getMitgliederFilterActionList();
+
+	$ui->viewMitgliederList($mitglieder, $mitgliedtemplates, $filteractions, $filters, $filter, $page, $pagecount, $mitgliedercount);
 	exit;
 }
 

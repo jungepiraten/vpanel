@@ -1,26 +1,16 @@
 <?php
 
-require_once(VPANEL_CORE . "/process.class.php");
+require_once(VPANEL_PROCESSES . "/mitgliederfilter.class.php");
 
-class MitgliederFilterBeitragProcess extends Process {
+class MitgliederFilterBeitragProcess extends MitgliederFilterProcess {
 	private $beitragid;
 
 	private $beitrag;
-	private $matcher;
 
 	public static function factory(Storage $storage, $row) {
-		$process = new MitgliederFilterBeitragProcess($storage);
-		$process->setMatcher($row["matcher"]);
+		$process = parent::factory($storage, $row);
 		$process->setBeitragID($row["beitragid"]);
 		return $process;
-	}
-
-	public function getMatcher() {
-		return $this->matcher;
-	}
-
-	public function setMatcher($matcher) {
-		$this->matcher = $matcher;
 	}
 
 	public function getBeitragID() {
@@ -54,29 +44,22 @@ class MitgliederFilterBeitragProcess extends Process {
 	}
 	
 	protected function getData() {
-		return array("matcher" => $this->getMatcher(), "beitragid" => $this->getBeitragID());
+		$data = parent::getData();
+		$data["beitragid"] = $this->getBeitragID();
+		return $data;
 	}
 
-	public function runProcess() {
-		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
-		$max = $result->getCount();
-		$i = 0;
-		$stepwidth = max(1, ceil($max / 100));
+	public function initProcess() {
+	}
 
-		while ($mitglied = $result->fetchRow()) {
-			if ($mitglied->getBeitrag($this->getBeitragID()) == null) {
-				$mitglied->setBeitrag($this->getBeitrag(), $this->getBeitragHoehe($mitglied), 0);
-				$mitglied->save();
-			}
-			
-			if ((++$i % $stepwidth) == 0) {
-				$this->setProgress($i / $max);
-				$this->save();
-			}
+	public function finalizeProcess() {
+	}
+
+	public function runProcessStep($mitglied) {
+		if ($mitglied->getBeitrag($this->getBeitragID()) == null) {
+			$mitglied->setBeitrag($this->getBeitrag(), $this->getBeitragHoehe($mitglied), 0);
+			$mitglied->save();
 		}
-		
-		$this->setProgress(1);
-		$this->save();
 	}
 }
 

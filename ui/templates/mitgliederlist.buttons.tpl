@@ -19,9 +19,9 @@
 			<ul class="dropdown-menu">
 				<li><a href="{"mitglieder_create"|___:-1}">{"(keine Vorlage)"|__}</a></li>
 				<li class="divider"></li>
-			{foreach from=$mitgliedtemplates item=mitgliedtemplate}
-				<li><a href="{"mitglieder_create"|___:$mitgliedtemplate.mitgliedtemplateid}">{$mitgliedtemplate.label|escape:html}</a></li>
-			{/foreach}
+				{foreach from=$mitgliedtemplates item=mitgliedtemplate}
+					<li><a href="{"mitglieder_create"|___:$mitgliedtemplate.mitgliedtemplateid}">{$mitgliedtemplate.label|escape:html}</a></li>
+				{/foreach}
 			</ul>
 		</div>
 	</div>

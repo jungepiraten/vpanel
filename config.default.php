@@ -1,15 +1,16 @@
 <?php
 
-define("VPANEL_ROOT",			dirname(__FILE__));
-define("VPANEL_CORE",			VPANEL_ROOT . "/core");
-define("VPANEL_STORAGE",		VPANEL_CORE . "/storage");
-define("VPANEL_MITGLIEDERMATCHER",	VPANEL_CORE . "/mitgliedermatcher");
-define("VPANEL_DOKUMENTTEMPLATES",	VPANEL_CORE . "/dokumenttemplates");
-define("VPANEL_SENDMAILBACKEND",	VPANEL_CORE . "/sendmailbackend");
-define("VPANEL_PROCESSES",		VPANEL_CORE . "/processes");
-define("VPANEL_UI",			VPANEL_ROOT . "/ui");
-define("VPANEL_LANGUAGE",		VPANEL_UI . "/language");
-define("VPANEL_FILES",			VPANEL_ROOT . "/files");
+define("VPANEL_ROOT",				dirname(__FILE__));
+define("VPANEL_CORE",				VPANEL_ROOT . "/core");
+define("VPANEL_STORAGE",			VPANEL_CORE . "/storage");
+define("VPANEL_MITGLIEDERMATCHER",		VPANEL_CORE . "/mitgliedermatcher");
+define("VPANEL_MITGLIEDERFILTERACTIONS",	VPANEL_CORE . "/mitgliederfilteractions");
+define("VPANEL_DOKUMENTTEMPLATES",		VPANEL_CORE . "/dokumenttemplates");
+define("VPANEL_SENDMAILBACKEND",		VPANEL_CORE . "/sendmailbackend");
+define("VPANEL_PROCESSES",			VPANEL_CORE . "/processes");
+define("VPANEL_UI",				VPANEL_ROOT . "/ui");
+define("VPANEL_LANGUAGE",			VPANEL_UI . "/language");
+define("VPANEL_FILES",				VPANEL_ROOT . "/files");
 
 require_once(VPANEL_UI . "/phpsession.class.php");
 require_once(VPANEL_UI . "/apisession.class.php");

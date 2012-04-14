@@ -7,14 +7,19 @@ foreach (glob(VPANEL_CORE . "/processes/*.class.php") as $processfile) {
 
 abstract class Process extends StorageClass {
 	private $processid;
+	private $userid;
 	private $progress;
 	private $queued;
 	private $started;
 	private $finished;
+	private $finishedpage;
+
+	private $user;
 
 	public static function factory(Storage $storage, $row) {
 		$process = $row["type"]::factory($storage, unserialize($row["typedata"]));
 		$process->setProcessID($row["processid"]);
+		$process->setUserID($row["userid"]);
 		$process->setProgress($row["progress"]);
 		$process->setQueued($row["queued"]);
 		$process->setStarted($row["started"]);
@@ -34,6 +39,29 @@ abstract class Process extends StorageClass {
 
 	public function setProcessID($processid) {
 		$this->processid = $processid;
+	}
+
+	public function getUserID() {
+		return $this->userid;
+	}
+
+	public function setUserID($userid) {
+		if ($this->userid == $userid) {
+			$this->user = null;
+		}
+		$this->userid = $userid;
+	}
+
+	public function getUser() {
+		if ($this->user == null) {
+			$this->user = $this->getStorage()->getUser($this->getUserID());
+		}
+		return $this->user;
+	}
+
+	public function setUser($user) {
+		$this->setUserID($user->getUserID());
+		$this->user = $user;
 	}
 
 	public function getProgress() {
@@ -94,6 +122,7 @@ abstract class Process extends StorageClass {
 		}
 		$this->setProcessID( $storage->setProcess(
 			$this->getProcessID(),
+			$this->getUserID(),
 			get_class($this),
 			serialize($this->getData()),
 			$this->getProgress(),
@@ -118,8 +147,10 @@ abstract class Process extends StorageClass {
 		$this->save();
 	}
 
-	abstract public function runProcess();
-	abstract protected function getData();
+	abstract protected function runProcess();
+	protected function getData() {
+		return array();
+	}
 }
 
 ?>

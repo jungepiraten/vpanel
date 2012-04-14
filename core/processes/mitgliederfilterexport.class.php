@@ -1,51 +1,17 @@
 <?php
 
-require_once(VPANEL_CORE . "/process.class.php");
+require_once(VPANEL_PROCESSES . "/mitgliederfilter.class.php");
 
-abstract class MitgliederFilterExportProcess extends Process {
-	private $fileid;
+class MitgliederFilterExportProcess extends MitgliederFilterProcess {
 	private $fields = array();
-
-	private $matcher;
-	private $file;
+	private $streamhandler;
 
 	public static function factory(Storage $storage, $row) {
-		$process = new $row["class"]($storage);
+		$process = parent::factory($storage, $row);
 		$process->setMatcher($row["matcher"]);
-		$process->setFileID($row["fileid"]);
 		$process->setFields($row["fields"]);
+		$process->setStreamHandler($row["streamhandler_class"]::factory($storage, $row["streamhandler"]));
 		return $process;
-	}
-
-	public function getMatcher() {
-		return $this->matcher;
-	}
-
-	public function setMatcher($matcher) {
-		$this->matcher = $matcher;
-	}
-
-	public function getFileID() {
-		return $this->fileid;
-	}
-
-	public function setFileID($fileid) {
-		if ($fileid != $this->fileid) {
-			$this->file = null;
-		}
-		$this->fileid = $fileid;
-	}
-
-	public function getFile() {
-		if ($this->file == null) {
-			$this->file = $this->getStorage()->getFile($this->getFileID());
-		}
-		return $this->file;
-	}
-
-	public function setFile($file) {
-		$this->setFileID($file->getFileID());
-		$this->file = $file;
 	}
 
 	public function getFields() {
@@ -56,70 +22,142 @@ abstract class MitgliederFilterExportProcess extends Process {
 		$this->fields = $fields;
 	}
 
-	public function addField($field, $value) {
-		$this->fields[$field] = $value;
+	public function getStreamHandler() {
+		return $this->streamhandler;
+	}
+
+	public function setStreamHandler($streamhandler) {
+		$streamhandler->setStorage($this->getStorage());
+		$this->streamhandler = $streamhandler;
 	}
 	
 	protected function getData() {
-		return array("class" => get_class($this), "matcher" => $this->getMatcher(), "fileid" => $this->getFileID(), "fields" => $this->getFields());
+		$data = parent::getData();
+		$data["streamhandler_class"] = get_class($this->getStreamHandler());
+		$data["streamhandler"] = $this->getStreamHandler()->getData();
+		$data["fields"] = $this->getFields();
+		return $data;
 	}
 
-	public function generateFieldsRow($mitglied) {
+	protected function initProcess() {
+		$this->getStreamHandler()->openFile(array_keys($this->getFields()));
+	}
+
+	protected function runProcessStep($mitglied) {
 		$row = array();
 		foreach ($this->getFields() as $field => $template) {
 			$row[$field] = $mitglied->replaceText($template);
 		}
-		return $row;
+		$this->getStreamHandler()->writeFile($row);
 	}
 
-	public function getTableHeading() {
-		return array_keys($this->getFields());
+	protected function finalizeProcess() {
+		$this->getStreamHandler()->closeFile();
 	}
 
-	abstract protected function openFile();
-	abstract protected function writeFile($data);
-	abstract protected function closeFile();
-
-	public function runProcess() {
-		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
-		$max = $result->getCount();
-		$i = 0;
-		$stepwidth = max(1, ceil($max / 100));
-
-		$this->openFile();
-		while ($mitglied = $result->fetchRow()) {
-			$this->writeFile($this->generateFieldsRow($mitglied));
-			
-			if ((++$i % $stepwidth) == 0) {
-				$this->setProgress($i / $max);
-				$this->save();
-			}
-		}
-		$this->closeFile();
-		
-		$this->setProgress(1);
-		$this->save();
+	public function delete() {
+		$this->getStreamHandler->delete();
+		parent::delete();
 	}
 }
 
-class MitgliederFilterExportCSVProcess extends MitgliederFilterExportProcess {
-	private $handler;
+abstract class ExportStreamHandler {
+	private $storage;
+
+	public static function factory(Storage $storage, $row) {
+		$handler = new $row["class"]();
+		$handler->setStorage($storage);
+		return $handler;
+	}
+
+	protected function getStorage() {
+		return $this->storage;
+	}
+
+	public function setStorage($storage) {
+		$this->storage = $storage;
+	}
+
+	public function getData() {
+		$data = array();
+		$data["class"] = get_class($this);
+		return $data;
+	}
+
+	abstract public function openFile($headers);
+	abstract public function writeFile($data);
+	abstract public function closeFile();
+	abstract public function delete();
+}
+
+abstract class TempFileExportStreamHandler extends ExportStreamHandler {
+	private $tempfile;
+
+	public static function factory(Storage $storage, $row) {
+		$handler = parent::factory($storage, $row);
+		if (isset($row["tempfileid"])) {
+			$handler->setTempFile($storage->getTempFile($row["tempfileid"]));
+		}
+		return $handler;
+	}
+
+	public function getData() {
+		$data = parent::getData();
+		$data["tempfileid"] = $this->getTempFile()->getTempFileID();
+		return $data;
+	}
+
+	public function getTempFile() {
+		if ($this->tempfile == null) {
+			$this->tempfile = new TempFile($this->getStorage());
+			$file = new File($this->getStorage());
+			$file->setExportFilename("export-" . time());
+			$file->save();
+			$this->tempfile->setFile($file);
+			$this->tempfile->setTimestamp(time());
+			$this->tempfile->save();
+		}
+		return $this->tempfile;
+	}
+
+	protected function setTempFile($tempfile) {
+		$this->tempfile = $tempfile;
+	}
+
+	protected function getFile() {
+		return $this->getTempFile()->getFile();
+	}
 	
-	protected function openFile() {
+	public function delete() {
+		if ($this->file != null) {
+			$this->file->delete();
+		}
+	}
+}
+
+class CSVTempFileExportStreamHandler extends TempFileExportStreamHandler {
+	private $handler;
+
+	public function openFile($headers) {
 		$file = $this->getFile();
 		$file->setMimeType("text/csv");
 		$file->setExportFilename($file->getExportFilename() . ".csv");
 		$file->save();
+
 		$this->handler = fopen($file->getAbsoluteFileName(), "w");
-		fputcsv($this->handler, $this->getTableHeading());
+		$this->writeFile($headers);
 	}
 
-	protected function writeFile($row) {
+	public function writeFile($row) {
 		fputcsv($this->handler, $row);
 	}
 
-	protected function closeFile() {
+	public function closeFile() {
 		fclose($this->handler);
+	}
+
+	public function delete() {
+		$this->getFile()->delete();
 	}
 }
 

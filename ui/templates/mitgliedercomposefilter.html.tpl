@@ -175,7 +175,7 @@ $(function () {
 <form action="{"mitglieder_composefilter"|___}" method="post">
  <fieldset>
   <div id="filter"></div>
-  <input type="submit" name="generate" value="Start" />
+  <input type="submit" name="generate" value="Start" class="btn btn-primary" />
  </fieldset>
 </form>
 {include file="footer.html.tpl"}

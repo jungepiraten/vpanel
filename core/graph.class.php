@@ -297,6 +297,9 @@ class Graph_DefaultAxis {
 		if ($val > $this->getMaximum()) {
 			return 1;
 		}
+		if ($this->getDelta() == 0) {
+			return 0;
+		}
 		return ($this->roundValue($val) - $this->getMinimum()) / $this->getDelta();
 	}
 
