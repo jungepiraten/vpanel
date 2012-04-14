@@ -376,6 +376,10 @@ abstract class SQLStorage extends AbstractStorage {
 	public function parseMitgliederBeitragBuchung($row) {
 		return $this->parseRow($row, null, "MitgliedBeitragBuchung");
 	}
+	public function getMitgliederBeitragBuchungByBeitragResult($beitragid) {
+		$sql = "SELECT `mbb`.`buchungid`, `mbb`.`beitragid`, `mbb`.`gliederungid`, `mbb`.`userid`, `mbb`.`timestamp`, `mbb`.`vermerk`, `mbb`.`hoehe` FROM `mitgliederbeitragbuchung` `mbb` LEFT JOIN `mitgliederbeitrag` `mb` ON (`mb`.`mitgliederbeitragid` = `mbb`.`beitragid`) WHERE `mb`.`beitragid` = " . intval($beitragid) . " ORDER BY `mbb`.`timestamp`";
+		return $this->getResult($sql, array($this, "parseMitgliederBeitragBuchung"));
+	}
 	public function getMitgliederBeitragBuchungByMitgliederBeitragResult($mitgliederbeitragid) {
 		$sql = "SELECT `buchungid`, `beitragid`, `gliederungid`, `userid`, `timestamp`, `vermerk`, `hoehe` FROM `mitgliederbeitragbuchung` WHERE `beitragid` = " . intval($mitgliederbeitragid) . " ORDER BY `timestamp`";
 		return $this->getResult($sql, array($this, "parseMitgliederBeitragBuchung"));

@@ -58,7 +58,7 @@ function queryProgress() {
 }
 
 setTimeout(queryProgress, 100);
-setInterval(queryProgress, 5000);
+setInterval(queryProgress, 1000);
 setInterval(countdownETA, 500);
 {/literal}
 </script>

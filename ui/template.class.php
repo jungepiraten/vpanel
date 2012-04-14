@@ -783,6 +783,16 @@ class Template {
 			$this->smarty->display("mitgliedersetbeitragselect.html.tpl");
 			return;
 		}
+		if ($action instanceof CalculateBeitragMitgliederFilterAction) {
+			if ($result["beitraglist"] != null) {
+				$this->smarty->assign("beitraglist", $this->parseBeitragList($result["beitraglist"]));
+			}
+			if ($result["gliederungen"] != null) {
+				$this->smarty->assign("gliederungen", $this->parseGliederungen($result["gliederungen"]));
+			}
+			$this->smarty->display("mitgliedercalculatebeitragselect.html.tpl");
+			return;
+		}
 	}
 
 	public function viewMitgliederFilterProcess($action, $process, $result) {
@@ -794,6 +804,16 @@ class Template {
 		if ($action instanceof StatistikMitgliederFilterAction) {
 			$this->smarty->assign("tempfiles", $this->parseTempFiles($result["tempfiles"]));
 			$this->smarty->display("mitgliederstatistik.html.tpl");
+			return;
+		}
+		if ($action instanceof CalculateBeitragMitgliederFilterAction) {
+			$this->smarty->assign("beitrag", $this->parseBeitrag($result["beitrag"]));
+			$this->smarty->assign("gliederungen", $this->parseGliederungen($result["gliederungen"]));
+			$this->smarty->assign("anteile", $result["anteile"]);
+			$this->smarty->assign("gliederungshoehe", $result["gliederungshoehe"]);
+			$this->smarty->assign("wunschhoehe", $result["wunschhoehe"]);
+			$this->smarty->assign("sumhoehe", $result["sumhoehe"]);
+			$this->smarty->display("mitgliedercalculatebeitrag.html.tpl");
 			return;
 		}
 	}

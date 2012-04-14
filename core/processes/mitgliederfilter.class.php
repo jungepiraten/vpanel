@@ -26,18 +26,20 @@ class MitgliederFilterProcess extends Process {
 		return $data;
 	}
 
-	protected function runProcess() {
-		global $config;
+	protected function getResult() {
+		return $this->getStorage()->getMitgliederResult($this->getMatcher());
+	}
 
-		$result = $this->getStorage()->getMitgliederResult($this->getMatcher());
+	protected function runProcess() {
+		$result = $this->getResult();
 		$max = $result->getCount();
 		$i = 0;
 		$stepwidth = ceil($max / 100);
 
 		$this->initProcess();
 
-		while ($mitglied = $result->fetchRow()) {
-			$this->runProcessStep($mitglied);
+		while ($item = $result->fetchRow()) {
+			$this->runProcessStep($item);
 			
 			if ((++$i % $stepwidth) == 0) {
 				$this->setProgress($i / $max);
@@ -52,7 +54,7 @@ class MitgliederFilterProcess extends Process {
 	}
 
 	protected function initProcess() {}
-	protected function runProcessStep($mitglied) {}
+	protected function runProcessStep($item) {}
 	protected function finalizeProcess() {}
 }
 

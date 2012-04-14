@@ -33,7 +33,7 @@ class SetBeitragMitgliederFilterAction extends MitgliederFilterAction {
 		$beitragid = $this->getBeitragID($session);
 		if ($beitragid == null) {
 			$beitraglist = $session->getStorage()->getBeitragList();
-			return array("sendmail" => "select", "beitraglist" => $beitraglist);
+			return array("setbeitrag" => "select", "beitraglist" => $beitraglist);
 		}
 
 		$process = new MitgliederFilterBeitragProcess($session->getStorage());
