@@ -55,7 +55,7 @@ class SendMailMitgliederFilterAction extends MitgliederFilterAction {
 	}
 
 	public function show($config, $session, $process) {
-		return array("redirect", $session->getLink("mitglieder"));
+		return array("redirect" => $session->getLink("mitglieder"));
 	}
 }
 
