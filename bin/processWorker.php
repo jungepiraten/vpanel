@@ -10,7 +10,7 @@ while (true) {
 			$process->run();
 		}
 	}
-	sleep(30);
+	sleep(5);
 }
 
 ?>
