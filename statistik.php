@@ -12,13 +12,31 @@ if (!$session->isAllowed("statistik_show")) {
 }
 
 require_once(VPANEL_CORE . "/mitgliedermatcher/logic.class.php");
+require_once(VPANEL_CORE . "/mitgliedermatcher/state.class.php");
+require_once(VPANEL_CORE . "/mitgliedermatcher/mitgliedschaft.class.php");
 require_once(VPANEL_CORE . "/mitgliedermatcher/ausgetreten.class.php");
 
 $storage = $session->getStorage();
 
-$mitgliedercount = $storage->getMitgliederCount(new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()));
+$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($session->getAllowedGliederungIDs("mitglieder_show")),
+                                    new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()) );
+
+$mitgliedercount = $storage->getMitgliederCount($matcher);
+
 $mitgliedschaften = $storage->getMitgliedschaftList();
+$countPerMitgliedschaft = array();
+foreach ($storage->getMitgliedschaftList() as $mitgliedschaft) {
+	$count = $storage->getMitgliederCount(new AndMitgliederMatcher($matcher, new MitgliedschaftMitgliederMatcher($mitgliedschaft->getMitgliedschaftID())));
+	$countPerMitgliedschaft[$mitgliedschaft->getMitgliedschaftID()] = $count;
+}
+		
 $states = $storage->getStateList();
-$ui->viewStatistik($mitgliedercount, $mitgliedschaften, $states);
+$countPerState = array();
+foreach ($states as $state) {
+	$count = $storage->getMitgliederCount(new AndMitgliederMatcher($matcher, new StateMitgliederMatcher($state->getStateID())));
+	$countPerState[$state->getStateID()] = $count;
+}
+
+$ui->viewStatistik($mitgliedercount, $mitgliedschaften, $countPerMitgliedschaft, $states, $countPerState);
 
 ?>

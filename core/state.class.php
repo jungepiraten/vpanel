@@ -2,8 +2,6 @@
 
 require_once(VPANEL_CORE . "/storageobject.class.php");
 require_once(VPANEL_CORE . "/country.class.php");
-require_once(VPANEL_CORE . "/mitgliedermatcher/logic.class.php");
-require_once(VPANEL_CORE . "/mitgliedermatcher/state.class.php");
 
 class State extends StorageClass {
 	private $stateid;
@@ -77,11 +75,6 @@ class State extends StorageClass {
 			$this->getLabel(),
 			$this->getPopulation(),
 			$this->getCountryID() );
-	}
-
-	public function getMitgliederCount() {
-		return $this->getStorage()->getMitgliederCount(new AndMitgliederMatcher(	new StateMitgliederMatcher($this->getStateID()),
-												new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()) ));
 	}
 }
 

@@ -505,14 +505,15 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof BeitragMissingMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM 
 			                            (SELECT `mitgliedid`, `mitgliederbeitrag`.`hoehe`
-			                                   FROM `mitgliederbeitrag` LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
+			                                   FROM `mitgliederbeitrag`
+			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
 			                                   WHERE `mitgliederbeitrag`.`beitragid` = ".intval($matcher->getBeitragID())."
 			                                   GROUP BY `mitgliederbeitrag`.`mitgliederbeitragid`
 			                                   HAVING `mitgliederbeitrag`.`hoehe` - IFNULL(SUM(`buchung`.`hoehe`),0) > 0) AS `tmp`)";
 		}
 		if ($matcher instanceof BeitragMissingBelowMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM 
-			                            (SELECT `mitgliedid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0) - IFNULL(SUM(`buchung`.`hoehe`),0) AS `missing`
+			                            (SELECT `mitgliedid`, SUM(IFNULL(`mitgliederbeitrag`.`hoehe`,0)) - IFNULL(SUM(`buchung`.`hoehe`),0) AS `missing`
 			                                   FROM `mitglieder`
 			                                   LEFT JOIN `mitgliederbeitrag` USING (`mitgliedid`)
 			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
@@ -521,7 +522,7 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		if ($matcher instanceof BeitragMissingAboveMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM 
-			                            (SELECT `mitgliedid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0) - IFNULL(SUM(`buchung`.`hoehe`),0) AS `missing`
+			                            (SELECT `mitgliedid`, SUM(IFNULL(`mitgliederbeitrag`.`hoehe`,0)) - IFNULL(SUM(`buchung`.`hoehe`),0) AS `missing`
 			                                   FROM `mitglieder`
 			                                   LEFT JOIN `mitgliederbeitrag` USING (`mitgliedid`)
 			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
