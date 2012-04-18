@@ -28,6 +28,7 @@ class MitgliederFilterExportProcess extends MitgliederFilterProcess {
 
 	public function setStreamHandler($streamhandler) {
 		$streamhandler->setStorage($this->getStorage());
+		$streamhandler->setProcess($this);
 		$this->streamhandler = $streamhandler;
 	}
 	
@@ -80,7 +81,7 @@ abstract class ExportStreamHandler {
 		$this->storage = $storage;
 	}
 
-	protected function getProces() {
+	protected function getProcess() {
 		return $this->process;
 	}
 
