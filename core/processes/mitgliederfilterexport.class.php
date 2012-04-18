@@ -10,7 +10,7 @@ class MitgliederFilterExportProcess extends MitgliederFilterProcess {
 		$process = parent::factory($storage, $row);
 		$process->setMatcher($row["matcher"]);
 		$process->setFields($row["fields"]);
-		$process->setStreamHandler($row["streamhandler_class"]::factory($storage, $row["streamhandler"]));
+		$process->setStreamHandler($row["streamhandler_class"]::factory($storage, $process, $row["streamhandler"]));
 		return $process;
 	}
 
@@ -63,10 +63,12 @@ class MitgliederFilterExportProcess extends MitgliederFilterProcess {
 
 abstract class ExportStreamHandler {
 	private $storage;
+	private $process;
 
-	public static function factory(Storage $storage, $row) {
+	public static function factory(Storage $storage, $process, $row) {
 		$handler = new $row["class"]();
 		$handler->setStorage($storage);
+		$handler->setProcess($process);
 		return $handler;
 	}
 
@@ -76,6 +78,14 @@ abstract class ExportStreamHandler {
 
 	public function setStorage($storage) {
 		$this->storage = $storage;
+	}
+
+	protected function getProces() {
+		return $this->process;
+	}
+
+	public function setProcess($process) {
+		$this->process = $process;
 	}
 
 	public function getData() {
@@ -93,8 +103,8 @@ abstract class ExportStreamHandler {
 abstract class TempFileExportStreamHandler extends ExportStreamHandler {
 	private $tempfile;
 
-	public static function factory(Storage $storage, $row) {
-		$handler = parent::factory($storage, $row);
+	public static function factory(Storage $storage, $process, $row) {
+		$handler = parent::factory($storage, $process, $row);
 		if (isset($row["tempfileid"])) {
 			$handler->setTempFile($storage->getTempFile($row["tempfileid"]));
 		}
@@ -113,6 +123,7 @@ abstract class TempFileExportStreamHandler extends ExportStreamHandler {
 			$file = new File($this->getStorage());
 			$file->setExportFilename("export-" . time());
 			$file->save();
+			$this->tempfile->setUserID($this->getProcess()->getUserID());
 			$this->tempfile->setFile($file);
 			$this->tempfile->setTimestamp(time());
 			$this->tempfile->save();
