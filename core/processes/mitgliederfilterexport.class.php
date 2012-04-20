@@ -57,7 +57,7 @@ class MitgliederFilterExportProcess extends MitgliederFilterProcess {
 	}
 
 	public function delete() {
-		$this->getStreamHandler->delete();
+		$this->getStreamHandler()->delete();
 		parent::delete();
 	}
 }
