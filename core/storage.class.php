@@ -177,14 +177,14 @@ interface Storage {
 	public function setProcess($processid, $userid, $type, $typedata, $progess, $queued, $started, $finished, $finishedpage);
 	public function delProcess($processid);
 
-	public function getDokumentResult($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
-	public function getDokumentList($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
+	public function getDokumentResult($gliederungids, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
+	public function getDokumentList($gliederungids, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
 	public function getDokumentByMitgliedResult($mitgliedid);
 	public function getDokumentByMitgliedList($mitgliedid);
 	public function getDokumentIdentifierMaxNumber($identifierPrefix, $identifierNumberLength);
 	public function getDokumentSearchResult($gliederungids, $query, $limit = null, $offset = null);
 	public function getDokumentSearchList($gliederungids, $query, $limit = null, $offset = null);
-	public function getDokumentCount($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatus = null);
+	public function getDokumentCount($gliederungids, $dokumentkategorieid = null, $dokumentstatus = null);
 	public function getDokument($dokumentid);
 	public function setDokument($dokumentid, $gliederungid, $dokumentkategorieid, $dokumentstatus, $identifier, $label, $content, $data, $fileid);
 	public function delDokument($dokumentid);
@@ -241,6 +241,11 @@ interface Storage {
 	public function getDokumentTemplateList($gliederungids);
 	public function hasDokumentTemplate($templateid);
 	public function getDokumentTemplate($templateid);
+
+	public function getSingleDokumentTransitionList($gliederungids, $kategorieid, $statusid);
+	public function getMultiDokumentTransitionList($gliederungids, $kategorieid, $statusid);
+	public function hasDokumentTransition($transitionid);
+	public function getDokumentTransition($transitionid);
 }
 
 abstract class AbstractStorage implements Storage {
@@ -376,8 +381,8 @@ abstract class AbstractStorage implements Storage {
 		return $this->getProcessResult()->fetchAll();
 	}
 
-	public function getDokumentList($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
-		return $this->getDokumentResult($gliederungids, $gliederungid, $dokumentkategorieid, $dokumentstatusid, $limit, $offset)->fetchAll();
+	public function getDokumentList($gliederungids, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
+		return $this->getDokumentResult($gliederungids, $dokumentkategorieid, $dokumentstatusid, $limit, $offset)->fetchAll();
 	}
 
 	public function getDokumentByMitgliedList($mitgliedid) {
@@ -480,6 +485,53 @@ abstract class AbstractStorage implements Storage {
 	}
 	public function registerDokumentTemplate($template) {
 		$this->dokumenttemplates[$template->getDokumentTemplateID()] = $template;
+	}
+
+	/** DokumentTransitionen **/
+	private $dokumenttransitionen = array();
+	public function getSingleDokumentTransitionList($gliederungids, $kategorieid, $statusid) {
+		if ($kategorieid instanceof DokumentKategorie) {
+			$kategorieid = $kategorieid->getDokumentKategorieID();
+		}
+		if ($statusid instanceof DokumentStatus) {
+			$statusid = $statusid->getDokumentStatusID();
+		}
+
+		$transitionen = array();
+		foreach ($this->dokumenttransitionen as $transition) {
+			if ($transition instanceof SingleDokumentTransition && $transition->isMatching($gliederungids, $kategorieid, $statusid)) {
+				$transitionen[] = $transition;
+			}
+		}
+		return $transitionen;
+	}
+	public function getMultiDokumentTransitionList($gliederungids, $kategorieid, $statusid) {
+		if ($kategorieid instanceof DokumentKategorie) {
+			$kategorieid = $kategorieid->getDokumentKategorieID();
+		}
+		if ($statusid instanceof DokumentStatus) {
+			$statusid = $statusid->getDokumentStatusID();
+		}
+
+		$transitionen = array();
+		foreach ($this->dokumenttransitionen as $transition) {
+			if ($transition instanceof MultiDokumentTransition && $transition->isMatching($gliederungids, $kategorieid, $statusid)) {
+				$transitionen[] = $transition;
+			}
+		}
+		return $transitionen;
+	}
+	public function hasDokumentTransition($transitionid) {
+		return isset($this->dokumenttransitionen[$transitionid]);
+	}
+	public function getDokumentTransition($transitionid) {
+		if (!$this->hasDokumentTransition($transitionid)) {
+			return null;
+		}
+		return $this->dokumenttransitionen[$transitionid];
+	}
+	public function registerDokumentTransition($transition) {
+		$this->dokumenttransitionen[$transition->getDokumentTransitionID()] = $transition;
 	}
 }
 

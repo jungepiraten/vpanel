@@ -1730,12 +1730,9 @@ abstract class SQLStorage extends AbstractStorage {
 	public function parseDokument($row) {
 		return $this->parseRow($row, null, "Dokument");
 	}
-	public function getDokumentCount($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null) {
+	public function getDokumentCount($gliederungids, $dokumentkategorieid = null, $dokumentstatusid = null) {
 		if (empty($gliederungids)) {
 			return 0;
-		}
-		if ($gliederungid instanceof Gliederung) {
-			$gliederungid = $gliederungid->getGliederungID();
 		}
 		if ($dokumentkategorieid instanceof DokumentKategorie) {
 			$dokumentkategorieid = $dokumentkategorieid->getDokumentKategorieID();
@@ -1744,9 +1741,6 @@ abstract class SQLStorage extends AbstractStorage {
 			$dokumentstatusid = $dokumentstatusid->getDokumentStatusID();
 		}
 		$sql = "SELECT COUNT(`dokumentid`) FROM `dokument` WHERE `gliederungid` IN (" . implode(",", array_map("intval", $gliederungids)) . ")";
-		if ($gliederungid != null) {
-			$sql .= " AND `gliederungid` = " . intval($gliederungid);
-		}
 		if ($dokumentkategorieid != null) {
 			$sql .= " AND `dokumentkategorieid` = " . intval($dokumentkategorieid);
 		}
@@ -1765,12 +1759,9 @@ abstract class SQLStorage extends AbstractStorage {
 		$row = $rslt->fetchRow();
 		return intval(substr($row["identifier"], strlen($identifierPrefix)));
 	}
-	public function getDokumentResult($gliederungids, $gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
+	public function getDokumentResult($gliederungids, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
 		if (empty($gliederungids)) {
 			return new EmptyStorageResult();
-		}
-		if ($gliederungid instanceof Gliederung) {
-			$gliederungid = $gliederungid->getGliederungID();
 		}
 		if ($dokumentkategorieid instanceof DokumentKategorie) {
 			$dokumentkategorieid = $dokumentkategorieid->getDokumentKategorieID();
@@ -1779,9 +1770,6 @@ abstract class SQLStorage extends AbstractStorage {
 			$dokumentstatusid = $dokumentstatusid->getDokumentStatusID();
 		}
 		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE `gliederungid` IN (" . implode(",", array_map("intval", $gliederungids)) . ")";
-		if ($gliederungid != null) {
-			$sql .= " AND `gliederungid` = " . intval($gliederungid);
-		}
 		if ($dokumentkategorieid != null) {
 			$sql .= " AND `dokumentkategorieid` = " . intval($dokumentkategorieid);
 		}

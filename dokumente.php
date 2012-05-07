@@ -112,10 +112,45 @@ case "details":
 	$dokumentnotizen = $session->getStorage()->getDokumentNotizList($dokument->getDokumentID());
 	$mitglieder = $session->getStorage()->getMitgliederByDokumentList($dokument->getDokumentID());
 
+	$transitionen = $session->getStorage()->getSingleDokumentTransitionList(array($dokument->getGliederungID()), $dokument->getDokumentKategorieID(), $dokument->getDokumentStatusID());
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
 	$mitgliedtemplates = $session->getStorage()->getMitgliedTemplateList($session->getAllowedGliederungIDs("mitglieder_create"));
-	$ui->viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $dokumentkategorien, $dokumentstatuslist, $mitgliedtemplates);
+	$ui->viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $mitgliedtemplates);
+	exit;
+case "transition":
+	$transition = $session->getStorage()->getDokumentTransition($session->getVariable("transitionid"));
+
+	if (!$session->isAllowed($transition->getPermission())) {
+		$ui->viewLogin();
+		exit;
+	}
+
+	if ($session->hasVariable("dokumentid")) {
+		$dokumentid = $session->getVariable("dokumentid");
+		$result = $transition->execute($config, $session, $dokumentid);
+	} else {
+		$gliederungids = $session->getAllowedGliederungIDs($transition->getPermission());
+		if ($session->hasVariable("gliederungid")) {
+			$gliederungids = array_intersect($gliederungids, array($session->getIntVariable("gliederungid")));
+		}
+		$kategorieid = $session->getVariable("kategorieid");
+		$statusid = $session->getVariable("statusid");
+		$result = $transition->executeMulti($config, $session, $gliederungids, $kategorieid, $statusid);
+	}
+	$ui->viewDokumentTransition($transition, $result);
+	exit;
+case "transitionprocess":
+	$transition = $session->getStorage()->getDokumentTransition($session->getVariable("transitionid"));
+	$process = $session->getStorage()->getProcess($session->getVariable("processid"));
+
+	if (!$session->isAllowed($transition->getPermission())) {
+		$ui->viewLogin();
+		exit;
+	}
+
+	$result = $transition->show($config, $session, $process);
+	$ui->viewDokumentTransitionProcess($transition, $process, $result);
 	exit;
 case "delete":
 	if (!$session->isAllowed("dokumente_delete")) {
@@ -147,20 +182,26 @@ default:
 		$dokumentstatus = $session->getStorage()->getDokumentStatus($session->getDefaultDokumentStatusID());
 	}
 
+	$gliederungids = $session->getAllowedGliederungIDs("dokumente_show");
+	if ($gliederung != null) {
+		$gliederungids = array_intersect($gliederungids, array($gliederung->getGliederungID()));
+	}
+
 	$pagesize = 20;
-	$pagecount = ceil($session->getStorage()->getDokumentCount($session->getAllowedGliederungIDs("dokumente_show"), $gliederung, $dokumentkategorie, $dokumentstatus) / $pagesize);
+	$pagecount = ceil($session->getStorage()->getDokumentCount($gliederungids, $dokumentkategorie, $dokumentstatus) / $pagesize);
 	$page = 0;
 	if ($session->hasVariable("page") and $session->getVariable("page") >= 0 and $session->getVariable("page") < $pagecount) {
 		$page = intval($session->getVariable("page"));
 	}
 	$offset = $page * $pagesize;
 
-	$dokumente = $session->getStorage()->getDokumentList($session->getAllowedGliederungIDs("dokumente_show"), $gliederung, $dokumentkategorie, $dokumentstatus, $pagesize, $offset);
+	$dokumente = $session->getStorage()->getDokumentList($gliederungids, $dokumentkategorie, $dokumentstatus, $pagesize, $offset);
 	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("dokumente_show"));
 	$templates = $session->getStorage()->getDokumentTemplateList($session->getAllowedGliederungIDs("dokumente_create"));
+	$transitionen = $session->getStorage()->getMultiDokumentTransitionList($session->getAllowedGliederungIDs("dokumente_modify"), $dokumentkategorie, $dokumentstatus);
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
-	$ui->viewDokumentList($dokumente, $templates, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount);
+	$ui->viewDokumentList($dokumente, $templates, $transitionen, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount);
 	exit;
 }
 

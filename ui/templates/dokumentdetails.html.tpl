@@ -13,39 +13,17 @@
 	<div class="span6">
 		<div class="btn-toolbar">
 			<div class="btn-group">
-				<a href="{"dokumente_mitglied"|___:$dokument.dokumentid}" class="btn">Mitglied verlinken</a>
-			</div>
-			<div class="btn-group">
-				<a class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="#">
-					{"Mitglied anlegen"|__}
+				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+					{"Transition ausführen"|__}
 					<span class="caret"></span>
 				</a>
 				<ul class="dropdown-menu">
-				{foreach from=$mitgliedtemplates item=mitgliedtemplate}
-					<li><a href="{"dokumente_mitglied_create"|___:$dokument.dokumentid:$mitgliedtemplate.mitgliedtemplateid}">{$mitgliedtemplate.label|escape:html}</a></li>
-				{/foreach}
+					{foreach from=$dokumenttransitionen item=dokumenttransition}
+						<li><a href="{"dokumente_transitionaction"|___:$dokumenttransition.dokumenttransitionid:$dokument.dokumentid}">{$dokumenttransition.label|escape:html}</a></li>
+					{/foreach}
 				</ul>
 			</div>
 		</div>
-		{if count($mitglieder) > 0}
-		{include file="mitgliederlist.block.tpl" mitglieder=$mitglieder showmitglieddokumentdel=1}
-		<div class="btn-toolbar">
-			<div class="btn-group">
-				<a href="{"dokumente_mitglied"|___:$dokument.dokumentid}" class="btn">Mitglied verlinken</a>
-			</div>
-			<div class="btn-group">
-				<a class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="#">
-					{"Mitglied anlegen"|__}
-					<span class="caret"></span>
-				</a>
-				<ul class="dropdown-menu">
-				{foreach from=$mitgliedtemplates item=mitgliedtemplate}
-					<li><a href="{"dokumente_mitglied_create"|___:$dokument.dokumentid:$mitgliedtemplate.mitgliedtemplateid}">{$mitgliedtemplate.label|escape:html}</a></li>
-				{/foreach}
-				</ul>
-			</div>
-		</div>
-		{/if}
 	</div>
 	<div class="span6">
 		{foreach from=$dokumentnotizen item=notiz}

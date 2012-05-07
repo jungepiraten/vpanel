@@ -52,10 +52,6 @@ class MitgliederFilterProcess extends Process {
 		$this->setProgress(1);
 		$this->save();
 	}
-
-	protected function initProcess() {}
-	protected function runProcessStep($item) {}
-	protected function finalizeProcess() {}
 }
 
 ?>

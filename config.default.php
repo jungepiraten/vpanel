@@ -6,6 +6,7 @@ define("VPANEL_STORAGE",			VPANEL_CORE . "/storage");
 define("VPANEL_MITGLIEDERMATCHER",		VPANEL_CORE . "/mitgliedermatcher");
 define("VPANEL_MITGLIEDERFILTERACTIONS",	VPANEL_CORE . "/mitgliederfilteractions");
 define("VPANEL_DOKUMENTTEMPLATES",		VPANEL_CORE . "/dokumenttemplates");
+define("VPANEL_DOKUMENTTRANSITIONEN",		VPANEL_CORE . "/dokumenttransitionen");
 define("VPANEL_SENDMAILBACKEND",		VPANEL_CORE . "/sendmailbackend");
 define("VPANEL_PROCESSES",			VPANEL_CORE . "/processes");
 define("VPANEL_UI",				VPANEL_ROOT . "/ui");

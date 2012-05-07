@@ -141,8 +141,8 @@ abstract class TempFileExportStreamHandler extends ExportStreamHandler {
 	}
 	
 	public function delete() {
-		if ($this->file != null) {
-			$this->file->delete();
+		if ($this->tempfile != null) {
+			$this->tempfile->delete();
 		}
 	}
 }

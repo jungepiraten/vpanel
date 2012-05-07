@@ -509,6 +509,17 @@ class Template {
 		return array_map(array($this, 'parseDokumentTemplate'), $rows);
 	}
 
+	protected function parseDokumentTransition($transition) {
+		$row = array();
+		$row["dokumenttransitionid"] = $transition->getDokumentTransitionID();
+		$row["label"] = $transition->getLabel();
+		return $row;
+	}
+
+	protected function parseDokumentTransitionen($rows) {
+		return array_map(array($this, 'parseDokumentTransition'), $rows);
+	}
+
 	protected function parseDokumentKategorie($kategorie) {
 		$row = array();
 		$row["dokumentkategorieid"] = $kategorie->getDokumentKategorieID();
@@ -832,7 +843,7 @@ class Template {
 		$this->smarty->display("process.html.tpl");
 	}
 
-	public function viewDokumentList($dokumente, $templates, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount) {
+	public function viewDokumentList($dokumente, $templates, $transitionen, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount) {
 		if ($gliederung != null) {
 			$this->smarty->assign("gliederung", $this->parseGliederung($gliederung));
 		}
@@ -846,6 +857,7 @@ class Template {
 		$this->smarty->assign("pagecount", $pagecount);
 		$this->smarty->assign("dokumente", $this->parseDokumente($dokumente));
 		$this->smarty->assign("dokumenttemplates", $this->parseDokumentTemplates($templates));
+		$this->smarty->assign("dokumenttransitionen", $this->parseDokumentTransitionen($transitionen));
 		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
@@ -871,14 +883,30 @@ class Template {
 		}
 	}
 
-	public function viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $dokumentkategorien, $dokumentstatuslist, $mitgliedtemplates) {
+	public function viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $mitgliedtemplates) {
 		$this->smarty->assign("dokument", $this->parseDokument($dokument));
 		$this->smarty->assign("dokumentnotizen", $this->parseDokumentNotizen($dokumentnotizen));
 		$this->smarty->assign("mitglieder", $this->parseMitglieder($mitglieder));
+		$this->smarty->assign("dokumenttransitionen", $this->parseDokumentTransitionen($transitionen));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
 		$this->smarty->assign("mitgliedtemplates", $this->parseMitgliedTemplates($mitgliedtemplates));
 		$this->smarty->display("dokumentdetails.html.tpl");
+	}
+
+	public function viewDokumentTransition($transition, $result) {
+		if (isset($result["redirect"])) {
+			return $this->redirect($result["redirect"]);
+		}
+		$this->smarty->assign("transition", $this->parseDokumentTransition($transition));
+	}
+
+	public function viewDokumentTransitionProcess($transition, $process, $result) {
+		if (isset($result["redirect"])) {
+			return $this->redirect($result["redirect"]);
+		}
+		$this->smarty->assign("transition", $this->parseDokumentTransition($transition));
+		$this->smarty->assign("process", $this->parseProcess($process));
 	}
 
 	public function viewMitgliedDokumentForm($mitglied, $dokument) {

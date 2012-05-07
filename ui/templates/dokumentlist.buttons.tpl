@@ -49,6 +49,17 @@
 			{/foreach}
 			</ul>
 		</div>
+		<div class="btn-group">
+			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+				{"Transition ausführen"|__}
+				<span class="caret"></span>
+			</a>    
+			<ul class="dropdown-menu">
+				{foreach from=$dokumenttransitionen item=dokumenttransition}
+					<li><a href="{"dokumente_transitionactionmulti"|___:$dokumenttransition.dokumenttransitionid:$gliederung.gliederungid:$dokumentkategorie.dokumentkategorieid:$dokumentstatus.dokumentstatusid}">{$dokumenttransition.label|escape:html}</a></li>
+				{/foreach}
+			</ul>
+		</div>
 	</div>
 	<div class="pagination pagination-right span4">
 		<ul>
