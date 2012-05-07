@@ -24,6 +24,7 @@
 				</ul>
 			</div>
 		</div>
+		{include file="mitgliederlist.block.tpl" mitglieder=$mitglieder showmitglieddokumentdel=1}
 	</div>
 	<div class="span6">
 		{foreach from=$dokumentnotizen item=notiz}
