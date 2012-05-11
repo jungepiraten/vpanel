@@ -9,8 +9,8 @@
 		<tr onclick="doNav('{"mitglieder_details"|___:$mitglied.mitgliedid}');" {if isset($mitglied.austritt)}id="ex"{/if}>
 			<td>{$mitglied.mitgliedid|escape:html}</td>
 			<td>
-				{if $showmitglieddel and ! isset($mitglied.austritt)}
-				<a class="close delete" href="{"mitglieder_del"|___:$mitglied.filterid}">&times;</a>
+				{if isset($mitglied.austritt)}
+				<span class="close">Ausgetreten</span>
 				{/if}
 				{if $showmitglieddokumentdel and isset($dokument)}
 				<a href="{"mitglieddokument_delete"|___:$mitglied.mitgliedid:$dokument.dokumentid}" class="close">&times;</a>
