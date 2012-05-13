@@ -81,7 +81,6 @@ class Mail {
 		$charset = "UTF-8";
 		
 		$raw .= "User-Agent: VPanel Mailer" . "\n";
-		$raw .= "To: <" . $this->getRecipient()->getEMail() . ">" . "\n";
 		if ($this->isMultipart()) {
 			$raw .= "MIME-Version: 1.0" . "\n";
 			$raw .= "Content-Type: multipart/mixed; boundary=" . $this->getBoundary() . "\n";
@@ -95,7 +94,6 @@ class Mail {
 		foreach ($headers as $key => $value) {
 			$raw .= $key . ": " . mb_encode_mimeheader($value, $charset) . "\n";
 		}
-		$raw .= "To: " . $this->getRecipient()->getEMail() . "\n";
 		$raw .= "\n";
 		
 		if ($this->isMultipart()) {
