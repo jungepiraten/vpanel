@@ -56,7 +56,9 @@
 			</a>    
 			<ul class="dropdown-menu">
 				{foreach from=$dokumenttransitionen item=dokumenttransition}
-					<li><a href="{"dokumente_transitionactionmulti"|___:$dokumenttransition.dokumenttransitionid:$gliederung.gliederungid:$dokumentkategorie.dokumentkategorieid:$dokumentstatus.dokumentstatusid}">{$dokumenttransition.label|escape:html}</a></li>
+					{if ! $dokumenttransition.hidden}
+						<li><a href="{"dokumente_transitionactionmulti"|___:$dokumenttransition.dokumenttransitionid:$gliederung.gliederungid:$dokumentkategorie.dokumentkategorieid:$dokumentstatus.dokumentstatusid}">{$dokumenttransition.label|escape:html}</a></li>
+					{/if}
 				{/foreach}
 			</ul>
 		</div>

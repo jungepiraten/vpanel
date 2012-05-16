@@ -2,6 +2,7 @@
 
 abstract class DokumentTransition {
 	private $transitionid;
+	private $hidden;
 	private $gliederungid;
 	private $kategorieid;
 	private $statusid;
@@ -9,8 +10,9 @@ abstract class DokumentTransition {
 	private $nextstatusid;
 	private $notizkommentar;
 
-	public function __construct($transitionid, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $notizkommentar) {
+	public function __construct($transitionid, $hidden, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $notizkommentar) {
 		$this->transitionid = $transitionid;
+		$this->hidden = $hidden;
 		$this->gliederungid = $gliederungid;
 		$this->kategorieid = $kategorieid;
 		$this->statusid = $statusid;
@@ -21,6 +23,10 @@ abstract class DokumentTransition {
 
 	public function getDokumentTransitionID() {
 		return $this->transitionid;
+	}
+
+	public function isHidden() {
+		return $this->hidden;
 	}
 
 	abstract public function getLabel();

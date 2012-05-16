@@ -4,8 +4,8 @@ require_once(VPANEL_CORE . "/dokumenttransition.class.php");
 require_once(VPANEL_PROCESSES . "/dokumenttransitiondownload.class.php");
 
 class DownloadDokumentTransition extends DokumentTransition implements SingleDokumentTransition, MultiDokumentTransition {
-	public function __construct($transitionid, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar) {
-		parent::__construct($transitionid, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar);
+	public function __construct($transitionid, $hidden, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar) {
+		parent::__construct($transitionid, $hidden, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar);
 	}
 
 	public function getLabel() {

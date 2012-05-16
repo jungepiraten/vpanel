@@ -6,8 +6,8 @@ class MitgliedCreateDokumentTransition extends DokumentTransition implements Sin
 	private $mitgliedtemplateid;
 	private $label;
 
-	public function __construct($transitionid, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar, $mitgliedtemplateid, $label) {
-		parent::__construct($transitionid, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar);
+	public function __construct($transitionid, $hidden, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar, $mitgliedtemplateid, $label) {
+		parent::__construct($transitionid, $hidden, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar);
 		$this->mitgliedtemplateid = $mitgliedtemplateid;
 		$this->label = $label;
 	}

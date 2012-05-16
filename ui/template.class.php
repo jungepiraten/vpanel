@@ -513,6 +513,7 @@ class Template {
 		$row = array();
 		$row["dokumenttransitionid"] = $transition->getDokumentTransitionID();
 		$row["label"] = $transition->getLabel();
+		$row["hidden"] = $transition->isHidden();
 		return $row;
 	}
 
