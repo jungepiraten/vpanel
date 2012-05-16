@@ -6,8 +6,8 @@ class SelectPrefixDateDokumentTemplate extends IdentifierDokumentTemplate {
 	private $prefixes;
 	private $dateFormat;
 
-	public function __construct($templateid, $label, $gliederungid, $prefixes, $dateFormat, $identifierNumberLength = 3) {
-		parent::__construct($templateid, $label, $gliederungid, $identifierNumberLength);
+	public function __construct($templateid, $label, $hidden, $gliederungid, $prefixes, $dateFormat, $identifierNumberLength = 3) {
+		parent::__construct($templateid, $label, $hidden, $gliederungid, $identifierNumberLength);
 		$this->prefixes = $prefixes;
 		$this->dateFormat = $dateFormat;
 	}

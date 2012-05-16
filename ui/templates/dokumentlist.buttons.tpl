@@ -45,7 +45,9 @@
 			</a>
 			<ul class="dropdown-menu">
 			{foreach from=$dokumenttemplates item=dokumenttemplate}
-				<li><a href="{"dokumente_create"|___:$dokumenttemplate.dokumenttemplateid}">{$dokumenttemplate.label|escape:html}</a></li>
+				{if ! $dokumenttemplate.hidden}
+					<li><a href="{"dokumente_create"|___:$dokumenttemplate.dokumenttemplateid}">{$dokumenttemplate.label|escape:html}</a></li>
+				{/if}
 			{/foreach}
 			</ul>
 		</div>

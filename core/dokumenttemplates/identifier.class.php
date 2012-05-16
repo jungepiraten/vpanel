@@ -5,8 +5,8 @@ require_once(VPANEL_CORE . "/dokumenttemplate.class.php");
 abstract class IdentifierDokumentTemplate extends DokumentTemplate {
 	private $identifierNumberLength;
 
-	public function __construct($templateid, $label, $gliederungid, $identifierNumberLength = 3) {
-		parent::__construct($templateid, $label, $gliederungid);
+	public function __construct($templateid, $label, $hidden, $gliederungid, $identifierNumberLength = 3) {
+		parent::__construct($templateid, $label, $hidden, $gliederungid);
 		$this->identifierNumberLength = $identifierNumberLength;
 	}
 

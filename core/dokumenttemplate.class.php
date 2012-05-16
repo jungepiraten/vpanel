@@ -3,11 +3,13 @@
 abstract class DokumentTemplate {
 	private $templateid;
 	private $label;
+	private $hidden;
 	private $gliederungid;
 
-	public function __construct($templateid, $label, $gliederungid) {
+	public function __construct($templateid, $label, $hidden, $gliederungid) {
 		$this->templateid = $templateid;
 		$this->label = $label;
+		$this->hidden = $hidden;
 		$this->gliederungid = $gliederungid;
 	}
 
@@ -17,6 +19,10 @@ abstract class DokumentTemplate {
 
 	public function getLabel() {
 		return $this->label;
+	}
+
+	public function isHidden() {
+		return $this->hidden;
 	}
 
 	public function getGliederungID() {
