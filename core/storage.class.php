@@ -224,26 +224,24 @@ interface Storage {
 	public function setTempFile($tempfileid, $userid, $timestamp, $fileid);
 	public function delTempFile($tempfileid);
 
-	public function getMitgliedTemplateResult($gliederungids = null);
-	public function getMitgliedTemplateList($gliederungids = null);
-	public function getMitgliedTemplate($templateid);
-	public function setMitgliedTemplate($templateid, $label, $gliederungid, $mitgliedschaftid, $beitrag, $createmailtemplateid);
-	public function delMitgliedTemplate($templateid);
+	public function getMitgliederTemplateList($session = null);
+	public function hasMitgliederTemplate($templateid);
+	public function getMitgliederTemplate($templateid);
 
-	public function getMitgliederFilterList($gliederungids);
+	public function getMitgliederFilterList($session = null);
 	public function hasMitgliederFilter($filterid);
 	public function getMitgliederFilter($filterid);
 
-	public function getMitgliederFilterActionList();
+	public function getMitgliederFilterActionList($session = null);
 	public function hasMitgliederFilterAction($actionid);
 	public function getMitgliederFilterAction($actionid);
 
-	public function getDokumentTemplateList($gliederungids);
+	public function getDokumentTemplateList($session = null);
 	public function hasDokumentTemplate($templateid);
 	public function getDokumentTemplate($templateid);
 
-	public function getSingleDokumentTransitionList($gliederungids, $kategorieid, $statusid);
-	public function getMultiDokumentTransitionList($gliederungids, $kategorieid, $statusid);
+	public function getSingleDokumentTransitionList($session, $dokument);
+	public function getMultiDokumentTransitionList($session, $kategorieid, $statusid);
 	public function hasDokumentTransition($transitionid);
 	public function getDokumentTransition($transitionid);
 }
@@ -417,16 +415,43 @@ abstract class AbstractStorage implements Storage {
 		return $this->getTempFileResult()->fetchAll();
 	}
 
-	public function getMitgliedTemplateList($gliederungids = null) {
-		return $this->getMitgliedTemplateResult($gliederungids)->fetchAll();
+	/** MitgliederTemplate **/
+	private $mitgliedertemplates = array();
+	public function getMitgliederTemplateList($session = null) {
+		if ($session == null) {
+			return $this->mitgliedertemplates;
+		}
+		$templates = array();
+		foreach ($this->getMitgliederTemplateList() as $template) {
+			if ($template->isAllowed($session)) {
+				$templates[] = $template;
+			}
+		}
+		return $templates;
+	}
+	public function hasMitgliederTemplate($templateid) {
+		return isset($this->mitgliedertemplates[$templateid]);
+	}
+	public function getMitgliederTemplate($templateid) {
+		if (!$this->hasMitgliederTemplate($templateid)) {
+			return null;
+		}
+		return $this->mitgliedertemplates[$templateid];
+	}
+	public function registerMitgliederTemplate($template) {
+		$template->setStorage($this);
+		$this->mitgliedertemplates[$template->getMitgliedTemplateID()] = $template;
 	}
 
 	/** Filter **/
 	private $mitgliederfilters = array();
-	public function getMitgliederFilterList($gliederungids) {
+	public function getMitgliederFilterList($session = null) {
+		if ($session == null) {
+			return $this->mitgliederfilters;
+		}
 		$filters = array();
-		foreach ($this->mitgliederfilters as $filter) {
-			if ($filter->getGliederungID() == null || in_array($filter->getGliederungID(), $gliederungids)) {
+		foreach ($this->getMitgliederFilterList() as $filter) {
+			if ($filter->isAllowed($session)) {
 				$filters[] = $filter;
 			}
 		}
@@ -442,13 +467,23 @@ abstract class AbstractStorage implements Storage {
 		return $this->mitgliederfilters[$filterid];
 	}
 	public function registerMitgliederFilter($filter) {
+		$filter->setStorage($this);
 		$this->mitgliederfilters[$filter->getFilterID()] = $filter;
 	}
 
 	/** FilterAction **/
 	private $mitgliederfilteractions = array();
-	public function getMitgliederFilterActionList() {
-		return $this->mitgliederfilteractions;
+	public function getMitgliederFilterActionList($session = null) {
+		if ($session == null) {
+			return $this->mitgliederfilteractions;
+		}
+		$actions = array();
+		foreach ($this->getMitgliederFilterActionList() as $action) {
+			if ($action->isAllowed($session)) {
+				$actions[] = $action;
+			}
+		}
+		return $actions;
 	}
 	public function hasMitgliederFilterAction($actionid) {
 		return isset($this->mitgliederfilteractions[$actionid]);
@@ -460,15 +495,19 @@ abstract class AbstractStorage implements Storage {
 		return $this->mitgliederfilteractions[$actionid];
 	}
 	public function registerMitgliederFilterAction($action) {
+		$action->setStorage($this);
 		$this->mitgliederfilteractions[$action->getActionID()] = $action;
 	}
 
 	/** DokumentTemplates **/
 	private $dokumenttemplates = array();
-	public function getDokumentTemplateList($gliederungids) {
+	public function getDokumentTemplateList($session = null) {
+		if ($session == null) {
+			return $this->dokumenttemplates;
+		}
 		$templates = array();
-		foreach ($this->dokumenttemplates as $template) {
-			if ($template->getGliederungID() == null || in_array($template->getGliederungID(), $gliederungids)) {
+		foreach ($this->getDokumentTemplateList() as $template) {
+			if ($template->isAllowed($session)) {
 				$templates[] = $template;
 			}
 		}
@@ -484,28 +523,22 @@ abstract class AbstractStorage implements Storage {
 		return $this->dokumenttemplates[$templateid];
 	}
 	public function registerDokumentTemplate($template) {
+		$template->setStorage($this);
 		$this->dokumenttemplates[$template->getDokumentTemplateID()] = $template;
 	}
 
 	/** DokumentTransitionen **/
 	private $dokumenttransitionen = array();
-	public function getSingleDokumentTransitionList($gliederungids, $kategorieid, $statusid) {
-		if ($kategorieid instanceof DokumentKategorie) {
-			$kategorieid = $kategorieid->getDokumentKategorieID();
-		}
-		if ($statusid instanceof DokumentStatus) {
-			$statusid = $statusid->getDokumentStatusID();
-		}
-
+	public function getSingleDokumentTransitionList($session, $dokument) {
 		$transitionen = array();
 		foreach ($this->dokumenttransitionen as $transition) {
-			if ($transition instanceof SingleDokumentTransition && $transition->isMatching($gliederungids, $kategorieid, $statusid)) {
+			if ($transition instanceof SingleDokumentTransition && $transition->isMatching($session, $dokument->getDokumentKategorieID(), $dokument->getDokumentStatusID())) {
 				$transitionen[] = $transition;
 			}
 		}
 		return $transitionen;
 	}
-	public function getMultiDokumentTransitionList($gliederungids, $kategorieid, $statusid) {
+	public function getMultiDokumentTransitionList($session, $kategorieid, $statusid) {
 		if ($kategorieid instanceof DokumentKategorie) {
 			$kategorieid = $kategorieid->getDokumentKategorieID();
 		}
@@ -515,7 +548,7 @@ abstract class AbstractStorage implements Storage {
 
 		$transitionen = array();
 		foreach ($this->dokumenttransitionen as $transition) {
-			if ($transition instanceof MultiDokumentTransition && $transition->isMatching($gliederungids, $kategorieid, $statusid)) {
+			if ($transition instanceof MultiDokumentTransition && $transition->isMatching($session, $kategorieid, $statusid)) {
 				$transitionen[] = $transition;
 			}
 		}
@@ -531,6 +564,7 @@ abstract class AbstractStorage implements Storage {
 		return $this->dokumenttransitionen[$transitionid];
 	}
 	public function registerDokumentTransition($transition) {
+		$transition->setStorage($this);
 		$this->dokumenttransitionen[$transition->getDokumentTransitionID()] = $transition;
 	}
 }

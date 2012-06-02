@@ -6,17 +6,9 @@ require_once(VPANEL_PROCESSES . "/mitgliederfilterbeitrag.class.php");
 class SetBeitragMitgliederFilterAction extends MitgliederFilterAction {
 	private $beitragid;
 
-	public function __construct($actionid, $beitragid = null) {
-		parent::__construct($actionid);
+	public function __construct($actionid, $label, $permission, $beitragid = null) {
+		parent::__construct($actionid, $label, $permission);
 		$this->beitragid = $beitragid;
-	}
-
-	public function getLabel() {
-		return "Beitrag eintragen";
-	}
-
-	public function getPermission() {
-		return "mitglieder_modify";
 	}
 
 	protected function getBeitragID($session) {

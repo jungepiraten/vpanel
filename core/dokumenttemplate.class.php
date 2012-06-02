@@ -1,32 +1,17 @@
 <?php
 
-abstract class DokumentTemplate {
-	private $templateid;
-	private $label;
-	private $hidden;
-	private $gliederungid;
+require_once(VPANEL_CORE . "/aktion.class.php");
 
-	public function __construct($templateid, $label, $hidden, $gliederungid) {
+abstract class DokumentTemplate extends GliederungAktion {
+	private $templateid;
+
+	public function __construct($templateid, $label, $permission, $gliederungid) {
+		parent::__construct($label, $permission, $gliederungid);
 		$this->templateid = $templateid;
-		$this->label = $label;
-		$this->hidden = $hidden;
-		$this->gliederungid = $gliederungid;
 	}
 
 	public function getDokumentTemplateID() {
 		return $this->templateid;
-	}
-
-	public function getLabel() {
-		return $this->label;
-	}
-
-	public function isHidden() {
-		return $this->hidden;
-	}
-
-	public function getGliederungID() {
-		return $this->gliederungid;
 	}
 	
 	protected function getDokumentPrototype($session) {

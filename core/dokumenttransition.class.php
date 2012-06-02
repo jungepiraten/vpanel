@@ -1,19 +1,18 @@
 <?php
 
-abstract class DokumentTransition {
+require_once(VPANEL_CORE . "/aktion.class.php");
+
+abstract class DokumentTransition extends GliederungAktion {
 	private $transitionid;
-	private $hidden;
-	private $gliederungid;
 	private $kategorieid;
 	private $statusid;
 	private $nextkategorieid;
 	private $nextstatusid;
 	private $notizkommentar;
 
-	public function __construct($transitionid, $hidden, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $notizkommentar) {
+	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $notizkommentar) {
+		parent::__construct($label, $permission, $gliederungid);
 		$this->transitionid = $transitionid;
-		$this->hidden = $hidden;
-		$this->gliederungid = $gliederungid;
 		$this->kategorieid = $kategorieid;
 		$this->statusid = $statusid;
 		$this->nextkategorieid = $nextkategorieid;
@@ -25,18 +24,6 @@ abstract class DokumentTransition {
 		return $this->transitionid;
 	}
 
-	public function isHidden() {
-		return $this->hidden;
-	}
-
-	abstract public function getLabel();
-
-	abstract public function getPermission();
-
-	public function getGliederungID() {
-		return $this->gliederungid;
-	}
-	
 	public function getDokumentKategorieID() {
 		return $this->kategorieid;
 	}
@@ -57,8 +44,8 @@ abstract class DokumentTransition {
 		return $this->notizkommentar;
 	}
 
-	public function isMatching($gliederungids, $kategorieid, $statusid) {
-		if ( ($this->getGliederungID() == null || in_array($this->getGliederungID(), $gliederungids)) &&
+	public function isMatching($session, $kategorieid, $statusid) {
+		if ( ($this->isAllowed($session)) &&
 		     ($this->getDokumentKategorieID() == null || $this->getDokumentKategorieID() == $kategorieid) &&
 		     ($this->getDokumentStatusID() == null || $this->getDokumentStatusID() == $statusid) ) {
 			return true;

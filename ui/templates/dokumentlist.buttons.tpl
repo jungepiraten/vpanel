@@ -45,9 +45,7 @@
 			</a>
 			<ul class="dropdown-menu">
 			{foreach from=$dokumenttemplates item=dokumenttemplate}
-				{if ! $dokumenttemplate.hidden}
-					<li><a href="{"dokumente_create"|___:$dokumenttemplate.dokumenttemplateid}">{$dokumenttemplate.label|escape:html}</a></li>
-				{/if}
+				<li><a href="{"dokumente_create"|___:$dokumenttemplate.dokumenttemplateid}">{$dokumenttemplate.label|escape:html}</a></li>
 			{/foreach}
 			</ul>
 		</div>
@@ -58,9 +56,7 @@
 			</a>    
 			<ul class="dropdown-menu">
 				{foreach from=$dokumenttransitionen item=dokumenttransition}
-					{if ! $dokumenttransition.hidden}
-						<li><a href="{"dokumente_transitionactionmulti"|___:$dokumenttransition.dokumenttransitionid:$gliederung.gliederungid:$dokumentkategorie.dokumentkategorieid:$dokumentstatus.dokumentstatusid}">{$dokumenttransition.label|escape:html}</a></li>
-					{/if}
+					<li><a href="{"dokumente_transitionactionmulti"|___:$dokumenttransition.dokumenttransitionid:$gliederung.gliederungid:$dokumentkategorie.dokumentkategorieid:$dokumentstatus.dokumentstatusid}">{$dokumenttransition.label|escape:html}</a></li>
 				{/foreach}
 			</ul>
 		</div>

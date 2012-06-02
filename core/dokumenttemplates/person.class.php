@@ -5,8 +5,8 @@ require_once(VPANEL_DOKUMENTTEMPLATES . "/default.class.php");
 class NatPersonDokumentTemplate extends DefaultDokumentTemplate {
 	private $labelPrefix;
 
-	public function __construct($templateid, $label, $hidden, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $labelPrefix) {
-		parent::__construct($templateid, $label, $hidden, $gliederungid, $kategorieid, $statusid, $identifierPrefix, 1);
+	public function __construct($templateid, $label, $permission, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $labelPrefix) {
+		parent::__construct($templateid, $label, $permission, $gliederungid, $kategorieid, $statusid, $identifierPrefix, 1);
 		$this->labelPrefix = $labelPrefix;
 	}
 

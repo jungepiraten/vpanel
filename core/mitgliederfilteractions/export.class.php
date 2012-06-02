@@ -6,17 +6,9 @@ require_once(VPANEL_PROCESSES . "/mitgliederfilterexport.class.php");
 class ExportMitgliederFilterAction extends MitgliederFilterAction {
 	private $streamhandler;
 
-	public function __construct($actionid, $streamhandler) {
-		parent::__construct($actionid);
+	public function __construct($actionid, $label, $permission, $streamhandler) {
+		parent::__construct($actionid, $label, $permission);
 		$this->streamhandler = $streamhandler;
-	}
-
-	public function getLabel() {
-		return "Exportieren";
-	}
-
-	public function getPermission() {
-		return "mitglieder_show";
 	}
 
 	private function getStreamHandler($session) {

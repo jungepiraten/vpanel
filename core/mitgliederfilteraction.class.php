@@ -1,9 +1,12 @@
 <?php
 
-abstract class MitgliederFilterAction {
+require_once(VPANEL_CORE . "/aktion.class.php");
+
+abstract class MitgliederFilterAction extends Aktion {
 	private $actionid;
 
-	public function __construct($actionid) {
+	public function __construct($actionid, $label, $permission) {
+		parent::__construct($label, $permission);
 		$this->actionid = $actionid;
 	}
 	
@@ -30,9 +33,6 @@ abstract class MitgliederFilterAction {
 			return array("redirect" => $session->getLink("processes_view", $process->getProcessID()));
 		}
 	}
-
-	abstract public function getLabel();
-	abstract public function getPermission();
 
 	abstract public function execute($config, $session, $filter, $matcher);
 	abstract public function show($config, $process, $matcher);

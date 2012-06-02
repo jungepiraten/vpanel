@@ -180,7 +180,7 @@ abstract class AbstractSession implements Session {
 
 	public function addMitgliederMatcher($matcher) {
 		$id = "custom" . substr(md5(microtime(true) . "-" . rand(1000,9999)),0,8);
-		$this->setSessionValue("mitgliederfilter_" . $id, new MitgliederFilter($id, "Userdefined #" . $id, null, $matcher));
+		$this->setSessionValue("mitgliederfilter_" . $id, new MitgliederFilter($id, "Userdefined #" . $id, null, null, $matcher));
 		return $this->getMitgliederFilter($id);
 	}
 	public function getMitgliederFilter($filterid) {

@@ -7,18 +7,10 @@ class CalculateBeitragMitgliederFilterAction extends MitgliederFilterAction {
 	private $beitragid;
 	private $gliederungsAnteil;
 
-	public function __construct($actionid, $beitragid = null, $gliederungsAnteil = null) {
-		parent::__construct($actionid);
+	public function __construct($actionid, $label, $permission, $beitragid = null, $gliederungsAnteil = null) {
+		parent::__construct($actionid, $label, $permission);
 		$this->beitragid = $beitragid;
 		$this->gliederungsAnteil = $gliederungsAnteil;
-	}
-
-	public function getLabel() {
-		return "Beitrag verteilen";
-	}
-
-	public function getPermission() {
-		return "mitglieder_show";
 	}
 
 	protected function getStartTimestamp($session) {

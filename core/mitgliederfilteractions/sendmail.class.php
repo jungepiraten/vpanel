@@ -6,17 +6,9 @@ require_once(VPANEL_PROCESSES . "/mitgliederfiltersendmail.class.php");
 class SendMailMitgliederFilterAction extends MitgliederFilterAction {
 	private $mailtemplateid;
 
-	public function __construct($actionid, $mailtemplateid = null) {
-		parent::__construct($actionid);
+	public function __construct($actionid, $label, $permission, $mailtemplateid = null) {
+		parent::__construct($actionid, $label, $permission);
 		$this->mailtemplateid = $mailtemplateid;
-	}
-
-	public function getLabel() {
-		return "Mail versenden";
-	}
-
-	public function getPermission() {
-		return "mitglieder_show";
 	}
 
 	protected function getMailTemplateID($session) {

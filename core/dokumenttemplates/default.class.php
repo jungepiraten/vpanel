@@ -7,8 +7,8 @@ class DefaultDokumentTemplate extends IdentifierDokumentTemplate {
 	private $statusid;
 	private $identifierPrefix;
 
-	public function __construct($templateid, $label, $hidden, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $identifierNumberLength = 3) {
-		parent::__construct($templateid, $label, $hidden, $gliederungid, $identifierNumberLength);
+	public function __construct($templateid, $label, $permission, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $identifierNumberLength = 3) {
+		parent::__construct($templateid, $label, $permission, $gliederungid, $identifierNumberLength);
 		$this->kategorieid = $kategorieid;
 		$this->statusid = $statusid;
 		$this->identifierPrefix = $identifierPrefix;

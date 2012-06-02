@@ -1,18 +1,16 @@
 <?php
 
+require_once(VPANEL_CORE . "/aktion.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/logic.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/gliederung.class.php");
 
-class MitgliederFilter {
+class MitgliederFilter extends Aktion {
 	private $filterid;
-	private $label;
 	private $matcher;
-	private $gliederungid;
 
-	public function __construct($filterid, $label, $gliederungid, $matcher) {
+	public function __construct($filterid, $label, $permission, $gliederungid, $matcher) {
+		parent::__construct($label, $permission, $gliederungid);
 		$this->filterid = $filterid;
-		$this->label = $label;
-		$this->gliederungid = $gliederungid;
 		if ($gliederungid != null) {
 			$matcher = new AndMitgliederMatcher(new GliederungMitgliederMatcher($gliederungid), $matcher);
 		}
@@ -21,14 +19,6 @@ class MitgliederFilter {
 	
 	public function getFilterID() {
 		return $this->filterid;
-	}
-	
-	public function getLabel() {
-		return $this->label;
-	}
-	
-	public function getGliederungID() {
-		return $this->gliederungid;
 	}
 	
 	public function getMatcher() {

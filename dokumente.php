@@ -59,7 +59,7 @@ case "create":
 
 		$file = $dokumenttemplate->getDokumentFile($session);
 
-		if (!$session->isAllowed("dokumente_create", $gliederungid)) {
+		if (!$dokumenttemplate->isAllowed($session, $gliederungid)) {
 			$ui->viewLogin();
 			exit;
 		}
@@ -112,16 +112,16 @@ case "details":
 	$dokumentnotizen = $session->getStorage()->getDokumentNotizList($dokument->getDokumentID());
 	$mitglieder = $session->getStorage()->getMitgliederByDokumentList($dokument->getDokumentID());
 
-	$transitionen = $session->getStorage()->getSingleDokumentTransitionList(array($dokument->getGliederungID()), $dokument->getDokumentKategorieID(), $dokument->getDokumentStatusID());
+	$transitionen = $session->getStorage()->getSingleDokumentTransitionList($session, $dokument);
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
-	$mitgliedtemplates = $session->getStorage()->getMitgliedTemplateList($session->getAllowedGliederungIDs("mitglieder_create"));
+	$mitgliedtemplates = $session->getStorage()->getMitgliederTemplateList($session);
 	$ui->viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $mitgliedtemplates);
 	exit;
 case "transition":
 	$transition = $session->getStorage()->getDokumentTransition($session->getVariable("transitionid"));
 
-	if (!$session->isAllowed($transition->getPermission())) {
+	if (!$transition->isAllowed($session)) {
 		$ui->viewLogin();
 		exit;
 	}
@@ -144,7 +144,7 @@ case "transitionprocess":
 	$transition = $session->getStorage()->getDokumentTransition($session->getVariable("transitionid"));
 	$process = $session->getStorage()->getProcess($session->getVariable("processid"));
 
-	if (!$session->isAllowed($transition->getPermission())) {
+	if (!$transition->isAllowed($session)) {
 		$ui->viewLogin();
 		exit;
 	}
@@ -153,12 +153,13 @@ case "transitionprocess":
 	$ui->viewDokumentTransitionProcess($transition, $process, $result);
 	exit;
 case "delete":
-	if (!$session->isAllowed("dokumente_delete")) {
+	$dokument = $session->getStorage()->getDokument($session->getVariable("dokumentid"));
+
+	if (!$session->isAllowed("dokumente_delete", $dokument->getGliederungID())) {
 		$ui->viewLogin();
 		exit;
 	}
 
-	$dokument = $session->getStorage()->getDokument($session->getVariable("dokumentid"));
 	$dokument->delete();
 
 	$ui->redirect();
@@ -197,8 +198,8 @@ default:
 
 	$dokumente = $session->getStorage()->getDokumentList($gliederungids, $dokumentkategorie, $dokumentstatus, $pagesize, $offset);
 	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("dokumente_show"));
-	$templates = $session->getStorage()->getDokumentTemplateList($session->getAllowedGliederungIDs("dokumente_create"));
-	$transitionen = $session->getStorage()->getMultiDokumentTransitionList($session->getAllowedGliederungIDs("dokumente_modify"), $dokumentkategorie, $dokumentstatus);
+	$templates = $session->getStorage()->getDokumentTemplateList($session);
+	$transitionen = $session->getStorage()->getMultiDokumentTransitionList($session, $dokumentkategorie, $dokumentstatus);
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
 	$ui->viewDokumentList($dokumente, $templates, $transitionen, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount);

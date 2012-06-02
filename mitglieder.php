@@ -320,10 +320,10 @@ case "create":
 
 	$template = null;
 	if (isset($data["mitgliedtemplateid"])) {
-		$template = $session->getStorage()->getMitgliedTemplate($data["mitgliedtemplateid"]);
+		$template = $session->getStorage()->getMitgliederTemplate($data["mitgliedtemplateid"]);
 	}
 	if ($session->hasVariable("mitgliedtemplateid")) {
-		$template = $session->getStorage()->getMitgliedTemplate($session->getVariable("mitgliedtemplateid"));
+		$template = $session->getStorage()->getMitgliederTemplate($session->getVariable("mitgliedtemplateid"));
 	}
 
 	if ($session->getBoolVariable("save")) {
@@ -435,7 +435,7 @@ case "composefilter":
 		}
 	}
 
-	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));
+	$filters = $session->getStorage()->getMitgliederFilterList($session);
 	$ui->viewMitgliederComposeFilter($filters);
 	exit;
 default:
@@ -466,9 +466,9 @@ default:
 	$offset = $page * $pagesize;
 
 	$mitglieder = $session->getStorage()->getMitgliederList($matcher, $pagesize, $offset);
-	$mitgliedtemplates = $session->getStorage()->getMitgliedTemplateList($session->getAllowedGliederungIDs("mitglieder_create"));
-	$filters = $session->getStorage()->getMitgliederFilterList($session->getAllowedGliederungIDs("mitglieder_show"));
-	$filteractions = $session->getStorage()->getMitgliederFilterActionList();
+	$mitgliedtemplates = $session->getStorage()->getMitgliederTemplateList($session);
+	$filters = $session->getStorage()->getMitgliederFilterList($session);
+	$filteractions = $session->getStorage()->getMitgliederFilterActionList($session);
 
 	$ui->viewMitgliederList($mitglieder, $mitgliedtemplates, $filteractions, $filters, $filter, $page, $pagecount, $mitgliedercount);
 	exit;

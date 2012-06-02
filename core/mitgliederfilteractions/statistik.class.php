@@ -4,14 +4,6 @@ require_once(VPANEL_CORE . "/mitgliederfilteraction.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfilterstatistik.class.php");
 
 class StatistikMitgliederFilterAction extends MitgliederFilterAction {
-	public function getLabel() {
-		return "Statistik erzeugen";
-	}
-
-	public function getPermission() {
-		return "mitglieder_show";
-	}
-
 	public function execute($config, $session, $filter, $matcher) {
 		$process = new MitgliederFilterStatistikProcess($session->getStorage());
 		$process->setTimestamp(time());

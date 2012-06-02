@@ -3,16 +3,8 @@
 require_once(VPANEL_CORE . "/dokumenttransition.class.php");
 
 class MitgliedLinkDokumentTransition extends DokumentTransition implements SingleDokumentTransition {
-	public function __construct($transitionid, $hidden, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar) {
-		parent::__construct($transitionid, $hidden, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar);
-	}
-
-	public function getLabel() {
-		return "Mitglied verlinken";
-	}
-
-	public function getPermission() {
-		return "dokumente_modify";
+	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar) {
+		parent::__construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar);
 	}
 
 	public function execute($config, $session, $dokumentid) {
