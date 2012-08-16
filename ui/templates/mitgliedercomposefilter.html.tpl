@@ -10,8 +10,11 @@
 </style>
 {/literal}
 
-<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
-<script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
+ <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
+ <!--[if lte IE 8]>
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.ie.css" />
+ <![endif]-->
+ <script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
 <script type="text/javascript">
 
 var presetFilters = new Array();
