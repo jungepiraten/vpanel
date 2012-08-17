@@ -124,11 +124,11 @@ function generateFilter(id, parentID, type) {
 		break;
 	case "umkreis":
 		content.append("Umkreissuche");
-		var input_lat = $("<input>").prop("type","text").prop("name","filter["+id+"][lat]").prop("size","8");
+		var input_lat = $("<input>").prop("type","text").prop("name","filter["+id+"][lat]").prop("size","8").attr('placeholder', 'lat');
 		input_lat.focus(function() {checkUmkreisMap(id, content);}).blur(function() {checkUmkreisMap(id,content);}).keyup(function() {updateUmkreisMap(id);});
 		content.append(input_lat);
 
-		var input_lng = $("<input>").prop("type","text").prop("name","filter["+id+"][lng]").prop("size","8");
+		var input_lng = $("<input>").prop("type","text").prop("name","filter["+id+"][lng]").prop("size","8").attr('placeholder', 'lng');
 		input_lng.focus(function() {checkUmkreisMap(id, content);}).blur(function() {checkUmkreisMap(id,content);}).keyup(function() {updateUmkreisMap(id);});
 		content.append(input_lng);
 
