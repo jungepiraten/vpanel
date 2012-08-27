@@ -64,11 +64,18 @@ class DefaultConfig {
 	}
 
 	private $sendmailbackend;
+	private $globalmailheader = array();
 	public function setSendMailBackend($sendmailbackend) {
 		$this->sendmailbackend = $sendmailbackend;
 	}
 	public function getSendMailBackend() {
 		return $this->sendmailbackend;
+	}
+	public function addGlobalMailHeader($field, $value) {
+		$this->globalmailheader[$field] = $value;
+	}
+	protected function getGlobalMailHeader() {
+		return $this->globalmailheader;
 	}
 	protected function getBounceAddress($email) {
 		return "bounce+" . $email->getEMailID() . "@" . $this->getHostPart();
@@ -82,6 +89,9 @@ class DefaultConfig {
 		$mail->setBounceAddress($this->getBounceAddress($email));
 		$mail->setHeader("From", $this->getFromMailAddress());
 		$mail->setHeader("X-VPanel", $this->getHostPart());
+		foreach ($this->getGlobalMailHeader() as $header) {
+			$mail->setHeader($header["field"], $header["value"]);
+		}
 		return $mail;
 	}
 }
