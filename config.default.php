@@ -72,7 +72,7 @@ class DefaultConfig {
 		return $this->sendmailbackend;
 	}
 	public function addGlobalMailHeader($field, $value) {
-		$this->globalmailheader[$field] = $value;
+		$this->globalmailheader[] = array("field" => $field, "value" => $value);
 	}
 	protected function getGlobalMailHeader() {
 		return $this->globalmailheader;
