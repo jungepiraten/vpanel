@@ -18,4 +18,10 @@ class NatPersonAgeMitgliederMatcher extends MitgliederMatcher {
 	}
 }
 
+class EintrittAgeNatPersonMitgliederMatcher extends NatPersonAgeMitgliederMatcher {
+	public function match(Mitglied $mitglied) {
+		return $mitglied->getLatestRevision()->isNatPerson() && $mitglied->getEintrittsdatum() - $mitglied->getLatestRevision()->getGeburtsdatum() > $age*356*24*60*60;
+	}
+}
+
 ?>

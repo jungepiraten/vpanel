@@ -450,6 +450,9 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof NatPersonAgeMitgliederMatcher) {
 			return "`r`.`natpersonid` IS NOT NULL AND ADDDATE(`n`.`geburtsdatum`, INTERVAL " . intval($matcher->getAge()) . " YEAR) <= CURRENT_DATE()";
 		}
+		if ($matcher instanceof EintrittAgeNatPersonMitgliederMatcher) {
+			return "`r`.`natpersonid` IS NOT NULL AND ADDDATE(`n`.`geburtsdatum`, INTERVAL " . intval($matcher->getAge()) . " YEAR) <= `m`.`eintritt`";
+		}
 		if ($matcher instanceof JurPersonMitgliederMatcher) {
 			return "`r`.`jurpersonid` IS NOT NULL";
 		}
