@@ -444,6 +444,9 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof StateMitgliederMatcher) {
 			return "`o`.`stateid` = " . intval($matcher->getStateID());
 		}
+		if ($matcher instanceof OrtMitgliederMatcher) {
+			return "`k`.`ortid` = " . intval($matcher->getOrtID());
+		}
 		if ($matcher instanceof NatPersonMitgliederMatcher) {
 			return "`r`.`natpersonid` IS NOT NULL";
 		}

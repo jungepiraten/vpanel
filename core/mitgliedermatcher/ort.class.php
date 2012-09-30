@@ -2,11 +2,31 @@
 
 require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 
+class OrtMitgliederMatcher extends MitgliederMatcher {
+	private $ortid;
+
+	public function __construct($ort) {
+		if ($ort instanceof Ort) {
+			$this->ortid = $ort->getOrtID();
+		} else {
+			$this->ortid = $ort;
+		}
+	}
+
+	public function getOrtID() {
+		return $this->ortid;
+	}
+
+	public function match(Mitglied $mitglied) {
+		return $mitglied->getLatestRevision()->getKontakt()->getOrtID() == $this->ortid;
+	}
+}
+
 class OrtDistanceMitgliederMatcher extends MitgliederMatcher {
 	private $latitude;
 	private $longitude;
 	private $distance;
-	
+
 	public function __construct($latitude, $longitude, $distance) {
 		$this->latitude = $latitude;
 		$this->longitude = $longitude;
