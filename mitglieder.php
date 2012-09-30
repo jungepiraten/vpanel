@@ -20,6 +20,7 @@ require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/logic.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/gliederung.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/ausgetreten.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/natperson-age.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/search.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/ort.class.php");
 
@@ -412,6 +413,12 @@ case "composefilter":
 		case "austrittafter":
 			$timestamp = strtotime($filter[$id]["timestamp"]);
 			return new AustrittsdatumAfterMitgliederMatcher($timestamp);
+		case "age":
+			$age = intval($filter[$id]["age"]);
+			return new NatPersonAgeMitgliederMatcher($age);
+		case "eintrittage":
+			$age = intval($filter[$id]["age"]);
+			return new EintrittAgeNatPersonMitgliederMatcher($age);
 		case "search":
 			if (empty($filter[$id]["query"])) {
 				return null;

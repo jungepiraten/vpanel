@@ -73,6 +73,8 @@ function generateFilterChooser(id, parentID) {
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'preset')").append("Vordefiniert")),
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'eintrittafter')").append("Eingetreten nach")),
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'austrittafter')").append("Ausgetreten nach")),
+		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'age')").append("&Auml;lter als")),
+		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'eintrittage')").append("Zum Eintritt &auml;lter als")),
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'search')").append("Suchen nach")),
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'umkreis')").append("Umkreissuche"))
 	));
@@ -117,6 +119,14 @@ function generateFilter(id, parentID, type) {
 	case "austrittafter":
 		content.append("Ausgetreten nach");
 		content.append($("<input>").prop("type","text").prop("name","filter["+id+"][timestamp]"));
+		break;
+	case "age":
+		content.append("&Auml;lter als");
+		content.append($("<input>").prop("type","text").prop("name","filter["+id+"][age]"));
+		break;
+	case "eintrittage":
+		content.append("Zum Eintritt &auml;lter als");
+		content.append($("<input>").prop("type","text").prop("name","filter["+id+"][age]"));
 		break;
 	case "search":
 		content.append("Suchen nach");
