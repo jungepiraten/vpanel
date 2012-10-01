@@ -26,8 +26,8 @@ while ($ort = $ortResult->fetchRow()) {
 			$ort->setLongitude($location->lng);
 			$ort->save();
 		}
-	}
 **/
+	}
 }
 
 ?>
