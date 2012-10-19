@@ -534,6 +534,15 @@ abstract class SQLStorage extends AbstractStorage {
 			                                   GROUP BY `mitglieder`.`mitgliedid`) AS `tmp`
 			                             WHERE `tmp`.`missing` > " . floatval($matcher->getBeitragMark()) . ")";
 		}
+		if ($matcher instanceof DokumentMitgliederMatcher) {
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitglieddokument` WHERE `dokumentid` = " . intval($matcher->getDokumentID()) . ")";
+		}
+		if ($matcher instanceof DokumentKategorieMitgliederMatcher) {
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitglieddokument` `mdok` LEFT JOIN `dokument` `dok` USING (`dokumentid`) WHERE `dok`.`dokumentkategorieid` = " . intval($matcher->getDokumentKategorieID()) . ")";
+		}
+		if ($matcher instanceof DokumentStatusMitgliederMatcher) {
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitglieddokument` `mdok` LEFT JOIN `dokument` `dok` USING (`dokumentid`) WHERE `dok`.`dokumentstatusid` = " . intval($matcher->getDokumentStatusID()) . ")";
+		}
 		if ($matcher instanceof EintrittsdatumAfterMitgliederMatcher) {
 			return "`m`.`eintritt` >= '" . $this->escape(date("Y-m-d", $matcher->getTimestamp())) . "'";
 		}
