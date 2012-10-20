@@ -20,7 +20,7 @@ function changeMailTemplateView(id) {
 var headers = {literal}{}{/literal};
 {foreach from=$mailtemplates item=mt}
 headers[{$mt.templateid}] = {literal}{}{/literal};
-{foreach from=$mt.headers key=headerfield item=headervalue}headers[{$mt.templateid}]["{$headerfield}"] = "{$headervalue}";{/foreach}
+{foreach from=$mt.headers key=headerfield item=headervalue}headers[{$mt.templateid}]['{$headerfield}'] = '{$headervalue}';{/foreach}
 {/foreach}
 
 -->
