@@ -7,7 +7,7 @@ require_once(VPANEL_MITGLIEDERMATCHER . "/mitglied.class.php");
 class Template {
 	private $smarty;
 	private $session;
-	
+
 	public function __construct($session) {
 		$this->session = $session;
 
@@ -162,7 +162,9 @@ class Template {
 	protected function parseMailTemplate($template) {
 		$row = array();
 		$row["templateid"] = $template->getTemplateID();
-		$row["gliederung"] = $this->parseGliederung($template->getGliederung());
+		if ($template->getGliederungID() != null) {
+			$row["gliederung"] = $this->parseGliederung($template->getGliederung());
+		}
 		$row["label"] = $template->getLabel();
 		$row["body"] = $template->getBody();
 		$row["headers"] = array();
@@ -775,11 +777,14 @@ class Template {
 			switch ($result["sendmail"]) {
 			case "select":
 				$this->smarty->assign("mailtemplates", $this->parseMailTemplates($result["templates"]));
+				if ($result["mailtemplate"] != null) {
+					$this->smarty->assign("mailtemplate", $this->parseMailTemplate($result["mailtemplate"]));
+				}
 				$this->smarty->display("mitgliedersendmailform.html.tpl");
 				return;
 			case "preview":
 				$this->smarty->assign("mail", $this->parseMail($result["mail"]));
-				$this->smarty->assign("mailtemplate", $this->parseMailTemplate($result["mailtemplate"]));
+				$this->smarty->assign("mailtemplatecode", $result["mailtemplatecode"]);
 				$this->smarty->display("mitgliedersendmailpreview.html.tpl");
 				return;
 			}

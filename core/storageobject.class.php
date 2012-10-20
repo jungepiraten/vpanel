@@ -7,7 +7,7 @@ abstract class StorageClass {
 		$this->setStorage($storage);
 	}
 
-	public function setStorage(Storage $storage) {
+	public function setStorage($storage) {
 		$this->storage = $storage;
 	}
 

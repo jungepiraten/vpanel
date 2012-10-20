@@ -1,7 +1,8 @@
 {include file="header.html.tpl" ansicht="Mail verschicken" menupunkt="mitglied"}
 <form action="{"mitglieder_filteraction"|___:$action.actionid:$filterid}" method="post">
 	<fieldset>
-		<input type="hidden" name="mailtemplateid" value="{$mailtemplate.templateid|escape:html}" />
+		<input type="hidden" name="mailtemplatecode" value="{$mailtemplatecode|escape:html}" />
+		<button class="btn" name="form" value="1">{"Zurück"|__}</button>
 		<button class="btn btn-primary" name="sendmail" value="send">{"Los gehts"|__}</button>
 	</fieldset>
 </form>

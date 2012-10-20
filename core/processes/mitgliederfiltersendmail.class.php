@@ -11,7 +11,7 @@ class MitgliederFilterSendMailProcess extends MitgliederFilterProcess {
 	public static function factory(Storage $storage, $row) {
 		$process = parent::factory($storage, $row);
 		$process->setBackend($row["backend"]);
-		$process->setTemplateID($row["templateid"]);
+		$process->setTemplate($row["template"]);
 		return $process;
 	}
 
@@ -23,33 +23,18 @@ class MitgliederFilterSendMailProcess extends MitgliederFilterProcess {
 		$this->backend = $backend;
 	}
 
-	public function getTemplateID() {
-		return $this->templateid;
-	}
-
-	public function setTemplateID($templateid) {
-		if ($templateid != $this->templateid) {
-			$this->template = null;
-		}
-		$this->templateid = $templateid;
-	}
-
 	public function getTemplate() {
-		if ($this->template == null) {
-			$this->template = $this->getStorage()->getMailTemplate($this->getTemplateID());
-		}
 		return $this->template;
 	}
 
 	public function setTemplate($template) {
-		$this->setTemplateID($template->getTemplateID());
 		$this->template = $template;
 	}
-	
+
 	protected function getData() {
 		$data = parent::getData();
 		$data["backend"] = $this->getBackend();
-		$data["templateid"] = $this->getTemplateID();
+		$data["template"] = $this->getTemplate();
 		return $data;
 	}
 

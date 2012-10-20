@@ -1,19 +1,5 @@
-<div>
+<div id="mailheaders">
  <div id="headerrowtemplate" style="display:none;">
-  <input type="text" name="headerfields[]" {literal}onKeyUp="if(this.value!=''){var l=document.getElementsByName('headerfields[]');for (var i=0;i<l.length;i++) {if (i>0 && l[i].value == '') {return;}} $(this.parentNode).after($('<div>').append($('#headerrowtemplate').html()));}"{/literal} value="" />
-  <input type="text" name="headervalues[]" value="" class="span5" />
-  <a href="javascript:void()" onClick="this.parentNode.parentNode.removeChild(this.parentNode)" class="close">&times;</a>
- </div>
- {if isset($headers)}
- {foreach from=$headers key=headerfield item=headervalue}
- <div>
-  <input type="text" name="headerfields[]" {literal}onKeyUp="if(this.value!=''){var l=document.getElementsByName('headerfields[]');for (var i=0;i<l.length;i++) {if (i>0 && l[i].value == '') {return;}} $(this.parentNode).after($('<div>').append($('#headerrowtemplate').html()));}"{/literal} value="{$headerfield|escape:html}" />
-  <input type="text" name="headervalues[]" value="{$headervalue|escape:html}" class="span5" />
-  <a href="javascript:void()" onClick="this.parentNode.parentNode.removeChild(this.parentNode)" class="close">&times;</a>
- </div>
- {/foreach}
- {/if}
- <div>
   <input type="text" name="headerfields[]" {literal}onKeyUp="if(this.value!=''){var l=document.getElementsByName('headerfields[]');for (var i=0;i<l.length;i++) {if (i>0 && l[i].value == '') {return;}} $(this.parentNode).after($('<div>').append($('#headerrowtemplate').html()));}"{/literal} value="" />
   <input type="text" name="headervalues[]" value="" class="span5" />
   <a href="javascript:void()" onClick="this.parentNode.parentNode.removeChild(this.parentNode)" class="close">&times;</a>
@@ -32,15 +18,51 @@
 </div>
 {/if}
 
-
 <div>
-    <textarea name="body" rows="10" cols="70" class="span7">{if isset($body)}{$body|escape:html}{/if}</textarea>
+    <textarea id="mailbody" name="body" rows="10" cols="70" class="span7">{if isset($body)}{$body|escape:html}{/if}</textarea>
 </div>
-
-<div class="form-actions">
-    <button class="btn btn-primary submit" type="submit" name="save" value="1">{"Speichern"|__}</button>
-    <button class="btn">{"Abbrechen"|__}</button>
-</div>
-
- </fieldset>
-</form>
+<script type="text/javascript">
+<!--
+{literal}
+function mailSetBody(body) {
+	$("#mailbody").html(body);
+}
+function mailClearHeader() {
+	$("#mailheaders").empty();
+	mailAddHeader("","");
+}
+function mailAddHeader(field, value) {
+	$("#mailheaders").append(
+		$("<div>")
+			.append($("<input>").attr("name","headerfields[]").val(field).keyup(function () {
+				if(this.value != ''){
+					var l = document.getElementsByName('headerfields[]');
+					for (var i=0;i<l.length;i++) {
+						if (l[i].value == '') {
+							return;
+						}
+					}
+					mailAddHeader("","");
+				}
+			}))
+			.append($("<input>").attr("name","headervalues[]").val(value).addClass("span5"))
+			.append($("<a>").addClass("close").html("&times;").click(function () {
+				this.parentNode.parentNode.removeChild(this.parentNode);
+			}))
+	);
+}
+function mailClearAttachments() {
+	$("#mailheaders").empty();
+}
+function mailCheckHeader() {
+	
+}
+{/literal}
+mailClearHeader();
+{if isset($headers)}
+{foreach from=$headers key=headerfield item=headervalue}
+mailAddHeader("{$headerfield|escape:html}", "{$headervalue|escape:html}");
+{/foreach}
+{/if}
+-->
+</script>
