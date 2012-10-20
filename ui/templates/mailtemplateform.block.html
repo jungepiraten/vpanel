@@ -19,47 +19,8 @@
     </div>
 </div>
 
-<div>
- <div id="headerrowtemplate" style="display:none;">
-  <input type="text" name="headerfields[]" {literal}onKeyUp="if(this.value!=''){var l=document.getElementsByName('headerfields[]');for (var i=0;i<l.length;i++) {if (i>0 && l[i].value == '') {return;}} $(this.parentNode).after($('<div>').append($('#headerrowtemplate').html()));}"{/literal} value="" />
-  <input type="text" name="headervalues[]" value="" class="span5" />
-  <a href="javascript:void()" onClick="this.parentNode.parentNode.removeChild(this.parentNode)" class="close">&times;</a>
- </div>
- {if isset($mailtemplate)}
- {foreach from=$mailtemplate.headers key=headerfield item=headervalue}
- <div>
-  <input type="text" name="headerfields[]" {literal}onKeyUp="if(this.value!=''){var l=document.getElementsByName('headerfields[]');for (var i=0;i<l.length;i++) {if (i>0 && l[i].value == '') {return;}} $(this.parentNode).after($('<div>').append($('#headerrowtemplate').html()));}"{/literal} value="{$headerfield|escape:html}" />
-  <input type="text" name="headervalues[]" value="{$headervalue|escape:html}" class="span5" />
-  <a href="javascript:void()" onClick="this.parentNode.parentNode.removeChild(this.parentNode)" class="close">&times;</a>
- </div>
- {/foreach}
- {/if}
- <div>
-  <input type="text" name="headerfields[]" {literal}onKeyUp="if(this.value!=''){var l=document.getElementsByName('headerfields[]');for (var i=0;i<l.length;i++) {if (i>0 && l[i].value == '') {return;}} $(this.parentNode).after($('<div>').append($('#headerrowtemplate').html()));}"{/literal} value="" />
-  <input type="text" name="headervalues[]" value="" class="span5" />
-  <a href="javascript:void()" onClick="this.parentNode.parentNode.removeChild(this.parentNode)" class="close">&times;</a>
- </div>
-</div>
-
-<div>
- {if isset($mailtemplate)}
-  {foreach from=$mailtemplate.attachments item=attachment}
-   <a href="{"mailtemplateattachment_get"|___:$mailtemplate.templateid:$attachment.fileid}">{$attachment.exportfilename}</a>
-   <a href="{"mailtemplateattachment_delete"|___:$mailtemplate.templateid:$attachment.fileid}" class="close">&times;</a>
-  {/foreach}
-  <a href="{"mailtemplateattachment_create"|___:$mailtemplate.templateid}" class="btn btn-success">{"Attachment hinzufügen"|__}</a>
- {/if}
-</div>
-
-
-<div>
-    <textarea name="body" rows="10" cols="70" class="span7">{if isset($mailtemplate)}{$mailtemplate.body|escape:html}{/if}</textarea>
-</div>
-
-<div class="form-actions">
-    <button class="btn btn-primary submit" type="submit" name="save" value="1">{"Speichern"|__}</button>
-    <button class="btn">{"Abbrechen"|__}</button>
-</div>
-
- </fieldset>
-</form>
+{if isset($mailtemplate)}
+{include file="mailform.block.html" attachmentlinkget="mailtemplateattachment_get" attachmentlinkdelete="mailtemplateattachment_delete" attachmentlinkcreate="mailtemplateattachment_create" headers=$mailtemplate.headers attachments=$mailtemplate.attachments body=$mailtemplate.body}
+{else}
+{include file="mailform.block.html" attachmentlinkget="mailtemplateattachment_get" attachmentlinkdelete="mailtemplateattachment_delete" attachmentlinkcreate="mailtemplateattachment_create"}
+{/if}
