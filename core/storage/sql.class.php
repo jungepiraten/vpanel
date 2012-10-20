@@ -930,13 +930,13 @@ abstract class SQLStorage extends AbstractStorage {
 			$sql = "INSERT INTO `mitgliedernotizen`
 				(`mitgliedid`, `author`, `timestamp`, `kommentar`) VALUES
 				(" . intval($mitgliedid) . ",
-				 " . intval($author) . ",
+				 " . ($author == NULL ? "NULL" : intval($author)) . ",
 				 '" . date("Y-m-d H:i:s", $timestamp) . "',
 				 '" . $this->escape($kommentar) . "')";
 		} else {
 			$sql = "UPDATE	`mitgliedernotizen`
 				SET	`mitgliedid` = " . intval($mitgliedid) . ",
-					`author` = " . intval($author) . ",
+					`author` = " . ($author == NULL ? "NULL" : intval($author)) . ",
 					`timestamp` = " . date("Y-m-d H:i:s", $timestamp) . ",
 					`kommentar` = '" . $this->escape($kommentar) . "'
 				WHERE `mitgliednotizid` = " . intval($mitgliednotizid);
