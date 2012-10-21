@@ -33,6 +33,8 @@
 			{include file="timestamp.tpl" timestamp=$notiz.timestamp}
 			{if isset($notiz.nextkategorie)}<span class="nextkategorie">{"Unter %s abgelegt"|__:$notiz.nextkategorie.label}</span>{/if}
 			{if isset($notiz.nextstatus)}<span class="nextstatus">{"Als %s markiert"|__:$notiz.nextstatus.label}</span>{/if}
+			{if isset($notiz.nextlabel)}<span class="nextlabel">{"In %s umbenannt"|__:$notiz.nextlabel}</span>{/if}
+			{if isset($notiz.nextidentifier)}<span class="nextidentifier">{"Als %s abgeheftet"|__:$notiz.nextidentifier}</span>{/if}
 			<div class="kommentar">{$notiz.kommentar}</div>
 		</div>
 		{/foreach}

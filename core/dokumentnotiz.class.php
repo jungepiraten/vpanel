@@ -9,6 +9,8 @@ class DokumentNotiz extends StorageClass {
 	private $timestamp;
 	private $nextkategorieid;
 	private $nextstatusid;
+	private $nextlabel;
+	private $nextidentifier;
 	private $kommentar;
 
 	private $dokument;
@@ -24,6 +26,8 @@ class DokumentNotiz extends StorageClass {
 		$dokumentnotiz->setTimestamp($row["timestamp"]);
 		$dokumentnotiz->setNextKategorieID($row["nextKategorie"]);
 		$dokumentnotiz->setNextStatusID($row["nextState"]);
+		$dokumentnotiz->setNextLabel($row["nextLabel"]);
+		$dokumentnotiz->setNextIdentifier($row["nextIdentifier"]);
 		$dokumentnotiz->setKommentar($row["kommentar"]);
 		return $dokumentnotiz;
 	}
@@ -136,6 +140,22 @@ class DokumentNotiz extends StorageClass {
 		$this->nextstatus = $nextstatus;
 	}
 
+	public function getNextLabel() {
+		return $this->nextlabel;
+	}
+
+	public function setNextLabel($nextlabel) {
+		$this->nextlabel = $nextlabel;
+	}
+
+	public function getNextIdentifier() {
+		return $this->nextidentifier;
+	}
+
+	public function setNextIdentifier($nextidentifier) {
+		$this->nextidentifier = $nextidentifier;
+	}
+
 	public function getKommentar() {
 		return $this->kommentar;
 	}
@@ -155,6 +175,8 @@ class DokumentNotiz extends StorageClass {
 			$this->getTimestamp(),
 			$this->getNextKategorieID(),
 			$this->getNextStatusID(),
+			$this->getNextLabel(),
+			$this->getNextIdentifier(),
 			$this->getKommentar() ));
 	}
 

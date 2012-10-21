@@ -17,11 +17,14 @@ function parseDokumentFormular($ui, $session, &$dokument = null) {
 	$kategorieid = $session->getIntVariable("kategorieid");
 	$statusid = $session->getIntVariable("statusid");
 	$label = $session->getVariable("label");
+	$identifier = $session->getVariable("identifier");
 	$kommentar = $session->getVariable("kommentar");
 
 	$gliederungid = $dokument->getGliederungID();
 	$oldkategorieid = $dokument->getDokumentKategorieID();
 	$oldstatusid = $dokument->getDokumentStatusID();
+	$oldlabel = $dokument->getLabel();
+	$oldidentifier = $dokument->getIdentifier();
 
 	if (!$session->isAllowed("dokumente_modify", $gliederungid)) {
 		$ui->viewLogin();
@@ -30,6 +33,7 @@ function parseDokumentFormular($ui, $session, &$dokument = null) {
 	$dokument->setDokumentKategorieID($kategorieid);
 	$dokument->setDokumentStatusID($statusid);
 	$dokument->setLabel($label);
+	$dokument->setIdentifier($identifier);
 	$dokument->save();
 
 	$notiz = new DokumentNotiz($session->getStorage());
@@ -41,6 +45,12 @@ function parseDokumentFormular($ui, $session, &$dokument = null) {
 	}
 	if ($oldstatusid != $statusid) {
 		$notiz->setNextStatusID($statusid);
+	}
+	if ($oldlabel != $label) {
+		$notiz->setNextLabel($label);
+	}
+	if ($oldidentifier != $identifier) {
+		$notiz->setNextIdentifier($identifier);
 	}
 	$notiz->setKommentar($kommentar);
 	$notiz->save();
@@ -81,6 +91,8 @@ case "create":
 			$notiz->setTimestamp(time());
 			$notiz->setNextKategorieID($kategorieid);
 			$notiz->setNextStatusID($statusid);
+			$notiz->setNextLabel($dokumenttemplate->getDokumentLabel($session));
+			$notiz->setNextIdentifier($dokumenttemplate->getDokumentIdentifier($session));
 			$notiz->setKommentar($dokumenttemplate->getDokumentKommentar($session));
 			$notiz->save();
 
@@ -105,10 +117,10 @@ case "details":
 
 	if ($session->getBoolVariable("save")) {
 		parseDokumentFormular($ui, $session, $dokument);
-		
+
 		$ui->redirect($session->getLink("dokumente_details", $dokument->getDokumentID()));
 	}
-	
+
 	$dokumentnotizen = $session->getStorage()->getDokumentNotizList($dokument->getDokumentID());
 	$mitglieder = $session->getStorage()->getMitgliederByDokumentList($dokument->getDokumentID());
 

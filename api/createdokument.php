@@ -47,6 +47,8 @@ if ($file == null) {
 	$notiz->setTimestamp(time());
 	$notiz->setNextKategorieID($kategorieid);
 	$notiz->setNextStatusID($statusid);
+	$notiz->setNextLabel($dokumenttemplate->getDokumentLabel($session)));
+	$notiz->setNextIdentifier($dokumenttemplate->getDokumentIdentifier($session));
 	$notiz->setKommentar($dokumenttemplate->getDokumentKommentar($session));
 	$notiz->save();
 

@@ -41,13 +41,9 @@
     </div>
 </div>
 <div class="control-group">
-    <label class="control-label" for="idkey">{"Identifikation:"|__}</label>
+    <label class="control-label" for="identifier">{"Identifikation:"|__}</label>
     <div class="controls">
-        {if isset($dokument)}
-         {$dokument.identifier|escape:html}
-        {else}
-         <input type="text" name="idkey" />
-        {/if}
+        <input type="text" name="identifier" value="{if isset($dokument)}{$dokument.identifier|escape:html}{/if}" />
     </div>
 </div>
 <div class="control-group">

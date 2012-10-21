@@ -209,7 +209,7 @@ interface Storage {
 	public function getDokumentNotizResult($dokumentid = null);
 	public function getDokumentNotizList($dokumentid = null);
 	public function getDokumentNotiz($dokumentnotizid);
-	public function setDokumentNotiz($dokumentnotizid, $dokumentid, $author, $timestamp, $nextState, $nextKategorie, $kommentar);
+	public function setDokumentNotiz($dokumentnotizid, $dokumentid, $author, $timestamp, $nextState, $nextKategorie, $nextLabel, $nextIdentifier, $kommentar);
 	public function delDokumentNotiz($dokumentnotizid);
 
 	public function getFileResult();

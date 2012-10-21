@@ -555,6 +555,12 @@ class Template {
 		if ($notiz->getNextStatusID() != null) {
 			$row["nextstatus"] = $this->parseDokumentStatus($notiz->getNextStatus());
 		}
+		if ($notiz->getNextLabel() != null) {
+			$row["nextlabel"] = $notiz->getNextLabel();
+		}
+		if ($notiz->getNextIdentifier() != null) {
+			$row["nextidentifier"] = $notiz->getNextIdentifier();
+		}
 		$row["kommentar"] = $notiz->getKommentar();
 		return $row;
 	}
