@@ -1986,8 +1986,8 @@ abstract class SQLStorage extends AbstractStorage {
 			$sql = "UPDATE	`dokumentnotizen`
 				SET	`dokumentid` = " . intval($dokumentid) . ",
 					`author` = " . intval($author) . ",
-					`timestamp` = " . date("Y-m-d H:i:s", $timestamp) . ",
-					`nextState` = '" . ($nextState == null ? "NULL" : intval($nextState)) . "',
+					`timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "',
+					`nextState` = " . ($nextState == null ? "NULL" : intval($nextState)) . ",
 					`nextKategorie` = " . ($nextKategorie == null ? "NULL" : intval($nextKategorie)) . ",
 					`nextLabel` = " . ($nextLabel == null ? "NULL" : "'".$this->escape($nextLabel)."'") . ",
 					`nextIdentifier` = " . ($nextIdentifier == null ? "NULL" : "'".$this->escape($nextIdentifier)."'") . ",
