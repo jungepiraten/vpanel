@@ -1959,7 +1959,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "DokumentNotiz");
 	}
 	public function getDokumentNotizResult($dokumentid = null) {
-		$sql = "SELECT `dokumentnotizid`, `dokumentid`, `author`, `timestamp`, `nextState`, `nextKategorie`, `nextLabel`, `nextIdentifier`, `kommentar` FROM `dokumentnotizen` WHERE 1=1";
+		$sql = "SELECT `dokumentnotizid`, `dokumentid`, `author`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `nextState`, `nextKategorie`, `nextLabel`, `nextIdentifier`, `kommentar` FROM `dokumentnotizen` WHERE 1=1";
 		if ($dokumentid != null) {
 			$sql .= " AND `dokumentid` = " . intval($dokumentid);
 		}
@@ -1967,7 +1967,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parseDokumentNotiz"));
 	}
 	public function getDokumentNotiz($dokumentnotizid) {
-		$sql = "SELECT `dokumentnotizid`, `dokumentid`, `author`, `timestamp`, `nextState`, `nextKategorie`, `nextLabel`, `nextIdentifier`, `kommentar` FROM `dokumentnotizen` WHERE `dokumentnotizid` = " . intval($dokumentnotizid);
+		$sql = "SELECT `dokumentnotizid`, `dokumentid`, `author`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `nextState`, `nextKategorie`, `nextLabel`, `nextIdentifier`, `kommentar` FROM `dokumentnotizen` WHERE `dokumentnotizid` = " . intval($dokumentnotizid);
 		return $this->getResult($sql, array($this, "parseDokumentNotiz"))->fetchRow();
 	}
 	public function setDokumentNotiz($dokumentnotizid, $dokumentid, $author, $timestamp, $nextKategorie, $nextState, $nextLabel, $nextIdentifier, $kommentar) {
