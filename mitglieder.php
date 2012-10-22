@@ -19,6 +19,7 @@ require_once(VPANEL_CORE . "/mitgliedbeitragbuchung.class.php");
 require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/logic.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/gliederung.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/flag.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/ausgetreten.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/natperson-age.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/search.class.php");
@@ -407,6 +408,8 @@ case "composefilter":
 				return null;
 			}
 			return $session->getMitgliederMatcher($filter[$id]["filterid"]);
+		case "flag":
+			return new RevisionFlagMitgliederMatcher($filter[$id]["flagid"]);
 		case "eintrittafter":
 			$timestamp = strtotime($filter[$id]["timestamp"]);
 			return new EintrittsdatumAfterMitgliederMatcher($timestamp);
@@ -443,7 +446,8 @@ case "composefilter":
 	}
 
 	$filters = $session->getStorage()->getMitgliederFilterList($session);
-	$ui->viewMitgliederComposeFilter($filters);
+	$flags = $session->getStorage()->getMitgliedFlagList();
+	$ui->viewMitgliederComposeFilter($filters, $flags);
 	exit;
 default:
 	$filter = null;
@@ -455,7 +459,7 @@ default:
 		}
 		$filter = $session->addMitgliederMatcher(new SearchMitgliederMatcher($term));
 	}
-	
+
 	if ($session->hasVariable("filterid")) {
 		$filter = $session->getMitgliederFilter($session->getVariable("filterid"));
 	}

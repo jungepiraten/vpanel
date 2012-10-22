@@ -19,7 +19,11 @@
 
 var presetFilters = new Array();
 {foreach from=$filters item=filter}
-presetFilters[{$filter.filterid}] = "{$filter.label}";
+presetFilters[{$filter.filterid}] = "{$filter.label|escape:html}";
+{/foreach}
+var mitgliederFlags = new Array();
+{foreach from=$mitgliederflags item=mitgliederflag}
+mitgliederFlags[{$mitgliederflag.flagid}] = "{$mitgliederflag.label|escape:html}";
 {/foreach}
 
 var umkreisMaps = new Array();
@@ -71,6 +75,7 @@ function generateFilterChooser(id, parentID) {
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'or')").append("OR")),
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'not')").append("NOT")),
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'preset')").append("Vordefiniert")),
+		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'flag')").append("Flag gesetzt")),
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'eintrittafter')").append("Eingetreten nach")),
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'austrittafter')").append("Ausgetreten nach")),
 		$("<li>").append($("<a>").prop("href","javascript:setFilter('"+id+"', '"+parentID+"', 'age')").append("&Auml;lter als")),
@@ -108,6 +113,13 @@ function generateFilter(id, parentID, type) {
 	case "preset":
 		var dropdown = $("<select>").prop("name","filter["+id+"][filterid]");
 		presetFilters.forEach(function(value, index, filters) {
+			dropdown.append($("<option>").prop("value",index).append(value));
+		});
+		content.append(dropdown);
+		break;
+	case "flag":
+		var dropdown = $("<select>").prop("name","filter["+id+"][flagid]");
+		mitgliederFlags.forEach(function(value, index) {
 			dropdown.append($("<option>").prop("value",index).append(value));
 		});
 		content.append(dropdown);
