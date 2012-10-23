@@ -142,7 +142,9 @@ class DokumentNotify extends StorageClass {
 			$mail = $config->createMail($this->getEMail());
 			$mail->setHeader("Subject", "[VPanel] Dokument " . $dokument->getLabel());
 			$mail->setHeader("Message-ID", "dokumentnotify-" . $notiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart());
-			$mail->setHeader("References", "dokumentnotify-" . $dokument->getFirstNotiz()->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart());
+			if ($dokument->getFirstNotiz() != null) {
+				$mail->setHeader("References", "dokumentnotify-" . $dokument->getFirstNotiz()->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart());
+			}
 			$mail->setBody(<<<EOT
 Hallo,
 
