@@ -855,9 +855,10 @@ class Template {
 		$this->smarty->display("process.html.tpl");
 	}
 
-	public function viewDokumentTemplate($dokumenttemplate, $link, $title) {
+	public function viewDokumentTemplate($dokumenttemplate, $link, $title, $options) {
 		$this->smarty->assign("title", $title);
 		$this->smarty->assign("link", $link);
+		$this->smarty->assign("showupload", !isset($options["hideupload"]))
 		$this->smarty->assign("dokumenttemplate", $this->parseDokumentTemplate($dokumenttemplate));
 		if ($dokumenttemplate instanceof NatPersonDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_person.html.tpl");
@@ -913,7 +914,7 @@ class Template {
 		}
 		$this->smarty->assign("transition", $this->parseDokumentTransition($transition));
 		if ($transition instanceof RenameDokumentTransition) {
-			$this->viewDokumentTemplate($transition->getDokumentTemplate(), "", $this->translate("%s umbenennen", $transition->getDokumentTemplate()->getLabel()));
+			$this->viewDokumentTemplate($transition->getDokumentTemplate(), "", $this->translate("%s umbenennen", $transition->getDokumentTemplate()->getLabel()), array("hideupload"));
 		}
 	}
 

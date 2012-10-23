@@ -14,12 +14,14 @@
         <input type="text" name="timestamp" value="{$smarty.now|date_format:"%d.%m.%Y"}" />
     </div>
 </div>
+{if $showupload}
 <div class="control-group">
     <label class="control-label" for="file">{"Datei:"|__}</label>
     <div class="controls">
         <input type="file" name="file" />
     </div>
 </div>
+{/if}
 <div class="control-group">
     <label class="control-label" for="label">{"Titel:"|__}</label>
     <div class="controls">
