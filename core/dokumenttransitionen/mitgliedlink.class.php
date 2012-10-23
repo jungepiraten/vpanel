@@ -2,7 +2,7 @@
 
 require_once(VPANEL_CORE . "/dokumenttransition.class.php");
 
-class MitgliedLinkDokumentTransition extends DokumentTransition implements SingleDokumentTransition {
+class MitgliedLinkDokumentTransition extends StaticDokumentTransition implements SingleDokumentTransition {
 	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar) {
 		parent::__construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar);
 	}

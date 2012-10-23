@@ -13,7 +13,7 @@ abstract class DokumentTemplate extends GliederungAktion {
 	public function getDokumentTemplateID() {
 		return $this->templateid;
 	}
-	
+
 	protected function getDokumentPrototype($session) {
 		$dokument = new Dokument($session->getStorage());
 		$dokument->setGliederungID($this->getGliederungID());
@@ -23,7 +23,7 @@ abstract class DokumentTemplate extends GliederungAktion {
 	public function getDokumentGliederungID($session) {
 		return $this->getGliederungID();
 	}
-	
+
 	abstract public function getDokumentKategorieID($session);
 	abstract public function getDokumentStatusID($session);
 	abstract public function getDokumentIdentifier($session);

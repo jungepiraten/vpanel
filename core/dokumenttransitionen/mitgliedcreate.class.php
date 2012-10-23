@@ -2,7 +2,7 @@
 
 require_once(VPANEL_CORE . "/dokumenttransition.class.php");
 
-class MitgliedCreateDokumentTransition extends DokumentTransition implements SingleDokumentTransition {
+class MitgliedCreateDokumentTransition extends StaticDokumentTransition implements SingleDokumentTransition {
 	private $mitgliedtemplateid;
 
 	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar, $mitgliedtemplateid) {

@@ -40,7 +40,7 @@ class MitgliederFilterProcess extends Process {
 
 		while ($item = $result->fetchRow()) {
 			$this->runProcessStep($item);
-			
+
 			if ((++$i % $stepwidth) == 0) {
 				$this->setProgress($i / $max);
 				$this->save();
@@ -48,7 +48,7 @@ class MitgliederFilterProcess extends Process {
 		}
 
 		$this->finalizeProcess();
-		
+
 		$this->setProgress(1);
 		$this->save();
 	}

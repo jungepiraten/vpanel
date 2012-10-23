@@ -52,11 +52,11 @@ class Template {
 
 		return $output;
 	}
-	
+
 	private function getStorage() {
 		return $this->session->getConfig()->getStorage();
 	}
-	
+
 	protected function parseUser($user) {
 		$row = array();
 		$row["userid"] = $user->getUserID();
@@ -855,6 +855,22 @@ class Template {
 		$this->smarty->display("process.html.tpl");
 	}
 
+	public function viewDokumentTemplate($dokumenttemplate, $link, $title) {
+		$this->smarty->assign("title", $title);
+		$this->smarty->assign("link", $link);
+		$this->smarty->assign("dokumenttemplate", $this->parseDokumentTemplate($dokumenttemplate));
+		if ($dokumenttemplate instanceof NatPersonDokumentTemplate) {
+			$this->smarty->display("dokumentcreate_person.html.tpl");
+		} else if ($dokumenttemplate instanceof DefaultDateDokumentTemplate) {
+			$this->smarty->display("dokumentcreate_defaultdate.html.tpl");
+		} else if ($dokumenttemplate instanceof DefaultDokumentTemplate) {
+			$this->smarty->display("dokumentcreate_default.html.tpl");
+		} else if ($dokumenttemplate instanceof SelectPrefixDateDokumentTemplate) {
+			$this->smarty->assign("options", $dokumenttemplate->getPrefixOptions());
+			$this->smarty->display("dokumentcreate_selectprefixdate.html.tpl");
+		}
+	}
+
 	public function viewDokumentList($dokumente, $templates, $transitionen, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount) {
 		if ($gliederung != null) {
 			$this->smarty->assign("gliederung", $this->parseGliederung($gliederung));
@@ -876,23 +892,8 @@ class Template {
 		$this->smarty->display("dokumentlist.html.tpl");
 	}
 
-	public function viewDokumentCreate($dokumenttemplate, $gliederungen, $dokumentkategorien, $dokumentstatuslist) {
-		$this->smarty->assign("dokumenttemplate", $this->parseDokumentTemplate($dokumenttemplate));
-		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
-		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
-		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
-		if ($dokumenttemplate instanceof NatPersonDokumentTemplate) {
-			$this->smarty->display("dokumentcreate_person.html.tpl");
-		} else if ($dokumenttemplate instanceof DefaultDateDokumentTemplate) {
-			$this->smarty->display("dokumentcreate_defaultdate.html.tpl");
-		} else if ($dokumenttemplate instanceof DefaultDokumentTemplate) {
-			$this->smarty->display("dokumentcreate_default.html.tpl");
-		} else if ($dokumenttemplate instanceof SelectPrefixDateDokumentTemplate) {
-			$this->smarty->assign("options", $dokumenttemplate->getPrefixOptions());
-			$this->smarty->display("dokumentcreate_selectprefixdate.html.tpl");
-		} else {
-//			$this->smarty->display("dokumentcreate.html.tpl");
-		}
+	public function viewDokumentCreate($dokumenttemplate) {
+		$this->viewDokumentTemplate($dokumenttemplate, $this->link("dokumente_create", $dokumenttemplate->getDokumentTemplateID()), $this->translate("%s anlegen", $dokumenttemplate->getLabel()) );
 	}
 
 	public function viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $mitgliedtemplates) {
@@ -911,6 +912,9 @@ class Template {
 			return $this->redirect($result["redirect"]);
 		}
 		$this->smarty->assign("transition", $this->parseDokumentTransition($transition));
+		if ($transition instanceof RenameDokumentTransition) {
+			$this->viewDokumentTemplate($transition->getDokumentTemplate(), "", $this->translate("%s umbenennen", $transition->getDokumentTemplate()->getLabel()));
+		}
 	}
 
 	public function viewDokumentTransitionProcess($transition, $process, $result) {

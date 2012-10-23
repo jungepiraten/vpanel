@@ -1,7 +1,6 @@
-{capture assign=ansicht}{$dokumenttemplate.label} anlegen{/capture}
-{include file="header.html.tpl" ansicht=$ansicht menupunkt="dokument"}
+{include file="header.html.tpl" ansicht=$title menupunkt="dokument"}
 
-<form action="{"dokumente_create"|___:$dokumenttemplate.dokumenttemplateid}" method="post" enctype="multipart/form-data" class="form-horizontal">
+<form action="{$link}" method="post" enctype="multipart/form-data" class="form-horizontal">
  <fieldset>
 <div class="control-group">
     <label class="control-label" for="option">{"Auswahl:"|__}</label>

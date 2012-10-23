@@ -102,10 +102,7 @@ case "create":
 		}
 	}
 
-	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("dokumente_create"));
-	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
-	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
-	$ui->viewDokumentCreate($dokumenttemplate, $gliederungen, $dokumentkategorien, $dokumentstatuslist);
+	$ui->viewDokumentCreate($dokumenttemplate);
 	exit;
 case "details":
 	$dokument = $session->getStorage()->getDokument($session->getIntVariable("dokumentid"));
