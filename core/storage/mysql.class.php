@@ -17,8 +17,9 @@ class MySQLStorage extends SQLStorage {
 
 	public function query($sql) {
 		$ret = $this->mysqli->query($sql);
-//		var_dump($sql);
-//		var_dump($this->mysqli->error);
+		if ($this->mysqli->error != "") {
+			trigger_error("MySQL: " . $this->mysqli->error . " at " . $sql);
+		}
 		return $ret;
 	}
 
