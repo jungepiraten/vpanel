@@ -28,11 +28,13 @@ require_once(VPANEL_MITGLIEDERMATCHER . "/ort.class.php");
 function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = null) {
 	global $config;
 
+	$eintritt = $session->getTimestampVariable("eintritt");
+	$austritt = $session->getTimestampVariable("austritt");
 	$persontyp = $session->getVariable("persontyp");
 	$anrede = $session->getVariable("anrede");
 	$name = $session->getVariable("name");
 	$vorname = $session->getVariable("vorname");
-	$geburtsdatum = strtotime($session->getVariable("geburtsdatum"));
+	$geburtsdatum = $session->getTimestampVariable("geburtsdatum");
 	$nationalitaet = $session->getVariable("nationalitaet");
 	$firma = $session->getVariable("firma");
 	$adresszusatz = $session->getVariable("adresszusatz");
@@ -72,8 +74,7 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 
 		$mitglied = new Mitglied($session->getStorage());
 		$mitglied->setGlobalID($config->generateGlobalID());
-		$mitglied->setEintrittsdatum(time());
-		$mitglied->setAustrittsdatum(null);
+		// Zwischenspeichern, um ersten Beitrag hinzuzufuegen
 		$mitglied->save();
 
 		$beitragobj = $session->getStorage()->searchBeitrag(date("Y",time()));
@@ -95,6 +96,10 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 			exit;
 		}
 	}
+
+	$mitglied->setEintrittsdatum($eintritt);
+	$mitglied->setAustrittsdatum(null);
+	$mitglied->save();
 
 	$revision = new MitgliedRevision($session->getStorage());
 	$revision->setTimestamp(time());
@@ -223,7 +228,7 @@ case "beitraege_buchungen":
 	$buchungen = $beitrag->getBuchungen();
 	
 	if ($session->getBoolVariable("add")) {
-		$timestamp = strtotime($session->getVariable("timestamp"));
+		$timestamp = $session->getTimestampVariable("timestamp");
 		$gliederung = $session->getStorage()->getGliederung($session->getIntVariable("gliederungid"));
 		$vermerk = $session->getVariable("vermerk");
 		$hoehe = $session->getDoubleVariable("hoehe");

@@ -12,7 +12,7 @@ class DefaultDateDokumentTemplate extends DefaultDokumentTemplate {
 
 	private function getTimestamp($session) {
 		if ($session->hasVariable("timestamp")) {
-			return strtotime($session->getVariable("timestamp"));
+			return $session->getTimestampVariable("timestamp");
 		} else {
 			return time();
 		}

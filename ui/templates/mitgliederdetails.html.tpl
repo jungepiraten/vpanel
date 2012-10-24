@@ -25,19 +25,6 @@
 				{include file="mitgliederfilter.options.tpl" filterid=$mitglied.filterid}
 			</div>
 
-			<table>
-				<tr>
-					<th>Eingetreten</th>
-					<td>{$mitglied.eintritt|date_format:"%d.%m.%Y"}</td>
-				</tr>
-				{if isset($mitglied.austritt)}
-					<tr>
-						<th>Ausgetreten</th>
-						<td>{$mitglied.austritt|date_format:"%d.%m.%Y"}</td>
-					</tr>
-				{/if}
-			</table>
-
 			{include file="mitgliederform.block.tpl" mitglied=$mitglied}
 		</div>
 		<div class="tab-pane" id="mitgliederdetails-notizen">

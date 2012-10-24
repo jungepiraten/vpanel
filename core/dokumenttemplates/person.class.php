@@ -27,7 +27,7 @@ class NatPersonDokumentTemplate extends DefaultDokumentTemplate {
 	}
 
 	private function getGeburtsdatum($session) {
-		return strtotime($session->getVariable("geburtsdatum"));
+		return $session->getTimestampVariable("geburtsdatum");
 	}
 
 	private function getNationalitaet($session) {

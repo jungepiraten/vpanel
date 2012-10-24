@@ -17,7 +17,7 @@ class SelectPrefixDateDokumentTemplate extends IdentifierDokumentTemplate {
 	}
 
 	private function getTimestamp($session) {
-		return strtotime($session->getVariable("timestamp"));
+		return $session->getTimestampVariable("timestamp");
 	}
 
 	private function getSelectedOption($session, $value) {

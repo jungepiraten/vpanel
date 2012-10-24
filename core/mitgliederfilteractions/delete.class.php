@@ -8,7 +8,7 @@ class DeleteMitgliederFilterAction extends MitgliederFilterAction {
 		if (! $session->hasVariable("timestamp")) {
 			return array("delete" => "options");
 		} else {
-			$timestamp = strtotime($session->getVariable("timestamp"));
+			$timestamp = $session->getTimestampVariable("timestamp");
 			$process = new MitgliederFilterDeleteProcess($session->getStorage());
 			$process->setTimestamp($timestamp);
 			return $this->executeProcess($session, $process, $filter, $matcher);

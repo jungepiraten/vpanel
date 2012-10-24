@@ -30,6 +30,7 @@ interface Session {
 	public function hasVariable($name);
 	public function hasFileVariable($name);
 	public function getVariable($name);
+	public function getTimestampVariable($name);
 	public function getDoubleVariable($name);
 	public function getIntVariable($name);
 	public function getBoolVariable($name);
@@ -224,6 +225,12 @@ abstract class AbstractHTTPSession extends AbstractSession {
 			return null;
 		}
 		return iconv($this->getEncoding(), "UTF-8", stripslashes($_REQUEST[$name]));
+	}
+	public function getTimestampVariable($name) {
+		if (!$this->hasVariable($name)) {
+			return null;
+		}
+		return strtotime($_REQUEST[$name]);
 	}
 	public function getDoubleVariable($name) {
 		if (!$this->hasVariable($name)) {

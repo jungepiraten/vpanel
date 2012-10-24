@@ -3,6 +3,22 @@
  {if isset($dokument)}<input type="hidden" name="dokumentid" value="{$dokument.dokumentid}" />{/if}
 
 <div class="control-group">
+	<label class="control-label" for="eintritt">Eintrittsdatum:</label>
+	<div class="controls">
+		<input type="text" name="eintritt" value="{if isset($mitglied)}{$mitglied.eintritt|date_format:"%d.%m.%Y"}{else}{$smarty.now|date_format:"%d.%m.%Y"}{/if}" />
+	</div>
+</div>
+
+{if isset($mitglied.austritt)}
+<div class="control-group">
+	<label class="control-label" for="austritt">Austrittsdatum:</label>
+	<div class="controls">
+		<input type="text" name="austritt" value="{$mitglied.austritt|date_format:"%d.%m.%Y"}" />
+	</div>
+</div>
+{/if}
+
+<div class="control-group">
     <label class="control-label" for="gliederungid">{"Gliederung:"|__}</label>
     <div class="controls">
         {if isset($mitgliedtemplate) && isset($mitgliedtemplate.gliederung)}
