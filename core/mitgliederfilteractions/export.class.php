@@ -17,7 +17,11 @@ class ExportMitgliederFilterAction extends MitgliederFilterAction {
 
 	private function getPredefinedFields() {
 		return array(
+			array("label" => "Mitgliedsnummer",	"template" => "{MITGLIEDID}"),
 			array("label" => "Bezeichnung",		"template" => "{BEZEICHNUNG}"),
+			array("label" => "Vorname",		"template" => "{VORNAME}"),
+			array("label" => "Nachname",		"template" => "{NAME}"),
+			array("label" => "Firma",		"template" => "{FIRMA}"),
 			array("label" => "Anschrift",		"template" => "{STRASSE} {HAUSNUMMER}"),
 			array("label" => "Adresszusatz",	"template" => "{ADRESSZUSATZ}"),
 			array("label" => "PLZ",			"template" => "{PLZ}"),

@@ -222,7 +222,7 @@ class Mitglied extends GlobalClass {
 			case "BEZEICHNUNG":
 				return $jurperson->getLabel();
 			case "FIRMA":
-				return $natperson->getLabel();
+				return $jurperson->getLabel();
 			}
 		}
 		return "";
