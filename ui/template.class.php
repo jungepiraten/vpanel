@@ -780,6 +780,9 @@ class Template {
 		} else {
 			$this->smarty->assign("filterid", null);
 		}
+		if ($action instanceof DeleteMitgliederFilterAction) {
+			$this->smarty->display("mitgliederdeleteform.html.tpl");
+		}
 		if ($action instanceof SendMailMitgliederFilterAction) {
 			switch ($result["sendmail"]) {
 			case "select":

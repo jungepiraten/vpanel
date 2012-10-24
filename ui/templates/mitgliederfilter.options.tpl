@@ -5,7 +5,7 @@
 	</a>
 	<ul class="dropdown-menu">
 		{foreach from=$filteractions item=filteraction}
-			<li><a href="{"mitglieder_filteraction"|___:$filteraction.actionid:$filterid}" {if $filteraction.permission == "mitglieder_delete"}class="delete"{/if}>{$filteraction.label|__}</a></li>
+			<li><a href="{"mitglieder_filteraction"|___:$filteraction.actionid:$filterid}">{$filteraction.label|__}</a></li>
 		{/foreach}
 	</ul>
 </div>

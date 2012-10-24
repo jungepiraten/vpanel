@@ -5,9 +5,14 @@ require_once(VPANEL_PROCESSES . "/mitgliederfilterdelete.class.php");
 
 class DeleteMitgliederFilterAction extends MitgliederFilterAction {
 	public function execute($config, $session, $filter, $matcher) {
-		$process = new MitgliederFilterDeleteProcess($session->getStorage());
-		$process->setTimestamp(time());
-		return $this->executeProcess($session, $process, $filter, $matcher);
+		if (! $session->hasVariable("timestamp")) {
+			return array("delete" => "options");
+		} else {
+			$timestamp = strtotime($session->getVariable("timestamp"));
+			$process = new MitgliederFilterDeleteProcess($session->getStorage());
+			$process->setTimestamp($timestamp);
+			return $this->executeProcess($session, $process, $filter, $matcher);
+		}
 	}
 
 	public function show($config, $session, $process) {
