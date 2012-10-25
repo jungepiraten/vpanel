@@ -11,8 +11,8 @@
 	{assign var=sumSoll value=0}
 	{foreach from=$gliederungen item=gliederung}
 		{assign var=gliederungid value=$gliederung.gliederungid}
-		{math assign=sumIst equation="sum + anteil" sum=$sumIst anteil=$istHoehe.$gliederungid}
-		{math assign=sumSoll equation="sum + anteil" sum=$sumSoll anteil=$sollHoehe.$gliederungid}
+		{if isset($istHoehe.$gliederungid)}{math assign=sumIst equation="sum + anteil" sum=$sumIst anteil=$istHoehe.$gliederungid}{/if}
+		{if isset($sollHoehe.$gliederungid)}{math assign=sumSoll equation="sum + anteil" sum=$sumSoll anteil=$sollHoehe.$gliederungid}{/if}
 		<tr>
 			<th>{$gliederung.label|escape:html}</th>
 			<td>{$istHoehe.$gliederungid|string_format:"%.2f"} EUR</td>
