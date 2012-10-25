@@ -127,7 +127,8 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 
 		$mitgliedbeitrag = $mitglied->getBeitrag($this->getBeitragID());
 		foreach ($mitgliedbeitrag->getBuchungen() as $buchung) {
-			if (true || $this->getStartTimestamp() <= $buchung->getTimestamp() && $buchung->getTimestamp() < $this->getEndTimestamp() + 24*60*60) {
+			if ( ( $this->getStartTimestamp() == NULL || $this->getStartTimestamp() <= $buchung->getTimestamp() )
+			  && ( $this->getEndTimestamp() == NULL   || $buchung->getTimestamp() < $this->getEndTimestamp() + 24*60*60 ) ) {
 				if (!isset($this->gliederungsBeitragHoehe[$buchung->getGliederungID()])) {
 					$this->gliederungsBeitragHoehe[$buchung->getGliederungID()] = 0;
 				}
