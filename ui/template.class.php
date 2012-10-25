@@ -854,7 +854,10 @@ class Template {
 		$this->smarty->display("process.html.tpl");
 	}
 
-	public function viewDokumentTemplate($dokumenttemplate, $link, $title, $options) {
+	public function viewDokumentTemplate($dokumenttemplate, $link, $title, $options = null) {
+		if ($options == null) {
+			$options = array();
+		}
 		$this->smarty->assign("title", $title);
 		$this->smarty->assign("link", $link);
 		$this->smarty->assign("showupload", !isset($options["hideupload"]));
