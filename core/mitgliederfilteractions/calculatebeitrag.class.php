@@ -15,14 +15,14 @@ class CalculateBeitragMitgliederFilterAction extends MitgliederFilterAction {
 
 	protected function getStartTimestamp($session) {
 		if ($session->hasVariable("starttimestamp")) {
-			return strftime($session->getVariable("starttimestamp"));
+			return $session->getTimestampVariable("starttimestamp");
 		}
 		return null;
 	}
 
 	protected function getEndTimestamp($session) {
 		if ($session->hasVariable("endtimestamp")) {
-			return strftime($session->getVariable("endtimestamp"));
+			return $session->getTimestampVariable("endtimestamp");
 		}
 		return null;
 	}
@@ -41,7 +41,9 @@ class CalculateBeitragMitgliederFilterAction extends MitgliederFilterAction {
 		if ($this->gliederungsAnteil != null) {
 			return $this->gliederungsAnteil;
 		} elseif ($session->hasVariable("gliederungsAnteil")) {
-			return array_map(create_function('$x', 'return $x/100;'), $session->getListVariable("gliederungsAnteil"));
+			$gliederungsAnteil = $session->getListVariable("gliederungsAnteil");
+			array_walk_recursive($gliederungsAnteil, create_function('&$x, $key', '$x = $x/100;'));
+			return $gliederungsAnteil;
 		}
 		return null;
 	}
@@ -52,15 +54,9 @@ class CalculateBeitragMitgliederFilterAction extends MitgliederFilterAction {
 		$beitragid = $this->getBeitragID($session);
 		$gliederungsAnteile = $this->getGliederungsAnteil($session);
 
-		$beitraglist = null;
-		if ($beitragid == null) {
+		if ($starttimestamp == null || $endtimestamp == null || $beitragid == null || $gliederungsAnteile == null) {
 			$beitraglist = $session->getStorage()->getBeitragList();
-		}
-		$gliederungen = null;
-		if ($gliederungsAnteile == null) {
-			$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs($this->getPermission()));
-		}
-		if ($starttimestamp == null || $endtimestamp == null || isset($beitraglist) || isset($gliederungen)) {
+			$gliederungen = $gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs($this->getPermission()));
 			return array("calculatebeitrag" => "select", "beitraglist" => $beitraglist, "gliederungen" => $gliederungen);
 		}
 
@@ -78,8 +74,8 @@ class CalculateBeitragMitgliederFilterAction extends MitgliederFilterAction {
 		             "beitrag" => $process->getBeitrag(),
 		             "gliederungen" => $gliederungen,
 		             "anteile" => $process->getGliederungsAnteile(),
-		             "gliederungshoehe" => $process->getGliederungsHoehe(),
-		             "wunschhoehe" => $process->getWunschHoehe(),
+		             "gliederungsMitgliedHoehe" => $process->getGliederungsMitgliedHoehe(),
+		             "gliederungsBeitragHoehe" => $process->getGliederungsBeitragHoehe(),
 		             "sumhoehe" => $process->getSumHoehe());
 	}
 }

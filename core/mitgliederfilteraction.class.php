@@ -9,7 +9,7 @@ abstract class MitgliederFilterAction extends Aktion {
 		parent::__construct($label, $permission);
 		$this->actionid = $actionid;
 	}
-	
+
 	public function getActionID() {
 		return $this->actionid;
 	}

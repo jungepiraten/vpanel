@@ -11,6 +11,8 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 	private $beitrag;
 
 	private $gliederungsHoehe = array();
+	private $gliederungsMitgliedHoehe = array();
+	private $gliederungsBeitragHoehe = array();
 	private $wunschHoehe = array();
 	private $sumHoehe = 0;
 
@@ -20,8 +22,8 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 		$process->setEndTimestamp($row["endtimestamp"]);
 		$process->setBeitragID($row["beitragid"]);
 		$process->setGliederungsAnteile($row["gliederungsAnteile"]);
-		$process->setGliederungsHoehe($row["gliederungsHoehe"]);
-		$process->setWunschHoehe($row["wunschHoehe"]);
+		$process->setGliederungsMitgliedHoehe($row["gliederungsMitgliedHoehe"]);
+		$process->setGliederungsBeitragHoehe($row["gliederungsBeitragHoehe"]);
 		$process->setSumHoehe($row["sumHoehe"]);
 		return $process;
 	}
@@ -73,20 +75,28 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 		$this->gliederungsAnteile = $gliederungsanteile;
 	}
 
-	public function getGliederungsHoehe() {
-		return $this->gliederungsHoehe;
+	public function getGliederungsMitgliedHoehe() {
+		return $this->gliederungsMitgliedHoehe;
 	}
 
-	public function setGliederungsHoehe($gliederungsHoehe) {
-		$this->gliederungsHoehe = $gliederungsHoehe;
+	public function setGliederungsMitgliedHoehe($hoehe) {
+		$this->gliederungsMitgliedHoehe = $hoehe;
+	}
+
+	public function getGliederungsBeitragHoehe() {
+		return $this->gliederungsBeitragHoehe;
+	}
+
+	public function setGliederungsBeitragHoehe($hoehe) {
+		$this->gliederungsBeitragHoehe = $hoehe;
 	}
 
 	public function getWunschHoehe() {
 		return $this->wunschHoehe;
 	}
 
-	public function setWunschhoehe($wunschHoehe) {
-		$this->wunschHoehe = $wunschHoehe;
+	public function setWunschHoehe($hoehe) {
+		$this->wunschHoehe = $hoehe;
 	}
 
 	public function getSumHoehe() {
@@ -96,40 +106,53 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 	public function setSumHoehe($sumHoehe) {
 		$this->sumHoehe = $sumHoehe;
 	}
-	
+
 	protected function getData() {
 		$data = parent::getData();
 		$data["starttimestamp"] = $this->getStartTimestamp();
 		$data["endtimestamp"] = $this->getEndTimestamp();
 		$data["beitragid"] = $this->getBeitragID();
 		$data["gliederungsAnteile"] = $this->getGliederungsAnteile();
-		$data["gliederungsHoehe"] = $this->getGliederungsHoehe();
-		$data["wunschHoehe"] = $this->getWunschHoehe();
+		$data["gliederungsMitgliedHoehe"] = $this->getGliederungsMitgliedHoehe();
+		$data["gliederungsBeitragHoehe"] = $this->getGliederungsBeitragHoehe();
 		$data["sumHoehe"] = $this->getSumHoehe();
 		return $data;
 	}
 
 	protected function runProcessStep($mitglied) {
+		$mitgliedgliederungid = $mitglied->getLatestRevision()->getGliederungID();
+		if (!isset($this->gliederungsHoehe[$mitgliedgliederungid])) {
+			$this->gliederungsHoehe[$mitgliedgliederungid] = 0;
+		}
+
 		$mitgliedbeitrag = $mitglied->getBeitrag($this->getBeitragID());
 		foreach ($mitgliedbeitrag->getBuchungen() as $buchung) {
-			if ($this->getStartTimestamp() <= $buchung->getTimestamp() && $buchung->getTimestamp() < $this->getEndTimestamp() + 24*60*60) {
-				if (!isset($this->gliederungsHoehe[$buchung->getGliederungID()])) {
-					$this->gliederungsHoehe[$buchung->getGliederungID()] = 0;
+			if (true || $this->getStartTimestamp() <= $buchung->getTimestamp() && $buchung->getTimestamp() < $this->getEndTimestamp() + 24*60*60) {
+				if (!isset($this->gliederungsBeitragHoehe[$buchung->getGliederungID()])) {
+					$this->gliederungsBeitragHoehe[$buchung->getGliederungID()] = 0;
 				}
-				$this->gliederungsHoehe[$buchung->getGliederungID()] += $buchung->getHoehe();
+				$this->gliederungsBeitragHoehe[$buchung->getGliederungID()] += $buchung->getHoehe();
+
+				$this->gliederungsHoehe[$mitgliedgliederungid] += $buchung->getHoehe();
 			}
 		}
 	}
 
 	protected function finalizeProcess() {
 		$this->sumHoehe = 0;
-		foreach ($this->gliederungsHoehe as $hoehe) {
+		foreach ($this->gliederungsHoehe as $gliederungid => $hoehe) {
 			$this->sumHoehe += $hoehe;
 		}
 
-		$this->wunschHoehe = array();
-		foreach ($this->gliederungsAnteile as $gliederungid => $anteil) {
-			$this->wunschHoehe[$gliederungid] = $anteil * $this->sumHoehe;
+		$this->gliederungsMitgliedHoehe = array();
+		foreach ($this->gliederungsAnteile as $mitgliedgliederungid => $anteile) {
+			if (!isset($this->gliederungsMitgliedHoehe[$mitgliedgliederungid])) {
+				$this->gliederungsMitgliedHoehe[$mitgliedgliederungid] = 0;
+			}
+
+			foreach ($anteile as $beitraggliederungid => $anteil) {
+				$this->gliederungsMitgliedHoehe[$mitgliedgliederungid] += $anteil * $this->gliederungsHoehe[$beitraggliederungid];
+			}
 		}
 	}
 }

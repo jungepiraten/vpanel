@@ -810,12 +810,8 @@ class Template {
 			return;
 		}
 		if ($action instanceof CalculateBeitragMitgliederFilterAction) {
-			if ($result["beitraglist"] != null) {
-				$this->smarty->assign("beitraglist", $this->parseBeitragList($result["beitraglist"]));
-			}
-			if ($result["gliederungen"] != null) {
-				$this->smarty->assign("gliederungen", $this->parseGliederungen($result["gliederungen"]));
-			}
+			$this->smarty->assign("beitraglist", $this->parseBeitragList($result["beitraglist"]));
+			$this->smarty->assign("gliederungen", $this->parseGliederungen($result["gliederungen"]));
 			$this->smarty->display("mitgliedercalculatebeitragselect.html.tpl");
 			return;
 		}
@@ -836,8 +832,8 @@ class Template {
 			$this->smarty->assign("beitrag", $this->parseBeitrag($result["beitrag"]));
 			$this->smarty->assign("gliederungen", $this->parseGliederungen($result["gliederungen"]));
 			$this->smarty->assign("anteile", $result["anteile"]);
-			$this->smarty->assign("gliederungshoehe", $result["gliederungshoehe"]);
-			$this->smarty->assign("wunschhoehe", $result["wunschhoehe"]);
+			$this->smarty->assign("istHoehe", $result["gliederungsBeitragHoehe"]);
+			$this->smarty->assign("sollHoehe", $result["gliederungsMitgliedHoehe"]);
 			$this->smarty->assign("sumhoehe", $result["sumhoehe"]);
 			$this->smarty->display("mitgliedercalculatebeitrag.html.tpl");
 			return;

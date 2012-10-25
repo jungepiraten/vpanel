@@ -27,15 +27,25 @@
 			</div>
 		{/if}
 		{if isset($gliederungen)}
-			{foreach from=$gliederungen item=gliederung}
-				<div class="control-group">
-					<label class="control-label" for="gliederungsAnteil[{$gliederung.gliederungid|escape:html}]">{$gliederung.label|escape:html}</label>
-					<div class="controls input-append">
-						<input type="text" name="gliederungsAnteil[{$gliederung.gliederungid|escape:html}]" class="span1" />
-						<span class="add-on">%</span>
-					</div>
-				</div>
-			{/foreach}
+			<table class="table table-striped table-bordered">
+				<tr>
+					<th>&nbsp;</th>
+					{foreach from=$gliederungen item=gliederung}
+						<th>Beitrag für {$gliederung.label|escape:html}</th>
+					{/foreach}
+				</tr>
+				{foreach from=$gliederungen item=gliederung}
+					<tr>
+						<th>Mitglied bei {$gliederung.label|escape:html}</th>
+						{foreach from=$gliederungen item=g2}
+							<td class="input-append">
+								<input type="text" name="gliederungsAnteil[{$gliederung.gliederungid|escape:html}][{$g2.gliederungid|escape:html}]" class="span1" value="0" />
+								<span class="add-on">%</span>
+							</td>
+						{/foreach}
+					</tr>
+				{/foreach}
+			</table>
 		{/if}
 		<div class="form-actions">
 			<input class="btn btn-primary" type="submit" name="save" value="{"Start"|__}" />
