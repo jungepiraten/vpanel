@@ -146,12 +146,12 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 
 		$this->gliederungsMitgliedHoehe = array();
 		foreach ($this->gliederungsAnteile as $mitgliedgliederungid => $anteile) {
-			if (!isset($this->gliederungsMitgliedHoehe[$mitgliedgliederungid])) {
-				$this->gliederungsMitgliedHoehe[$mitgliedgliederungid] = 0;
-			}
-
 			foreach ($anteile as $beitraggliederungid => $anteil) {
-				$this->gliederungsMitgliedHoehe[$mitgliedgliederungid] += $anteil * $this->gliederungsHoehe[$beitraggliederungid];
+				if (!isset($this->gliederungsMitgliedHoehe[$beitraggliederungid])) {
+					$this->gliederungsMitgliedHoehe[$beitraggliederungid] = 0;
+				}
+
+				$this->gliederungsMitgliedHoehe[$beitraggliederungid] += $anteil * $this->gliederungsHoehe[$mitgliedgliederungid];
 			}
 		}
 	}
