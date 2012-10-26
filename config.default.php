@@ -33,6 +33,10 @@ class DefaultConfig {
 		return uniqid("", true) . "@" . $this->getHostPart();
 	}
 
+	public function getWebRoot() {
+		return "http://" . $this->getHostPart() . "/";
+	}
+
 	/** Mehrsprachen-Support **/
 	private $langs = array();
 	public function getLang($lang = null) {
@@ -49,7 +53,7 @@ class DefaultConfig {
 	public function getLink() {
 		$params = func_get_args();
 		$name = array_shift($params);
-		return vsprintf($this->pages[$name], $params);
+		return $this->getWebRoot() . vsprintf($this->pages[$name], $params);
 	}
 	public function registerPage($name, $link) {
 		$this->pages[$name] = $link;
