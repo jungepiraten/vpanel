@@ -53,8 +53,13 @@ abstract class DokumentTransition extends GliederungAktion {
 			$process->save();
 		}
 
-		// TODO single-process direkt abfackeln
-		return array("redirect" => $session->getLink("processes_view", $process->getProcessID()));
+		// single-process direkt abfackeln
+		if ($process->getDokumentID() != null) {
+			$process->run();
+			return array("redirect" => $process->getFinishedPage());
+		} else {
+			return array("redirect" => $session->getLink("processes_view", $process->getProcessID()));
+		}
 	}
 
 	public function show($config, $session, $process) {
