@@ -860,7 +860,7 @@ class Template {
 		}
 		$this->smarty->assign("title", $title);
 		$this->smarty->assign("link", $link);
-		$this->smarty->assign("showupload", !isset($options["hideupload"]));
+		$this->smarty->assign("showupload", ! in_array("hideupload", $options));
 		$this->smarty->assign("dokumenttemplate", $this->parseDokumentTemplate($dokumenttemplate));
 		if ($dokumenttemplate instanceof NatPersonDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_person.html.tpl");
