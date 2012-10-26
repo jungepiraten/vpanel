@@ -30,7 +30,7 @@ foreach ($mitglieder as $mitglied) {
 	} else if ($revision->isNatPerson()) {
 		$row["label"] = $revision->getNatPerson()->getVorname() . " " . $revision->getNatPerson()->getName();
 	}
-	
+
 	$jsons[] = $row;
 }
 

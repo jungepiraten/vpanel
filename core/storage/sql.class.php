@@ -561,7 +561,7 @@ abstract class SQLStorage extends AbstractStorage {
 				}
 				$wordclauses[] = implode(" OR ", $clauses);
 			}
-			return "(" . implode(") AND (", $wordclauses) . ") OR `m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliedernotizen` WHERE `kommentar` LIKE '%" . implode("%' AND `kommentar` LIKE '%", $escapedwords) . "%')";
+			return "( (" . implode(") AND (", $wordclauses) . ") OR `m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliedernotizen` WHERE `kommentar` LIKE '%" . implode("%' AND `kommentar` LIKE '%", $escapedwords) . "%') )";
 		}
 		throw new Exception("Not implemented: ".get_class($matcher));
 	}
