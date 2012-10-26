@@ -148,18 +148,17 @@ class DokumentNotify extends StorageClass {
 			$mail->setBody(<<<EOT
 Hallo,
 
-bitte beachte das Dokument {$dokument->getLabel()}:
+bitte beachte das folgende Dokument:
 
 Dokument ansehen:
 {$config->getLink("dokumente_details", $dokument->getDokumentID())}
 
-Neues Mitglied erstellen:
-{$config->getLink("dokumente_mitglied_create", $dokument->getDokumentID())}
-
-Kategorie: {$dokument->getDokumentKategorie()->getLabel()}
-Status:    {$dokument->getDokumentStatus()->getLabel()}
-
-{$notiz->getKommentar()}
+Gliederung:     {$dokument->getGliederung()->getLabel()}
+Kategorie:      {$dokument->getDokumentKategorie()->getLabel()}
+Status:         {$dokument->getDokumentStatus()->getLabel()}
+Identifikation: {$dokument->getIdentifier()}
+Titel:          {$dokument->getLabel()}
+Kommentar:      {$notiz->getKommentar()}
 
 Viele Grüße,
 
