@@ -107,14 +107,14 @@ abstract class AbstractSession implements Session {
 				}
 			}
 			$this->user = $user;
-			$this->setSessionValue("user", $user);
+			$this->setSessionValue("userid", $user->getUserID());
 			$this->setSessionValue("defaultgliederungid", $user->getDefaultGliederungID());
 			$this->setSessionValue("defaultdokumentkategorieid", $user->getDefaultDokumentKategorieID());
 			$this->setSessionValue("defaultdokumentstatusid", $user->getDefaultDokumentStatusID());
 		} else {
 			$this->clearPermissions();
 			$this->user = null;
-			$this->setSessionValue("user", null);
+			$this->setSessionValue("userid", null);
 			$this->setSessionValue("defaultgliederungid", null);
 			$this->setSessionValue("defaultdokumentkategorieid", null);
 			$this->setSessionValue("defaultdokumentstatusid", null);
@@ -122,9 +122,8 @@ abstract class AbstractSession implements Session {
 	}
 	public function getUser() {
 		if ($this->user == null) {
-			if ($this->hasSessionValue("user")) {
-				$this->user = $this->getSessionValue("user");
-				$this->user->setStorage($this->getStorage());
+			if ($this->hasSessionValue("userid") && $this->getSessionValue("userid") !== null) {
+				$this->user = $this->getStorage()->getUser($this->getSessionValue("userid"));
 			}
 		}
 		return $this->user;
