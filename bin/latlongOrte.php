@@ -10,6 +10,7 @@ while ($ort = $ortResult->fetchRow()) {
 		$ortname = str_replace(array("ä","ö","ü","ß"), array("ae", "oe", "ue", "ss"), $ort->getLabel());
 		$state = str_replace(array("ä","ö","ü","ß"), array("ae", "oe", "ue", "ss"), $ort->getState()->getLabel());
 		$country = str_replace(array("ä","ö","ü","ß"), array("ae", "oe", "ue", "ss"), $ort->getState()->getCountry()->getLabel());
+/**
 		$data = json_decode(file_get_contents("http://nominatim.openstreetmap.org/search/" . urlencode($plz." ".$ortname." ".$state." ".$country) . "?format=json"));
 
 		if (count($data) > 0) {
@@ -17,7 +18,7 @@ while ($ort = $ortResult->fetchRow()) {
 			$ort->setLongitude($data[0]->lon);
 			$ort->save();
 		}
-/**
+**/
 		$data = json_decode(file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?address=" . urlencode($plz." ".$ortname." ".$state." ".$country) . "&sensor=false"));
 
 		if (count($data->results) > 0) {
@@ -26,7 +27,6 @@ while ($ort = $ortResult->fetchRow()) {
 			$ort->setLongitude($location->lng);
 			$ort->save();
 		}
-**/
 	}
 }
 
