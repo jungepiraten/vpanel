@@ -74,11 +74,15 @@ class File extends StorageClass {
 			$this->getMimeType()));
 	}
 
+	public function exists() {
+		return file_exists($this->getAbsoluteFilename());
+	}
+
 	public function delete(Storage $storage = null) {
 		if ($storage == null) {
 			$storage = $this->getStorage();
 		}
-		if (file_exists($this->getAbsoluteFilename())) {
+		if ($this->exists()) {
 			unlink($this->getAbsoluteFilename());
 		}
 		$storage->delFile($this->getFileID());
