@@ -101,8 +101,8 @@ class TempFile extends StorageClass {
 		if ($storage == null) {
 			$storage = $this->getStorage();
 		}
-		$this->getFile()->delete($storage);
 		$storage->delTempFile($this->getTempFileID());
+		$this->getFile()->delete($storage);
 	}
 }
 
