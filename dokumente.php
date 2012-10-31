@@ -138,16 +138,19 @@ case "transition":
 	if ($session->hasVariable("dokumentid")) {
 		$dokumentid = $session->getVariable("dokumentid");
 		$result = $transition->execute($config, $session, $dokumentid);
+		$ui->viewSingleDokumentTransition($transition, $result, $dokumentid);
 	} else {
+		$gliederungid = null;
 		$gliederungids = $session->getAllowedGliederungIDs($transition->getPermission());
 		if ($session->hasVariable("gliederungid")) {
-			$gliederungids = array_intersect($gliederungids, array($session->getIntVariable("gliederungid")));
+			$gliederungid = $session->getIntVariable("gliederungid");
+			$gliederungids = array_intersect($gliederungids, array($gliederungid));
 		}
 		$kategorieid = $session->getVariable("kategorieid");
 		$statusid = $session->getVariable("statusid");
 		$result = $transition->executeMulti($config, $session, $gliederungids, $kategorieid, $statusid);
+		$ui->viewMultiDokumentTransition($transition, $result, $gliederungid, $kategorieid, $statusid);
 	}
-	$ui->viewDokumentTransition($transition, $result);
 	exit;
 case "transitionprocess":
 	$transition = $session->getStorage()->getDokumentTransition($session->getVariable("transitionid"));

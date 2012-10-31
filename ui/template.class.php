@@ -910,13 +910,28 @@ class Template {
 		$this->smarty->display("dokumentdetails.html.tpl");
 	}
 
-	public function viewDokumentTransition($transition, $result) {
+	public function viewSingleDokumentTransition($transition, $result, $dokumentid) {
+		return $this->viewDokumentTransition($transition, $result, $this->link("dokumente_transitionaction", $transition->getDokumentTransitionID(), $dokumentid));
+	}
+
+	public function viewMultiDokumentTransition($transition, $result, $gliederungid, $kategorieid, $statusid) {
+		return $this->viewDokumentTransition($transition, $result, $this->link("dokumente_transitionactionmulti", $transition->getDokumentTransitionID(), $gliederungid, $kategorieid, $statusid));
+	}
+
+	private function viewDokumentTransition($transition, $result, $link) {
 		if (isset($result["redirect"])) {
 			return $this->redirect($result["redirect"]);
 		}
 		$this->smarty->assign("transition", $this->parseDokumentTransition($transition));
+		$this->smarty->assign("link", $link);
 		if ($transition instanceof RenameDokumentTransition) {
-			$this->viewDokumentTemplate($transition->getDokumentTemplate(), "", $this->translate("%s umbenennen", $transition->getDokumentTemplate()->getLabel()), array("hideupload"));
+			if (isset($result["selectTransition"])) {
+				$this->smarty->assign("dokumenttemplates", $this->parseDokumentTemplates($result["templates"]));
+				$this->smarty->display("dokumenttransition_rename.html.tpl");
+			} else {
+				$link .= "&templateid=" . urlencode($result["template"]->getDokumentTemplateID());
+				$this->viewDokumentTemplate($transition->getDokumentTemplate($this->session), $link, $this->translate("%s umbenennen", $transition->getDokumentTemplate($this->session)->getLabel()), array("hideupload"));
+			}
 		}
 	}
 
