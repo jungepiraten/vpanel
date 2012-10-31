@@ -154,7 +154,7 @@ function generateFilter(id, parentID, type) {
 		input_lng.focus(function() {checkUmkreisMap(id, content);}).blur(function() {checkUmkreisMap(id,content);}).keyup(function() {updateUmkreisMap(id);});
 		content.append(input_lng);
 
-		var input_radius = $("<input>").prop("type","text").prop("name","filter["+id+"][radius]").prop("size","4").val("25");
+		var input_radius = $("<input>").prop("type","text").prop("name","filter["+id+"][radius]").addClass("span1").val("25");
 		input_radius.focus(function() {checkUmkreisMap(id, content);}).blur(function() {checkUmkreisMap(id,content);}).keyup(function() {updateUmkreisMap(id);});
 		content.append(input_radius);
 		content.append("km");
