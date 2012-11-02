@@ -1,6 +1,8 @@
 <?php
 
 $config->registerPage("index", "index.php");
+$config->registerPage("dashboard_widget_del", "index.php?delWidget&widgetid=%d");
+
 $config->registerPage("login", "login.php");
 $config->registerPage("logout", "login.php?logout=1");
 $config->registerPage("einstellungen", "einstellungen.php");

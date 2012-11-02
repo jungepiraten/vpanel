@@ -23,6 +23,12 @@ interface Storage {
 	public function getUserRoleList($userid);
 	public function setUserRoleList($userid, $roles);
 
+	public function getDashboardWidgetResult($userid);
+	public function getDashboardWidgetList($userid);
+	public function getDashboardWidget($userid);
+	public function setDashboardWidget($widgetid, $userid, $column, $type, $typedata);
+	public function delDashboardWidget($widgetid);
+
 	public function getRoleResult();
 	public function getRoleList();
 	public function getRole($roleid);
@@ -265,6 +271,10 @@ abstract class AbstractStorage implements Storage {
 
 	public function getUserRoleList($userid) {
 		return $this->getUserRoleResult($userid)->fetchAll();
+	}
+
+	public function getDashboardWidgetList($userid) {
+		return $this->getDashboardWidgetResult($userid)->fetchAll();
 	}
 
 	public function getRoleList() {

@@ -115,7 +115,7 @@ abstract class Process extends StorageClass {
 	public function isFinished() {
 		return $this->getFinished() != null;
 	}
-	
+
 	public function save(Storage $storage = null) {
 		if ($storage == null) {
 			$storage = $this->getStorage();

@@ -11,6 +11,31 @@ if (!$session->isSignedIn()) {
 	exit;
 }
 
-$ui->viewIndex();
+require_once(VPANEL_CORE . "/dashboardwidget.class.php");
+
+if ($session->hasVariable("delWidget")) {
+	$widgetid = $session->getIntVariable("widgetid");
+	$session->getStorage()->getDashboardWidget($widgetid)->delete();
+	$ui->redirect($session->getLink("index"));
+}
+if ($session->hasVariable("widgets")) {
+	$widgets = $session->getListVariable("widgets");
+	foreach ($widgets as $id => $widget) {
+		if (isset($widget["type"])) {
+			switch ($widget["type"]) {
+			case "static":
+				$w = new StaticDashboardWidget($session->getStorage());
+				$w->setText($widget["text"]);
+				break;
+			}
+			$w->setColumn($widget["column"]);
+			$w->setUser($session->getUser());
+			$w->save();
+		}
+	}
+	$ui->redirect($session->getLink("index"));
+}
+
+$ui->viewDashboard($session->getUser(), $session->getStorage()->getDashboardWidgetList($session->getUser()->getUserID()));
 
 ?>

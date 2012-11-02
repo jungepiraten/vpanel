@@ -2,6 +2,7 @@
 
 require_once(VPANEL_CORE . "/storage.class.php");
 require_once(VPANEL_CORE . "/user.class.php");
+require_once(VPANEL_CORE . "/dashboardwidget.class.php");
 require_once(VPANEL_CORE . "/role.class.php");
 require_once(VPANEL_CORE . "/permission.class.php");
 require_once(VPANEL_CORE . "/rolepermission.class.php");
@@ -34,7 +35,7 @@ require_once(VPANEL_MITGLIEDERMATCHER . "/mitglied.class.php");
 
 abstract class SQLStorage extends AbstractStorage {
 	public function __construct() {}
-	
+
 	abstract protected function query($sql);
 	abstract protected function getEncoding();
 	abstract public function fetchRow($result);
@@ -176,6 +177,8 @@ abstract class SQLStorage extends AbstractStorage {
 		return $userid;
 	}
 	public function delUser($userid) {
+		$sql = "DELETE FROM `dashboardwidgets` WHERE `userid` = " . intval($userid);
+		return $this->query($sql);
 		$sql = "DELETE FROM `users` WHERE `userid` = " . intval($userid);
 		return $this->query($sql);
 	}
@@ -196,6 +199,39 @@ abstract class SQLStorage extends AbstractStorage {
 			$this->query($sql);
 		}
 		return true;
+	}
+
+	/**
+	 * Widgets
+	 **/
+
+	public function parseDashboardWidget($row) {
+		return $this->parseRow($row, null, "DashboardWidget");
+	}
+	public function getDashboardWidgetResult($userid) {
+		$sql = "SELECT `widgetid`,`userid`,`column`,`type`,`typedata` FROM `dashboardwidgets` WHERE `userid` = " . intval($userid);
+		return $this->getResult($sql, array($this, "parseDashboardWidget"));
+	}
+	public function getDashboardWidget($widgetid) {
+		$sql = "SELECT `widgetid`,`userid`,`column`,`type`,`typedata` FROM `dashboardwidgets` WHERE `widgetid` = " . intval($widgetid);
+		return $this->getResult($sql, array($this, "parseDashboardWidget"))->fetchRow();
+	}
+	public function setDashboardWidget($widgetid, $userid, $column, $type, $typedata) {
+		if ($widgetid == null) {
+			$sql = "INSERT INTO `dashboardwidgets` (`userid`,`column`,`type`,`typedata`) VALUES (" . intval($userid) . ", " . intval($column) . ", '" . $this->escape($type) . "', '" . $this->escape($typedata) . "')";
+		} else {
+			$sql = "UPDATE `dashboardwidgets` SET `userid` = " . intval($userid) . ", `column` = " . intval($column) . ", `type` = '" . $this->escape($type) . "', `typedata` = '" . $this->escape($typedata) . "' WHERE `widgetid` = " . intval($widgetid);
+		}
+		$this->query($sql);
+		if ($widgetid == null) {
+			return $this->getInsertID();
+		} else {
+			return $widgetid;
+		}
+	}
+	public function delDashboardWidget($widgetid) {
+		$sql = "DELETE FROM `dashboardwidgets` WHERE `widgetid` = " . intval($widgetid);
+		return $this->query($sql);
 	}
 
 	/**

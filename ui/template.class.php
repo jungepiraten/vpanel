@@ -73,6 +73,18 @@ class Template {
 		return array_map(array($this, 'parseUser'), $rows);
 	}
 
+	protected function parseDashboardWidget($widget) {
+		$row = array();
+		$row["widgetid"] = $widget->getWidgetID();
+		$row["user"] = $this->parseUser($widget->getUser());
+		$row["column"] = $widget->getColumn();
+		return $row;
+	}
+
+	protected function parseDashboardWidgets($rows) {
+		return array_map(array($this, 'parseDashboardWidget'), $rows);
+	}
+
 	protected function parseRole($role) {
 		$row = array();
 		$row["roleid"] = $role->getRoleID();
@@ -594,8 +606,28 @@ class Template {
 	}
 
 
-	public function viewIndex() {
-		$this->smarty->display("index.html.tpl");
+	protected function fetchDashboardWidget($widget) {
+		$this->smarty->assign("widget", $this->parseDashboardWidget($widget));
+		if ($widget instanceof StaticDashboardWidget) {
+			$this->smarty->assign("text", $widget->getText());
+			return $this->smarty->fetch("dashboardwidget_static.block.tpl");
+		}
+	}
+
+	public function viewDashboard($user, $widgets) {
+		$columns = array();
+		foreach ($widgets as $widget) {
+			if (!isset($columns[$widget->getColumn()])) {
+				$columns[$widget->getColumn()] = array();
+			}
+			$w = $this->parseDashboardWidget($widget);
+			$w["content"] = $this->fetchDashboardWidget($widget);
+			$columns[$widget->getColumn()][] = $w;
+		}
+
+		$this->smarty->assign("user", $this->parseUser($user));
+		$this->smarty->assign("columns", $columns);
+		$this->smarty->display("dashboard.html.tpl");
 	}
 
 	public function viewEinstellungen($success = false, $wrongpw = false, $pwsnotequal = false, $pwtooshort = false) {
