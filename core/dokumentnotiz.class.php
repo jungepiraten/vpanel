@@ -187,7 +187,31 @@ class DokumentNotiz extends StorageClass {
 		$storage->delDokumentNotiz($this->getDokumentNotizID());
 	}
 
+	public function hasPrevNotiz() {
+		return $this->getPrevNotiz() != null;
+	}
+
+	public function getPrevNotiz() {
+		$notizen = $this->getStorage()->getDokumentNotizList($this->getDokumentID());
+		foreach ($notizen as $notiz) {
+			if ($notiz->getDokumentNotizID() == $this->getDokumentNotizID()) {
+				return $prev;
+			}
+			$prev = $notiz;
+		}
+	}
+
+	public function notifyUpdate($newnotiz) {
+		foreach ($this->getStorage()->getDokumentNotifyList($this->getDokument()->getGliederungID(), $this->getNextKategorieID(), $this->getNextStatusID()) as $notify) {
+			$notify->notify($this->getDokument(), $newnotiz, $this);
+		}
+	}
+
 	public function notify() {
+		if ($this->hasPrevNotiz()) {
+			$this->getPrevNotiz()->notifyUpdate($this);
+		}
+
 		foreach ($this->getStorage()->getDokumentNotifyList($this->getDokument()->getGliederungID(), $this->getNextKategorieID(), $this->getNextStatusID()) as $notify) {
 			$notify->notify($this->getDokument(), $this);
 		}

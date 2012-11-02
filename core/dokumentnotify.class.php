@@ -136,16 +136,14 @@ class DokumentNotify extends StorageClass {
 			$this->getEMailID() ));
 	}
 
-	public function notify($dokument, $notiz) {
+	public function notify($dokument, $notiz, $oldnotiz = null) {
 		global $config;
 		if ($this->getEMail() != null) {
 			$mail = $config->createMail($this->getEMail());
-			$mail->setHeader("Subject", "[VPanel] Dokument " . $dokument->getLabel());
-			$mail->setHeader("Message-ID", "dokumentnotify-" . $notiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart());
-			if ($dokument->getFirstNotiz() != null) {
-				$mail->setHeader("References", "dokumentnotify-" . $dokument->getFirstNotiz()->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart());
-			}
-			$mail->setBody(<<<EOT
+			if ($oldnotiz == null) {
+				$mail->setHeader("Subject", "[VPanel] Dokument " . $dokument->getLabel());
+				$mail->setHeader("Message-ID", "dokumentnotify-" . $notiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart());
+				$mail->setBody(<<<EOT
 Hallo,
 
 bitte beachte das folgende Dokument:
@@ -154,10 +152,10 @@ Dokument ansehen:
 {$config->getLink("dokumente_details", $dokument->getDokumentID())}
 
 Gliederung:     {$dokument->getGliederung()->getLabel()}
-Kategorie:      {$dokument->getDokumentKategorie()->getLabel()}
-Status:         {$dokument->getDokumentStatus()->getLabel()}
-Identifikation: {$dokument->getIdentifier()}
-Titel:          {$dokument->getLabel()}
+Kategorie:      {$notiz->getNextKategorie()->getLabel()}
+Status:         {$notiz->getNextStatus()->getLabel()}
+Identifikation: {$notiz->getNextIdentifier()}
+Titel:          {$notiz->getNextLabel()}
 Kommentar:      {$notiz->getKommentar()}
 
 Viele Grüße,
@@ -165,6 +163,31 @@ Viele Grüße,
 VPanel
 EOT
 );
+			} else {
+				$mail->setHeader("Subject", "[VPanel] [erledigt] Dokument " . $dokument->getLabel());
+				$mail->setHeader("Message-ID", "dokumentnotify-" . $oldnotiz->getDokumentNotizID() . "-" . $notiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart());
+				$mail->setHeader("References", "dokumentnotify-" . $oldnotiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart());
+				$mail->setBody(<<<EOT
+Hallo,
+
+das Dokument wurde bearbeitet:
+
+Dokument ansehen:
+{$config->getLink("dokumente_details", $dokument->getDokumentID())}
+
+Gliederung:     {$dokument->getGliederung()->getLabel()}
+Kategorie:      {$notiz->getNextKategorie()->getLabel()}
+Status:         {$notiz->getNextStatus()->getLabel()}
+Identifikation: {$notiz->getNextIdentifier()}
+Titel:          {$notiz->getNextLabel()}
+Kommentar:      {$notiz->getKommentar()}
+
+Viele Grüße,
+
+VPanel
+EOT
+);
+			}
 			$mail->addAttachment($dokument->getFile());
 			$config->getSendMailBackend()->send($mail);
 		}
