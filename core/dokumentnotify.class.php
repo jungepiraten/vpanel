@@ -142,7 +142,7 @@ class DokumentNotify extends StorageClass {
 			$mail = $config->createMail($this->getEMail());
 			if ($oldnotiz == null) {
 				$mail->setHeader("Subject", "[VPanel] Dokument " . $dokument->getLabel());
-				$mail->setHeader("Message-ID", "dokumentnotify-" . $notiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart());
+				$mail->setHeader("Message-ID", "<dokumentnotify-" . $notiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
 				$mail->setBody(<<<EOT
 Hallo,
 
@@ -165,8 +165,8 @@ EOT
 );
 			} else {
 				$mail->setHeader("Subject", "[VPanel] [erledigt] Dokument " . $dokument->getLabel());
-				$mail->setHeader("Message-ID", "dokumentnotify-" . $oldnotiz->getDokumentNotizID() . "-" . $notiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart());
-				$mail->setHeader("References", "dokumentnotify-" . $oldnotiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart());
+				$mail->setHeader("Message-ID", "<dokumentnotify-" . $oldnotiz->getDokumentNotizID() . "-" . $notiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
+				$mail->setHeader("References", "<dokumentnotify-" . $oldnotiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
 				$mail->setBody(<<<EOT
 Hallo,
 
