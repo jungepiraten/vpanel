@@ -138,6 +138,9 @@ class DokumentNotify extends StorageClass {
 
 	public function notify($dokument, $notiz, $oldnotiz = null) {
 		global $config;
+		/**
+		 * Do not use DokumentNotiz::next* here, as it might be NULL
+		 **/
 		if ($this->getEMail() != null) {
 			$mail = $config->createMail($this->getEMail());
 			if ($oldnotiz == null) {
@@ -152,10 +155,10 @@ Dokument ansehen:
 {$config->getLink("dokumente_details", $dokument->getDokumentID())}
 
 Gliederung:     {$dokument->getGliederung()->getLabel()}
-Kategorie:      {$notiz->getNextKategorie()->getLabel()}
-Status:         {$notiz->getNextStatus()->getLabel()}
-Identifikation: {$notiz->getNextIdentifier()}
-Titel:          {$notiz->getNextLabel()}
+Kategorie:      {$dokument->getDokumentKategorie()->getLabel()}
+Status:         {$dokument->getDokumentStatus()->getLabel()}
+Identifikation: {$dokument->getIdentifier()}
+Titel:          {$dokument->getLabel()}
 Kommentar:      {$notiz->getKommentar()}
 
 Viele Grüße,
@@ -176,10 +179,10 @@ Dokument ansehen:
 {$config->getLink("dokumente_details", $dokument->getDokumentID())}
 
 Gliederung:     {$dokument->getGliederung()->getLabel()}
-Kategorie:      {$notiz->getNextKategorie()->getLabel()}
-Status:         {$notiz->getNextStatus()->getLabel()}
-Identifikation: {$notiz->getNextIdentifier()}
-Titel:          {$notiz->getNextLabel()}
+Kategorie:      {$dokument->getDokumentKategorie()->getLabel()}
+Status:         {$dokument->getDokumentStatus()->getLabel()}
+Identifikation: {$dokument->getIdentifier()}
+Titel:          {$dokument->getLabel()}
 Kommentar:      {$notiz->getKommentar()}
 
 Viele Grüße,
