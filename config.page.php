@@ -33,6 +33,7 @@ $config->registerPage("dokumente_view", "file.php?mode=view&dokumentid=%d");
 $config->registerPage("dokumente_transitionaction", "dokumente.php?mode=transition&transitionid=%s&dokumentid=%d");
 $config->registerPage("dokumente_transitionactionmulti", "dokumente.php?mode=transition&transitionid=%s&gliederungid=%s&kategorieid=%s&statusid=%s");
 $config->registerPage("dokumente_transitionprocess", "dokumente.php?mode=transitionprocess&transitionid=%s&processid=%d");
+$config->registerPage("dokumente_timeline_json", "json/dokumentnotizen_timeline.php");
 
 $config->registerPage("mitglieddokument", "mitglieddokument.php");
 $config->registerPage("mitglieddokument_delete", "mitglieddokument.php?mode=delete&mitgliedid=%d&dokumentid=%d");
@@ -50,10 +51,12 @@ $config->registerPage("mitglieder_dokument", "mitglieddokument.php?mode=add&mitg
 $config->registerPage("mitglieder_beitraege", "mitglieder.php?mode=beitraege&mitgliedid=%d");
 $config->registerPage("mitglieder_beitraege_del", "mitglieder.php?mode=beitragdelete&mitgliedbeitragid=%d");
 $config->registerPage("mitglieder_beitraege_buchungen", "mitglieder.php?mode=beitraege_buchungen&mitgliedbeitragid=%d");
+$config->registerPage("mitglieder_beitraege_buchungen_timeline_json", "json/mitgliederbeitragbuchung_timeline.php");
 $config->registerPage("mitglieder_beitraege_buchungen_del", "mitglieder.php?mode=beitraege_buchungen_delete&buchungid=%d");
 $config->registerPage("mitglieder_filteraction", "mitglieder.php?mode=filteraction&actionid=%s&filterid=%s");
 $config->registerPage("mitglieder_filterprocess", "mitglieder.php?mode=filterprocess&actionid=%s&processid=%d");
 $config->registerPage("mitglieder_composefilter", "mitglieder.php?mode=composefilter");
+$config->registerPage("mitglieder_revision_timeline_json", "json/mitgliederrevisions_timeline.php");
 
 $config->registerPage("emailbounces_delete", "emails.php?mode=delbounce&bounceid=%d");
 

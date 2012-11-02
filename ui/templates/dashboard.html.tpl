@@ -57,7 +57,10 @@ function addWidget(column) {
 			$("<input>").attr("type","hidden").attr("name","widgets[" + id + "][column]").attr("value",column),
 			$("<div>").addClass("content").append(
 				$("<ul>").append(
-					$("<li>").append($("<a>").click(function(){setWidget(id,"static");checkWidgets(column);}).append("Statisch"))
+					$("<li>").append($("<a>").click(function(){setWidget(id,"static");checkWidgets(column);}).append("Statisch")),
+					$("<li>").append($("<a>").click(function(){setWidget(id,"mitgliederbeitragbuchung_timeline");checkWidgets(column);}).append("Beitragsbuchungen")),
+					$("<li>").append($("<a>").click(function(){setWidget(id,"mitgliederrevision_timeline");checkWidgets(column);}).append("Mitglieder")),
+					$("<li>").append($("<a>").click(function(){setWidget(id,"dokumentnotizen_timeline");checkWidgets(column);}).append("Dokumente"))
 				)
 			)
 		)
@@ -69,6 +72,12 @@ function setWidget(id, type) {
 	switch (type) {
 	case "static":
 		content.append($("<textarea>").attr("name","widgets[" + id + "][text]"));
+		break;
+	case "mitgliederbeitragbuchung_timeline":
+		break;
+	case "mitgliederrevision_timeline":
+		break;
+	case "dokumentnotizen_timeline":
 		break;
 	}
 	$("#widgets .widget-" + id)
@@ -87,7 +96,7 @@ addColumn({$index});
 $("#widgets #column-{$index} .widgets").append(
 	$("<div>").addClass("widget").append(
 		$("<a>").addClass("close").attr("href", "{"dashboard_widget_del"|___:$widget.widgetid}").html("×"),
-		$("<div>").html($("#widget-{$widget.widgetid}").html())
+		$("#widget-{$widget.widgetid}").detach().html()
 	)
 );
 {/foreach}

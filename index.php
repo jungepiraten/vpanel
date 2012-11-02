@@ -27,10 +27,21 @@ if ($session->hasVariable("widgets")) {
 				$w = new StaticDashboardWidget($session->getStorage());
 				$w->setText($widget["text"]);
 				break;
+			case "mitgliederbeitragbuchung_timeline":
+				$w = new MitgliederBeitragBuchungTimelineDashboardWidget($session->getStorage());
+				break;
+			case "mitgliederrevision_timeline":
+				$w = new MitgliederRevisionTimelineDashboardWidget($session->getStorage());
+				break;
+			case "dokumentnotizen_timeline":
+				$w = new DokumentNotizenTimelineDashboardWidget($session->getStorage());
+				break;
 			}
-			$w->setColumn($widget["column"]);
-			$w->setUser($session->getUser());
-			$w->save();
+			if (isset($w)) {
+				$w->setColumn($widget["column"]);
+				$w->setUser($session->getUser());
+				$w->save();
+			}
 		}
 	}
 	$ui->redirect($session->getLink("index"));

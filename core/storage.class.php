@@ -62,6 +62,8 @@ interface Storage {
 	public function setMitgliederBeitrag($beitragid, $mitgliedid, $beitragid, $hoehe);
 	public function delMitgliederBeitrag($beitragid);
 
+	public function getMitgliederBeitragBuchungResultTimeline($gliederungids, $start, $count);
+	public function getMitgliederBeitragBuchungListTimeline($gliederungids, $start, $count);
 	public function getMitgliederBeitragBuchungByBeitragResult($beitragid);
 	public function getMitgliederBeitragBuchungByBeitragList($beitragid);
 	public function getMitgliederBeitragBuchungByMitgliederBeitragResult($beitragid);
@@ -97,6 +99,8 @@ interface Storage {
 	public function setMitgliedNotiz($mitgliednotizid, $mitgliedid, $author, $timestamp, $kommentar);
 	public function delMitgliedNotiz($mitgliednotizid);
 
+	public function getMitgliederRevisionResultTimeline($gliederungids, $start, $count);
+	public function getMitgliederRevisionListTimeline($gliederungids, $start, $count);
 	public function getMitgliederRevisionResult();
 	public function getMitgliederRevisionList();
 	public function getMitgliederRevisionsByMitgliedIDResult($mitgliedid);
@@ -122,6 +126,8 @@ interface Storage {
 	public function delEMail($emailid);
 	public function searchEMail($email);
 
+	public function getEMailBounceResultTimeline($start, $count);
+	public function getEMailBounceListTimeline($start, $count);
 	public function getEMailBounceResultByEMail($emailid);
 	public function getEMailBounceListByEMail($emailid);
 	public function getEMailBounce($bounceid);
@@ -212,6 +218,8 @@ interface Storage {
 	public function setDokumentStatus($dokumentstatusid, $label);
 	public function delDokumentStatus($dokumentstatusid);
 
+	public function getDokumentNotizResultTimeline($gliederungids, $start, $count);
+	public function getDokumentNotizListTimeline($gliederungids, $start, $count);
 	public function getDokumentNotizResult($dokumentid = null);
 	public function getDokumentNotizList($dokumentid = null);
 	public function getDokumentNotiz($dokumentnotizid);
@@ -305,6 +313,10 @@ abstract class AbstractStorage implements Storage {
 		return $this->getMitgliederBeitragByBeitragResult($beitragid, $pagesize, $offset)->fetchAll();
 	}
 
+	public function getMitgliederBeitragBuchungListTimeline($gliederungids, $start, $count) {
+		return $this->getMitgliederBeitragBuchungResultTimeline($gliederungids, $start, $count)->fetchAll();
+	}
+
 	public function getMitgliederBeitragBuchungByBeitragList($beitragid) {
 		return $this->getMitgliederBeitragBuchungByBeitragResult($beitragid)->fetchAll();
 	}
@@ -333,6 +345,10 @@ abstract class AbstractStorage implements Storage {
 		return $this->getMitgliedNotizResult($mitgliedid)->fetchAll();
 	}
 
+	public function getMitgliederRevisionListTimeline($gliederungids, $start, $count) {
+		return $this->getMitgliederRevisionResultTimeline($gliederungids, $start, $count)->fetchAll();
+	}
+
 	public function getMitgliederRevisionList() {
 		return $this->getMitgliederRevisionResult()->fetchAll();
 	}
@@ -347,6 +363,10 @@ abstract class AbstractStorage implements Storage {
 
 	public function getMitgliederRevisionTextFieldList($revisionid) {
 		return $this->getMitgliederRevisionTextFieldResult($revisionid)->fetchAll();
+	}
+
+	public function getEMailBounceListTimeline($start, $count) {
+		return $this->getEMailBounceResultTimeline($start, $count)->fetchAll();
 	}
 
 	public function getEMailBounceListByEMail($emailid) {
@@ -411,6 +431,10 @@ abstract class AbstractStorage implements Storage {
 
 	public function getDokumentStatusList() {
 		return $this->getDokumentStatusResult()->fetchAll();
+	}
+
+	public function getDokumentNotizListTimeline($gliederungids, $start, $count) {
+		return $this->getDokumentNotizResultTimeline($gliederungids, $start, $count)->fetchAll();
 	}
 
 	public function getDokumentNotizList($dokumentid = null) {

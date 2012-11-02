@@ -411,16 +411,27 @@ abstract class SQLStorage extends AbstractStorage {
 	public function parseMitgliederBeitragBuchung($row) {
 		return $this->parseRow($row, null, "MitgliedBeitragBuchung");
 	}
+	public function getMitgliederBeitragBuchungResultTimeline($gliederungids, $start, $count) {
+		$sql = "SELECT	`mbb`.`buchungid`, `mbb`.`beitragid`, `mbb`.`gliederungid`, `mbb`.`userid`, UNIX_TIMESTAMP(`mbb`.`timestamp`) AS `timestamp`, `mbb`.`vermerk`, `mbb`.`hoehe`
+			FROM	`mitgliederbeitragbuchung` `mbb`
+			LEFT JOIN `mitgliederbeitrag` `mb` ON (`mb`.`mitgliederbeitragid` = `mbb`.`beitragid`)
+			LEFT JOIN `mitgliederrevisions` `r` ON (`r`.`mitgliedid` = `mb`.`mitgliedid`)
+			WHERE	`r`.`timestamp` = (	SELECT	MAX(`rmax`.`timestamp`)
+							FROM	`mitgliederrevisions` `rmax`
+							WHERE   `r`.`mitgliedid` = `rmax`.`mitgliedid`)
+				AND `r`.`gliederungsid` IN (" . implode(",", array_map("intval", $gliederungids)) . ") ORDER BY `mbb`.`timestamp` DESC LIMIT " . intval($start) . "," . intval($count);
+		return $this->getResult($sql, array($this, "parseMitgliederBeitragBuchung"));
+	}
 	public function getMitgliederBeitragBuchungByBeitragResult($beitragid) {
-		$sql = "SELECT `mbb`.`buchungid`, `mbb`.`beitragid`, `mbb`.`gliederungid`, `mbb`.`userid`, `mbb`.`timestamp`, `mbb`.`vermerk`, `mbb`.`hoehe` FROM `mitgliederbeitragbuchung` `mbb` LEFT JOIN `mitgliederbeitrag` `mb` ON (`mb`.`mitgliederbeitragid` = `mbb`.`beitragid`) WHERE `mb`.`beitragid` = " . intval($beitragid) . " ORDER BY `mbb`.`timestamp`";
+		$sql = "SELECT `mbb`.`buchungid`, `mbb`.`beitragid`, `mbb`.`gliederungid`, `mbb`.`userid`, UNIX_TIMESTAMP(`mbb`.`timestamp`) AS `timestamp`, `mbb`.`vermerk`, `mbb`.`hoehe` FROM `mitgliederbeitragbuchung` `mbb` LEFT JOIN `mitgliederbeitrag` `mb` ON (`mb`.`mitgliederbeitragid` = `mbb`.`beitragid`) WHERE `mb`.`beitragid` = " . intval($beitragid) . " ORDER BY `mbb`.`timestamp`";
 		return $this->getResult($sql, array($this, "parseMitgliederBeitragBuchung"));
 	}
 	public function getMitgliederBeitragBuchungByMitgliederBeitragResult($mitgliederbeitragid) {
-		$sql = "SELECT `buchungid`, `beitragid`, `gliederungid`, `userid`, `timestamp`, `vermerk`, `hoehe` FROM `mitgliederbeitragbuchung` WHERE `beitragid` = " . intval($mitgliederbeitragid) . " ORDER BY `timestamp`";
+		$sql = "SELECT `buchungid`, `beitragid`, `gliederungid`, `userid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `vermerk`, `hoehe` FROM `mitgliederbeitragbuchung` WHERE `beitragid` = " . intval($mitgliederbeitragid) . " ORDER BY `timestamp`";
 		return $this->getResult($sql, array($this, "parseMitgliederBeitragBuchung"));
 	}
 	public function getMitgliederBeitragBuchung($buchungid) {
-		$sql = "SELECT `buchungid`, `beitragid`, `gliederungid`, `userid`, `timestamp`, `vermerk`, `hoehe` FROM `mitgliederbeitragbuchung` WHERE `buchungid` = " . intval($buchungid) . " ORDER BY `timestamp`";
+		$sql = "SELECT `buchungid`, `beitragid`, `gliederungid`, `userid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `vermerk`, `hoehe` FROM `mitgliederbeitragbuchung` WHERE `buchungid` = " . intval($buchungid) . " ORDER BY `timestamp`";
 		return $this->getResult($sql, array($this, "parseMitgliederBeitragBuchung"))->fetchRow();
 	}
 	public function setMitgliederBeitragBuchung($buchungid, $beitragid, $gliederungid, $userid, $timestamp, $vermerk, $hoehe) {
@@ -819,7 +830,7 @@ abstract class SQLStorage extends AbstractStorage {
 			ORDER BY `m`.`mitgliedid`";
 		return $this->getResult($sql, array($this, "parseMitglied"));
 	}
-	public function getMitglied($mitgliedid) {		
+	public function getMitglied($mitgliedid) {
 		return $this->getMitgliederResult(new MitgliedMitgliederMatcher($mitgliedid))->fetchRow();
 	}
 	public function setMitglied($mitgliedid, $globalid, $eintritt, $austritt) {
@@ -1005,6 +1016,82 @@ abstract class SQLStorage extends AbstractStorage {
 		$o["r"]->setMitgliedschaft($o["t"]);
 		$o["r"]->setUser($o["u"]);
 		return $o["r"];
+	}
+	public function getMitgliederRevisionResultTimeline($gliederungids, $start, $count) {
+		$sql = "SELECT	`r`.`revisionid` AS `r_revisionid`,
+				`r`.`globaleid` AS `r_globaleid`,
+				UNIX_TIMESTAMP(`r`.`timestamp`) AS `r_timestamp`,
+				`r`.`userid` AS `r_userid`,
+				`r`.`mitgliedid` AS `r_mitgliedid`,
+				`r`.`mitgliedschaftid` AS `r_mitgliedschaftid`,
+				`r`.`gliederungsid` AS `r_gliederungsid`,
+				`r`.`geloescht` AS `r_geloescht`,
+				`r`.`beitrag` AS `r_beitrag`,
+				`r`.`natpersonid` AS `r_natpersonid`,
+				`r`.`jurpersonid` AS `r_jurpersonid`,
+				`r`.`kontaktid` AS `r_kontaktid`,
+				`n`.`natpersonid` AS `n_natpersonid`,
+				`n`.`anrede` AS `n_anrede`,
+				`n`.`name` AS `n_name`,
+				`n`.`vorname` AS `n_vorname`,
+				`n`.`geburtsdatum` AS `n_geburtsdatum`,
+				`n`.`nationalitaet` AS `n_nationalitaet`,
+				`j`.`jurpersonid` AS `j_jurpersonid`,
+				`j`.`label` AS `j_label`,
+				`k`.`kontaktid` AS `k_kontaktid`,
+				`k`.`adresszusatz` AS `k_adresszusatz`,
+				`k`.`strasse` AS `k_strasse`,
+				`k`.`hausnummer` AS `k_hausnummer`,
+				`k`.`ortid` AS `k_ortid`,
+				`k`.`telefonnummer` AS `k_telefonnummer`,
+				`k`.`handynummer` AS `k_handynummer`,
+				`k`.`emailid` AS `k_emailid`,
+				`e`.`emailid` AS `e_emailid`,
+				`e`.`email` AS `e_email`,
+				`o`.`ortid` AS `o_ortid`,
+				`o`.`plz` AS `o_plz`,
+				`o`.`label` AS `o_label`,
+				`o`.`latitude` AS `o_latitude`,
+				`o`.`longitude` AS `o_longitude`,
+				`o`.`stateid` AS `o_stateid`,
+				`s`.`stateid` AS `s_stateid`,
+				`s`.`label` AS `s_label`,
+				`s`.`population` AS `s_population`,
+				`s`.`countryid` AS `s_countryid`,
+				`c`.`countryid` AS `c_countryid`,
+				`c`.`label` AS `c_label`,
+				`g`.`gliederungsid` AS `g_gliederungsid`,
+				`g`.`label` AS `g_label`,
+				`g`.`parentid` AS `g_parentid`,
+				`t`.`mitgliedschaftid` AS `t_mitgliedschaftid`,
+				`t`.`label` AS `t_label`,
+				`t`.`description` AS `t_description`,
+				`u`.`userid` AS `u_userid`,
+				`u`.`username` AS `u_username`,
+				`u`.`password` AS `u_password`,
+				`u`.`passwordsalt` AS `u_passwordsalt`,
+				`u`.`apikey` AS `u_apikey`,
+				`u`.`aktiv` AS `u_aktiv`,
+				`u`.`defaultgliederungid` AS `u_defaultgliederungid`,
+				`u`.`defaultdokumentkategorieid` AS `u_defaultdokumentkategorieid`,
+				`u`.`defaultdokumentstatusid` AS `u_defaultdokumentstatusid`
+			FROM	`mitgliederrevisions` `r`
+			LEFT JOIN `natperson` `n` USING (`natpersonid`)
+			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
+			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
+			LEFT JOIN `orte` `o` USING (`ortid`)
+			LEFT JOIN `states` `s` USING (`stateid`)
+			LEFT JOIN `countries` `c` USING (`countryid`)
+			LEFT JOIN `gliederungen` `g` USING (`gliederungsid`)
+			LEFT JOIN `emails` `e` USING (`emailid`)
+			LEFT JOIN `mitgliedschaften` `t` USING (`mitgliedschaftid`)
+			LEFT JOIN `users` `u` USING (`userid`)
+			WHERE	`r`.`timestamp` = (	SELECT	MAX(`rmax`.`timestamp`)
+							FROM	`mitgliederrevisions` `rmax`
+							WHERE   `r`.`mitgliedid` = `rmax`.`mitgliedid`)
+			ORDER BY `r`.`timestamp` DESC
+			LIMIT " . intval($start) . ",". intval($count);
+		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
 	}
 	public function getMitgliederRevisionResult() {
 		$sql = "SELECT	`r`.`revisionid` AS `r_revisionid`,
@@ -1323,6 +1410,10 @@ abstract class SQLStorage extends AbstractStorage {
 	 **/
 	public function parseEMailBounce($row) {
 		return $this->parseRow($row, null, "EMailBounce");
+	}
+	public function getEMailBounceResultTimeline($start, $count) {
+		$sql = "SELECT `bounceid`, `emailid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `message` FROM `emailbounces` ORDER BY `timestamp` DESC LIMIT " . intval($start) . "," . intval($count);
+		return $this->getResult($sql, array($this, "parseEMailBounce"));
 	}
 	public function getEMailBounceResultByEMail($emailid) {
 		$sql = "SELECT `bounceid`, `emailid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `message` FROM `emailbounces` WHERE `emailid` = " . intval($emailid);
@@ -1993,6 +2084,10 @@ abstract class SQLStorage extends AbstractStorage {
 	 **/
 	public function parseDokumentNotiz($row) {
 		return $this->parseRow($row, null, "DokumentNotiz");
+	}
+	public function getDokumentNotizResultTimeline($gliederungids, $start, $count) {
+		$sql = "SELECT `dokumentnotizid`, `dokumentid`, `author`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `nextState`, `nextKategorie`, `nextLabel`, `nextIdentifier`, `kommentar` FROM `dokumentnotizen` ORDER BY `timestamp` DESC LIMIT " . intval($start) . "," . intval($count);
+		return $this->getResult($sql, array($this, "parseDokumentNotiz"));
 	}
 	public function getDokumentNotizResult($dokumentid = null) {
 		$sql = "SELECT `dokumentnotizid`, `dokumentid`, `author`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `nextState`, `nextKategorie`, `nextLabel`, `nextIdentifier`, `kommentar` FROM `dokumentnotizen` WHERE 1=1";

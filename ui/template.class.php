@@ -612,6 +612,15 @@ class Template {
 			$this->smarty->assign("text", $widget->getText());
 			return $this->smarty->fetch("dashboardwidget_static.block.tpl");
 		}
+		if ($widget instanceof MitgliederBeitragBuchungTimelineDashboardWidget) {
+			return $this->smarty->fetch("dashboard_mitgliederbeitragbuchung_timeline.block.tpl");
+		}
+		if ($widget instanceof MitgliederRevisionTimelineDashboardWidget) {
+			return $this->smarty->fetch("dashboard_mitgliederrevision_timeline.block.tpl");
+		}
+		if ($widget instanceof DokumentNotizenTimelineDashboardWidget) {
+			return $this->smarty->fetch("dashboard_dokumentnotizen_timeline.block.tpl");
+		}
 	}
 
 	public function viewDashboard($user, $widgets) {
