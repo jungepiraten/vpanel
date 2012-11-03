@@ -68,16 +68,34 @@ function addWidget(column) {
 }
 
 function setWidget(id, type) {
-	var content = $("<div>");
+	var content = $("<div>").addClass("form-horizontal");
 	switch (type) {
 	case "static":
 		content.append($("<textarea>").attr("name","widgets[" + id + "][text]"));
 		break;
 	case "mitgliederbeitragbuchung_timeline":
+		content.append($("<div>").addClass("control-group").append(
+			$("<label>").addClass("control-label").text("Reload"),
+			$("<div>").addClass("controls").append(
+				$("<input>").attr("type","text").attr("name","widgets[" + id + "][reload]").attr("placeholder","0 um zu deaktivieren")
+			)
+		));
 		break;
 	case "mitgliederrevision_timeline":
+		content.append($("<div>").addClass("control-group").append(
+			$("<label>").addClass("control-label").text("Reload"),
+			$("<div>").addClass("controls").append(
+				$("<input>").attr("type","text").attr("name","widgets[" + id + "][reload]").attr("placeholder","0 um zu deaktivieren")
+			)
+		));
 		break;
 	case "dokumentnotizen_timeline":
+		content.append($("<div>").addClass("control-group").append(
+			$("<label>").addClass("control-label").text("Reload"),
+			$("<div>").addClass("controls").append(
+				$("<input>").attr("type","text").attr("name","widgets[" + id + "][reload]").attr("placeholder","0 um zu deaktivieren")
+			)
+		));
 		break;
 	}
 	$("#widgets .widget-" + id)
@@ -88,17 +106,22 @@ function setWidget(id, type) {
 
 {/literal}
 </script>
-{foreach from=$columns key=index item=widgets}{foreach from=$widgets item=widget}<div id="widget-{$widget.widgetid}" style="display:none;">{$widget.content}</div>{/foreach}{/foreach}
 <script type="text/javascript">
+{literal}
+var callbacks = [];
+{/literal}
+
 {foreach from=$columns key=index item=widgets}
 addColumn({$index});
 {foreach from=$widgets item=widget}
-$("#widgets #column-{$index} .widgets").append(
-	$("<div>").addClass("widget").append(
-		$("<a>").addClass("close").attr("href", "{"dashboard_widget_del"|___:$widget.widgetid}").html("×"),
-		$("#widget-{$widget.widgetid}").detach().html()
-	)
-);
+$.get("{"dashboard_widget_json"|___:$widget.widgetid}", function (res) {literal}{{/literal}
+	$("#widgets #column-{$index} .widgets").append(
+		$("<div>").addClass("widget").append(
+			$("<a>").addClass("close").attr("href", "{"dashboard_widget_del"|___:$widget.widgetid}").html("×"),
+			$("<div>").html(res)
+		)
+	);
+{literal}});{/literal}
 {/foreach}
 {foreachelse}
 addColumn();

@@ -1,11 +1,12 @@
 <?php
 
-require_once(VPANEL_CORE . "/dashboardwidget.class.php");
+require_once(VPANEL_CORE . "/dashboardwidgets/table.class.php");
 
-class MitgliederBeitragBuchungTimelineDashboardWidget extends DashboardWidget {
+class MitgliederBeitragBuchungTimelineDashboardWidget extends TableDashboardWidget {
 	public static function factory(Storage $storage, $row) {
-		$static = new MitgliederBeitragBuchungTimelineDashboardWidget($storage);
-		return $static;
+		$widget = new MitgliederBeitragBuchungTimelineDashboardWidget($storage);
+		$widget->init($row);
+		return $widget;
 	}
 }
 

@@ -1,6 +1,7 @@
 <?php
 
 $config->registerPage("index", "index.php");
+$config->registerPage("dashboard_widget_json", "json/dashboard_widget.php?widgetid=%d");
 $config->registerPage("dashboard_widget_del", "index.php?delWidget&widgetid=%d");
 
 $config->registerPage("login", "login.php");

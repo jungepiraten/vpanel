@@ -606,20 +606,29 @@ class Template {
 	}
 
 
-	protected function fetchDashboardWidget($widget) {
+	public function viewDashboardWidget($widget) {
 		$this->smarty->assign("widget", $this->parseDashboardWidget($widget));
 		if ($widget instanceof StaticDashboardWidget) {
 			$this->smarty->assign("text", $widget->getText());
-			return $this->smarty->fetch("dashboardwidget_static.block.tpl");
+			$this->smarty->display("dashboardwidget_static.block.tpl");
 		}
 		if ($widget instanceof MitgliederBeitragBuchungTimelineDashboardWidget) {
-			return $this->smarty->fetch("dashboard_mitgliederbeitragbuchung_timeline.block.tpl");
+			if ($widget->hasReload()) {
+				$this->smarty->assign("reload", $widget->getReload());
+			}
+			$this->smarty->display("dashboard_mitgliederbeitragbuchung_timeline.block.tpl");
 		}
 		if ($widget instanceof MitgliederRevisionTimelineDashboardWidget) {
-			return $this->smarty->fetch("dashboard_mitgliederrevision_timeline.block.tpl");
+			if ($widget->hasReload()) {
+				$this->smarty->assign("reload", $widget->getReload());
+			}
+			$this->smarty->display("dashboard_mitgliederrevision_timeline.block.tpl");
 		}
 		if ($widget instanceof DokumentNotizenTimelineDashboardWidget) {
-			return $this->smarty->fetch("dashboard_dokumentnotizen_timeline.block.tpl");
+			if ($widget->hasReload()) {
+				$this->smarty->assign("reload", $widget->getReload());
+			}
+			$this->smarty->display("dashboard_dokumentnotizen_timeline.block.tpl");
 		}
 	}
 
@@ -629,9 +638,7 @@ class Template {
 			if (!isset($columns[$widget->getColumn()])) {
 				$columns[$widget->getColumn()] = array();
 			}
-			$w = $this->parseDashboardWidget($widget);
-			$w["content"] = $this->fetchDashboardWidget($widget);
-			$columns[$widget->getColumn()][] = $w;
+			$columns[$widget->getColumn()][] = $this->parseDashboardWidget($widget);
 		}
 
 		$this->smarty->assign("user", $this->parseUser($user));

@@ -29,12 +29,21 @@ if ($session->hasVariable("widgets")) {
 				break;
 			case "mitgliederbeitragbuchung_timeline":
 				$w = new MitgliederBeitragBuchungTimelineDashboardWidget($session->getStorage());
+				if ($widget["reload"] > 0) {
+					$w->setReload($widget["reload"]);
+				}
 				break;
 			case "mitgliederrevision_timeline":
 				$w = new MitgliederRevisionTimelineDashboardWidget($session->getStorage());
+				if ($widget["reload"] > 0) {
+					$w->setReload($widget["reload"]);
+				}
 				break;
 			case "dokumentnotizen_timeline":
 				$w = new DokumentNotizenTimelineDashboardWidget($session->getStorage());
+				if ($widget["reload"] > 0) {
+					$w->setReload($widget["reload"]);
+				}
 				break;
 			}
 			if (isset($w)) {
