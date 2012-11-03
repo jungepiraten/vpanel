@@ -75,7 +75,7 @@ function setWidget(id, type) {
 		break;
 	case "mitgliederbeitragbuchung_timeline":
 		content.append($("<div>").addClass("control-group").append(
-			$("<label>").addClass("control-label").text("Reload"),
+			$("<label>").addClass("control-label").text("Reloadzeit in Sekunden"),
 			$("<div>").addClass("controls").append(
 				$("<input>").attr("type","text").attr("name","widgets[" + id + "][reload]").attr("placeholder","0 um zu deaktivieren")
 			)
@@ -83,7 +83,7 @@ function setWidget(id, type) {
 		break;
 	case "mitgliederrevision_timeline":
 		content.append($("<div>").addClass("control-group").append(
-			$("<label>").addClass("control-label").text("Reload"),
+			$("<label>").addClass("control-label").text("Reloadzeit in Sekunden"),
 			$("<div>").addClass("controls").append(
 				$("<input>").attr("type","text").attr("name","widgets[" + id + "][reload]").attr("placeholder","0 um zu deaktivieren")
 			)
@@ -91,7 +91,7 @@ function setWidget(id, type) {
 		break;
 	case "dokumentnotizen_timeline":
 		content.append($("<div>").addClass("control-group").append(
-			$("<label>").addClass("control-label").text("Reload"),
+			$("<label>").addClass("control-label").text("Reloadzeit in Sekunden"),
 			$("<div>").addClass("controls").append(
 				$("<input>").attr("type","text").attr("name","widgets[" + id + "][reload]").attr("placeholder","0 um zu deaktivieren")
 			)
