@@ -36,7 +36,7 @@ case "details":
 			$ui->viewLogin();
 			exit;
 		}
-		
+
 		parseBeitragFormular($session, $beitrag);
 	}
 
@@ -53,14 +53,16 @@ case "details":
 	$ui->viewBeitragDetails($beitrag, $mitgliederbeitraglist, $page, $pagecount, $mailtemplates);
 	exit;
 case "create":
+	$beitrag = null;
+
 	if ($session->getBoolVariable("save")) {
 		if (!$session->isAllowed("beitraege_create")) {
 			$ui->viewLogin();
 			exit;
 		}
-		
+
 		parseBeitragFormular($session, $beitrag);
-		
+
 		$ui->redirect($session->getLink("beitraege_details", $beitrag->getBeitragID()));
 	}
 	$mailtemplates = $session->getStorage()->getMailTemplateList($session->getAllowedGliederungIDs("beitrag_create"));
