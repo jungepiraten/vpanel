@@ -152,7 +152,9 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 					$this->gliederungsMitgliedHoehe[$beitraggliederungid] = 0;
 				}
 
-				$this->gliederungsMitgliedHoehe[$beitraggliederungid] += $anteil * $this->gliederungsHoehe[$mitgliedgliederungid];
+				if (isset($this->gliederungsHoehe[$mitgliedgliederungid])) {
+					$this->gliederungsMitgliedHoehe[$beitraggliederungid] += $anteil * $this->gliederungsHoehe[$mitgliedgliederungid];
+				}
 			}
 		}
 	}
