@@ -57,7 +57,7 @@ class MitgliederFilterBeitragProcess extends MitgliederFilterProcess {
 
 	public function runProcessStep($mitglied) {
 		if ($mitglied->getBeitrag($this->getBeitragID())->getHoehe() == null) {
-			$mitglied->getBeitrag($this->getBeitrag())->setHoehe($this->getBeitragHoehe($mitglied));
+			$mitglied->getBeitrag($this->getBeitragID())->setHoehe($this->getBeitragHoehe($mitglied));
 			$mitglied->save();
 		}
 	}
