@@ -12,7 +12,7 @@ class Mitglied extends GlobalClass {
 
 	private $revisions;
 	private $latestRevision;
-	
+
 	public static function factory(Storage $storage, $row) {
 		$mitglied = new Mitglied($storage);
 		$mitglied->setMitgliedID($row["mitgliedid"]);
@@ -63,7 +63,7 @@ class Mitglied extends GlobalClass {
 		}
 		return $this->revisions;
 	}
-	
+
 	public function &getRevision($revisionid) {
 		$this->getRevisionList();
 		if (!isset($this->revisions[$revisionid]) or $this->revisions[$revisionid] == null) {
@@ -137,7 +137,7 @@ class Mitglied extends GlobalClass {
 			}
 		}
 	}
-	
+
 	private function getVariableValue($keyword) {
 		$keyword = strtoupper($keyword);
 

@@ -42,7 +42,7 @@ class MitgliederFilterBeitragProcess extends MitgliederFilterProcess {
 		}
 		return $this->getBeitrag()->getHoehe();
 	}
-	
+
 	protected function getData() {
 		$data = parent::getData();
 		$data["beitragid"] = $this->getBeitragID();
@@ -56,8 +56,8 @@ class MitgliederFilterBeitragProcess extends MitgliederFilterProcess {
 	}
 
 	public function runProcessStep($mitglied) {
-		if ($mitglied->getBeitrag($this->getBeitragID()) == null) {
-			$mitglied->setBeitrag($this->getBeitrag(), $this->getBeitragHoehe($mitglied), 0);
+		if ($mitglied->getBeitrag($this->getBeitragID())->getHoehe() == null) {
+			$mitglied->getBeitrag($this->getBeitrag())->setHoehe($this->getBeitragHoehe($mitglied));
 			$mitglied->save();
 		}
 	}
