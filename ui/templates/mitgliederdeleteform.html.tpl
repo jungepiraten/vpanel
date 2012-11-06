@@ -8,7 +8,7 @@
 			</div>
 		</div>
 
-		<div class="form-action">
+		<div class="form-actions">
 			<input class="btn btn-danger" type="submit" name="save" value="{"Löschen"|__}" />
 		</div>
 	</fieldset>
