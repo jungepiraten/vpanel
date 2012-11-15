@@ -1855,7 +1855,7 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 	public function getDokumentIdentifierMaxNumber($identifierPrefix, $identifierNumberCount) {
 		$identifierPrefixEscaped = str_replace(array("/", "%", "?", "_"), array("//", "/%", "/?", "/_"), $identifierPrefix);
-		$sql = "SELECT `identifier` FROM `dokument` WHERE `identifier` LIKE '" . $this->escape($identifierPrefixEscaped) . str_repeat("_", $identifierNumberCount) . "' ESCAPE '/' ORDER BY `identifier` LIMIT 1";
+		$sql = "SELECT `identifier` FROM `dokument` WHERE `identifier` LIKE '" . $this->escape($identifierPrefixEscaped) . str_repeat("_", $identifierNumberCount) . "' ESCAPE '/' ORDER BY `identifier` DESC LIMIT 1";
 		$rslt = $this->getResult($sql);
 		if ($rslt->getCount() == 0) {
 			return 0;

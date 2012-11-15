@@ -10,7 +10,7 @@ class TempFile extends StorageClass {
 
 	private $user;
 	private $file;
-	
+
 	public static function factory(Storage $storage, $row) {
 		$tempfile = new TempFile($storage);
 		$tempfile->setTempFileID($row["tempfileid"]);
