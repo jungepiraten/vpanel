@@ -193,6 +193,7 @@ class DokumentNotiz extends StorageClass {
 
 	public function getPrevNotiz() {
 		$notizen = $this->getStorage()->getDokumentNotizList($this->getDokumentID());
+		$prev = null;
 		foreach ($notizen as $notiz) {
 			if ($notiz->getDokumentNotizID() == $this->getDokumentNotizID()) {
 				return $prev;
