@@ -5,12 +5,14 @@ require_once(VPANEL_DOKUMENTTEMPLATES . "/identifier.class.php");
 class DefaultDokumentTemplate extends IdentifierDokumentTemplate {
 	private $kategorieid;
 	private $statusid;
+	private $flags;
 	private $identifierPrefix;
 
-	public function __construct($templateid, $label, $permission, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $identifierNumberLength = 3) {
+	public function __construct($templateid, $label, $permission, $gliederungid, $kategorieid, $statusid, $flags, $identifierPrefix, $identifierNumberLength = 3) {
 		parent::__construct($templateid, $label, $permission, $gliederungid, $identifierNumberLength);
 		$this->kategorieid = $kategorieid;
 		$this->statusid = $statusid;
+		$this->flags = $flags;
 		$this->identifierPrefix = $identifierPrefix;
 	}
 
@@ -20,6 +22,10 @@ class DefaultDokumentTemplate extends IdentifierDokumentTemplate {
 
 	public function getDokumentStatusID($session) {
 		return $this->statusid;
+	}
+
+	public function getDokumentFlags($session) {
+		return $this->flags;
 	}
 
 	protected function getIdentifierPrefix($session) {

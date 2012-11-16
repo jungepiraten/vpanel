@@ -39,6 +39,7 @@ if ($file == null) {
 	$dokument->setLabel($dokumenttemplate->getDokumentLabel($session));
 	$dokument->setFile($file);
 	$dokument->setData($dokumenttemplate->getDokumentData($session));
+	// Zwischenspeichern um die ID zu bekommen
 	$dokument->save();
 
 	$notiz = new DokumentNotiz($session->getStorage());
@@ -50,6 +51,14 @@ if ($file == null) {
 	$notiz->setNextLabel($dokumenttemplate->getDokumentLabel($session));
 	$notiz->setNextIdentifier($dokumenttemplate->getDokumentIdentifier($session));
 	$notiz->setKommentar($dokumenttemplate->getDokumentKommentar($session));
+
+	foreach ($dokumenttemplate->getDokumentFlags($session) as $flagid) {
+		$flag = $session->getStorage()->getDokumentFlag($flagid);
+		$dokument->setFlag($flag);
+		$notiz->setAddFlag($flag);
+	}
+
+	$dokument->save();
 	$notiz->save();
 
 	$notiz->notify();

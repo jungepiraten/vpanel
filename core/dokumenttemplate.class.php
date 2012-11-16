@@ -26,6 +26,7 @@ abstract class DokumentTemplate extends GliederungAktion {
 
 	abstract public function getDokumentKategorieID($session);
 	abstract public function getDokumentStatusID($session);
+	abstract public function getDokumentFlags($session);
 	abstract public function getDokumentIdentifier($session);
 	abstract public function getDokumentLabel($session);
 	abstract public function getDokumentFile($session);

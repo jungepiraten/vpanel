@@ -16,6 +16,7 @@ require_once(VPANEL_CORE . "/dokument.class.php");
 function parseDokumentFormular($ui, $session, &$dokument = null) {
 	$kategorieid = $session->getIntVariable("kategorieid");
 	$statusid = $session->getIntVariable("statusid");
+	$flagids = array_keys($session->getListVariable("flags"));
 	$label = $session->getVariable("label");
 	$identifier = $session->getVariable("identifier");
 	$kommentar = $session->getVariable("kommentar");
@@ -23,6 +24,7 @@ function parseDokumentFormular($ui, $session, &$dokument = null) {
 	$gliederungid = $dokument->getGliederungID();
 	$oldkategorieid = $dokument->getDokumentKategorieID();
 	$oldstatusid = $dokument->getDokumentStatusID();
+	$oldflagids = $dokument->getFlagIDs();
 	$oldlabel = $dokument->getLabel();
 	$oldidentifier = $dokument->getIdentifier();
 
@@ -34,7 +36,6 @@ function parseDokumentFormular($ui, $session, &$dokument = null) {
 	$dokument->setDokumentStatusID($statusid);
 	$dokument->setLabel($label);
 	$dokument->setIdentifier($identifier);
-	$dokument->save();
 
 	$notiz = new DokumentNotiz($session->getStorage());
 	$notiz->setDokument($dokument);
@@ -46,6 +47,15 @@ function parseDokumentFormular($ui, $session, &$dokument = null) {
 	if ($oldstatusid != $statusid) {
 		$notiz->setNextStatusID($statusid);
 	}
+	foreach (array_diff($flagids, $oldflagids) as $flagid) {
+		$flag = $session->getStorage()->getDokumentFlag($flagid);
+		$dokument->setFlag($flag);
+		$notiz->setAddFlag($flag);
+	}
+	foreach (array_diff($oldflagids, $flagids) as $flagid) {
+		$dokument->delFlag($flagid);
+		$notiz->setDelFlag($session->getStorage()->getDokumentFlag($flagid));
+	}
 	if ($oldlabel != $label) {
 		$notiz->setNextLabel($label);
 	}
@@ -53,6 +63,8 @@ function parseDokumentFormular($ui, $session, &$dokument = null) {
 		$notiz->setNextIdentifier($identifier);
 	}
 	$notiz->setKommentar($kommentar);
+
+	$dokument->save();
 	$notiz->save();
 
 	$notiz->notify();
@@ -83,6 +95,7 @@ case "create":
 			$dokument->setLabel($dokumenttemplate->getDokumentLabel($session));
 			$dokument->setFile($file);
 			$dokument->setData($dokumenttemplate->getDokumentData($session));
+			// Zwischenspeichern um an die ID zu kommen
 			$dokument->save();
 
 			$notiz = new DokumentNotiz($session->getStorage());
@@ -94,6 +107,14 @@ case "create":
 			$notiz->setNextLabel($dokumenttemplate->getDokumentLabel($session));
 			$notiz->setNextIdentifier($dokumenttemplate->getDokumentIdentifier($session));
 			$notiz->setKommentar($dokumenttemplate->getDokumentKommentar($session));
+
+			foreach ($dokument->getDokumentFlags($session) as $flagid) {
+				$flag = $session->getStorage()->getDokumentFlag($flagid);
+				$dokument->setFlag($flag);
+				$notiz->setAddFlag($flag);
+			}
+
+			$dokument->save();
 			$notiz->save();
 
 			$notiz->notify();

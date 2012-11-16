@@ -29,6 +29,8 @@
 			{if isset($notiz.nextstatus)}<span class="nextstatus">{"Als %s markiert"|__:$notiz.nextstatus.label}</span>{/if}
 			{if isset($notiz.nextlabel)}<span class="nextlabel">{"In %s umbenannt"|__:$notiz.nextlabel}</span>{/if}
 			{if isset($notiz.nextidentifier)}<span class="nextidentifier">{"Als %s abgeheftet"|__:$notiz.nextidentifier}</span>{/if}
+			{foreach from=$notiz.addFlags item=flag}<span class="nextaddflag">{$flag.label|escape:html} hinzugef&uuml;gt</span>{/foreach}
+			{foreach from=$notiz.delFlags item=flag}<span class="nextdelflag">{$flag.label|escape:html} entfernt</span>{/foreach}
 			<div class="kommentar">{$notiz.kommentar}</div>
 		</div>
 		{/foreach}

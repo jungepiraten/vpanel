@@ -1972,6 +1972,30 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 
 	/**
+	 * DokumentDokumentFlag
+	 **/
+	public function getDokumentDokumentFlagResult($dokumentid) {
+		$sql = "SELECT	`dokumentflags`.`flagid`, `dokumentflags`.`label`
+			FROM	`dokumentdokumentflags`
+			LEFT JOIN `dokumentflags` USING (`flagid`)
+			WHERE	`dokumentdokumentflags`.`dokumentid` = " . intval($dokumentid);
+		return $this->getResult($sql, array($this, "parseDokumentFlag"));
+	}
+
+	public function setDokumentDokumentFlagList($dokumentid, $flagids) {
+		$sql = "DELETE FROM `dokumentdokumentflags` WHERE `dokumentid` = " . intval($dokumentid);
+		$this->query($sql);
+		$sqlinserts = array();
+		foreach ($flagids as $flagid) {
+			$sqlinserts[] = "(" . intval($dokumentid) . ", " . intval($flagid) . ")";
+		}
+		if (count($sqlinserts) > 0) {
+			$sql = "INSERT INTO `dokumentdokumentflags` (`dokumentid`, `flagid`) VALUES " . implode(", ", $sqlinserts);
+			$this->query($sql);
+		}
+	}
+
+	/**
 	 * DokumentNotify
 	 **/
 	public function parseDokumentNotify($row) {
@@ -2166,6 +2190,48 @@ abstract class SQLStorage extends AbstractStorage {
 	public function delDokumentNotiz($dokumentnotizid) {
 		$sql = "DELETE FROM `dokumentnotizen` WHERE `dokumentnotizid` = " . intval($dokumentnotizid);
 		return $this->query($sql);
+	}
+
+	/**
+	 * DokumentNotizFlags
+	 **/
+	public function getDokumentNotizFlagResultAdd($notizid) {
+		$sql = "SELECT	`dokumentflags`.`flagid`, `dokumentflags`.`label`
+			FROM	`dokumentnotizflags`
+			LEFT JOIN	`dokumentflags` ON (`dokumentnotizflags`.`flagid` = `dokumentflags`.`flagid`)
+			WHERE	`dokumentnotizflags`.`notizid` = " . intval($notizid) . " AND `dokumentnotizflags`.`change` = 'add'";
+		return $this->getResult($sql, array($this, "parseDokumentFlag"));
+	}
+	public function setDokumentNotizFlagListAdd($notizid, $flags) {
+		$sql = "DELETE FROM `dokumentnotizflags` WHERE `notizid` = " . intval($notizid) . " AND `change` = 'add'";
+		$this->query($sql);
+		$sqlinserts = array();
+		while (count($flags) > 0) {
+			$sqlinserts[] = "(" . intval($notizid) . ", " . intval(array_shift($flags)) . ", 'add')";
+		}
+		if (count($sqlinserts) > 0) {
+			$sql = "INSERT INTO `dokumentnotizflags` (`notizid`, `flagid`, `change`) VALUES " . implode(", ", $sqlinserts);
+			$this->query($sql);
+		}
+	}
+	public function getDokumentNotizFlagResultDel($notizid) {
+		$sql = "SELECT	`dokumentflags`.`flagid`, `dokumentflags`.`label`
+			FROM	`dokumentnotizflags`
+			LEFT JOIN	`dokumentflags` ON (`dokumentnotizflags`.`flagid` = `dokumentflags`.`flagid`)
+			WHERE	`dokumentnotizflags`.`notizid` = " . intval($notizid) . " AND `dokumentnotizflags`.`change` = 'del'";
+		return $this->getResult($sql, array($this, "parseDokumentFlag"));
+	}
+	public function setDokumentNotizFlagListDel($notizid, $flags) {
+		$sql = "DELETE FROM `dokumentnotizflags` WHERE `notizid` = " . intval($notizid) . " AND `change` = 'del'";
+		$this->query($sql);
+		$sqlinserts = array();
+		while (count($flags) > 0) {
+			$sqlinserts[] = "(" . intval($notizid) . ", " . intval(array_shift($flags)) . ", 'del')";
+		}
+		if (count($sqlinserts) > 0) {
+			$sql = "INSERT INTO `dokumentnotizflags` (`notizid`, `flagid`, `change`) VALUES " . implode(", ", $sqlinserts);
+			$this->query($sql);
+		}
 	}
 
 	/**

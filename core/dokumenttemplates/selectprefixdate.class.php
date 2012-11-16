@@ -40,6 +40,10 @@ class SelectPrefixDateDokumentTemplate extends IdentifierDokumentTemplate {
 		return $this->getSelectedOption($session, "statusid");
 	}
 
+	public function getDokumentFlags($session) {
+		return $this->getSelectedOption($session, "flags");
+	}
+
 	public function getDokumentLabel($session) {
 		return $session->getVariable("label");
 	}

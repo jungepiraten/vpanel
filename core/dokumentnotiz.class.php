@@ -17,6 +17,8 @@ class DokumentNotiz extends StorageClass {
 	private $author;
 	private $dokumentkategorie;
 	private $dokumentstatus;
+	private $addFlags;
+	private $delFlags;
 
 	public static function factory(Storage $storage, $row) {
 		$dokumentnotiz = new DokumentNotiz($storage);
@@ -178,12 +180,22 @@ class DokumentNotiz extends StorageClass {
 			$this->getNextLabel(),
 			$this->getNextIdentifier(),
 			$this->getKommentar() ));
+
+		if ($this->addFlags != null) {
+			$storage->setDokumentNotizFlagListAdd($this->getDokumentNotizID(), $this->getAddFlagIDs());
+		}
+
+		if ($this->delFlags != null) {
+			$storage->setDokumentNotizFlagListDel($this->getDokumentNotizID(), $this->getDelFlagIDs());
+		}
 	}
 
 	public function delete(Storage $storage = null) {
 		if ($storage === null) {
 			$storage = $this->getStorage();
 		}
+		$storage->setDokumentNotizFlagListAdd($this->getDokumentNotizID(), array());
+		$storage->setDokumentNotizFlagListDel($this->getDokumentNotizID(), array());
 		$storage->delDokumentNotiz($this->getDokumentNotizID());
 	}
 
@@ -200,6 +212,66 @@ class DokumentNotiz extends StorageClass {
 			}
 			$prev = $notiz;
 		}
+	}
+
+	public function getAddFlags() {
+		if ($this->addFlags === null) {
+			$flags = $this->getStorage()->getDokumentNotizFlagListAdd($this->getDokumentNotizID());
+			$this->addFlags = array();
+			foreach ($flags as $flag) {
+				$this->setAddFlag($flag);
+			}
+		}
+		return $this->addFlags;
+	}
+	public function getAddFlagIDs() {
+		return array_keys($this->getAddFlags());
+	}
+	public function hasAddFlag($flagid) {
+		$this->getAddFlags();
+		return isset($this->addFlags[$flagid]);
+	}
+	public function getAddFlag($flagid) {
+		$this->getAddFlags();
+		return $this->addFlags[$flagid];
+	}
+	public function setAddFlag($flag) {
+		$this->getAddFlags();
+		$this->addFlags[$flag->getFlagID()] = $flag;
+	}
+	public function delAddFlag($flagid) {
+		$this->getAddFlags();
+		unset($this->addFlags[$flagid]);
+	}
+
+	public function getDelFlags() {
+		if ($this->delFlags === null) {
+			$flags = $this->getStorage()->getDokumentNotizFlagListDel($this->getDokumentNotizID());
+			$this->delFlags = array();
+			foreach ($flags as $flag) {
+				$this->setDelFlag($flag);
+			}
+		}
+		return $this->delFlags;
+	}
+	public function getDelFlagIDs() {
+		return array_keys($this->getDelFlags());
+	}
+	public function hasDelFlag($flagid) {
+		$this->getDelFlags();
+		return isset($this->delFlags[$flagid]);
+	}
+	public function getDelFlag($flagid) {
+		$this->getDelFlags();
+		return $this->delFlags[$flagid];
+	}
+	public function setDelFlag($flag) {
+		$this->getDelFlags();
+		$this->delFlags[$flag->getFlagID()] = $flag;
+	}
+	public function delDelFlag($flagid) {
+		$this->getDelFlags();
+		unset($this->delFlags[$flagid]);
 	}
 
 	public function notifyUpdate($newnotiz) {

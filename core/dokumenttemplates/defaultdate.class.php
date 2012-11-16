@@ -5,8 +5,8 @@ require_once(VPANEL_DOKUMENTTEMPLATES . "/default.class.php");
 class DefaultDateDokumentTemplate extends DefaultDokumentTemplate {
 	private $dateFormat;
 
-	public function __construct($templateid, $label, $permission, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $dateFormat, $identifierNumberLength = 3) {
-		parent::__construct($templateid, $label, $permission, $gliederungid, $kategorieid, $statusid, $identifierPrefix, $identifierNumberLength);
+	public function __construct($templateid, $label, $permission, $gliederungid, $kategorieid, $statusid, $flags, $identifierPrefix, $dateFormat, $identifierNumberLength = 3) {
+		parent::__construct($templateid, $label, $permission, $gliederungid, $kategorieid, $statusid, $flags, $identifierPrefix, $identifierNumberLength);
 		$this->dateFormat = $dateFormat;
 	}
 

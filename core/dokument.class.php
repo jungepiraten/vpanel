@@ -17,6 +17,7 @@ class Dokument extends StorageClass {
 	private $dokumentkategorie;
 	private $dokumentstatus;
 	private $file;
+	private $flags;
 
 	public static function factory(Storage $storage, $row) {
 		$dokument = new Dokument($storage);
@@ -164,6 +165,37 @@ class Dokument extends StorageClass {
 		$this->file = $file;
 	}
 
+	public function getFlags() {
+		if ($this->flags === null) {
+			$flags = $this->getStorage()->getDokumentDokumentFlagList($this->getDokumentID());
+			$this->flags = array();
+			foreach ($flags as $flag) {
+				$this->setFlag($flag);
+			}
+		}
+		return $this->flags;
+	}
+	public function getFlagIDs() {
+		$this->getFlags();
+		return array_keys($this->flags);
+	}
+	public function hasFlag($flagid) {
+		$this->getFlags();
+		return isset($this->flags[$flagid]);
+	}
+	public function getFlag($flagid) {
+		$this->getFlags();
+		return $this->flags[$flagid];
+	}
+	public function setFlag($flag) {
+		$this->getFlags();
+		$this->flags[$flag->getFlagID()] = $flag;
+	}
+	public function delFlag($flagid) {
+		$this->getFlags();
+		unset($this->flags[$flagid]);
+	}
+
 	public function save(Storage $storage = null) {
 		if ($storage === null) {
 			$storage = $this->getStorage();
@@ -178,6 +210,10 @@ class Dokument extends StorageClass {
 			$this->getContent(),
 			serialize($this->getData()),
 			$this->getFileID() ));
+
+		if ($this->flags != null) {
+			$storage->setDokumentDokumentFlagList($this->getDokumentID(), $this->getFlagIDs());
+		}
 	}
 
 	public function delete(Storage $storage = null) {
@@ -192,6 +228,7 @@ class Dokument extends StorageClass {
 		foreach ($mitglieder as $mitglied) {
 			$storage->delMitgliedDokument($mitglied->getMitgliedID(), $this->getDokumentID());
 		}
+		$storage->setDokumentDokumentFlagList($this->getDokumentID(), array());
 		$storage->delDokument($this->getDokumentID());
 		$this->getFile()->delete($storage);
 	}

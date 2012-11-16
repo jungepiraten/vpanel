@@ -501,6 +501,7 @@ class Template {
 		$row["gliederung"] = $this->parseGliederung($dokument->getGliederung());
 		$row["dokumentkategorie"] = $this->parseDokumentKategorie($dokument->getDokumentKategorie());
 		$row["dokumentstatus"] = $this->parseDokumentStatus($dokument->getDokumentStatus());
+		$row["flags"] = $this->parseDokumentFlags($dokument->getFlags());
 		$row["identifier"] = $dokument->getIdentifier();
 		$row["label"] = $dokument->getLabel();
 		$row["content"] = $dokument->getContent();
@@ -578,6 +579,8 @@ class Template {
 		if ($notiz->getNextStatusID() != null) {
 			$row["nextstatus"] = $this->parseDokumentStatus($notiz->getNextStatus());
 		}
+		$row["addFlags"] = $this->parseDokumentFlags($notiz->getAddFlags());
+		$row["delFlags"] = $this->parseDokumentFlags($notiz->getDelFlags());
 		if ($notiz->getNextLabel() != null) {
 			$row["nextlabel"] = $notiz->getNextLabel();
 		}
