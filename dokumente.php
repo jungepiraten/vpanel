@@ -124,8 +124,9 @@ case "details":
 	$transitionen = $session->getStorage()->getSingleDokumentTransitionList($session, $dokument);
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
+	$flags = $session->getStorage()->getDokumentFlagList();
 	$mitgliedtemplates = $session->getStorage()->getMitgliederTemplateList($session);
-	$ui->viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $mitgliedtemplates);
+	$ui->viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $flags, $mitgliedtemplates);
 	exit;
 case "transition":
 	$transition = $session->getStorage()->getDokumentTransition($session->getVariable("transitionid"));

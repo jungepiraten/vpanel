@@ -30,6 +30,15 @@
         {/if}
     </div>
 </div>
+{foreach from=$flags item=flag}
+{assign var=flagid value=$flag.flagid}
+<div class="control-group">
+    <label class="control-label" for="flags[{$flag.flagid}]">{$flag.label|escape:html}</label>
+    <div class="controls">
+        <input type="checkbox" name="flags[{$flag.flagid}]" {if isset($dokument.flags.$flagid) or isset($data.flags.$flagid)}checked="checked"{/if} />
+    </div>
+</div>
+{/foreach}
 <div class="control-group">
     <label class="control-label" for="file">{"Datei:"|__}</label>
     <div class="controls">

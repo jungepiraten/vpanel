@@ -28,6 +28,7 @@ require_once(VPANEL_CORE . "/dokument.class.php");
 require_once(VPANEL_CORE . "/dokumentnotify.class.php");
 require_once(VPANEL_CORE . "/dokumentkategorie.class.php");
 require_once(VPANEL_CORE . "/dokumentstatus.class.php");
+require_once(VPANEL_CORE . "/dokumentflag.class.php");
 require_once(VPANEL_CORE . "/dokumentnotiz.class.php");
 require_once(VPANEL_CORE . "/file.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
@@ -2076,6 +2077,37 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 	public function delDokumentStatus($dokumentstatusid) {
 		$sql = "DELETE FROM `dokumentstatus` WHERE `dokumentstatusid` = " . intval($dokumentstatusid);
+		return $this->query($sql);
+	}
+
+	/**
+	 * DokumentFlag
+	 **/
+	public function parseDokumentFlag($row) {
+		return $this->parseRow($row, null, "DokumentFlag");
+	}
+	public function getDokumentFlagResult() {
+		$sql = "SELECT `flagid`, `label` FROM `dokumentflags`";
+		return $this->getResult($sql, array($this, "parseDokumentFlag"));
+	}
+	public function getDokumentFlag($flagid) {
+		$sql = "SELECT `flagid`, `label` FROM `dokumentflags` WHERE `flagid` = " . intval($flagid);
+		return $this->getResult($sql, array($this, "parseDokumentFlag"))->fetchRow();
+	}
+	public function setDokumentFlag($flagid, $label) {
+		if ($flagid == null) {
+			$sql = "INSERT INTO `dokumentflags` (`label`) VALUES ('" . $this->escape($label) . "')";
+		} else {
+			$sql = "UPDATE `dokumentflags` SET `label` = '" . $this->escape($label) . "' WHERE `flagid` = " . intval($flagid);
+		}
+		$this->query($sql);
+		if ($flagid == null) {
+			$flagid = $this->getInsertID();
+		}
+		return $flagid;
+	}
+	public function delDokumentFlag($flagid) {
+		$sql = "DELETE FROM `dokumentflags` WHERE `flagid` = " . intval($flagid);
 		return $this->query($sql);
 	}
 

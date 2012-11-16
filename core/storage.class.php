@@ -218,6 +218,12 @@ interface Storage {
 	public function setDokumentStatus($dokumentstatusid, $label);
 	public function delDokumentStatus($dokumentstatusid);
 
+	public function getDokumentFlagResult();
+	public function getDokumentFlagList();
+	public function getDokumentFlag($flagid);
+	public function setDokumentFlag($flagid, $status);
+	public function delDokumentFlag($flagid);
+
 	public function getDokumentNotizResultTimeline($gliederungids, $start, $count);
 	public function getDokumentNotizListTimeline($gliederungids, $start, $count);
 	public function getDokumentNotizResult($dokumentid = null);
@@ -431,6 +437,10 @@ abstract class AbstractStorage implements Storage {
 
 	public function getDokumentStatusList() {
 		return $this->getDokumentStatusResult()->fetchAll();
+	}
+
+	public function getDokumentFlagList() {
+		return $this->getDokumentFlagResult()->fetchAll();
 	}
 
 	public function getDokumentNotizListTimeline($gliederungids, $start, $count) {

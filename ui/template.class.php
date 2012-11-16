@@ -556,6 +556,17 @@ class Template {
 		return array_map(array($this, 'parseDokumentStatus'), $rows);
 	}
 
+	protected function parseDokumentFlag($flag) {
+		$row = array();
+		$row["flagid"] = $flag->getFlagID();
+		$row["label"] = $flag->getLabel();
+		return $row;
+	}
+
+	protected function parseDokumentFlags($rows) {
+		return array_map(array($this, 'parseDokumentFlag'), $rows);
+	}
+
 	protected function parseDokumentNotiz($notiz) {
 		$row = array();
 		$row["dokumentnotizid"] = $notiz->getDokumentNotizID();
@@ -947,13 +958,14 @@ class Template {
 		$this->viewDokumentTemplate($dokumenttemplate, $this->link("dokumente_create", $dokumenttemplate->getDokumentTemplateID()), $this->translate("%s anlegen", $dokumenttemplate->getLabel()) );
 	}
 
-	public function viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $mitgliedtemplates) {
+	public function viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $flags, $mitgliedtemplates) {
 		$this->smarty->assign("dokument", $this->parseDokument($dokument));
 		$this->smarty->assign("dokumentnotizen", $this->parseDokumentNotizen($dokumentnotizen));
 		$this->smarty->assign("mitglieder", $this->parseMitglieder($mitglieder));
 		$this->smarty->assign("dokumenttransitionen", $this->parseDokumentTransitionen($transitionen));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));
+		$this->smarty->assign("flags", $this->parseDokumentFlags($flags));
 		$this->smarty->assign("mitgliedtemplates", $this->parseMitgliedTemplates($mitgliedtemplates));
 		$this->smarty->display("dokumentdetails.html.tpl");
 	}
