@@ -17,6 +17,7 @@ require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/mitgliedbeitrag.class.php");
 require_once(VPANEL_CORE . "/mitgliedbeitragbuchung.class.php");
 require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
+require_once(VPANEL_DOKUMENTMATCHER . "/mitglied.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/logic.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/gliederung.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/flag.class.php");
@@ -301,9 +302,9 @@ case "details":
 
 		$ui->redirect();
 	}
-	
+
 	$notizen = $session->getStorage()->getMitgliedNotizList($mitglied->getMitgliedID());
-	$dokumente = $session->getStorage()->getDokumentByMitgliedList($mitglied->getMitgliedID());
+	$dokumente = $session->getStorage()->getDokumentList(new MitgliedDokumentMatcher($mitglied->getMitgliedID()));
 
 	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("mitglieder_show"));
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();

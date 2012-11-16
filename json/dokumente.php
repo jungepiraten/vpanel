@@ -9,7 +9,14 @@ if (!$session->isSignedIn()) {
 	exit;
 }
 
-$dokumente = $session->getStorage()->getDokumentSearchList($session->getAllowedGliederungIDs("dokumente_show"), explode(" ", $session->getVariable("q")), 5);
+require_once(VPANEL_DOKUMENTMATCHER . "/logic.class.php");
+require_once(VPANEL_DOKUMENTMATCHER . "/gliederung.class.php");
+require_once(VPANEL_DOKUMENTMATCHER . "/search.class.php");
+
+$matcher = new SearchDokumentMatcher(explode(' ', $session->getVariable("q")));
+$matcher = new AndDokumentMatcher(new GliederungDokumentMatcher($session->getAllowedGliederungIDs("dokumente_show")), $matcher);
+
+$dokumente = $session->getStorage()->getDokumentList($matcher, 5);
 $jsons = array();
 
 foreach ($dokumente AS $dokument) {
@@ -17,7 +24,7 @@ foreach ($dokumente AS $dokument) {
 	$row["dokumentid"] = $dokument->getDokumentID();
 	$row["location"] = $session->getLink("dokumente_details", $dokument->getDokumentID());
 	$row["label"] = $dokument->getIdentifier() . " " . $dokument->getLabel();
-	
+
 	$jsons[] = $row;
 }
 

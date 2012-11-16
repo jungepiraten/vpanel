@@ -12,6 +12,11 @@ if (!$session->isSignedIn()) {
 }
 
 require_once(VPANEL_CORE . "/dokument.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/dokument.class.php");
+require_once(VPANEL_DOKUMENTMATCHER . "/logic.class.php");
+require_once(VPANEL_DOKUMENTMATCHER . "/gliederung.class.php");
+require_once(VPANEL_DOKUMENTMATCHER . "/kategorie.class.php");
+require_once(VPANEL_DOKUMENTMATCHER . "/status.class.php");
 
 function parseDokumentFormular($ui, $session, &$dokument = null) {
 	$kategorieid = $session->getIntVariable("kategorieid");
@@ -140,7 +145,7 @@ case "details":
 	}
 
 	$dokumentnotizen = $session->getStorage()->getDokumentNotizList($dokument->getDokumentID());
-	$mitglieder = $session->getStorage()->getMitgliederByDokumentList($dokument->getDokumentID());
+	$mitglieder = $session->getStorage()->getMitgliederList(new DokumentMitgliederMatcher($dokument->getDokumentID()));
 
 	$transitionen = $session->getStorage()->getSingleDokumentTransitionList($session, $dokument);
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
@@ -222,15 +227,21 @@ default:
 		$gliederungids = array_intersect($gliederungids, array($gliederung->getGliederungID()));
 	}
 
+	$matcher = new AndDokumentMatcher(
+		new GliederungDokumentMatcher($gliederungids),
+		($dokumentkategorie == null ? new TrueDokumentMatcher() : new KategorieDokumentMatcher($dokumentkategorie)),
+		($dokumentstatus == null ? new TrueDokumentMatcher() : new StatusDokumentMatcher($dokumentstatus)) );
+
+	$dokumentcount = $session->getStorage()->getDokumentCount($matcher);
 	$pagesize = 20;
-	$pagecount = ceil($session->getStorage()->getDokumentCount($gliederungids, $dokumentkategorie, $dokumentstatus) / $pagesize);
+	$pagecount = ceil($dokumentcount / $pagesize);
 	$page = 0;
 	if ($session->hasVariable("page") and $session->getVariable("page") >= 0 and $session->getVariable("page") < $pagecount) {
 		$page = intval($session->getVariable("page"));
 	}
 	$offset = $page * $pagesize;
 
-	$dokumente = $session->getStorage()->getDokumentList($gliederungids, $dokumentkategorie, $dokumentstatus, $pagesize, $offset);
+	$dokumente = $session->getStorage()->getDokumentList($matcher, $pagesize, $offset);
 	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("dokumente_show"));
 	$templates = $session->getStorage()->getDokumentTemplateList($session);
 	$transitionen = $session->getStorage()->getMultiDokumentTransitionList($session, $dokumentkategorie, $dokumentstatus);

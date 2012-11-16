@@ -1,6 +1,7 @@
 <?php
 
 require_once(VPANEL_CORE . "/storageobject.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/dokument.class.php");
 
 class Dokument extends StorageClass {
 	private $dokumentid;
@@ -224,7 +225,7 @@ class Dokument extends StorageClass {
 		foreach ($notizen as $notiz) {
 			$notiz->delete($storage);
 		}
-		$mitglieder = $storage->getMitgliederByDokumentList($this->getDokumentID());
+		$mitglieder = $storage->getMitgliederList(new DokumentMitgliedMatcher($this->getDokumentID()));
 		foreach ($mitglieder as $mitglied) {
 			$storage->delMitgliedDokument($mitglied->getMitgliedID(), $this->getDokumentID());
 		}

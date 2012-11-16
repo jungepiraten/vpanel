@@ -1832,27 +1832,85 @@ abstract class SQLStorage extends AbstractStorage {
 	/**
 	 * Dokument
 	 **/
+	protected function parseDokumentMatcher($matcher) {
+		if ($matcher instanceof TrueDokumentMatcher || $matcher == null) {
+			return "1";
+		}
+		if ($matcher instanceof FalseDokumentMatcher) {
+			return "0";
+		}
+		if ($matcher instanceof AndDokumentMatcher) {
+			return "(" . implode(" AND ",array_map(array($this,'parseDokumentMatcher'), $matcher->getConditions())) . ")";
+		}
+		if ($matcher instanceof OrDokumentMatcher) {
+			return "(" . implode(" OR ",array_map(array($this,'parseDokumentMatcher'), $matcher->getConditions())) . ")";
+		}
+		if ($matcher instanceof NotDokumentMatcher) {
+			return "NOT (" . $this->parseDokumentMatcher . ")";
+		}
+		if ($matcher instanceof GliederungDokumentMatcher) {
+			return "`d`.`gliederungid` IN (" . implode(",", array_map("intval", $matcher->getGliederungIDs())) . ")";
+		}
+		if ($matcher instanceof KategorieDokumentMatcher) {
+			return "`d`.`dokumentkategorieid` = " . intval($matcher->getKategorieID());
+		}
+		if ($matcher instanceof StatusDokumentMatcher) {
+			return "`d`.`dokumentstatusid` = " . intval($matcher->getStatusID());
+		}
+		if ($matcher instanceof MitgliedDokumentMatcher) {
+			return "`d`.`dokumentid` IN (SELECT `dokumentid` FROM `mitglieddokument` WHERE `mitgliedid` = " . intval($matcher->getMitgliedID()) . ")";
+		}
+		if ($matcher instanceof SearchDokumentMatcher) {
+			$fields = array("`d`.`identifier`", "`d`.`label`", "`d`.`content`");
+			$wordclauses = array();
+			$escapedwords = array();
+			foreach ($matcher->getWords() as $word) {
+				$escapedwords[] = $this->escape($word);
+				$clauses = array();
+				foreach ($fields as $field) {
+					$clauses[] = $field . " LIKE '%" . $this->escape($word) . "%'";
+				}
+				$wordclauses[] = implode(" OR ", $clauses);
+			}
+			return "( (" . implode(") AND (", $wordclauses) . ") OR `dokumentid` IN (SELECT `dokumentid` FROM `dokumentnotizen` WHERE
+					(`nextlabel` LIKE '%" . implode("%' AND `nextlabel` LIKE '%", $escapedwords) . "%') OR
+					(`nextidentifier` LIKE '%" . implode("%' AND `nextidentifier` LIKE '%", $escapedwords) . "%') OR
+					(`kommentar` LIKE '%" . implode("%' AND `kommentar` LIKE '%", $escapedwords) . "%') ))";
+		}
+		throw new Exception("Not implemented: ".get_class($matcher));
+	}
+
 	public function parseDokument($row) {
 		return $this->parseRow($row, null, "Dokument");
 	}
-	public function getDokumentCount($gliederungids, $dokumentkategorieid = null, $dokumentstatusid = null) {
-		if (empty($gliederungids)) {
-			return 0;
-		}
-		if ($dokumentkategorieid instanceof DokumentKategorie) {
-			$dokumentkategorieid = $dokumentkategorieid->getDokumentKategorieID();
-		}
-		if ($dokumentstatusid instanceof DokumentStatus) {
-			$dokumentstatusid = $dokumentstatusid->getDokumentStatusID();
-		}
-		$sql = "SELECT COUNT(`dokumentid`) FROM `dokument` WHERE `gliederungid` IN (" . implode(",", array_map("intval", $gliederungids)) . ")";
-		if ($dokumentkategorieid != null) {
-			$sql .= " AND `dokumentkategorieid` = " . intval($dokumentkategorieid);
-		}
-		if ($dokumentstatusid != null) {
-			$sql .= " AND `dokumentstatusid` = " . intval($dokumentstatusid);
-		}
+	public function getDokumentCount($matcher) {
+		$sql = "SELECT	COUNT(`d`.`dokumentid`)
+			FROM	`dokument` `d`
+			WHERE	" . $this->parseDokumentMatcher($matcher);
 		return reset($this->getResult($sql)->fetchRow());
+	}
+	public function getDokumentResult($matcher, $limit = null, $offset = null) {
+		$sql = "SELECT	`d`.`dokumentid`,
+				`d`.`gliederungid`,
+				`d`.`dokumentkategorieid`,
+				`d`.`dokumentstatusid`,
+				`d`.`identifier`,
+				`d`.`label`,
+				`d`.`content`,
+				`d`.`data`,
+				`d`.`fileid`
+			FROM	`dokument` `d`
+			WHERE	" . $this->parseDokumentMatcher($matcher);
+		if ($limit !== null or $offset !== null) {
+			$sql .= " LIMIT ";
+			if ($offset !== null) {
+				$sql .= $offset . ",";
+			}
+			if ($limit !== null) {
+				$sql .= $limit;
+			}
+		}
+		return $this->getResult($sql, array($this, "parseDokument"));
 	}
 	public function getDokumentIdentifierMaxNumber($identifierPrefix, $identifierNumberCount) {
 		$identifierPrefixEscaped = str_replace(array("/", "%", "?", "_"), array("//", "/%", "/?", "/_"), $identifierPrefix);
@@ -1864,72 +1922,8 @@ abstract class SQLStorage extends AbstractStorage {
 		$row = $rslt->fetchRow();
 		return intval(substr($row["identifier"], strlen($identifierPrefix)));
 	}
-	public function getDokumentResult($gliederungids, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
-		if (empty($gliederungids)) {
-			return new EmptyStorageResult();
-		}
-		if ($dokumentkategorieid instanceof DokumentKategorie) {
-			$dokumentkategorieid = $dokumentkategorieid->getDokumentKategorieID();
-		}
-		if ($dokumentstatusid instanceof DokumentStatus) {
-			$dokumentstatusid = $dokumentstatusid->getDokumentStatusID();
-		}
-		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE `gliederungid` IN (" . implode(",", array_map("intval", $gliederungids)) . ")";
-		if ($dokumentkategorieid != null) {
-			$sql .= " AND `dokumentkategorieid` = " . intval($dokumentkategorieid);
-		}
-		if ($dokumentstatusid != null) {
-			$sql .= " AND `dokumentstatusid` = " . intval($dokumentstatusid);
-		}
-		if ($limit !== null or $offset !== null) {
-			$sql .= " LIMIT ";
-			if ($offset !== null) {
-				$sql .= $offset . ",";
-			}
-			if ($limit !== null) {
-				$sql .= $limit;
-			}
-		}
-		return $this->getResult($sql, array($this, "parseDokument"));
-	}
 	public function getDokumentByMitgliedResult($mitgliedid) {
 		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` LEFT JOIN `mitglieddokument` USING (`dokumentid`) WHERE `mitgliedid` = " . intval($mitgliedid);
-		return $this->getResult($sql, array($this, "parseDokument"));
-	}
-	public function getDokumentSearchResult($gliederungids, $querys, $limit = null, $offset = null) {
-		if (!is_array($querys)) {
-			$querys = array($querys);
-		}
-		if (empty($gliederungids) || count($querys) == 0) {
-			return new EmptyStorageResult();
-		}
-		$fields = array("`identifier`", "`label`", "`content`");
-		$wordclauses = array();
-		$escapedwords = array();
-		foreach ($querys as $word) {
-			$escapedwords[] = $this->escape($word);
-			$clauses = array();
-			foreach ($fields as $field) {
-				$clauses[] = $field . " LIKE '%" . $this->escape($word) . "%'";
-			}
-			$wordclauses[] = implode(" OR ", $clauses);
-		}
-		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument`
-			WHERE `gliederungid` IN (" . implode(",", array_map("intval", $gliederungids)) . ") AND (
-				(" . implode(") AND (", $wordclauses) . ") OR `dokumentid` IN
-					(SELECT `dokumentid` FROM `dokumentnotizen` WHERE
-						(`nextlabel` LIKE '%" . implode("%' AND `nextlabel` LIKE '%", $escapedwords) . "%') OR
-						(`nextidentifier` LIKE '%" . implode("%' AND `nextidentifier` LIKE '%", $escapedwords) . "%') OR
-						(`kommentar` LIKE '%" . implode("%' AND `kommentar` LIKE '%", $escapedwords) . "%') ))";
-		if ($limit !== null or $offset !== null) {
-			$sql .= " LIMIT ";
-			if ($offset !== null) {
-				$sql .= $offset . ",";
-			}
-			if ($limit !== null) {
-				$sql .= $limit;
-			}
-		}
 		return $this->getResult($sql, array($this, "parseDokument"));
 	}
 	public function getDokument($dokumentid) {

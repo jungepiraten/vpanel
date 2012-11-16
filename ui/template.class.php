@@ -520,6 +520,17 @@ class Template {
 		return $row;
 	}
 
+	protected function parseDokumentFilter($filter) {
+		$row = array();
+		$row["filterid"] = $filter->getFilterID();
+		$row["label"] = $filter->getLabel();
+		return $row;
+	}
+
+	protected function parseDokumentFilters($rows) {
+		return array_map(array($this, 'parseDokumentFilter'), $rows);
+	}
+
 	protected function parseDokumentTemplates($rows) {
 		return array_map(array($this, 'parseDokumentTemplate'), $rows);
 	}

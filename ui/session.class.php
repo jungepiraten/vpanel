@@ -27,6 +27,11 @@ interface Session {
 	public function hasMitgliederMatcher($filterid);
 	public function getMitgliederMatcher($filterid);
 
+	public function addDokumentMatcher($matcher);
+	public function getDokumentFilter($filterid);
+	public function hasDokumentMatcher($filterid);
+	public function getDokumentMatcher($filterid);
+
 	public function hasVariable($name);
 	public function hasFileVariable($name);
 	public function getVariable($name);
@@ -194,6 +199,28 @@ abstract class AbstractSession implements Session {
 	}
 	public function getMitgliederMatcher($filterid) {
 		$filter = $this->getMitgliederFilter($filterid);
+		if ($filter == null) {
+			return null;
+		}
+		return $filter->getMatcher();
+	}
+
+	public function addDokumentMatcher($matcher) {
+		$id = "custom" . substr(md5(microtime(true) . "-" . rand(1000,9999)),0,8);
+		$this->setSessionValue("dokumentfilter_" . $id, new DokumentFilter($id, "Userdefined #" . $id, null, null, $matcher));
+		return $this->getDokumentFilter($id);
+	}
+	public function getDokumentFilter($filterid) {
+		if ($this->hasSessionValue("dokumentfilter_" . $filterid)) {
+			return $this->getSessionValue("dokumentfilter_" . $filterid);
+		}
+		return $this->getStorage()->getDokumentFilter($filterid);
+	}
+	public function hasDokumentMatcher($filterid) {
+		return $this->getDokumentFilter($filterid) != null;
+	}
+	public function getDokumentMatcher($filterid) {
+		$filter = $this->getDokumentFilter($filterid);
 		if ($filter == null) {
 			return null;
 		}

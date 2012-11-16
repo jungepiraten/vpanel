@@ -77,8 +77,6 @@ interface Storage {
 
 	public function getMitgliederResult($filter = null, $limit = null, $offset = null);
 	public function getMitgliederList($filter = null, $limit = null, $offset = null);
-	public function getMitgliederByDokumentResult($dokumentid);
-	public function getMitgliederByDokumentList($dokumentid);
 	public function getMitglied($mitgliedid);
 	public function getMitgliederCount($filter = null);
 	public function setMitglied($mitgliedid, $globalid, $eintritt, $austritt);
@@ -189,14 +187,10 @@ interface Storage {
 	public function setProcess($processid, $userid, $type, $typedata, $progess, $queued, $started, $finished, $finishedpage);
 	public function delProcess($processid);
 
-	public function getDokumentResult($gliederungids, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
-	public function getDokumentList($gliederungids, $dokumentkategorieid = null, $dokumentstatus = null, $limit = null, $offset = null);
-	public function getDokumentByMitgliedResult($mitgliedid);
-	public function getDokumentByMitgliedList($mitgliedid);
+	public function getDokumentResult($matcher, $limit = null, $offset = null);
+	public function getDokumentList($matcher, $limit = null, $offset = null);
 	public function getDokumentIdentifierMaxNumber($identifierPrefix, $identifierNumberLength);
-	public function getDokumentSearchResult($gliederungids, $query, $limit = null, $offset = null);
-	public function getDokumentSearchList($gliederungids, $query, $limit = null, $offset = null);
-	public function getDokumentCount($gliederungids, $dokumentkategorieid = null, $dokumentstatus = null);
+	public function getDokumentCount($matcher);
 	public function getDokument($dokumentid);
 	public function setDokument($dokumentid, $gliederungid, $dokumentkategorieid, $dokumentstatus, $identifier, $label, $content, $data, $fileid);
 	public function delDokument($dokumentid);
@@ -271,6 +265,10 @@ interface Storage {
 	public function hasDokumentTemplate($templateid);
 	public function getDokumentTemplate($templateid);
 
+	public function getDokumentFilterList($session = null);
+	public function hasDokumentFilter($filterid);
+	public function getDokumentFilter($filterid);
+
 	public function getSingleDokumentTransitionList($session, $dokument);
 	public function getMultiDokumentTransitionList($session, $kategorieid, $statusid);
 	public function hasDokumentTransition($transitionid);
@@ -344,10 +342,6 @@ abstract class AbstractStorage implements Storage {
 
 	public function getMitgliederList($filter = null, $limit = null, $offset = null) {
 		return $this->getMitgliederResult($filter, $limit, $offset)->fetchAll();
-	}
-
-	public function getMitgliederByDokumentList($dokumentid) {
-		return $this->getMitgliederByDokumentResult($dokumentid)->fetchAll();
 	}
 
 	public function getMitgliedFlagList() {
@@ -426,16 +420,8 @@ abstract class AbstractStorage implements Storage {
 		return $this->getProcessResult()->fetchAll();
 	}
 
-	public function getDokumentList($gliederungids, $dokumentkategorieid = null, $dokumentstatusid = null, $limit = null, $offset = null) {
-		return $this->getDokumentResult($gliederungids, $dokumentkategorieid, $dokumentstatusid, $limit, $offset)->fetchAll();
-	}
-
-	public function getDokumentByMitgliedList($mitgliedid) {
-		return $this->getDokumentByMitgliedResult($mitgliedid)->fetchAll();
-	}
-
-	public function getDokumentSearchList($gliederungids, $query, $limit = null, $offset = null) {
-		return $this->getDokumentSearchResult($gliederungids, $query, $limit = null, $offset = null)->fetchAll();
+	public function getDokumentList($matcher, $limit = null, $offset = null) {
+		return $this->getDokumentResult($matcher, $limit, $offset)->fetchAll();
 	}
 
 	public function getDokumentDokumentFlagList($dokumentid) {
@@ -510,7 +496,7 @@ abstract class AbstractStorage implements Storage {
 		$this->mitgliedertemplates[$template->getMitgliedTemplateID()] = $template;
 	}
 
-	/** Filter **/
+	/** MitgliederFilter **/
 	private $mitgliederfilters = array();
 	public function getMitgliederFilterList($session = null) {
 		if ($session == null) {
@@ -538,7 +524,7 @@ abstract class AbstractStorage implements Storage {
 		$this->mitgliederfilters[$filter->getFilterID()] = $filter;
 	}
 
-	/** FilterAction **/
+	/** MitgliederFilterAction **/
 	private $mitgliederfilteractions = array();
 	public function getMitgliederFilterActionList($session = null) {
 		if ($session == null) {
@@ -564,6 +550,34 @@ abstract class AbstractStorage implements Storage {
 	public function registerMitgliederFilterAction($action) {
 		$action->setStorage($this);
 		$this->mitgliederfilteractions[$action->getActionID()] = $action;
+	}
+
+	/** DokumentFilter **/
+	private $dokumentfilters = array();
+	public function getDokumentFilterList($session = null) {
+		if ($session == null) {
+			return $this->dokumentfilters;
+		}
+		$filters = array();
+		foreach ($this->getDokumentFilterList() as $filter) {
+			if ($filter->isAllowed($session)) {
+				$filters[] = $filter;
+			}
+		}
+		return $filters;
+	}
+	public function hasDokumentFilter($filterid) {
+		return isset($this->dokumentfilters[$filterid]);
+	}
+	public function getDokumentFilter($filterid) {
+		if (!$this->hasDokumentFilter($filterid)) {
+			return null;
+		}
+		return $this->dokumentfilters[$filterid];
+	}
+	public function registerDokumentFilter($filter) {
+		$filter->setStorage($this);
+		$this->dokumentfilters[$filter->getFilterID()] = $filter;
 	}
 
 	/** DokumentTemplates **/
