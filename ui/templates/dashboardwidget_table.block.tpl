@@ -1,4 +1,4 @@
-<div class="pagination" id="widgetpagination-{$widget.widgetid}">
+<div class="pagination" id="widgetpagination-{$widget.widgetid}" style="margin:0px;">
 	<ul>
 		<li class="prev"><a href="#">&lt;</a></li>
 		<li class="cur disabled active"><a href="#">&nbsp;</a></li>
@@ -54,8 +54,10 @@ function initWidgetTable_{/literal}{$widget.widgetid}{literal}(options) {
 		var pagination = $("#widgetpagination-{/literal}{$widget.widgetid}{literal}");
 		pagination.find(".cur a").text(widgetOptions_{/literal}{$widget.widgetid}{literal}.page + 1);
 		pagination.find(".prev").unbind("click").toggleClass("disabled", widgetOptions_{/literal}{$widget.widgetid}{literal}.page <= 0).click(function () {
-			widgetOptions_{/literal}{$widget.widgetid}{literal}.page--;
-			initWidgetTable_{/literal}{$widget.widgetid}{literal}(options);
+			if (! $(this).hasClass("disabled")) {
+				widgetOptions_{/literal}{$widget.widgetid}{literal}.page--;
+				initWidgetTable_{/literal}{$widget.widgetid}{literal}(options);
+			}
 			return false;
 		});
 		pagination.find(".next").unbind("click").click(function () {
