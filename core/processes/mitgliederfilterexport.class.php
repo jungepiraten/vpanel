@@ -139,7 +139,7 @@ abstract class TempFileExportStreamHandler extends ExportStreamHandler {
 	protected function getFile() {
 		return $this->getTempFile()->getFile();
 	}
-	
+
 	public function delete() {
 		if ($this->tempfile != null) {
 			$this->tempfile->delete();
@@ -166,10 +166,6 @@ class CSVTempFileExportStreamHandler extends TempFileExportStreamHandler {
 
 	public function closeFile() {
 		fclose($this->handler);
-	}
-
-	public function delete() {
-		$this->getFile()->delete();
 	}
 }
 
