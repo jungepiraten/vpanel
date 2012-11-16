@@ -9,7 +9,10 @@ if (!$session->isSignedIn()) {
 	exit;
 }
 
-$notizen = $session->getStorage()->getDokumentNotizListTimeline($session->getAllowedGliederungIDs("dokumente_show"), 0, 10);
+$pagesize = 10;
+$offset = $session->getVariable("page") * $pagesize;
+
+$notizen = $session->getStorage()->getDokumentNotizListTimeline($session->getAllowedGliederungIDs("dokumente_show"), $offset, $pagesize);
 $jsons = array();
 
 foreach ($notizen AS $notiz) {

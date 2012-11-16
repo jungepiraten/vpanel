@@ -9,7 +9,10 @@ if (!$session->isSignedIn()) {
 	exit;
 }
 
-$revisionen = $session->getStorage()->getMitgliederRevisionListTimeline($session->getAllowedGliederungIDs("mitglieder_show"), 0, 10);
+$pagesize = 10;
+$offset = $session->getVariable("page") * $pagesize;
+
+$revisionen = $session->getStorage()->getMitgliederRevisionListTimeline($session->getAllowedGliederungIDs("mitglieder_show"), $offset, $pagesize);
 $jsons = array();
 
 foreach ($revisionen as $revision) {

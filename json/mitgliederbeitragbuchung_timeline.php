@@ -9,7 +9,10 @@ if (!$session->isSignedIn()) {
 	exit;
 }
 
-$buchungen = $session->getStorage()->getMitgliederBeitragBuchungListTimeline($session->getAllowedGliederungIDs("mitglieder_show"), 0, 10);
+$pagesize = 10;
+$offset = $session->getVariable("page") * $pagesize;
+
+$buchungen = $session->getStorage()->getMitgliederBeitragBuchungListTimeline($session->getAllowedGliederungIDs("mitglieder_show"), $offset, $pagesize);
 $jsons = array();
 
 foreach ($buchungen as $buchung) {
