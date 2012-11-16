@@ -3,13 +3,8 @@
 <div>
 <div class="row-fluid">
 	<div class="span6">
-		<button class="btn" onclick="$(this).parent().html($('<iframe>').attr('src','{"dokumente_view"|___:$dokument.dokumentid}').attr('width','100%').attr('height','350px'));">Vorschau anzeigen</button>
-	</div>
-	<div class="span6">
 		{include file="dokumentform.block.tpl" dokument=$dokument dokumentkategorien=$dokumentkategorien dokumentstatuslist=$dokumentstatuslist}
 	</div>
-</div>
-<div class="row-fluid">
 	<div class="span6">
 		<div class="btn-toolbar">
 			<div class="btn-group">
@@ -25,8 +20,7 @@
 			</div>
 		</div>
 		{include file="mitgliederlist.block.tpl" mitglieder=$mitglieder showmitglieddokumentdel=1}
-	</div>
-	<div class="span6">
+
 		{foreach from=$dokumentnotizen item=notiz}
 		<div class="well">
 			<span class="meta">{"Von %s"|__:$notiz.author.username}</span>

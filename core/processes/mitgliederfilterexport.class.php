@@ -31,7 +31,7 @@ class MitgliederFilterExportProcess extends MitgliederFilterProcess {
 		$streamhandler->setProcess($this);
 		$this->streamhandler = $streamhandler;
 	}
-	
+
 	protected function getData() {
 		$data = parent::getData();
 		$data["streamhandler_class"] = get_class($this->getStreamHandler());
