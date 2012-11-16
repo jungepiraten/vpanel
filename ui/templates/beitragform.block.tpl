@@ -8,9 +8,11 @@
 		</div>
 		<div class="control-group">
 			<label class="control-label" for="hoehe">{"Beitrag:"|__}</label>
-			<div class="input-append controls">
-				<input type="text" name="hoehe" value="{if isset($beitrag) && $beitrag.hoehe != null}{$beitrag.hoehe|string_format:"%.2f"}{/if}" class="input-small"/>
-				<span class="add-on">EUR</span>
+			<div class="controls">
+				<div class="input-append">
+					<input type="text" name="hoehe" value="{if isset($beitrag) && $beitrag.hoehe != null}{$beitrag.hoehe|string_format:"%.2f"}{/if}" class="input-small"/>
+					<span class="add-on">EUR</span>
+				</div>
 			</div>
 		</div>
 		<div class="control-group">

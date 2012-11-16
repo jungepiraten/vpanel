@@ -158,6 +158,6 @@ $(function() {
 </style>
 {/literal}
  <fieldset class="suche">
-  <input type="text" id="dokumentsuche{$rand}" name="dokumentsuche" autocomplete="off" {if isset($smarty.request.dokumentsuche)}value="{$smarty.request.dokumentsuche|escape:html}"{/if} class="span2"/>
+  <input type="text" id="dokumentsuche{$rand}" name="dokumentsuche" autocomplete="off" {if isset($smarty.request.dokumentsuche)}value="{$smarty.request.dokumentsuche|escape:html}"{/if} />
   <div id="dropdowndokumentsuche{$rand}"><ul></ul></div>
  </fieldset>

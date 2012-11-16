@@ -18,7 +18,7 @@ function doNav(url) {
 </head>
 <body>
 <div class="container-fluid">
-	<div class="navbar navbar-fixed-top">
+	<div class="navbar navbar-fixed-top navbar-inverse">
 		<div class="navbar-inner">
 			<div class="container-fluid">
 				<a class="brand" href="{"index"|___}"><span style="color:#ff8d00; font-weight:bolder;">V</span>Panel</a>

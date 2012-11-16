@@ -57,7 +57,7 @@
    <div class="control-group">
     <label class="control-label" for="anrede">{"Anrede:"|__}</label>
     <div class="controls">
-     <input type="text" name="anrede" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.anrede|escape:html}{else}{$data.anrede|escape:html}{/if}" class="span1" />
+     <input type="text" name="anrede" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.anrede|escape:html}{else}{$data.anrede|escape:html}{/if}" style="width:4em;" />
     </div>
    </div>
 
@@ -105,14 +105,14 @@
     <label class="control-label" for="strasse">{"Adresse:"|__}</label>
     <div class="controls">
         <input type="text" name="strasse" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.strasse|escape:html}{else}{$data.strasse|escape:html}{/if}" />
-        <input type="text" name="hausnummer" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.hausnummer|escape:html}{else}{$data.hausnummer|escape:html}{/if}" class="span1" />
+        <input type="text" name="hausnummer" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.hausnummer|escape:html}{else}{$data.hausnummer|escape:html}{/if}" style="width:4em;" />
     </div>
 </div>
 
 <div class="control-group">
     <label class="control-label" for="strasse">{"Ort:"|__}</label>
     <div class="controls">
-        <input type="text" name="plz" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.plz|escape:html}{else}{$data.plz|escape:html}{/if}" autocomplete="off" class="span1" />
+        <input type="text" name="plz" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.plz|escape:html}{else}{$data.plz|escape:html}{/if}" autocomplete="off" style="width:4em;" />
         <input type="text" name="ort" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.ort.label|escape:html}{else}{$data.ort|escape:html}{/if}" autocomplete="off" />
         <select name="stateid">
          <option value="">&nbsp;</option>
@@ -153,11 +153,11 @@
 
 <div class="control-group">
     <label class="control-label" for="beitrag">{"Beitrag:"|__}</label>
-    <div class="controls input-append">
-        <input type="text" name="beitrag" value="{if isset($mitgliedrevision)}{$mitgliedrevision.beitrag|string_format:"%.2f"|escape:html}
-                                                 {elseif $data.beitrag != null}{$data.beitrag|string_format:"%.2f"|escape:html}
-                                                 {elseif isset($mitgliedtemplate)}{$mitgliedtemplate.beitrag|string_format:"%.2f"|escape:html}{/if}" class="span1" />
-        <span class="add-on">EUR</span>
+    <div class="controls">
+        <div class="input-append">
+            <input type="text" name="beitrag" value="{if isset($mitgliedrevision)}{$mitgliedrevision.beitrag|string_format:"%.2f"|escape:html}{elseif $data.beitrag != null}{$data.beitrag|string_format:"%.2f"|escape:html}{elseif isset($mitgliedtemplate)}{$mitgliedtemplate.beitrag|string_format:"%.2f"|escape:html}{/if}" style="width:4em;text-align:right;" />
+            <span class="add-on">EUR</span>
+        </div>
     </div>
 </div>
 
