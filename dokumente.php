@@ -133,6 +133,11 @@ case "create":
 case "details":
 	$dokument = $session->getStorage()->getDokument($session->getIntVariable("dokumentid"));
 
+	if ($dokument === null) {
+		$ui->redirect();
+		exit;
+	}
+
 	if (!$session->isAllowed("dokumente_show", $dokument->getGliederungID())) {
 		$ui->viewLogin();
 		exit;
@@ -201,7 +206,7 @@ case "delete":
 
 	$dokument->delete();
 
-	$ui->redirect();
+	$ui->redirect($session->getLink("dokumente"));
 	exit;
 default:
 	if ($session->hasVariable("gliederungid")) {
