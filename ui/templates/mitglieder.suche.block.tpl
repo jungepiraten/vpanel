@@ -42,14 +42,14 @@ VPanel_DropdownMitgliederSuche.prototype = {
 				this._prev();
 				break;
 			case 13: //enter
-				if(this.current >= 0 && this.current < this.data.length) {
+				if (this.active && this.current >= 0 && this.current < this.data.length) {
 					{/literal}{if isset($mitgliedsuchehandler)}{$mitgliedsuchehandler}(this.data[this.current]);{else}location.href = this.data[this.current].location;{/if}{literal}
 					this._close();
 					e.preventDefault();
 				}
 				break;
 			case 27: //esc
-				this.inputq.blur();
+				this._close();
 				break;
 			default:
 				this.ignoreKey = false;
@@ -130,14 +130,12 @@ VPanel_DropdownMitgliederSuche.prototype = {
 		this._renderData(data);
 		this._select(0);
 		this.overlay.show();
-		if(!this.active) {
-			this.active = true;
-			//this..focus();
-		}
+		this.active = true;
 	},
 	_close: function() {
 		this._cancel();
-		this.overlay.hide();	
+		this.overlay.hide();
+		this.active = false;
 	}
 }
 
