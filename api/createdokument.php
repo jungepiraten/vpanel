@@ -6,14 +6,14 @@ $session = $config->getSession(true);
 $api = $session->getTemplate();
 
 if (!$session->isSignedIn()) {
-	$api->output(array("failed" => "AUTH_MISSING"));
+	$api->output(array("failed" => "AUTH_MISSING"), 401);
 	exit;
 }
 
 $dokumenttemplate = $session->getStorage()->getDokumentTemplate($session->getVariable("dokumenttemplateid"));
 
 if ($dokumenttemplate == null) {
-	$api->output(array("failed" => "DOKUMENTTEMPLATE_MISSING"));
+	$api->output(array("failed" => "DOKUMENTTEMPLATE_MISSING"), 400);
 	exit;
 }
 
@@ -24,12 +24,12 @@ $statusid = $dokumenttemplate->getDokumentStatusID($session);
 $file = $dokumenttemplate->getDokumentFile($session);
 
 if (!$session->isAllowed("dokumente_create", $gliederungid)) {
-	$api->output(array("failed" => "PERMISSION_DENIED"));
+	$api->output(array("failed" => "PERMISSION_DENIED"), 403);
 	exit;
 }
 
 if ($file == null) {
-	$api->output(array("failed" => "FILE_MISSING"));
+	$api->output(array("failed" => "FILE_MISSING"), 400);
 } else {
 	$dokument = new Dokument($session->getStorage());
 	$dokument->setGliederungID($gliederungid);

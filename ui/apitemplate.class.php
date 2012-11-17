@@ -7,7 +7,7 @@ class APITemplate {
 		$this->session = $session;
 	}
 
-	public function output($result = null) {
+	public function output($result = null, $httpcode = 200) {
 		$data = array();
 		if ($this->session->isActive()) {
 			$data["sessionid"] = $this->session->getSessionID();
@@ -16,6 +16,7 @@ class APITemplate {
 		if ($result != null) {
 			$data["result"] = $result;
 		}
+		header("Status: " . $httpcode, true, $httpcode);
 		print(json_encode($data));
 	}
 }

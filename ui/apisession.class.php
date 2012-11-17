@@ -55,7 +55,10 @@ class APISession extends AbstractHTTPSession {
 	}
 
 	public function getChallenge() {
-		return $this->getSessionValue("challenge");
+		if ($this->hasSessionValue("challenge")) {
+			return $this->getSessionValue("challenge");
+		}
+		return null;
 	}
 
 	private function getAuthhash() {
