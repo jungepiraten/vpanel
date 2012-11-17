@@ -78,7 +78,7 @@ $config->registerPage("mailtemplateattachment_create", "mailtemplates.php?mode=c
 $config->registerPage("mailtemplateattachment_delete", "mailtemplates.php?mode=deleteattachment&templateid=%d&fileid=%d");
 $config->registerPage("mailtemplateattachment_get", "file.php?mode=get&mailtemplateid?%d&fileid=%d");
 
-$config->registerPage("statistik", "statistik.php");
+$config->registerPage("stats", "stats.php");
 
 $config->registerPage("file_tokenget", "file.php?mode=get&fileid=%d&token=%s");
 

@@ -61,8 +61,8 @@ function doNav(url) {
 					{if $session->isAllowed("mailtemplates_show")}
 						<li {if $menupunkt == "mail"}class="active"{/if}><a href="{"mailtemplates"|___}">{"Mailverwaltung"|__}</a></li>
 					{/if}
-					{if $session->isAllowed("statistik_show")}
-						<li {if $menupunkt == "statistik"}class="active"{/if}><a href="{"statistik"|___}">{"Mitgliederstatistik"|__}</a></li>
+					{if $session->isAllowed("stats_show")}
+						<li {if $menupunkt == "stats"}class="active"{/if}><a href="{"stats"|___}">{"Mitgliederstats"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("dokumente_show")}
 						<li class="nav-header">Dokumentensuche</li>

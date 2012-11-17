@@ -1,4 +1,4 @@
-{include file="header.html.tpl" ansicht="Mitgliederstatistik" menupunkt="statistik"}
+{include file="header.html.tpl" ansicht="Mitgliederstatistik" menupunkt="stats"}
 <p>Insgesamt <strong>{$mitgliedercount}</strong> Mitglieder.</p>
 
 <h2>Aufteilung nach Mitgliedschaften</h2>

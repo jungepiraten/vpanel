@@ -896,9 +896,9 @@ class Template {
 		}
 		$this->smarty->assign("action", $this->parseMitgliederFilterAction($action));
 		$this->smarty->assign("process", $this->parseProcess($process));
-		if ($action instanceof StatistikMitgliederFilterAction) {
+		if ($action instanceof StatsMitgliederFilterAction) {
 			$this->smarty->assign("tempfiles", $this->parseTempFiles($result["tempfiles"]));
-			$this->smarty->display("mitgliederstatistik.html.tpl");
+			$this->smarty->display("mitgliederstats.html.tpl");
 			return;
 		}
 		if ($action instanceof CalculateBeitragMitgliederFilterAction) {
@@ -913,13 +913,13 @@ class Template {
 		}
 	}
 
-	public function viewStatistik($mitgliedercount, $mitgliedschaften, $countPerMitgliedschaft, $states, $countPerState) {
+	public function viewStats($mitgliedercount, $mitgliedschaften, $countPerMitgliedschaft, $states, $countPerState) {
 		$this->smarty->assign("mitgliedercount", $mitgliedercount);
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
 		$this->smarty->assign("mitgliedercountPerMitgliedschaft", $countPerMitgliedschaft);
 		$this->smarty->assign("states", $this->parseStates($states));
 		$this->smarty->assign("mitgliedercountPerState", $countPerState);
-		$this->smarty->display("statistik.html.tpl");
+		$this->smarty->display("stats.html.tpl");
 	}
 
 	public function viewProcess($process) {
