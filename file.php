@@ -15,6 +15,10 @@ if ($session->hasVariable("tempfileid")) {
 	$tempfileid = $session->getIntVariable("tempfileid");
 	$tempfile = $session->getStorage()->getTempFile($tempfileid);
 
+	if ($tempfile === null) {
+		die("<h1>404 Not Found</h1>");
+	}
+
 	if (!$tempfile->isAllowed($session->getUser())) {
 		die("<h1>403 Forbidden</h1>");
 	}
@@ -22,6 +26,10 @@ if ($session->hasVariable("tempfileid")) {
 	$file = $tempfile->getFile();
 } elseif ($session->hasVariable("dokumentid")) {
 	$dokument = $session->getStorage()->getDokument($session->getIntVariable("dokumentid"));
+
+	if ($dokument === null) {
+		die("<h1>404 Not Found</h1>");
+	}
 
 	if (!$session->isAllowed("dokumente_show", $dokument->getGliederungID())) {
 		die("<h1>403 Forbidden</h1>");
@@ -37,7 +45,7 @@ if ($session->hasVariable("tempfileid")) {
 } elseif ($session->hasVariable("fileid") && $session->hasVariable("token")) {
 	$file = $session->getStorage()->getFile($session->getVariable("fileid"));
 	$token = $session->getVariable("token");
-	
+
 	if (!$session->validToken($session->getFileTokenKey($file), $token)) {
 		die("<h1>403 Forbidden</h1>");
 	}
@@ -46,7 +54,7 @@ if ($session->hasVariable("tempfileid")) {
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
 case "view":
 	$token = $session->generateToken($session->getFileTokenKey($file));
-	
+
 	if (substr($file->getMimeType(),0,5) == "image") {
 		$ui->viewFileImagePreview($file, $token);
 		exit;
