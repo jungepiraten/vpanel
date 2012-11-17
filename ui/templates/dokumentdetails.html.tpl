@@ -23,15 +23,16 @@
 
 		{foreach from=$dokumentnotizen item=notiz}
 		<div class="well">
-			<span class="meta">{"Von %s"|__:$notiz.author.username}</span>
-			{include file="timestamp.tpl" timestamp=$notiz.timestamp}
-			{if isset($notiz.nextkategorie)}<span class="nextkategorie">{"Unter %s abgelegt"|__:$notiz.nextkategorie.label}</span>{/if}
-			{if isset($notiz.nextstatus)}<span class="nextstatus">{"Als %s markiert"|__:$notiz.nextstatus.label}</span>{/if}
-			{if isset($notiz.nextlabel)}<span class="nextlabel">{"In %s umbenannt"|__:$notiz.nextlabel}</span>{/if}
-			{if isset($notiz.nextidentifier)}<span class="nextidentifier">{"Als %s abgeheftet"|__:$notiz.nextidentifier}</span>{/if}
-			{foreach from=$notiz.addFlags item=flag}<span class="nextaddflag">{$flag.label|escape:html} hinzugef&uuml;gt</span>{/foreach}
-			{foreach from=$notiz.delFlags item=flag}<span class="nextdelflag">{$flag.label|escape:html} entfernt</span>{/foreach}
-			<div class="kommentar">{$notiz.kommentar}</div>
+			<ul style="font-size:0.8em; list-style-type:square;">
+				<li class="meta">{"Von %s"|__:$notiz.author.username} {include file="timestamp.tpl" timestamp=$notiz.timestamp}</li>
+				{if isset($notiz.nextkategorie)}<li class="nextkategorie">{"Unter %s abgelegt"|__:$notiz.nextkategorie.label}</li>{/if}
+				{if isset($notiz.nextstatus)}<li class="nextstatus">{"Als %s markiert"|__:$notiz.nextstatus.label}</li>{/if}
+				{if isset($notiz.nextlabel)}<li class="nextlabel">{"In %s umbenannt"|__:$notiz.nextlabel}</li>{/if}
+				{if isset($notiz.nextidentifier)}<li class="nextidentifier">{"Als %s abgeheftet"|__:$notiz.nextidentifier}</li>{/if}
+				{foreach from=$notiz.addFlags item=flag}<li class="nextaddflag">{$flag.label|escape:html} hinzugef&uuml;gt</li>{/foreach}
+				{foreach from=$notiz.delFlags item=flag}<li class="nextdelflag">{$flag.label|escape:html} entfernt</li>{/foreach}
+			</ul>
+			<div class="kommentar" style="margin-top:0.5em;">{$notiz.kommentar}</div>
 		</div>
 		{/foreach}
 	</div>
