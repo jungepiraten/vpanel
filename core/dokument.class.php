@@ -225,7 +225,7 @@ class Dokument extends StorageClass {
 		foreach ($notizen as $notiz) {
 			$notiz->delete($storage);
 		}
-		$mitglieder = $storage->getMitgliederList(new DokumentMitgliedMatcher($this->getDokumentID()));
+		$mitglieder = $storage->getMitgliederList(new DokumentMitgliederMatcher($this->getDokumentID()));
 		foreach ($mitglieder as $mitglied) {
 			$storage->delMitgliedDokument($mitglied->getMitgliedID(), $this->getDokumentID());
 		}
