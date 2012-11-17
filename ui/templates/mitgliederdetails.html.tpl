@@ -205,7 +205,7 @@ $(function () {
 							<div class="control-group">
 								<label class="control-label" for="timestamp">{"Erhalten:"|__}</label>
 								<div class="controls">
-									<input type="text" class="span2" name="timestamp" value="{$smarty.now|date_format:"%d.%m.%Y"}" />
+									<input type="date" name="timestamp" value="{$smarty.now|date_format:"%Y-%m-%d"}" />
 								</div>
 							</div>
 							<div class="control-group">
