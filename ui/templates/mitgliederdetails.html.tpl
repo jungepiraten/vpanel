@@ -131,9 +131,11 @@ $(function () {
 						</div>
 						<div class="control-group">
 							<label class="control-label" for="beitrag_neu_hoehe">{"Höhe:"|__}</label>
-							<div class="controls input-append">
-								<input type="text" class="span1" name="beitrag_neu_hoehe" id="beitrag_neu_hoehe" />
-								<span class="add-on">EUR</span>
+							<div class="controls">
+								<div class="input-append">
+									<input type="text" class="input-small" name="beitrag_neu_hoehe" id="beitrag_neu_hoehe" />
+									<span class="add-on">EUR</span>
+								</div>
 							</div>
 						</div>
 					</fieldset>
@@ -157,7 +159,7 @@ $(function () {
 									<th><a href="javascript:showMitgliederBeitraegePane('{$beitrag.beitrag.beitragid}')">{$beitrag.beitrag.label|escape:html}</a></th>
 									<td>
 										<div class="input-append">
-											<input type="text" class="span1" name="beitraege_hoehe[{$beitrag.beitrag.beitragid}]" value="{$beitrag.hoehe|string_format:"%.2f"}" />
+											<input type="text" class="input-small" name="beitraege_hoehe[{$beitrag.beitrag.beitragid}]" value="{$beitrag.hoehe|string_format:"%.2f"}" />
 											<span class="add-on">EUR</span>
 										</div>
 									</td>
@@ -214,9 +216,11 @@ $(function () {
 							</div>
 							<div class="control-group">
 								<label class="control-label" for="hoehe">{"Betrag:"|__}</label>
-								<div class="input-append controls">
-									<input type="text" class="span1" name="hoehe" value="{$beitrag.hoehe-$beitrag.bezahlt}" />
-									<span class="add-on">EUR</span>
+								<div class="controls">
+									<div class="input-append">
+										<input type="text" class="input-small" name="hoehe" value="{$beitrag.hoehe-$beitrag.bezahlt}" />
+										<span class="add-on">EUR</span>
+									</div>
 								</div>
 							</div>
 							<div class="control-group">
