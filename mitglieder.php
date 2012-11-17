@@ -166,17 +166,18 @@ function parseMitgliederBeitraegeFormular($ui, $session, &$mitglied) {
 }
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
-case "statistik":
+case "stats":
 	if (!$session->isAllowed("mitglieder_show")) {
 		$ui->viewLogin();
 		exit;
 	}
 
 	$process = $session->getStorage()->getProcess($session->getVariable("processid"));
-	if ($process instanceof MitgliederFilterStatistikProcess) {
-		$ui->viewMitgliederStatistik($process);
+	if ($process instanceof MitgliederFilterStatsProcess) {
+		$ui->viewMitgliederStats($process);
 	}
 	break;
+
 case "beitraege":
 	$mitgliedid = intval($session->getVariable("mitgliedid"));
 	$mitglied = $session->getStorage()->getMitglied($mitgliedid);
@@ -212,6 +213,7 @@ case "beitraege":
 
 	$ui->redirect();
 	break;
+
 case "beitragdelete":
 	$beitrag = $session->getStorage()->getMitgliederBeitrag($session->getIntVariable("mitgliedbeitragid"));
 
@@ -224,6 +226,7 @@ case "beitragdelete":
 	
 	$ui->redirect();
 	break;
+
 case "beitraege_buchungen":
 	$beitrag = $session->getStorage()->getMitgliederBeitrag($session->getIntVariable("mitgliedbeitragid"));
 	$buchungen = $beitrag->getBuchungen();
@@ -262,6 +265,7 @@ case "beitraege_buchungen":
 
 	$ui->redirect();
 	break;
+
 case "beitraege_buchungen_delete":
 	$buchung = $session->getStorage()->getMitgliederBeitragBuchung($session->getIntVariable("buchungid"));
 
@@ -273,6 +277,7 @@ case "beitraege_buchungen_delete":
 	$buchung->delete();
 	$ui->redirect();
 	break;
+
 case "details":
 	if ($session->hasVariable("revisionid")) {
 		$revisionid = intval($session->getVariable("revisionid"));
@@ -317,6 +322,7 @@ case "details":
 
 	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $mailtemplates, $filteractions, $states, $mitgliederflags, $mitgliedertextfields, $beitraege);
 	exit;
+
 case "create":
 	$data = array();
 
@@ -353,6 +359,7 @@ case "create":
 
 	$ui->viewMitgliedCreate($template, $dokument, $data, $gliederungen, $mitgliedschaften, $mailtemplates, $states, $mitgliederflags, $mitgliedertextfields);
 	exit;
+
 case "filteraction":
 	$filteraction = $session->getStorage()->getMitgliederFilterAction($session->getVariable("actionid"));
 
@@ -367,6 +374,7 @@ case "filteraction":
 	$result = $filteraction->execute($config, $session, $filter, $matcher);
 	$ui->viewMitgliederFilterAction($filteraction, $filter, $matcher, $result);
 	exit;
+
 case "filterprocess":
 	$filteraction = $session->getStorage()->getMitgliederFilterAction($session->getVariable("actionid"));
 	$process = $session->getStorage()->getProcess($session->getVariable("processid"));
@@ -379,6 +387,7 @@ case "filterprocess":
 	$result = $filteraction->show($config, $session, $process);
 	$ui->viewMitgliederFilterProcess($filteraction, $process, $result);
 	exit;
+
 case "composefilter":
 	function buildComposedMatcher($session, $filter, $id) {
 		if (!isset($filter[$id])) {
@@ -455,6 +464,7 @@ case "composefilter":
 	$flags = $session->getStorage()->getMitgliedFlagList();
 	$ui->viewMitgliederComposeFilter($filters, $flags);
 	exit;
+
 default:
 	$filter = null;
 

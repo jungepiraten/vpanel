@@ -6,7 +6,7 @@ require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
 $ui = $session->getTemplate();
 
-if (!$session->isAllowed("statistik_show")) {
+if (!$session->isAllowed("stats_show")) {
 	$ui->viewLogin();
 	exit;
 }
@@ -37,6 +37,6 @@ foreach ($states as $state) {
 	$countPerState[$state->getStateID()] = $count;
 }
 
-$ui->viewStatistik($mitgliedercount, $mitgliedschaften, $countPerMitgliedschaft, $states, $countPerState);
+$ui->viewStats($mitgliedercount, $mitgliedschaften, $countPerMitgliedschaft, $states, $countPerState);
 
 ?>
