@@ -22,7 +22,9 @@ foreach ($revisionen as $revision) {
 	$row["mitgliedid"] = $revision->getMitgliedID();
 	$row["mitgliedlabel"] = $revision->getMitglied()->replaceText("{BEZEICHNUNG}");
 	$row["userid"] = $revision->getUserID();
-	$row["username"] = $revision->getUser()->getUsername();
+	if ($revision->getUser() !== null) {
+		$row["username"] = $revision->getUser()->getUsername();
+	}
 	$row["location"] = $session->getLink("mitglieder_details", $revision->getMitgliedID());
 	$jsons[] = $row;
 }
