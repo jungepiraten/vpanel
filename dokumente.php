@@ -17,6 +17,7 @@ require_once(VPANEL_DOKUMENTMATCHER . "/logic.class.php");
 require_once(VPANEL_DOKUMENTMATCHER . "/gliederung.class.php");
 require_once(VPANEL_DOKUMENTMATCHER . "/kategorie.class.php");
 require_once(VPANEL_DOKUMENTMATCHER . "/status.class.php");
+require_once(VPANEL_DOKUMENTMATCHER . "/search.class.php");
 
 function parseDokumentFormular($ui, $session, &$dokument = null) {
 	$kategorieid = $session->getIntVariable("kategorieid");
@@ -235,7 +236,8 @@ default:
 	$matcher = new AndDokumentMatcher(
 		new GliederungDokumentMatcher($gliederungids),
 		($dokumentkategorie == null ? new TrueDokumentMatcher() : new KategorieDokumentMatcher($dokumentkategorie)),
-		($dokumentstatus == null ? new TrueDokumentMatcher() : new StatusDokumentMatcher($dokumentstatus)) );
+		($dokumentstatus == null ? new TrueDokumentMatcher() : new StatusDokumentMatcher($dokumentstatus)),
+		($session->hasVariable("dokumentsuche") ? new SearchDokumentMatcher($session->getVariable("dokumentsuche")) : new TrueMitgliederMatcher()) );
 
 	$dokumentcount = $session->getStorage()->getDokumentCount($matcher);
 	$pagesize = 20;
