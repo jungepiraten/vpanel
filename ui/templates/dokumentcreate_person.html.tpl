@@ -19,7 +19,7 @@
 <div class="control-group">
     <label class="control-label" for="geburtsdatum">{"Geburtsdatum:"|__}</label>
     <div class="controls">
-        <input type="text" name="geburtsdatum" size="20" />
+        <input type="date" name="geburtsdatum" />
     </div>
 </div>
 <div class="control-group">

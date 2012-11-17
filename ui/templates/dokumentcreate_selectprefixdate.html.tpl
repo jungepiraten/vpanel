@@ -11,7 +11,7 @@
 <div class="control-group">
     <label class="control-label" for="timestamp">{"Eingang:"|__}</label>
     <div class="controls">
-        <input type="text" name="timestamp" value="{$smarty.now|date_format:"%d.%m.%Y"}" />
+        <input type="date" name="timestamp" value="{$smarty.now|date_format:"%Y-%m-%d"}" />
     </div>
 </div>
 {if $showupload}

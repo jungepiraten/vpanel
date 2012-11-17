@@ -5,7 +5,7 @@
 <div class="control-group">
 	<label class="control-label" for="eintritt">Eintrittsdatum:</label>
 	<div class="controls">
-		<input type="text" name="eintritt" value="{if isset($mitglied)}{$mitglied.eintritt|date_format:"%d.%m.%Y"}{else}{$smarty.now|date_format:"%d.%m.%Y"}{/if}" />
+		<input type="date" name="eintritt" value="{if isset($mitglied)}{$mitglied.eintritt|date_format:"%Y-%m-%d"}{else}{$smarty.now|date_format:"%Y-%m-%d"}{/if}" />
 	</div>
 </div>
 
@@ -13,7 +13,7 @@
 <div class="control-group">
 	<label class="control-label" for="austritt">Austrittsdatum:</label>
 	<div class="controls">
-		<input type="text" name="austritt" value="{$mitglied.austritt|date_format:"%d.%m.%Y"}" />
+		<input type="date" name="austritt" value="{$mitglied.austritt|date_format:"%Y-%m-%d"}" />
 	</div>
 </div>
 {/if}
@@ -72,7 +72,7 @@
    <div class="control-group">
     <label class="control-label" for="geburtsdatum">{"Geboren:"|__}</label>
     <div class="controls">
-     <input type="text" name="geburtsdatum" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.geburtsdatum|date_format:"%d.%m.%Y"}{else}{$data.geburtsdatum}{/if}" class="span2" />
+     <input type="date" name="geburtsdatum" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.geburtsdatum|date_format:"%Y-%m-%d"}{else}{$data.geburtsdatum}{/if}" />
     </div>
    </div>
 
