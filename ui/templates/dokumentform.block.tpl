@@ -43,7 +43,7 @@
     <label class="control-label" for="file">{"Datei:"|__}</label>
     <div class="controls">
         {if isset($dokument)}
-         <a href="{"dokumente_get"|___:$dokument.dokumentid}">{"Download"|__}</a>
+         <a href="{"dokumente_get"|___:$dokument.dokumentid}" class="btn btn-info">{"Download"|__}</a>
         {else}
          <input type="file" name="file" />
         {/if}
