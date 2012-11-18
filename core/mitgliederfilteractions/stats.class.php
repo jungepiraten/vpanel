@@ -5,7 +5,7 @@ require_once(VPANEL_PROCESSES . "/mitgliederfilterstats.class.php");
 
 class StatistikMitgliederFilterAction extends MitgliederFilterAction {
 	public function execute($config, $session, $filter, $matcher) {
-		$process = new MitgliederFilterStatsProcess($session->getStorage());
+		$process = new MitgliederFilterStatistikProcess($session->getStorage());
 		$process->setTimestamp(time());
 		return $this->executeProcess($session, $process, $filter, $matcher);
 	}
