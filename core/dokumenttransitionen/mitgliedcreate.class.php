@@ -31,7 +31,7 @@ class DynamicMitgliedCreateDokumentTransition extends StaticDokumentTransition i
 			if ($session->hasVariable("mitgliedtemplateid") && in_array($session->getVariable("mitgliedtemplateid"), $mitgliedtemplateid)) {
 				$mitgliedtemplateid = $session->getVariable("mitgliedtemplateid");
 			} else {
-				return array("selectMitgliedTemplate" => 1, "mitgliedtemplates" => array_map(array($session->getStorage(), "getMitgliederTemplate"), $mitgliedtemplateid);
+				return array("selectMitgliedTemplate" => 1, "mitgliedtemplates" => array_map(array($session->getStorage(), "getMitgliederTemplate"), $mitgliedtemplateid));
 			}
 		}
 		return array("redirect" => $session->getLink("dokumente_mitglied_create", $dokumentid, $mitgliedtemplateid));
