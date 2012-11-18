@@ -896,7 +896,7 @@ class Template {
 		}
 		$this->smarty->assign("action", $this->parseMitgliederFilterAction($action));
 		$this->smarty->assign("process", $this->parseProcess($process));
-		if ($action instanceof StatsMitgliederFilterAction) {
+		if ($action instanceof StatistikMitgliederFilterAction) {
 			$this->smarty->assign("tempfiles", $this->parseTempFiles($result["tempfiles"]));
 			$this->smarty->display("mitgliederstats.html.tpl");
 			return;
