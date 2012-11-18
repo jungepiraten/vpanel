@@ -10,7 +10,6 @@
 		</div>
 		<div class="form-actions">
 			<button class="btn btn-primary submit" type="submit" name="continue" value="1">{"Weiter"|__}</button>
-			<button class="btn">{"Abbrechen"|__}</button>
 		</div>
 	</fieldset>
 </form>
