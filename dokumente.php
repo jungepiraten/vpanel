@@ -237,7 +237,7 @@ default:
 		new GliederungDokumentMatcher($gliederungids),
 		($dokumentkategorie == null ? new TrueDokumentMatcher() : new KategorieDokumentMatcher($dokumentkategorie)),
 		($dokumentstatus == null ? new TrueDokumentMatcher() : new StatusDokumentMatcher($dokumentstatus)),
-		($session->hasVariable("dokumentsuche") ? new SearchDokumentMatcher($session->getVariable("dokumentsuche")) : new TrueMitgliederMatcher()) );
+		($session->hasVariable("dokumentsuche") ? new SearchDokumentMatcher($session->getVariable("dokumentsuche")) : new TrueDokumentMatcher()) );
 
 	$dokumentcount = $session->getStorage()->getDokumentCount($matcher);
 	$pagesize = 20;
