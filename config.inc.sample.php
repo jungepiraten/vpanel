@@ -18,7 +18,11 @@ foreach (glob(VPANEL_MITGLIEDERFILTERACTIONS . "/*.class.php") as $actionfile) {
 	require_once($actionfile);
 }
 
-class MyConfig extends DefaultConfig {}
+class MyConfig extends DefaultConfig {
+	public function getWebRoot() {
+		return "http://192.168.100.166/~prauscher/vpanel/";
+	}
+}
 
 $config = new MyConfig;
 $config->setStorage(new MySQLStorage("localhost", "root", "anything92", "vpanel"));
@@ -86,9 +90,8 @@ $transitionid = 0;
 
 $config->getStorage()->registerDokumentTransition(new DownloadDokumentTransition(++$transitionid, false, null, null, 6, null, 4, "Gesammelt ausgedruckt"));
 $config->getStorage()->registerDokumentTransition(new MitgliedLinkDokumentTransition(++$transitionid, false, null, null, null, null, null, "Mitglied verlinkt"));
-foreach ($config->getStorage()->getMitgliedTemplateList() as $mitgliedtemplate) {
-	$config->getStorage()->registerDokumentTransition(new MitgliedCreateDokumentTransition(++$transitionid, false, null, null, null, null, null, "Mitglied angelegt", $mitgliedtemplate->getMitgliedTemplateID(), 
-$mitgliedtemplate->getLabel() . " anlegen"));
+foreach ($config->getStorage()->getMitgliederTemplateList() as $mitgliedtemplate) {
+	$config->getStorage()->registerDokumentTransition(new MitgliedCreateDokumentTransition(++$transitionid, false, null, null, null, null, null, "Mitglied angelegt", $mitgliedtemplate->getMitgliedTemplateID(), $mitgliedtemplate->getLabel() . " anlegen"));
 }
 
 ?>
