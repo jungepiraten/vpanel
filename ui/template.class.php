@@ -1010,7 +1010,7 @@ class Template {
 		if ($transition instanceof DynamicMitgliedCreateDokumentTransition) {
 			if (isset($result["selectMitgliedTemplate"])) {
 				$this->smarty->assign("mitgliedtemplates", $this->parseMitgliedTemplates($result["mitgliedtemplates"]));
-				$this->smarty->assign("dokumenttransition_dynamicmitgliedcreate.html.tpl");
+				$this->smarty->display("dokumenttransition_dynamicmitgliedcreate.html.tpl");
 			}
 		}
 	}
