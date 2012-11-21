@@ -57,7 +57,7 @@ class NatPersonDokumentTemplate extends DefaultDokumentTemplate {
 				"vorname"		=> $this->getVorname($session),
 				"name"			=> $this->getName($session),
 				"nationalitaet"		=> $this->getNationalitaet($session),
-				"geburtsdatum"		=> date("d.m.Y", $this->getGeburtsdatum($session)) );
+				"geburtsdatum"		=> date("Y-m-d", $this->getGeburtsdatum($session)) );
 	}
 
 	public function getDokumentKommentar($session) {
