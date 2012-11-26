@@ -106,7 +106,11 @@ class MailTemplate extends StorageClass {
 
 	public function getHeaders() {
 		if ($this->headers == null) {
-			$this->headers = $this->getStorage()->getMailTemplateHeaderList($this->getTemplateID());
+			if ($this->getTemplateID() !== null) {
+				$this->headers = $this->getStorage()->getMailTemplateHeaderList($this->getTemplateID());
+			} else {
+				$this->headers = array();
+			}
 		}
 		return $this->headers;
 	}
@@ -118,17 +122,19 @@ class MailTemplate extends StorageClass {
 	public function getHeader($header) {
 		return $this->headers[strtolower($header)];
 	}
-	
+
 	public function setHeader($field, $value) {
 		$this->headers[strtolower($field)] = new MailTemplateHeader($this->getStorage(), $this->getTemplateID(), $field, $value);
 	}
 
 	public function getAttachments() {
 		if ($this->attachments === null) {
-			$attachments = $this->getStorage()->getMailTemplateAttachmentList($this->getTemplateID());
 			$this->attachments = array();
-			foreach ($attachments as $attachment) {
-				$this->addAttachment($attachment);
+			if ($this->getTemplateID() !== null) {
+				$attachments = $this->getStorage()->getMailTemplateAttachmentList($this->getTemplateID());
+				foreach ($attachments as $attachment) {
+					$this->addAttachment($attachment);
+				}
 			}
 		}
 		return $this->attachments;
@@ -143,7 +149,7 @@ class MailTemplate extends StorageClass {
 		$this->getAttachments();
 		unset($this->attachments[$attachmentid]);
 	}
-	
+
 	public function addAttachment($attachment) {
 		$this->getAttachments();
 		$this->attachments[$attachment->getFileID()] = $attachment;
