@@ -1058,7 +1058,9 @@ class Template {
 	}
 
 	public function getRedirectURL() {
-		return isset($_REQUEST["redirect"]) ? $_REQUEST["redirect"] : $_SERVER["HTTP_REFERER"];
+		return	(isset($_REQUEST["redirect"]) ? $_REQUEST["redirect"] :
+			(isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] :
+			$this->session->getLink("index") ));
 	}
 
 	public function redirect($url = null) {
