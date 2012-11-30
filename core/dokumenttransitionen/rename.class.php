@@ -40,6 +40,7 @@ class RenameDokumentTransition extends DokumentTransition implements SingleDokum
 
 		if ($session->hasVariable("save")) {
 			$process = new DokumentTransaktionRenameProcess($session->getStorage());
+			$process->setNextData($this->getDokumentTemplate($session)->getDokumentData($session));
 			$process->setNextIdentifier($this->getDokumentTemplate($session)->getDokumentIdentifier($session));
 			$process->setNextLabel($this->getDokumentTemplate($session)->getDokumentLabel($session));
 			$process->match($dokumentid);

@@ -11,6 +11,7 @@ class DokumentTransitionProcess extends Process {
 	private $nextstatusid;
 	private $nextidentifier;
 	private $nextlabel;
+	private $nextdata;
 	private $notizkommentar;
 
 	public static function factory(Storage $storage, $row) {
@@ -19,6 +20,7 @@ class DokumentTransitionProcess extends Process {
 		$process->setNextStatusID($row["nextstatusid"]);
 		$process->setNextIdentifier($row["nextidentifier"]);
 		$process->setNextLabel($row["nextlabel"]);
+		$process->setNextData($row["data"]);
 		$process->setNotizKommentar($row["notizkommentar"]);
 		if ($row["dokumentid"] != null) {
 			$process->match($row["dokumentid"]);
@@ -76,6 +78,14 @@ class DokumentTransitionProcess extends Process {
 		$this->nextlabel = $label;
 	}
 
+	public function getNextData() {
+		return $this->nextdata;
+	}
+
+	public function setNextData($data) {
+		$this->nextdata = $data;
+	}
+
 	public function getNotizKommentar() {
 		return $this->notizkommentar;
 	}
@@ -105,6 +115,7 @@ class DokumentTransitionProcess extends Process {
 		$data["nextstatusid"] = $this->nextstatusid;
 		$data["nextidentifier"] = $this->nextidentifier;
 		$data["nextlabel"] = $this->nextlabel;
+		$data["nextdata"] = $this->nextdata;
 		$data["notizkommentar"] = $this->notizkommentar;
 		return $data;
 	}
@@ -164,6 +175,10 @@ class DokumentTransitionProcess extends Process {
 		if ($this->getNextLabel() != null) {
 			$item->setLabel($this->getNextLabel());
 			$notiz->setNextLabel($this->getNextLabel());
+		}
+
+		if ($this->getNextData() != null) {
+			$item->setData($this->getNextData());
 		}
 
 		$notiz->save();
