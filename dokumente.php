@@ -114,7 +114,7 @@ case "create":
 			$notiz->setNextIdentifier($dokumenttemplate->getDokumentIdentifier($session));
 			$notiz->setKommentar($dokumenttemplate->getDokumentKommentar($session));
 
-			foreach ($dokument->getDokumentFlags($session) as $flagid) {
+			foreach ($dokumenttemplate->getDokumentFlags($session) as $flagid) {
 				$flag = $session->getStorage()->getDokumentFlag($flagid);
 				$dokument->setFlag($flag);
 				$notiz->setAddFlag($flag);
