@@ -40,6 +40,10 @@ class DokumentTransaktionForwardProcess extends DokumentTransitionProcess {
 		$this->forwardemail = $forwardemail;
 	}
 
+	public function getNotizKommentar() {
+		return sprintf(parent::getNotizKommentar(), $this->getForwardEMail()->getEMail());
+	}
+
 	public function initProcess() {
 	}
 
