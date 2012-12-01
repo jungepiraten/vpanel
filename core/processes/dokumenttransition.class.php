@@ -20,7 +20,7 @@ class DokumentTransitionProcess extends Process {
 		$process->setNextStatusID($row["nextstatusid"]);
 		$process->setNextIdentifier($row["nextidentifier"]);
 		$process->setNextLabel($row["nextlabel"]);
-		$process->setNextData($row["data"]);
+		$process->setNextData($row["nextdata"]);
 		$process->setNotizKommentar($row["notizkommentar"]);
 		if ($row["dokumentid"] != null) {
 			$process->match($row["dokumentid"]);

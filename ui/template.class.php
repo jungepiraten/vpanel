@@ -1007,6 +1007,11 @@ class Template {
 				$this->viewDokumentTemplate($transition->getDokumentTemplate($this->session), $link, $this->translate("%s umbenennen", $transition->getDokumentTemplate($this->session)->getLabel()), array("hideupload"));
 			}
 		}
+		if ($transition instanceof ForwardDokumentTransition) {
+			if (isset($result["inputNeeded"])) {
+				$this->smarty->display("dokumenttransition_forward.html.tpl");
+			}
+		}
 		if ($transition instanceof DynamicMitgliedCreateDokumentTransition) {
 			if (isset($result["selectMitgliedTemplate"])) {
 				$this->smarty->assign("mitgliedtemplates", $this->parseMitgliedTemplates($result["mitgliedtemplates"]));
