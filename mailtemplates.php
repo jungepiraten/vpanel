@@ -36,7 +36,7 @@ function parseMailTemplateFormular($ui, $session, &$template = null) {
 	}
 	$template->setLabel($label);
 	$template->setBody($body);
-	
+
 	// Headerfelder
 	$headerfields = $session->getListVariable("headerfields");
 	$headervalues = $session->getListVariable("headervalues");
@@ -70,10 +70,10 @@ case "createattachment":
 			$template->addAttachment($file);
 			$template->save();
 		}
-		
+
 		$ui->redirect();
 	}
-	
+
 	$ui->viewMailTemplateCreateAttachment($template);
 	exit;
 case "deleteattachment":
@@ -82,10 +82,10 @@ case "deleteattachment":
 		$ui->viewLogin();
 		exit;
 	}
-	
+
 	$template->delAttachment($session->getIntVariable("fileid"));
 	$template->save();
-	
+
 	$ui->redirect();
 	exit;
 case "details":
@@ -107,6 +107,7 @@ case "create":
 	}
 
 	if ($session->getBoolVariable("save")) {
+		$template = null;
 		parseMailTemplateFormular($ui, $session, &$template);
 
 		$ui->redirect($session->getLink("mailtemplates_details", $template->getTemplateID()));
