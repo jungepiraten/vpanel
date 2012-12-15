@@ -13,7 +13,7 @@ function changeMailTemplateView(id) {
 	for (var field in headers[id]) {
 		mailAddHeader(field, headers[id][field]);
 	}
-	mailSetBody($("#mailbody-" + id).html());
+	mailSetBody($("#mailbody-" + id).text());
 }
 {/literal}
 
