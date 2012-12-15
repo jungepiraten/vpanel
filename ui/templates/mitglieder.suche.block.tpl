@@ -102,9 +102,11 @@ VPanel_DropdownMitgliederSuche.prototype = {
 		this.list.html("")
 		this.data = data;
 		for(i in data) {
-			$('<li></li>').append(
-				$('<a></a>').text(data[i].label).attr('href',data[i].location)
-			).appendTo( this.list );
+			var link = $('<a>').text(data[i].label).attr('href',data[i].location);
+			if (data[i].austritt) {
+				link.css("text-decoration", "line-through");
+			}
+			this.list.append($('<li>').append(link));
 		}
 	},
 

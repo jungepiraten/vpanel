@@ -25,6 +25,9 @@ foreach ($mitglieder as $mitglied) {
 	$row = array();
 	$row["mitgliedid"] = $mitglied->getMitgliedID();
 	$row["location"] = $session->getLink("mitglieder_details", $mitglied->getMitgliedID());
+	if ($mitglied->isAusgetreten()) {
+		$row["austritt"] = true;
+	}
 	if ($revision->isJurPerson()) {
 		$row["label"] = $revision->getJurPerson()->getLabel();
 	} else if ($revision->isNatPerson()) {
