@@ -80,7 +80,7 @@ class Mail {
 		$raw = "";
 		$charset = "UTF-8";
 
-		if (function_exists("imap_8bit") && false) {
+		if (function_exists("imap_8bit")) {
 			$body = str_replace("\r\n", "\n", imap_8bit($this->getBody()));
 			$bodyencoding = "quoted-printable";
 		} else {
