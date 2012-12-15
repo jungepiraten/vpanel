@@ -79,14 +79,22 @@ class Mail {
 	public function getRaw() {
 		$raw = "";
 		$charset = "UTF-8";
-		
+
+		if (function_exists("imap_8bit") && false) {
+			$body = str_replace("\r\n", "\n", imap_8bit($this->getBody()));
+			$bodyencoding = "quoted-printable";
+		} else {
+			$body = chunk_split(base64_encode($this->getBody()), 76, "\n");
+			$bodyencoding = "base64";
+		}
+
 		$raw .= "User-Agent: VPanel Mailer" . "\n";
 		if ($this->isMultipart()) {
 			$raw .= "MIME-Version: 1.0" . "\n";
 			$raw .= "Content-Type: multipart/mixed; boundary=" . $this->getBoundary() . "\n";
 		} else {
 			$raw .= "Content-Type: text/plain; charset=" . $charset . "\n";
-			$raw .= "Content-Transfer-Encoding: base64" . "\n";
+			$raw .= "Content-Transfer-Encoding: " . $bodyencoding . "\n";
 		}
 
 		$headers = $this->getHeaders();
@@ -95,14 +103,14 @@ class Mail {
 			$raw .= $key . ": " . mb_encode_mimeheader($value, $charset) . "\n";
 		}
 		$raw .= "\n";
-		
+
 		if ($this->isMultipart()) {
 			$raw .= "This is a multipart message." . "\n";
 			$raw .= "--" . $this->getBoundary() . "\n";
 			$raw .= "Content-Type: text/plain; charset=" . $charset . "\n";
-			$raw .= "Content-Transfer-Encoding: base64" . "\n";
+			$raw .= "Content-Transfer-Encoding: " . $bodyencoding . "\n";
 			$raw .= "\n";
-			$raw .= chunk_split(base64_encode($this->getBody()), 76, "\n");
+			$raw .= $body;
 			foreach ($this->getAttachments() as $attachment) {
 				$raw .= "--" . $this->getBoundary() . "\n";
 				$raw .= "Content-Type: " . $attachment->getMimeType() . "\n";
@@ -113,9 +121,9 @@ class Mail {
 			}
 			$raw .= "--" . $this->getBoundary() . "--" . "\n";
 		} else {
-			$raw .= chunk_split(base64_encode($this->getBody()), 76, "\n");
+			$raw .= $body;
 		}
-		
+
 		return $raw;
 	}
 }
