@@ -598,7 +598,7 @@ abstract class SQLStorage extends AbstractStorage {
 			return "`m`.`austritt` >= '" . $this->escape(date("Y-m-d", $matcher->getTimestamp())) . "'";
 		}
 		if ($matcher instanceof SearchMitgliederMatcher) {
-			$fields = array("`m`.`mitgliedid`", "`m`.`globalid`", "`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`n`.`anrede`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`adresszusatz`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`e`.`email`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
+			$fields = array("`m`.`mitgliedid`", "`m`.`globalid`", "`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`n`.`anrede`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`adresszusatz`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`k`.`iban`", "`e`.`email`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
 			$wordclauses = array();
 			$escapedwords = array();
 			foreach ($matcher->getWords() as $word) {
@@ -689,6 +689,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`emailid` AS `k_emailid`,
+				`k`.`iban` AS `k_iban`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
 				`o`.`ortid` AS `o_ortid`,
@@ -781,6 +782,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`emailid` AS `k_emailid`,
+				`k`.`iban` AS `k_iban`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
 				`o`.`ortid` AS `o_ortid`,
@@ -1047,6 +1049,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`emailid` AS `k_emailid`,
+				`k`.`iban` AS `k_iban`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
 				`o`.`ortid` AS `o_ortid`,
@@ -1123,6 +1126,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`emailid` AS `k_emailid`,
+				`k`.`iban` AS `k_iban`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
 				`o`.`ortid` AS `o_ortid`,
@@ -1195,6 +1199,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`emailid` AS `k_emailid`,
+				`k`.`iban` AS `k_iban`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
 				`o`.`ortid` AS `o_ortid`,
@@ -1268,6 +1273,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`emailid` AS `k_emailid`,
+				`k`.`iban` AS `k_iban`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
 				`o`.`ortid` AS `o_ortid`,
@@ -1331,14 +1337,14 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "Kontakt");
 	}
 	public function getKontakt($kontaktid) {
-		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid` FROM `kontakt` WHERE `kontaktid` = " . intval($kontaktid);
+		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid`, `iban` FROM `kontakt` WHERE `kontaktid` = " . intval($kontaktid);
 		return $this->getResult($sql, array($this, "parseKontakt"))->fetchRow();
 	}
-	public function setKontakt($kontaktid, $adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $emailid) {
+	public function setKontakt($kontaktid, $adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $emailid, $iban) {
 		if ($kontaktid == null) {
-			$sql = "INSERT INTO `kontakte` (`adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid`) VALUES ('" . $this->escape($adresszusatz) . "', '" . $this->escape($strasse) . "', '" . $this->escape($hausnummer) . "', " . intval($ortid) . ", '" . $this->escape($telefon) . "', '" . $this->escape($handy) . "', " . intval($emailid) . ")";
+			$sql = "INSERT INTO `kontakte` (`adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid`, `iban`) VALUES ('" . $this->escape($adresszusatz) . "', '" . $this->escape($strasse) . "', '" . $this->escape($hausnummer) . "', " . intval($ortid) . ", '" . $this->escape($telefon) . "', '" . $this->escape($handy) . "', " . intval($emailid) . ", '" . $this->escape($iban) . "')";
 		} else {
-			$sql = "UPDATE `kontakte` SET `adresszusatz` = '" . $this->escape($adresszusatz) . "', `strasse` = '" . $this->escape($strasse) . "', `hausnummer` = '" . $this->escape($hausnummer) . "', `ortid` = " . intval($ortid) . ", `telefonnummer` = '" . $this->escape($telefon) . "', `handynummer` = '" . $this->escape($handy) . "', `emailid` = " . intval($emailid) . " WHERE `kontaktid` = " . intval($kontaktid);
+			$sql = "UPDATE `kontakte` SET `adresszusatz` = '" . $this->escape($adresszusatz) . "', `strasse` = '" . $this->escape($strasse) . "', `hausnummer` = '" . $this->escape($hausnummer) . "', `ortid` = " . intval($ortid) . ", `telefonnummer` = '" . $this->escape($telefon) . "', `handynummer` = '" . $this->escape($handy) . "', `emailid` = " . intval($emailid) . ", `iban` = '" . $this->escape($iban) . "' WHERE `kontaktid` = " . intval($kontaktid);
 		}
 		$this->query($sql);
 		if ($kontaktid == null) {
@@ -1350,8 +1356,8 @@ abstract class SQLStorage extends AbstractStorage {
 		$sql = "DELETE FROM `kontakte` WHERE `kontaktid` = " . intval($kontaktid);
 		return $this->query($sql);
 	}
-	public function searchKontakt($adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $emailid) {
-		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid` FROM `kontakte` WHERE `adresszusatz` = '" . $this->escape($adresszusatz) . "' AND `strasse` = '" . $this->escape($strasse) . "' AND `hausnummer` = '" . $this->escape($hausnummer) . "' AND `ortid` = " . intval($ortid) . " AND `telefonnummer` = '" . $this->escape($telefon) . "' AND `handynummer` = '" . $this->escape($handy) . "' AND `emailid` = '" . intval($emailid) . "'";
+	public function searchKontakt($adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $emailid, $iban) {
+		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid`, `iban` FROM `kontakte` WHERE `adresszusatz` = '" . $this->escape($adresszusatz) . "' AND `strasse` = '" . $this->escape($strasse) . "' AND `hausnummer` = '" . $this->escape($hausnummer) . "' AND `ortid` = " . intval($ortid) . " AND `telefonnummer` = '" . $this->escape($telefon) . "' AND `handynummer` = '" . $this->escape($handy) . "' AND `emailid` = '" . intval($emailid) . "' AND `iban` = '" . $this->escape($iban) . "'";
 		$result = $this->getResult($sql, array($this, "parseKontakt"));
 		if ($result->getCount() > 0) {
 			return $result->fetchRow();
@@ -1364,6 +1370,7 @@ abstract class SQLStorage extends AbstractStorage {
 		$kontakt->setTelefonnummer($telefon);
 		$kontakt->setHandynummer($handy);
 		$kontakt->setEMailID($emailid);
+		$kontakt->setIBan($iban);
 		$kontakt->save();
 		return $kontakt;
 	}

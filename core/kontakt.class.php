@@ -13,10 +13,11 @@ class Kontakt extends GlobalClass {
 	private $telefonnummer;
 	private $handynummer;
 	private $emailid;
+	private $iban;
 
 	private $ort;
 	private $email;
-	
+
 	public static function factory(Storage $storage, $row) {
 		$kontakt = new Kontakt($storage);
 		$kontakt->setKontaktID($row["kontaktid"]);
@@ -27,6 +28,7 @@ class Kontakt extends GlobalClass {
 		$kontakt->setTelefonnummer($row["telefonnummer"]);
 		$kontakt->setHandynummer($row["handynummer"]);
 		$kontakt->setEMailID($row["emailid"]);
+		$kontakt->setIBan($row["iban"]);
 		return $kontakt;
 	}
 
@@ -88,7 +90,7 @@ class Kontakt extends GlobalClass {
 	public function getTelefonnummer() {
 		return $this->telefonnummer;
 	}
-	
+
 	public function setTelefonnummer($telefonnummer) {
 		$this->telefonnummer = $telefonnummer;
 	}
@@ -124,6 +126,18 @@ class Kontakt extends GlobalClass {
 		$this->email = $email;
 	}
 
+	public function getIBan() {
+		return $this->iban;
+	}
+
+	public function setIBan($iban) {
+		$this->iban = $iban;
+	}
+
+	public function hasIBan() {
+		return $this->iban != null;
+	}
+
 	public function save(Storage $storage = null) {
 		if ($storage === null) {
 			$storage = $this->getStorage();
@@ -136,7 +150,8 @@ class Kontakt extends GlobalClass {
 			$this->getOrtID(),
 			$this->getTelefonnummer(),
 			$this->getHandynummer(),
-			$this->getEMailID() ));
+			$this->getEMailID(),
+			$this->getIBan() ));
 	}
 }
 

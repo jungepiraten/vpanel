@@ -402,6 +402,7 @@ class Template {
 		$row["telefon"] = $kontakt->getTelefonnummer();
 		$row["handy"] = $kontakt->getHandynummer();
 		$row["email"] = $this->parseEMail($kontakt->getEMail());
+		$row["iban"] = $kontakt->getIBan();
 		return $row;
 	}
 

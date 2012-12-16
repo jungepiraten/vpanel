@@ -152,6 +152,13 @@
 </div>
 
 <div class="control-group">
+    <label class="control-label" for="iban">{"Konto (IBAN):"|__}</label>
+    <div class="controls">
+        <input type="text" name="email" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.iban|escape:html}{else}{$data.iban|escape:html}{/if}" />
+    </div>
+</div>
+
+<div class="control-group">
     <label class="control-label" for="beitrag">{"Beitrag:"|__}</label>
     <div class="controls">
         <div class="input-append">

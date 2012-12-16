@@ -47,6 +47,8 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 	$telefon = $session->getVariable("telefon");
 	$handy = $session->getVariable("handy");
 	$email = $session->getVariable("email");
+	$iban = $session->getVariable("iban");
+	$iban = empty($iban) ? null : $iban;
 	$gliederungid = intval($session->getVariable("gliederungid"));
 	$gliederung = $session->getStorage()->getGliederung($gliederungid);
 	$mitgliedschaftid = $session->getIntVariable("mitgliedschaftid");
@@ -65,7 +67,7 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 
 	$ort = $session->getStorage()->searchOrt($plz, $ortname, $stateid);
 	$email = $session->getStorage()->searchEMail($email);
-	$kontakt = $session->getStorage()->searchKontakt($adresszusatz, $strasse, $hausnummer, $ort->getOrtID(), $telefon, $handy, $email->getEMailID());
+	$kontakt = $session->getStorage()->searchKontakt($adresszusatz, $strasse, $hausnummer, $ort->getOrtID(), $telefon, $handy, $email->getEMailID(), $iban);
 
 	if ($mitglied == null) {
 		if (!$session->isAllowed("mitglieder_create", $gliederung->getGliederungID())) {

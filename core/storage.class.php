@@ -115,9 +115,9 @@ interface Storage {
 	public function setMitgliederRevisionTextFieldList($revisionid, $textfieldids, $textfieldvalues);
 
 	public function getKontakt($kontaktid);
-	public function setKontakt($kontaktid, $adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $email);
+	public function setKontakt($kontaktid, $adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $email, $iban);
 	public function delKontakt($kontaktid);
-	public function searchKontakt($strasse, $adresszusatz, $hausnummer, $ortid, $telefon, $handy, $email);
+	public function searchKontakt($strasse, $adresszusatz, $hausnummer, $ortid, $telefon, $handy, $email, $iban);
 
 	public function getEMail($emailid);
 	public function setEMail($emailid, $email);
