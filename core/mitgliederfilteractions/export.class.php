@@ -57,7 +57,7 @@ class ExportMitgliederFilterAction extends MitgliederFilterAction {
 	}
 
 	public function show($config, $session, $process) {
-		if ($process->getStreamHandler() instanceof TempFileExportStreamHandler) {
+		if ($process->getStreamHandler() instanceof TempFileStreamHandler) {
 			return array("redirect" => $session->getLink("tempfile_get", $process->getStreamHandler()->getTempFile()->getTempFileID()));
 		}
 	}

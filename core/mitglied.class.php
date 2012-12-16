@@ -105,9 +105,13 @@ class Mitglied extends GlobalClass {
 		return $this->beitraglist;
 	}
 
-	public function getBeitrag($beitragid) {
+	public function hasBeitrag($beitragid) {
 		$this->getBeitragList();
-		if (!isset($this->beitraglist[$beitragid])) {
+		return isset($this->beitraglist[$beitragid]);
+	}
+
+	public function getBeitrag($beitragid) {
+		if (! $this->hasBeitrag($beitragid)) {
 			$this->beitraglist[$beitragid] = new MitgliedBeitrag($this->getStorage());
 			$this->beitraglist[$beitragid]->setMitglied($this);
 			$this->beitraglist[$beitragid]->setBeitragID($beitragid);

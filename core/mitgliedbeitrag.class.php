@@ -82,6 +82,18 @@ class MitgliedBeitrag extends StorageClass {
 		$this->hoehe = $hoehe;
 	}
 
+	public function getBuchungenHoehe() {
+		$hoehe = 0;
+		foreach ($this->getBuchungen() as $buchung) {
+			$hoehe += $buchung->getHoehe();
+		}
+		return $hoehe;
+	}
+
+	public function getRemainingHoehe() {
+		return $this->getHoehe() - $this->getBuchungenHoehe();
+	}
+
 	public function getBuchungen() {
 		return $this->getStorage()->getMitgliederBeitragBuchungByMitgliederBeitragList($this->getMitgliederBeitragID());
 	}
