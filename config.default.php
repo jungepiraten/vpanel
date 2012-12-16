@@ -14,6 +14,7 @@ define("VPANEL_PROCESSES",			VPANEL_CORE . "/processes");
 define("VPANEL_UI",				VPANEL_ROOT . "/ui");
 define("VPANEL_LANGUAGE",			VPANEL_UI . "/language");
 define("VPANEL_FILES",				VPANEL_ROOT . "/files");
+define("VPANEL_LIBS",				VPANEL_ROOT . "/libs");
 
 require_once(VPANEL_UI . "/phpsession.class.php");
 require_once(VPANEL_UI . "/apisession.class.php");
