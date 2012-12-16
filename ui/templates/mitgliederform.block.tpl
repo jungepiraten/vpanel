@@ -151,12 +151,67 @@
     </div>
 </div>
 
-<div class="control-group">
+<div class="control-group" id="ibanControlGroup">
     <label class="control-label" for="iban">{"Konto (IBAN):"|__}</label>
     <div class="controls">
-        <input type="text" name="email" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.iban|escape:html}{else}{$data.iban|escape:html}{/if}" />
+        <input type="text" name="iban" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.iban|escape:html}{else}{$data.iban|escape:html}{/if}" onChange="checkIBan(this)" />
+        <span class="help-inline"></span>
     </div>
 </div>
+{literal}
+<script type="text/javascript">
+<!--
+
+// Modulo 97 for huge numbers given as digit strings.
+// JS converts huge numbers into floating points, so modulo-arthmetics will fail.
+function mod97(digit_string) {
+	var m = 0;
+	for (var i = 0; i < digit_string.length; ++i)
+		m = (m * 10 + parseInt(digit_string.charAt(i))) % 97;
+	return m;
+}
+
+function checkIBan(field) {
+	$("#ibanControlGroup").removeClass("success error").find(".help-inline").text("");
+	field.value = field.value.replace(/\s/g, "").toUpperCase();
+	if (field.value != "") {
+		var check = field.value.substring(4) + field.value.substring(0,4);
+		check = check.replace("A","10");
+		check = check.replace("B","11");
+		check = check.replace("C","12");
+		check = check.replace("D","13");
+		check = check.replace("E","14");
+		check = check.replace("F","15");
+		check = check.replace("G","16");
+		check = check.replace("H","17");
+		check = check.replace("I","18");
+		check = check.replace("J","19");
+		check = check.replace("K","20");
+		check = check.replace("L","21");
+		check = check.replace("M","22");
+		check = check.replace("N","23");
+		check = check.replace("O","24");
+		check = check.replace("P","25");
+		check = check.replace("Q","26");
+		check = check.replace("R","27");
+		check = check.replace("S","28");
+		check = check.replace("T","29");
+		check = check.replace("U","30");
+		check = check.replace("V","31");
+		check = check.replace("W","32");
+		check = check.replace("X","33");
+		check = check.replace("Y","34");
+		check = check.replace("Z","35");
+		if (mod97(check) != 1) {
+			$("#ibanControlGroup").addClass("error").find(".help-inline").text("Ungültige IBan");
+		}
+	}
+}
+checkIBan(document.getElementsByName("iban")[0]);
+
+//-->
+</script>
+{/literal}
 
 <div class="control-group">
     <label class="control-label" for="beitrag">{"Beitrag:"|__}</label>
