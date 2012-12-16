@@ -153,9 +153,17 @@
 
 <div class="control-group" id="ibanControlGroup">
     <label class="control-label" for="iban">{"Konto (IBAN):"|__}</label>
-    <div class="controls">
-        <input type="text" name="iban" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.iban|escape:html}{else}{$data.iban|escape:html}{/if}" onChange="checkIBan(this)" />
+    <div class="controls iban">
+        <div class="input-append">
+            <input type="text" class="iban" name="iban" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.iban|escape:html}{else}{$data.iban|escape:html}{/if}" onChange="checkIBan(this)" />
+            <button type="button" class="btn btn-info" onClick="showIBanDE()">{"Generieren"|__}</button>
+        </div>
         <span class="help-inline"></span>
+    </div>
+    <div class="controls iban-de hide">
+        <input type="text" name="blz" class="blz" placeholder="BLZ" {literal}pattern="[0-9]{8}"{/literal} />
+        <input type="text" name="konto" class="konto" placeholder="Kontonummer" {literal}pattern="[0-9]{1,}"{/literal} />
+        <button type="button" class="btn btn-primary" onClick="saveIBanDE()">Speichern</button>
     </div>
 </div>
 {literal}
@@ -171,37 +179,42 @@ function mod97(digit_string) {
 	return m;
 }
 
+function iban2ibancheck(check) {
+	check = check.substring(4) + check.substring(0,4);
+	check = check.replace("A","10");
+	check = check.replace("B","11");
+	check = check.replace("C","12");
+	check = check.replace("D","13");
+	check = check.replace("E","14");
+	check = check.replace("F","15");
+	check = check.replace("G","16");
+	check = check.replace("H","17");
+	check = check.replace("I","18");
+	check = check.replace("J","19");
+	check = check.replace("K","20");
+	check = check.replace("L","21");
+	check = check.replace("M","22");
+	check = check.replace("N","23");
+	check = check.replace("O","24");
+	check = check.replace("P","25");
+	check = check.replace("Q","26");
+	check = check.replace("R","27");
+	check = check.replace("S","28");
+	check = check.replace("T","29");
+	check = check.replace("U","30");
+	check = check.replace("V","31");
+	check = check.replace("W","32");
+	check = check.replace("X","33");
+	check = check.replace("Y","34");
+	check = check.replace("Z","35");
+	return check;
+}
+
 function checkIBan(field) {
 	$("#ibanControlGroup").removeClass("success error").find(".help-inline").text("");
 	field.value = field.value.replace(/\s/g, "").toUpperCase();
 	if (field.value != "") {
-		var check = field.value.substring(4) + field.value.substring(0,4);
-		check = check.replace("A","10");
-		check = check.replace("B","11");
-		check = check.replace("C","12");
-		check = check.replace("D","13");
-		check = check.replace("E","14");
-		check = check.replace("F","15");
-		check = check.replace("G","16");
-		check = check.replace("H","17");
-		check = check.replace("I","18");
-		check = check.replace("J","19");
-		check = check.replace("K","20");
-		check = check.replace("L","21");
-		check = check.replace("M","22");
-		check = check.replace("N","23");
-		check = check.replace("O","24");
-		check = check.replace("P","25");
-		check = check.replace("Q","26");
-		check = check.replace("R","27");
-		check = check.replace("S","28");
-		check = check.replace("T","29");
-		check = check.replace("U","30");
-		check = check.replace("V","31");
-		check = check.replace("W","32");
-		check = check.replace("X","33");
-		check = check.replace("Y","34");
-		check = check.replace("Z","35");
+		var check = iban2ibancheck(field.value);
 		if (mod97(check) != 1) {
 			$("#ibanControlGroup").addClass("error").find(".help-inline").text("Ungültige IBan");
 		}
@@ -209,9 +222,32 @@ function checkIBan(field) {
 }
 checkIBan(document.getElementsByName("iban")[0]);
 
-//-->
-</script>
-{/literal}
+function showIBanDE() {
+	var iban = $("#ibanControlGroup .controls.iban .iban").val();
+	$("#ibanControlGroup .controls.iban-de .blz").val(iban.substring(4,12));
+	$("#ibanControlGroup .controls.iban-de .konto").val(iban.substring(12));
+
+	$("#ibanControlGroup .controls.iban").hide();
+	$("#ibanControlGroup .controls.iban-de").show();
+}
+
+function saveIBanDE() {
+	var blz = $("#ibanControlGroup .controls.iban-de .blz").val();
+	var konto = $("#ibanControlGroup .controls.iban-de .konto").val();
+	while (konto.length < 10) {
+		konto = "0" + konto;
+	}
+	var check = 98 - mod97(iban2ibancheck("DE00" + blz + konto));
+	if (check < 10) {
+		check = "0" + check;
+	}
+	$("#ibanControlGroup .controls.iban .iban").val("DE" + check + blz + konto);
+
+	$("#ibanControlGroup .controls.iban-de").hide();
+	$("#ibanControlGroup .controls.iban").show();
+}
+
+//--> </script> {/literal}
 
 <div class="control-group">
     <label class="control-label" for="beitrag">{"Beitrag:"|__}</label>
