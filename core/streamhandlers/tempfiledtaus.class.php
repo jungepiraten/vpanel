@@ -11,7 +11,6 @@ class DTAUSTempFileStreamHandler extends TempFileStreamHandler {
 	private $handler;
 
 	public function __construct($name, $bankcode, $account)  {
-		parent::__construct();
 		$this->name = $name;
 		$this->bankcode = $bankcode;
 		$this->account = $account;
