@@ -18,7 +18,7 @@ class DTAUSTempFileStreamHandler extends TempFileStreamHandler {
 
 	public function openFile($headers) {
 		$file = $this->getFile();
-		$file->setMimeType("text/plain");
+		$file->setMimeType("application/octet-stream");
 		$file->setExportFilename($file->getExportFilename() . ".dtaus");
 		$file->save();
 
