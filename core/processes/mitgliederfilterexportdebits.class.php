@@ -71,13 +71,15 @@ class MitgliederFilterExportDebitsProcess extends MitgliederFilterProcess {
 	protected function runProcessStep($mitglied) {
 		if ($mitglied->getLatestRevision()->getKontakt()->hasIBan() && $mitglied->hasBeitrag($this->getBeitragID())) {
 			$beitrag = $mitglied->getBeitrag($this->getBeitragID());
-			$row = array();
-			$row["mitgliedid"] = $mitglied->getMitgliedID();
-			$row["mitglied"] = $mitglied->replaceText("{BEZEICHNUNG}");
-			$row["iban"] = $mitglied->getLatestRevision()->getKontakt()->getIBan();
-			$row["beitrag"] = $this->getBeitrag()->getLabel();
-			$row["betrag"] = $beitrag->getRemainingHoehe();
-			$this->getStreamHandler()->writeFile($row);
+			if ($beitrag->getRemainingHoehe() > 0) {
+				$row = array();
+				$row["mitgliedid"] = $mitglied->getMitgliedID();
+				$row["mitglied"] = $mitglied->replaceText("{BEZEICHNUNG}");
+				$row["iban"] = $mitglied->getLatestRevision()->getKontakt()->getIBan();
+				$row["beitrag"] = $this->getBeitrag()->getLabel();
+				$row["betrag"] = $beitrag->getRemainingHoehe();
+				$this->getStreamHandler()->writeFile($row);
+			}
 		}
 	}
 
