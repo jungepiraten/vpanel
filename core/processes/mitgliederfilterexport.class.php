@@ -1,7 +1,6 @@
 <?php
 
 require_once(VPANEL_PROCESSES . "/mitgliederfilter.class.php");
-require_once(VPANEL_CORE . "/streamhandler.class.php");
 
 class MitgliederFilterExportProcess extends MitgliederFilterProcess {
 	private $fields = array();

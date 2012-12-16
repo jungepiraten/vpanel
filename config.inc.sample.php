@@ -17,6 +17,9 @@ foreach (glob(VPANEL_DOKUMENTTRANSITIONEN . "/*.class.php") as $transitionfile) 
 foreach (glob(VPANEL_MITGLIEDERFILTERACTIONS . "/*.class.php") as $actionfile) {
 	require_once($actionfile);
 }
+foreach (glob(VPANEL_STREAMHANDLERS . "/*.class.php") as $streamhandlerfile) {
+	require_once($streamhandlerfile);
+}
 
 class MyConfig extends DefaultConfig {
 	public function getWebRoot() {
@@ -81,8 +84,9 @@ $actionid = 0;
 
 $config->getStorage()->registerMitgliederFilterAction(new DeleteMitgliederFilterAction(++$actionid));
 $config->getStorage()->registerMitgliederFilterAction(new SendMailMitgliederFilterAction(++$actionid));
-$config->getStorage()->registerMitgliederFilterAction(new ExportMitgliederFilterAction(++$actionid, new CSVTempFileExportStreamHandler()));
+$config->getStorage()->registerMitgliederFilterAction(new ExportMitgliederFilterAction(++$actionid, new CSVTempFileStreamHandler()));
 $config->getStorage()->registerMitgliederFilterAction(new StatistikMitgliederFilterAction(++$actionid));
+$config->getStorage()->registerMitgliederFilterAction(new ExportDebitsMitgliederFilterAction(++$actionid, new CSVTempFileStreamHandler()));
 $config->getStorage()->registerMitgliederFilterAction(new SetBeitragMitgliederFilterAction(++$actionid));
 $config->getStorage()->registerMitgliederFilterAction(new CalculateBeitragMitgliederFilterAction(++$actionid));
 
