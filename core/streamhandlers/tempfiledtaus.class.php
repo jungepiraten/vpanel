@@ -10,9 +10,37 @@ class DTAUSTempFileStreamHandler extends TempFileStreamHandler {
 
 	private $handler;
 
-	public function __construct($name, $bankcode, $account)  {
+	public static function factory(Storage $storage, $process, $row) {
+		$handler = parent::factory($storage, $process, $row);
+		$handler->setName($row["name"]);
+		$handler->setBankCode($row["bankcode"]);
+		$handler->setAccount($row["account"]);
+		return $handler;
+	}
+
+	public function getData() {
+		$data = parent::getData();
+		$data["name"] = $this->name;
+		$data["bankcode"] = $this->bankcode;
+		$data["account"] = $this->account;
+		return $data;
+	}
+
+	public function __construct($name = null, $bankcode = null, $account = null) {
 		$this->name = $name;
 		$this->bankcode = $bankcode;
+		$this->account = $account;
+	}
+
+	public function setName($name) {
+		$this->name = $name;
+	}
+
+	public function setBankCode($bankcode) {
+		$this->bankcode = $bankcode;
+	}
+
+	public function setAccount($account) {
 		$this->account = $account;
 	}
 
