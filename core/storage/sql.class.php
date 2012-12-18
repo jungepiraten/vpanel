@@ -1,4 +1,4 @@
-<?php
+M<?php
 
 require_once(VPANEL_CORE . "/storage.class.php");
 require_once(VPANEL_CORE . "/user.class.php");
@@ -509,6 +509,9 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		if ($matcher instanceof AusgetretenMitgliederMatcher) {
 			return "`m`.`austritt` IS NOT NULL";
+		}
+		if ($matcher instanceof IBANMitgliederMatcher) {
+			return "`k`.`iban` IS NOT NULL";
 		}
 		if ($matcher instanceof MitgliedMitgliederMatcher) {
 			return "`m`.`mitgliedid` = " . intval($matcher->getMitgliedID());
