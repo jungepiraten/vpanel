@@ -1,4 +1,4 @@
-M<?php
+<?php
 
 require_once(VPANEL_CORE . "/storage.class.php");
 require_once(VPANEL_CORE . "/user.class.php");
