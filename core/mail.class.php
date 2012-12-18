@@ -111,6 +111,7 @@ class Mail {
 			$raw .= "Content-Transfer-Encoding: " . $bodyencoding . "\n";
 			$raw .= "\n";
 			$raw .= $body;
+			$raw .= "\n";
 			foreach ($this->getAttachments() as $attachment) {
 				$raw .= "--" . $this->getBoundary() . "\n";
 				$raw .= "Content-Type: " . $attachment->getMimeType() . "\n";
@@ -118,6 +119,7 @@ class Mail {
 				$raw .= "Content-Transfer-Encoding: base64" . "\n";
 				$raw .= "\n";
 				$raw .= chunk_split(base64_encode($attachment->getContent()), 76, "\n");
+				$raw .= "\n";
 			}
 			$raw .= "--" . $this->getBoundary() . "--" . "\n";
 		} else {
