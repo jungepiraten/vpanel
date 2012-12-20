@@ -35,6 +35,10 @@ class MitgliedDokumentTemplate extends NatPersonDokumentTemplate {
 		return $session->getVariable("email");
 	}
 
+	private function getIBan($session) {
+		return $session->getVariable("iban");
+	}
+
 	private function getBeitrag($session) {
 		return $session->getVariable("beitrag");
 	}
@@ -57,6 +61,7 @@ class MitgliedDokumentTemplate extends NatPersonDokumentTemplate {
 		$array["telefon"] = $this->getTelefonnummer($session);
 		$array["handy"] = $this->getHandynummer($session);
 		$array["email"] = $this->getEMailAdresse($session);
+		$array["iban"] = $this->getIBan($session);
 		$array["beitrag"] = $this->getBeitrag($session);
 		$array["flags"] = array_flip($this->getFlags($session));
 		$array["textfields"] = $this->getTextFields($session);
