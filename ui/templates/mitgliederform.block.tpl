@@ -163,7 +163,7 @@
     <div class="controls iban-de hide">
         <input type="text" name="blz" class="blz" placeholder="BLZ" {literal}pattern="[0-9]{8}"{/literal} />
         <input type="text" name="konto" class="konto" placeholder="Kontonummer" {literal}pattern="[0-9]{1,}"{/literal} />
-        <button type="button" class="btn btn-primary" onClick="saveIBanDE()">Speichern</button>
+        <button type="button" class="btn btn-primary" onClick="saveIBanDE()">{"Übernehmen"|__}</button>
     </div>
 </div>
 {literal}
@@ -229,6 +229,8 @@ function showIBanDE() {
 
 	$("#ibanControlGroup .controls.iban").hide();
 	$("#ibanControlGroup .controls.iban-de").show();
+
+	$("#ibanControlGroup").parents("form").submit(saveIBanDE);
 }
 
 function saveIBanDE() {
