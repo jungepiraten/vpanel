@@ -31,8 +31,7 @@ $config->registerPage("dokumente_mitglied", "mitglieddokument.php?mode=add&dokum
 $config->registerPage("dokumente_mitglied_create", "mitglieder.php?mode=create&dokumentid=%d&mitgliedtemplateid=%d");
 $config->registerPage("dokumente_get", "file.php?mode=get&dokumentid=%d");
 $config->registerPage("dokumente_view", "file.php?mode=view&dokumentid=%d");
-$config->registerPage("dokumente_transitionaction", "dokumente.php?mode=transition&transitionid=%s&dokumentid=%d");
-$config->registerPage("dokumente_transitionactionmulti", "dokumente.php?mode=transition&transitionid=%s&gliederungid=%s&kategorieid=%s&statusid=%s");
+$config->registerPage("dokumente_transitionaction", "dokumente.php?mode=transition&transitionid=%s&filterid=%s");
 $config->registerPage("dokumente_transitionprocess", "dokumente.php?mode=transitionprocess&transitionid=%s&processid=%d");
 $config->registerPage("dokumente_timeline_json", "json/dokumentnotizen_timeline.php");
 

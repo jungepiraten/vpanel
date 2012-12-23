@@ -21,32 +21,14 @@ class ForwardDokumentTransition extends StaticDokumentTransition implements Sing
 		return null;
 	}
 
-	private function getProcessPrototype($config, $session) {
+	public function execute($config, $session, $filter, $matcher) {
 		$process = new DokumentTransaktionForwardProcess($session->getStorage());
 		$destination = $this->getForwardDestination($session);
 		if ($destination == null) {
 			return array("inputNeeded" => 1);
 		}
 		$process->setForwardEMail($destination);
-		return $process;
-	}
-
-	public function execute($config, $session, $dokumentid) {
-		$process = $this->getProcessPrototype($config, $session);
-		if (is_array($process)) {
-			return $process;
-		}
-		$process->match($dokumentid);
-		return $this->executeProcess($session, $process);
-	}
-
-	public function executeMulti($config, $session, $gliederungids, $kategorieid, $statusid) {
-		$process = $this->getProcessPrototype($config, $session);
-		if (is_array($process)) {
-			return $process;
-		}
-		$process->matchMulti($gliederungids, $kategorieid, $statusid);
-		return $this->executeProcess($session, $process);
+		return $this->executeProcess($session, $process, $filter, $matcher);
 	}
 }
 

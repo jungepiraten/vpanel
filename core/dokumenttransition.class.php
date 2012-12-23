@@ -39,7 +39,8 @@ abstract class DokumentTransition extends GliederungAktion {
 		return false;
 	}
 
-	protected function executeProcess($session, $process) {
+	protected function executeProcess($session, $process, $filter, $matcher) {
+		$process->setMatcher($matcher);
 		$process->setUser($session->getUser());
 		$process->setNextKategorieID($this->getNextKategorieID($session));
 		$process->setNextStatusID($this->getNextStatusID($session));
@@ -53,8 +54,7 @@ abstract class DokumentTransition extends GliederungAktion {
 			$process->save();
 		}
 
-		// single-process direkt abfackeln
-		if ($process->getDokumentID() != null) {
+		if ($session->getStorage()->getDokumentCount($matcher) < 5) {
 			$process->run();
 			return array("redirect" => $process->getFinishedPage());
 		} else {
@@ -62,12 +62,9 @@ abstract class DokumentTransition extends GliederungAktion {
 		}
 	}
 
+	abstract public function execute($config, $session, $filter, $matcher);
 	public function show($config, $session, $process) {
-		if ($process->getDokumentID() != null) {
-			return array("redirect" => $session->getLink("dokumente_details", $process->getDokumentID()));
-		} else {
-			return array("redirect" => $session->getLink("dokumente_page", null, $process->getDokumentKategorieID(), $process->getDokumentStatusID(), 0));
-		}
+		return array("redirect" => $session->getLink("dokumente"));
 	}
 }
 
@@ -96,12 +93,8 @@ abstract class StaticDokumentTransition extends DokumentTransition {
 	}
 }
 
-interface SingleDokumentTransition {
-	public function execute($config, $session, $dokumentid);
-}
+interface SingleDokumentTransition {}
 
-interface MultiDokumentTransition {
-	public function executeMulti($config, $session, $gliederungid, $kategorieid, $statusid);
-}
+interface MultiDokumentTransition {}
 
 ?>

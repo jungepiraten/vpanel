@@ -7,11 +7,9 @@ class MitgliedLinkDokumentTransition extends StaticDokumentTransition implements
 		parent::__construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar);
 	}
 
-	public function execute($config, $session, $dokumentid) {
-		return array("redirect" => $session->getLink("dokumente_mitglied", $dokumentid));
-	}
-
-	public function show($config, $session, $process) {
+	public function execute($config, $session, $filter, $matcher) {
+		// TODO hacky and needs to be rewritten
+		return array("redirect" => $session->getLink("dokumente_mitglied", $matcher->getDokumentID()));
 	}
 }
 

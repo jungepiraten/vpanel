@@ -13,6 +13,7 @@ if (!$session->isSignedIn()) {
 
 require_once(VPANEL_CORE . "/dokument.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/dokument.class.php");
+require_once(VPANEL_DOKUMENTMATCHER . "/dokument.class.php");
 require_once(VPANEL_DOKUMENTMATCHER . "/logic.class.php");
 require_once(VPANEL_DOKUMENTMATCHER . "/gliederung.class.php");
 require_once(VPANEL_DOKUMENTMATCHER . "/kategorie.class.php");
@@ -168,22 +169,11 @@ case "transition":
 		exit;
 	}
 
-	if ($session->hasVariable("dokumentid")) {
-		$dokumentid = $session->getVariable("dokumentid");
-		$result = $transition->execute($config, $session, $dokumentid);
-		$ui->viewSingleDokumentTransition($transition, $result, $dokumentid);
-	} else {
-		$gliederungid = null;
-		$gliederungids = $session->getAllowedGliederungIDs($transition->getPermission());
-		if ($session->hasVariable("gliederungid")) {
-			$gliederungid = $session->getIntVariable("gliederungid");
-			$gliederungids = array_intersect($gliederungids, array($gliederungid));
-		}
-		$kategorieid = $session->getVariable("kategorieid");
-		$statusid = $session->getVariable("statusid");
-		$result = $transition->executeMulti($config, $session, $gliederungids, $kategorieid, $statusid);
-		$ui->viewMultiDokumentTransition($transition, $result, $gliederungid, $kategorieid, $statusid);
-	}
+	$filter = $session->getDokumentFilter($session->getVariable("filterid"));
+	$matcher = new AndDokumentMatcher(new GliederungDokumentMatcher($session->getAllowedGliederungIDs($transition->getPermission())), ($filter == null ? null : $filter->getMatcher()));
+
+	$result = $transition->execute($config, $session, $filter, $matcher);
+	$ui->viewDokumentTransition($transition, $filter, $matcher, $result);
 	exit;
 case "transitionprocess":
 	$transition = $session->getStorage()->getDokumentTransition($session->getVariable("transitionid"));
@@ -238,6 +228,7 @@ default:
 		($dokumentkategorie == null ? new TrueDokumentMatcher() : new KategorieDokumentMatcher($dokumentkategorie)),
 		($dokumentstatus == null ? new TrueDokumentMatcher() : new StatusDokumentMatcher($dokumentstatus)),
 		($session->hasVariable("dokumentsuche") ? new SearchDokumentMatcher($session->getVariable("dokumentsuche")) : new TrueDokumentMatcher()) );
+	$filter = $session->addDokumentMatcher($matcher);
 
 	$dokumentcount = $session->getStorage()->getDokumentCount($matcher);
 	$pagesize = 20;
@@ -254,7 +245,7 @@ default:
 	$transitionen = $session->getStorage()->getMultiDokumentTransitionList($session, $dokumentkategorie, $dokumentstatus);
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
-	$ui->viewDokumentList($dokumente, $templates, $transitionen, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount);
+	$ui->viewDokumentList($dokumente, $templates, $transitionen, $gliederungen, $filter, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount);
 	exit;
 }
 

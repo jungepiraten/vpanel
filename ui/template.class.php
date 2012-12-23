@@ -3,6 +3,7 @@
 require_once("Smarty/Smarty.class.php");
 
 require_once(VPANEL_MITGLIEDERMATCHER . "/mitglied.class.php");
+require_once(VPANEL_DOKUMENTMATCHER . "/dokument.class.php");
 
 class Template {
 	private $smarty;
@@ -499,6 +500,7 @@ class Template {
 	protected function parseDokument($dokument) {
 		$row = array();
 		$row["dokumentid"] = $dokument->getDokumentID();
+		$row["filterid"] = $this->session->addDokumentMatcher(new DokumentDokumentMatcher($dokument->getDokumentID()))->getFilterID();
 		$row["gliederung"] = $this->parseGliederung($dokument->getGliederung());
 		$row["dokumentkategorie"] = $this->parseDokumentKategorie($dokument->getDokumentKategorie());
 		$row["dokumentstatus"] = $this->parseDokumentStatus($dokument->getDokumentStatus());
@@ -953,7 +955,7 @@ class Template {
 		}
 	}
 
-	public function viewDokumentList($dokumente, $templates, $transitionen, $gliederungen, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount) {
+	public function viewDokumentList($dokumente, $templates, $transitionen, $gliederungen, $filter, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount) {
 		if ($gliederung != null) {
 			$this->smarty->assign("gliederung", $this->parseGliederung($gliederung));
 		}
@@ -962,6 +964,9 @@ class Template {
 		}
 		if ($dokumentstatus != null) {
 			$this->smarty->assign("dokumentstatus", $this->parseDokumentStatus($dokumentstatus));
+		}
+		if ($filter != null) {
+			$this->smarty->assign("filter", $this->parseDokumentFilter($filter));
 		}
 		$this->smarty->assign("page", $page);
 		$this->smarty->assign("pagecount", $pagecount);
@@ -990,20 +995,14 @@ class Template {
 		$this->smarty->display("dokumentdetails.html.tpl");
 	}
 
-	public function viewSingleDokumentTransition($transition, $result, $dokumentid) {
-		return $this->viewDokumentTransition($transition, $result, $this->link("dokumente_transitionaction", $transition->getDokumentTransitionID(), $dokumentid));
-	}
-
-	public function viewMultiDokumentTransition($transition, $result, $gliederungid, $kategorieid, $statusid) {
-		return $this->viewDokumentTransition($transition, $result, $this->link("dokumente_transitionactionmulti", $transition->getDokumentTransitionID(), $gliederungid, $kategorieid, $statusid));
-	}
-
-	private function viewDokumentTransition($transition, $result, $link) {
+	public function viewDokumentTransition($transition, $filter, $matcher, $result) {
 		if (isset($result["redirect"])) {
 			return $this->redirect($result["redirect"]);
 		}
+		$link = $this->link("dokumente_transitionaction", $transition->getDokumentTransitionID(), $filter->getFilterID());
 		$this->smarty->assign("transition", $this->parseDokumentTransition($transition));
 		$this->smarty->assign("link", $link);
+		$this->smarty->assign("filter", $this->parseDokumentFilter($filter));
 		if ($transition instanceof RenameDokumentTransition) {
 			if (isset($result["selectTransition"])) {
 				$this->smarty->assign("dokumenttemplates", $this->parseDokumentTemplates($result["templates"]));

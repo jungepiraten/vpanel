@@ -8,20 +8,9 @@ class DownloadDokumentTransition extends StaticDokumentTransition implements Sin
 		parent::__construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar);
 	}
 
-	private function getProcessPrototype($config, $session) {
-		return new DokumentTransaktionDownloadProcess($session->getStorage());
-	}
-
-	public function execute($config, $session, $dokumentid) {
-		$process = $this->getProcessPrototype($config, $session);
-		$process->match($dokumentid);
-		return $this->executeProcess($session, $process);
-	}
-
-	public function executeMulti($config, $session, $gliederungids, $kategorieid, $statusid) {
-		$process = $this->getProcessPrototype($config, $session);
-		$process->matchMulti($gliederungids, $kategorieid, $statusid);
-		return $this->executeProcess($session, $process);
+	public function execute($config, $session, $filter, $matcher) {
+		$process = new DokumentTransaktionDownloadProcess($session->getStorage());
+		return $this->executeProcess($session, $process, $filter, $matcher);
 	}
 
 	public function show($config, $session, $process) {

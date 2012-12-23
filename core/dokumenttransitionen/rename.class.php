@@ -33,7 +33,7 @@ class RenameDokumentTransition extends DokumentTransition implements SingleDokum
 		return $this->getDokumentTemplate($session)->getDokumentKommentar($session);
 	}
 
-	public function execute($config, $session, $dokumentid) {
+	public function execute($config, $session, $filter, $matcher) {
 		if ($this->getDokumentTemplate($session) == null) {
 			return array("selectTransition" => 1, "templates" => $config->getStorage()->getDokumentTemplateList($session));
 		}
@@ -43,8 +43,7 @@ class RenameDokumentTransition extends DokumentTransition implements SingleDokum
 			$process->setNextData($this->getDokumentTemplate($session)->getDokumentData($session));
 			$process->setNextIdentifier($this->getDokumentTemplate($session)->getDokumentIdentifier($session));
 			$process->setNextLabel($this->getDokumentTemplate($session)->getDokumentLabel($session));
-			$process->match($dokumentid);
-			return $this->executeProcess($session, $process);
+			return $this->executeProcess($session, $process, $filter, $matcher);
 		}
 		return array("template" => $this->getDokumentTemplate($session));
 	}

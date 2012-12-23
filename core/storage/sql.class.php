@@ -1858,6 +1858,9 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof NotDokumentMatcher) {
 			return "NOT (" . $this->parseDokumentMatcher . ")";
 		}
+		if ($matcher instanceof DokumentDokumentMatcher) {
+			return "`d`.`dokumentid` = " . intval($matcher->getDokumentID());
+		}
 		if ($matcher instanceof GliederungDokumentMatcher) {
 			return "`d`.`gliederungid` IN (" . implode(",", array_map("intval", $matcher->getGliederungIDs())) . ")";
 		}

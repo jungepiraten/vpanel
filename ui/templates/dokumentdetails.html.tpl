@@ -14,7 +14,7 @@
 				</a>
 				<ul class="dropdown-menu">
 					{foreach from=$dokumenttransitionen item=dokumenttransition}
-						<li><a href="{"dokumente_transitionaction"|___:$dokumenttransition.dokumenttransitionid:$dokument.dokumentid}">{$dokumenttransition.label|escape:html}</a></li>
+						<li><a href="{"dokumente_transitionaction"|___:$dokumenttransition.dokumenttransitionid:$dokument.filterid}">{$dokumenttransition.label|escape:html}</a></li>
 					{/foreach}
 				</ul>
 			</div>

@@ -3,10 +3,7 @@
 require_once(VPANEL_CORE . "/process.class.php");
 
 class DokumentTransitionProcess extends Process {
-	private $dokumentid;
-	private $gliederungids;
-	private $kategorieid;
-	private $statusid;
+	private $matcher;
 	private $nextkategorieid;
 	private $nextstatusid;
 	private $nextidentifier;
@@ -16,34 +13,22 @@ class DokumentTransitionProcess extends Process {
 
 	public static function factory(Storage $storage, $row) {
 		$process = new $row["class"]($storage);
+		$process->setMatcher($row["matcher"]);
 		$process->setNextKategorieID($row["nextkategorieid"]);
 		$process->setNextStatusID($row["nextstatusid"]);
 		$process->setNextIdentifier($row["nextidentifier"]);
 		$process->setNextLabel($row["nextlabel"]);
 		$process->setNextData($row["nextdata"]);
 		$process->setNotizKommentar($row["notizkommentar"]);
-		if ($row["dokumentid"] != null) {
-			$process->match($row["dokumentid"]);
-		} else {
-			$process->matchMulti($row["gliederungids"], $row["kategorieid"], $row["statusid"]);
-		}
 		return $process;
 	}
 
-	public function getDokumentID() {
-		return $this->dokumentid;
+	public function getMatcher() {
+		return $this->matcher;
 	}
 
-	public function getGliederungIDs() {
-		return $this->gliederungids;
-	}
-
-	public function getDokumentKategorieID() {
-		return $this->kategorieid;
-	}
-
-	public function getDokumentStatusID() {
-		return $this->statusid;
+	public function setMatcher($matcher) {
+		$this->matcher = $matcher;
 	}
 
 	public function getNextKategorieID() {
@@ -94,23 +79,10 @@ class DokumentTransitionProcess extends Process {
 		$this->notizkommentar = $kommentar;
 	}
 
-	public function match($dokumentid) {
-		$this->dokumentid = $dokumentid;
-	}
-
-	public function matchMulti($gliederungids, $kategorieid, $statusid) {
-		$this->gliederungids = $gliederungids;
-		$this->kategorieid = $kategorieid;
-		$this->statusid = $statusid;
-	}
-
 	protected function getData() {
 		$data = parent::getData();
 		$data["class"] = get_class($this);
-		$data["dokumentid"] = $this->dokumentid;
-		$data["gliederungids"] = $this->gliederungids;
-		$data["kategorieid"] = $this->kategorieid;
-		$data["statusid"] = $this->statusid;
+		$data["matcher"] = $this->matcher;
 		$data["nextkategorieid"] = $this->nextkategorieid;
 		$data["nextstatusid"] = $this->nextstatusid;
 		$data["nextidentifier"] = $this->nextidentifier;
@@ -120,29 +92,28 @@ class DokumentTransitionProcess extends Process {
 		return $data;
 	}
 
+	protected function getResult() {
+		return $this->getStorage()->getDokumentResult($this->getMatcher());
+	}
+
 	protected function runProcess() {
-		if ($this->dokumentid != null) {
-			$dokument = $this->getStorage()->getDokument($this->dokumentid);
-			$this->initProcess();
-			$this->processItem($dokument);
-			$this->finalizeProcess();
-		} else {
-			$result = $this->getStorage()->getDokumentResult($this->gliederungids, $this->kategorieid, $this->statusid);
-			$max = $result->getCount();
-			$i = 0;
-			$stepwidth = ceil($max / 100);
+		$result = $this->getResult();
+		$max = $result->getCount();
+		$i = 0;
+		$stepwidth = ceil($max / 100);
 
-			$this->initProcess();
-			while ($item = $result->fetchRow()) {
-				$this->processItem($item);
+		$this->initProcess();
 
-				if ((++$i % $stepwidth) == 0) {
-					$this->setProgress($i / $max);
-					$this->save();
-				}
+		while ($item = $result->fetchRow()) {
+			$this->processItem($item);
+
+			if ((++$i % $stepwidth) == 0) {
+				$this->setProgress($i / $max);
+				$this->save();
 			}
-			$this->finalizeProcess();
 		}
+
+		$this->finalizeProcess();
 
 		$this->setProgress(1);
 		$this->save();
