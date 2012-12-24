@@ -3,7 +3,10 @@
 require_once(dirname(__FILE__) . "/../config.inc.php");
 $storage = $config->getStorage();
 
-$mitglieder = $storage->getMitgliederResult();
+require_once(VPANEL_MITGLIEDERMATCHER . "/logic.class.php");
+require_once(VPANEL_MITGLIEDERMATCHER . "/ausgetreten.class.php");
+
+$mitglieder = $storage->getMitgliederResult(new NotMitgliederMatcher(new AusgetretenMitgliederMatcher()));
 while ($mitglied = $mitglieder->fetchRow()) {
 	$beitragtimeformat = $mitglied->getLatestRevision()->getBeitragTimeFormat();
 	$beitrag = $beitragtimeformat->getBeitrag();
