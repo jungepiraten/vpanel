@@ -501,19 +501,34 @@ class Template {
 		$row = array();
 		$row["dokumentid"] = $dokument->getDokumentID();
 		$row["filterid"] = $this->session->addDokumentMatcher(new DokumentDokumentMatcher($dokument->getDokumentID()))->getFilterID();
-		$row["gliederung"] = $this->parseGliederung($dokument->getGliederung());
-		$row["dokumentkategorie"] = $this->parseDokumentKategorie($dokument->getDokumentKategorie());
-		$row["dokumentstatus"] = $this->parseDokumentStatus($dokument->getDokumentStatus());
-		$row["flags"] = $this->parseDokumentFlags($dokument->getFlags());
-		$row["identifier"] = $dokument->getIdentifier();
-		$row["label"] = $dokument->getLabel();
-		$row["content"] = $dokument->getContent();
-		$row["file"] = $this->parseFile($dokument->getFile());
+		$row["latest"] = $this->parseDokumentRevision($dokument->getLatestRevision());
 		return $row;
 	}
 
 	protected function parseDokumente($rows) {
 		return array_map(array($this, 'parseDokument'), $rows);
+	}
+
+	protected function parseDokumentRevision($revision) {
+		$row = array();
+		$row["revisionid"] = $revision->getRevisionID();
+		$row["user"] = $this->parseUser($revision->getUser());
+		$row["timestamp"] = $revision->getTimestamp();
+		$row["dokument"] = $revision->getDokument();
+		$row["gliederung"] = $this->parseGliederung($revision->getGliederung());
+		$row["kategorie"] = $this->parseDokumentKategorie($revision->getKategorie());
+		$row["status"] = $this->parseDokumentStatus($revision->getStatus());
+		$row["flags"] = $this->parseDokumentFlags($revision->getFlags());
+		$row["identifier"] = $revision->getIdentifier();
+		$row["label"] = $revision->getLabel();
+		$row["content"] = $revision->getContent();
+		$row["file"] = $this->parseFile($revision->getFile());
+		$row["kommentar"] = $revision->getKommentar();
+		return $row;
+	}
+
+	protected function parseDokumentRevisions($rows) {
+		return array_map(array($this, 'parseDokumentRevision'), $rows);
 	}
 
 	protected function parseDokumentTemplate($template) {
@@ -652,11 +667,11 @@ class Template {
 			}
 			$this->smarty->display("dashboard_mitgliederrevision_timeline.block.tpl");
 		}
-		if ($widget instanceof DokumentNotizenTimelineDashboardWidget) {
+		if ($widget instanceof DokumentRevisionTimelineDashboardWidget) {
 			if ($widget->hasReload()) {
 				$this->smarty->assign("reload", $widget->getReload());
 			}
-			$this->smarty->display("dashboard_dokumentnotizen_timeline.block.tpl");
+			$this->smarty->display("dashboard_dokumentrevision_timeline.block.tpl");
 		}
 	}
 
@@ -983,9 +998,9 @@ class Template {
 		$this->viewDokumentTemplate($dokumenttemplate, $this->link("dokumente_create", $dokumenttemplate->getDokumentTemplateID()), $this->translate("%s anlegen", $dokumenttemplate->getLabel()) );
 	}
 
-	public function viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $flags, $mitgliedtemplates) {
+	public function viewDokumentDetails($dokument, $dokumentrevisionen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $flags, $mitgliedtemplates) {
 		$this->smarty->assign("dokument", $this->parseDokument($dokument));
-		$this->smarty->assign("dokumentnotizen", $this->parseDokumentNotizen($dokumentnotizen));
+		$this->smarty->assign("dokumentrevisionen", $this->parseDokumentRevisions($dokumentrevisionen));
 		$this->smarty->assign("mitglieder", $this->parseMitglieder($mitglieder));
 		$this->smarty->assign("dokumenttransitionen", $this->parseDokumentTransitionen($transitionen));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));

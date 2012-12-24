@@ -21,7 +21,7 @@ if (isset($mitglied) && !$session->isAllowed("mitglieder_modify", $mitglied->get
 	exit;
 }
 
-if (isset($dokument) && !$session->isAllowed("dokumente_modify", $dokument->getGliederungID())) {
+if (isset($dokument) && !$session->isAllowed("dokumente_modify", $dokument->getLatestRevision()->getGliederungID())) {
 	$ui->viewLogin();
 	exit;
 }
@@ -35,7 +35,7 @@ if ($mitglied != null && $dokument != null) {
 		$session->getStorage()->delMitgliedDokument($mitglied->getMitgliedID(), $dokument->getDokumentID());
 		break;
 	}
-	
+
 	$ui->redirect();
 } else {
 	$ui->viewMitgliedDokumentForm($mitglied, $dokument);

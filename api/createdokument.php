@@ -32,36 +32,29 @@ if ($file == null) {
 	$api->output(array("failed" => "FILE_MISSING"), 400);
 } else {
 	$dokument = new Dokument($session->getStorage());
-	$dokument->setGliederungID($gliederungid);
-	$dokument->setDokumentKategorieID($kategorieid);
-	$dokument->setDokumentStatusID($statusid);
-	$dokument->setIdentifier($dokumenttemplate->getDokumentIdentifier($session));
-	$dokument->setLabel($dokumenttemplate->getDokumentLabel($session));
-	$dokument->setFile($file);
-	$dokument->setData($dokumenttemplate->getDokumentData($session));
 	// Zwischenspeichern um die ID zu bekommen
 	$dokument->save();
 
-	$notiz = new DokumentNotiz($session->getStorage());
-	$notiz->setDokument($dokument);
-	$notiz->setAuthor($session->getUser());
-	$notiz->setTimestamp(time());
-	$notiz->setNextKategorieID($kategorieid);
-	$notiz->setNextStatusID($statusid);
-	$notiz->setNextLabel($dokumenttemplate->getDokumentLabel($session));
-	$notiz->setNextIdentifier($dokumenttemplate->getDokumentIdentifier($session));
-	$notiz->setKommentar($dokumenttemplate->getDokumentKommentar($session));
+	$revision = new DokumentRevision($session->getStorage());
+	$revision->setDokument($dokument);
+	$revision->setUser($session->getUser());
+	$revision->setTimestamp(time());
+	$revision->setGliederungID($gliederungid);
+	$revision->setKategorieID($kategorieid);
+	$revision->setStatusID($statusid);
+	$revision->setIdentifier($dokumenttemplate->getDokumentIdentifier($session));
+	$revision->setLabel($dokumenttemplate->getDokumentLabel($session));
+	$revision->setFile($file);
+	$revision->setData($dokumenttemplate->getDokumentData($session));
+	$revision->setKommentar($dokumenttemplate->getDokumentKommentar($session));
 
 	foreach ($dokumenttemplate->getDokumentFlags($session) as $flagid) {
 		$flag = $session->getStorage()->getDokumentFlag($flagid);
-		$dokument->setFlag($flag);
-		$notiz->setAddFlag($flag);
+		$notiz->setFlag($flag);
 	}
 
-	$dokument->save();
-	$notiz->save();
-
-	$notiz->notify();
+	$revision->save();
+	$revision->notify();
 
 	$api->output(array("success" => "1"));
 }

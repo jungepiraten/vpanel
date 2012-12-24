@@ -21,6 +21,10 @@ require_once(VPANEL_DOKUMENTMATCHER . "/status.class.php");
 require_once(VPANEL_DOKUMENTMATCHER . "/search.class.php");
 
 function parseDokumentFormular($ui, $session, &$dokument = null) {
+	$gliederungid = $dokument->getLatestRevision()->getGliederungID();
+	$fileid = $dokument->getLatestRevision()->getFileID();
+	$data = $dokument->getLatestRevision()->getData();
+	$content = $dokument->getLatestRevision()->getContent();
 	$kategorieid = $session->getIntVariable("kategorieid");
 	$statusid = $session->getIntVariable("statusid");
 	$flagids = array_keys($session->getListVariable("flags"));
@@ -28,53 +32,31 @@ function parseDokumentFormular($ui, $session, &$dokument = null) {
 	$identifier = $session->getVariable("identifier");
 	$kommentar = $session->getVariable("kommentar");
 
-	$gliederungid = $dokument->getGliederungID();
-	$oldkategorieid = $dokument->getDokumentKategorieID();
-	$oldstatusid = $dokument->getDokumentStatusID();
-	$oldflagids = $dokument->getFlagIDs();
-	$oldlabel = $dokument->getLabel();
-	$oldidentifier = $dokument->getIdentifier();
-
 	if (!$session->isAllowed("dokumente_modify", $gliederungid)) {
 		$ui->viewLogin();
 		exit;
 	}
-	$dokument->setDokumentKategorieID($kategorieid);
-	$dokument->setDokumentStatusID($statusid);
-	$dokument->setLabel($label);
-	$dokument->setIdentifier($identifier);
 
-	$notiz = new DokumentNotiz($session->getStorage());
-	$notiz->setDokument($dokument);
-	$notiz->setAuthor($session->getUser());
-	$notiz->setTimestamp(time());
-	if ($oldkategorieid != $kategorieid) {
-		$notiz->setNextKategorieID($kategorieid);
-	}
-	if ($oldstatusid != $statusid) {
-		$notiz->setNextStatusID($statusid);
-	}
-	foreach (array_diff($flagids, $oldflagids) as $flagid) {
+	$revision = new DokumentRevision($session->getStorage());
+	$revision->setDokument($dokument);
+	$revision->setUser($session->getUser());
+	$revision->setTimestamp(time());
+	$revision->setGliederungID($gliederungid);
+	$revision->setKategorieID($kategorieid);
+	$revision->setStatusID($statusid);
+	$revision->setIdentifier($identifier);
+	$revision->setLabel($label);
+	$revision->setFileID($fileid);
+	foreach ($flagids as $flagid) {
 		$flag = $session->getStorage()->getDokumentFlag($flagid);
-		$dokument->setFlag($flag);
-		$notiz->setAddFlag($flag);
+		$revision->setFlag($flag);
 	}
-	foreach (array_diff($oldflagids, $flagids) as $flagid) {
-		$dokument->delFlag($flagid);
-		$notiz->setDelFlag($session->getStorage()->getDokumentFlag($flagid));
-	}
-	if ($oldlabel != $label) {
-		$notiz->setNextLabel($label);
-	}
-	if ($oldidentifier != $identifier) {
-		$notiz->setNextIdentifier($identifier);
-	}
-	$notiz->setKommentar($kommentar);
+	$revision->setContent($content);
+	$revision->setData($data);
+	$revision->setKommentar($kommentar);
 
-	$dokument->save();
-	$notiz->save();
-
-	$notiz->notify();
+	$revision->save();
+	$revision->notify();
 }
 
 switch ($session->hasVariable("mode") ? $session->getVariable("mode") : null) {
@@ -95,36 +77,29 @@ case "create":
 
 		if ($file != null) {
 			$dokument = new Dokument($session->getStorage());
-			$dokument->setGliederungID($gliederungid);
-			$dokument->setDokumentKategorieID($kategorieid);
-			$dokument->setDokumentStatusID($statusid);
-			$dokument->setIdentifier($dokumenttemplate->getDokumentIdentifier($session));
-			$dokument->setLabel($dokumenttemplate->getDokumentLabel($session));
-			$dokument->setFile($file);
-			$dokument->setData($dokumenttemplate->getDokumentData($session));
 			// Zwischenspeichern um an die ID zu kommen
 			$dokument->save();
 
-			$notiz = new DokumentNotiz($session->getStorage());
-			$notiz->setDokument($dokument);
-			$notiz->setAuthor($session->getUser());
-			$notiz->setTimestamp(time());
-			$notiz->setNextKategorieID($kategorieid);
-			$notiz->setNextStatusID($statusid);
-			$notiz->setNextLabel($dokumenttemplate->getDokumentLabel($session));
-			$notiz->setNextIdentifier($dokumenttemplate->getDokumentIdentifier($session));
-			$notiz->setKommentar($dokumenttemplate->getDokumentKommentar($session));
+			$revision = new DokumentRevision($session->getStorage());
+			$revision->setDokument($dokument);
+			$revision->setUser($session->getUser());
+			$revision->setTimestamp(time());
+			$revision->setGliederungID($gliederungid);
+			$revision->setKategorieID($kategorieid);
+			$revision->setStatusID($statusid);
+			$revision->setLabel($dokumenttemplate->getDokumentLabel($session));
+			$revision->setIdentifier($dokumenttemplate->getDokumentIdentifier($session));
+			$revision->setFile($file);
+			$revision->setData($dokumenttemplate->getDokumentData($session));
+			$revision->setKommentar($dokumenttemplate->getDokumentKommentar($session));
 
 			foreach ($dokumenttemplate->getDokumentFlags($session) as $flagid) {
 				$flag = $session->getStorage()->getDokumentFlag($flagid);
-				$dokument->setFlag($flag);
-				$notiz->setAddFlag($flag);
+				$revision->setFlag($flag);
 			}
 
-			$dokument->save();
-			$notiz->save();
-
-			$notiz->notify();
+			$revision->save();
+			$revision->notify();
 
 			$ui->redirect($session->getLink("dokumente_details", $dokument->getDokumentID()));
 		}
@@ -140,7 +115,7 @@ case "details":
 		exit;
 	}
 
-	if (!$session->isAllowed("dokumente_show", $dokument->getGliederungID())) {
+	if (!$session->isAllowed("dokumente_show", $dokument->getLatestRevision()->getGliederungID())) {
 		$ui->viewLogin();
 		exit;
 	}
@@ -151,7 +126,7 @@ case "details":
 		$ui->redirect($session->getLink("dokumente_details", $dokument->getDokumentID()));
 	}
 
-	$dokumentnotizen = $session->getStorage()->getDokumentNotizList($dokument->getDokumentID());
+	$dokumentrevisionen = $session->getStorage()->getDokumentRevisionList($dokument->getDokumentID());
 	$mitglieder = $session->getStorage()->getMitgliederList(new DokumentMitgliederMatcher($dokument->getDokumentID()));
 
 	$transitionen = $session->getStorage()->getSingleDokumentTransitionList($session, $dokument);
@@ -159,7 +134,7 @@ case "details":
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
 	$flags = $session->getStorage()->getDokumentFlagList();
 	$mitgliedtemplates = $session->getStorage()->getMitgliederTemplateList($session);
-	$ui->viewDokumentDetails($dokument, $dokumentnotizen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $flags, $mitgliedtemplates);
+	$ui->viewDokumentDetails($dokument, $dokumentrevisionen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $flags, $mitgliedtemplates);
 	exit;
 case "transition":
 	$transition = $session->getStorage()->getDokumentTransition($session->getVariable("transitionid"));

@@ -122,39 +122,33 @@ class DokumentTransitionProcess extends Process {
 	private function processItem($item) {
 		$this->runProcessStep($item);
 
-		$notiz = new DokumentNotiz($this->getStorage());
-		$notiz->setDokument($item);
-		$notiz->setTimestamp(time());
-		$notiz->setAuthorID($this->getUserID());
-		$notiz->setKommentar($this->getNotizKommentar());
+		$revision = $item->getLatestRevision()->fork();
+		$revision->setUserID($this->getUserID());
+		$revision->setTimestamp(time());
+		$revision->setKommentar($this->getNotizKommentar());
 
 		if ($this->getNextKategorieID() != null) {
-			$item->setDokumentKategorieID($this->getNextKategorieID());
-			$notiz->setNextKategorieID($this->getNextKategorieID());
+			$revision->setKategorieID($this->getNextKategorieID());
 		}
 
 		if ($this->getNextStatusID() != null) {
-			$item->setDokumentStatusID($this->getNextStatusID());
-			$notiz->setNextStatusID($this->getNextStatusID());
+			$revision->setStatusID($this->getNextStatusID());
 		}
 
 		if ($this->getNextIdentifier() != null) {
-			$item->setIdentifier($this->getNextIdentifier());
-			$notiz->setNextIdentifier($this->getNextIdentifier());
+			$revision->setIdentifier($this->getNextIdentifier());
 		}
 
 		if ($this->getNextLabel() != null) {
-			$item->setLabel($this->getNextLabel());
-			$notiz->setNextLabel($this->getNextLabel());
+			$revision->setLabel($this->getNextLabel());
 		}
 
 		if ($this->getNextData() != null) {
-			$item->setData($this->getNextData());
+			$revision->setData($this->getNextData());
 		}
 
-		$notiz->save();
-		$notiz->notify();
-		$item->save();
+		$revision->save();
+		$revision->notify();
 	}
 
 	public function initProcess() {}

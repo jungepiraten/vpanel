@@ -33,7 +33,8 @@ $config->registerPage("dokumente_get", "file.php?mode=get&dokumentid=%d");
 $config->registerPage("dokumente_view", "file.php?mode=view&dokumentid=%d");
 $config->registerPage("dokumente_transitionaction", "dokumente.php?mode=transition&transitionid=%s&filterid=%s");
 $config->registerPage("dokumente_transitionprocess", "dokumente.php?mode=transitionprocess&transitionid=%s&processid=%d");
-$config->registerPage("dokumente_timeline_json", "json/dokumentnotizen_timeline.php");
+$config->registerPage("dokumente_timeline_json", "json/dokumentrevisions_timeline.php");
+$config->registerPage("dokumentrevision_get", "file.php?mode=get&dokumentrevisionid=%d");
 
 $config->registerPage("mitglieddokument", "mitglieddokument.php");
 $config->registerPage("mitglieddokument_delete", "mitglieddokument.php?mode=delete&mitgliedid=%d&dokumentid=%d");

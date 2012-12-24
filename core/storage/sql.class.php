@@ -25,6 +25,7 @@ require_once(VPANEL_CORE . "/mailtemplate.class.php");
 require_once(VPANEL_CORE . "/mailtemplateheader.class.php");
 require_once(VPANEL_CORE . "/process.class.php");
 require_once(VPANEL_CORE . "/dokument.class.php");
+require_once(VPANEL_CORE . "/dokumentrevision.class.php");
 require_once(VPANEL_CORE . "/dokumentnotify.class.php");
 require_once(VPANEL_CORE . "/dokumentkategorie.class.php");
 require_once(VPANEL_CORE . "/dokumentstatus.class.php");
@@ -44,6 +45,7 @@ abstract class SQLStorage extends AbstractStorage {
 	abstract protected function getInsertID();
 
 	protected function escape($str) {
+		if (!is_string($str) && $str != null) throw new Exception("String expected");
 		return addslashes($str);
 	}
 
@@ -589,10 +591,20 @@ abstract class SQLStorage extends AbstractStorage {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitglieddokument` WHERE `dokumentid` = " . intval($matcher->getDokumentID()) . ")";
 		}
 		if ($matcher instanceof DokumentKategorieMitgliederMatcher) {
-			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitglieddokument` `mdok` LEFT JOIN `dokument` `dok` USING (`dokumentid`) WHERE `dok`.`dokumentkategorieid` = " . intval($matcher->getDokumentKategorieID()) . ")";
+			return "`m`.`mitgliedid` IN (
+					SELECT	`mitgliedid`
+					FROM	`mitglieddokument` `mdok`
+					LEFT JOIN	`dokumentrevisions` `dokr` USING (`dokumentid`)
+					WHERE	`dokr`.`timestamp` = (SELECT MAX(`dokrmax`.`timestamp`) FROM `dokumentrevisions` `dokrmax` WHERE `dokrmax`.`dokumentid` = `dokr`.`dokumentid`)
+						AND `dokr`.`kategorieid` = " . intval($matcher->getDokumentKategorieID()) . ")";
 		}
 		if ($matcher instanceof DokumentStatusMitgliederMatcher) {
-			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitglieddokument` `mdok` LEFT JOIN `dokument` `dok` USING (`dokumentid`) WHERE `dok`.`dokumentstatusid` = " . intval($matcher->getDokumentStatusID()) . ")";
+			return "`m`.`mitgliedid` IN (
+					SELECT	`mitgliedid`
+					FROM	`mitglieddokument` `mdok`
+					LEFT JOIN	`dokumentrevisions` `dokr` USING (`dokumentid`)
+					WHERE	`dokr`.`timestamp` = (SELECT MAX(`dokrmax`.`timestamp`) FROM `dokumentrevisions` `dokrmax` WHERE `dokrmax`.`dokumentid` = `dokr`.`dokumentid`)
+						AND `dokr`.`statusid` = " . intval($matcher->getDokumentStatusID()) . ")";
 		}
 		if ($matcher instanceof EintrittsdatumAfterMitgliederMatcher) {
 			return "`m`.`eintritt` >= '" . $this->escape(date("Y-m-d", $matcher->getTimestamp())) . "'";
@@ -1862,58 +1874,63 @@ abstract class SQLStorage extends AbstractStorage {
 			return "`d`.`dokumentid` = " . intval($matcher->getDokumentID());
 		}
 		if ($matcher instanceof GliederungDokumentMatcher) {
-			return "`d`.`gliederungid` IN (" . implode(",", array_map("intval", $matcher->getGliederungIDs())) . ")";
+			return "`r`.`gliederungid` IN (" . implode(",", array_map("intval", $matcher->getGliederungIDs())) . ")";
 		}
 		if ($matcher instanceof KategorieDokumentMatcher) {
-			return "`d`.`dokumentkategorieid` = " . intval($matcher->getKategorieID());
+			return "`r`.`kategorieid` = " . intval($matcher->getKategorieID());
 		}
 		if ($matcher instanceof StatusDokumentMatcher) {
-			return "`d`.`dokumentstatusid` = " . intval($matcher->getStatusID());
+			return "`r`.`statusid` = " . intval($matcher->getStatusID());
 		}
 		if ($matcher instanceof MitgliedDokumentMatcher) {
 			return "`d`.`dokumentid` IN (SELECT `dokumentid` FROM `mitglieddokument` WHERE `mitgliedid` = " . intval($matcher->getMitgliedID()) . ")";
 		}
 		if ($matcher instanceof SearchDokumentMatcher) {
-			$fields = array("`d`.`identifier`", "`d`.`label`", "`d`.`content`");
-			$wordclauses = array();
 			$escapedwords = array();
 			foreach ($matcher->getWords() as $word) {
 				$escapedwords[] = $this->escape($word);
-				$clauses = array();
-				foreach ($fields as $field) {
-					$clauses[] = $field . " LIKE '%" . $this->escape($word) . "%'";
-				}
-				$wordclauses[] = implode(" OR ", $clauses);
 			}
-			return "( (" . implode(") AND (", $wordclauses) . ") OR `dokumentid` IN (SELECT `dokumentid` FROM `dokumentnotizen` WHERE
-					(`nextlabel` LIKE '%" . implode("%' AND `nextlabel` LIKE '%", $escapedwords) . "%') OR
-					(`nextidentifier` LIKE '%" . implode("%' AND `nextidentifier` LIKE '%", $escapedwords) . "%') OR
+			return "(`dokumentid` IN (SELECT `dokumentid` FROM `dokumentrevisions` WHERE
+					(`label` LIKE '%" . implode("%' AND `label` LIKE '%", $escapedwords) . "%') OR
+					(`identifier` LIKE '%" . implode("%' AND `identifier` LIKE '%", $escapedwords) . "%') OR
 					(`kommentar` LIKE '%" . implode("%' AND `kommentar` LIKE '%", $escapedwords) . "%') ))";
 		}
 		throw new Exception("Not implemented: ".get_class($matcher));
 	}
 
 	public function parseDokument($row) {
-		return $this->parseRow($row, null, "Dokument");
+		$o = $this->parseRow($row, null, array("d" => "Dokument", "r" => "DokumentRevision"));
+		$o["d"]->setLatestRevision($o["r"]);
+		return $o["d"];
 	}
 	public function getDokumentCount($matcher) {
 		$sql = "SELECT	COUNT(`d`.`dokumentid`)
 			FROM	`dokument` `d`
-			WHERE	" . $this->parseDokumentMatcher($matcher);
+			LEFT JOIN `dokumentrevisions` `r` USING (`dokumentid`)
+			WHERE	`r`.`timestamp` = (SELECT MAX(`rmax`.`timestamp`) FROM `dokumentrevisions` `rmax` WHERE `rmax`.`dokumentid` = `r`.`dokumentid`)
+				AND " . $this->parseDokumentMatcher($matcher);
 		return reset($this->getResult($sql)->fetchRow());
 	}
 	public function getDokumentResult($matcher, $limit = null, $offset = null) {
-		$sql = "SELECT	`d`.`dokumentid`,
-				`d`.`gliederungid`,
-				`d`.`dokumentkategorieid`,
-				`d`.`dokumentstatusid`,
-				`d`.`identifier`,
-				`d`.`label`,
-				`d`.`content`,
-				`d`.`data`,
-				`d`.`fileid`
+		$sql = "SELECT	`r`.`timestamp` AS `null`,
+				`d`.`dokumentid` AS `d_dokumentid`,
+				`r`.`revisionid` as `r_revisionid`,
+				UNIX_TIMESTAMP(`r`.`timestamp`) as `r_timestamp`,
+				`r`.`userid` as `r_userid`,
+				`r`.`dokumentid` as `r_dokumentid`,
+				`r`.`gliederungid` as `r_gliederungid`,
+				`r`.`kategorieid` as `r_kategorieid`,
+				`r`.`statusid` as `r_statusid`,
+				`r`.`identifier` as `r_identifier`,
+				`r`.`label` as `r_label`,
+				`r`.`content` as `r_content`,
+				`r`.`data` as `r_data`,
+				`r`.`fileid` as `r_fileid`,
+				`r`.`kommentar` AS `r_kommentar`
 			FROM	`dokument` `d`
-			WHERE	" . $this->parseDokumentMatcher($matcher);
+			LEFT JOIN `dokumentrevisions` `r` USING (`dokumentid`)
+			WHERE	`r`.`timestamp` = (SELECT MAX(`rmax`.`timestamp`) FROM `dokumentrevisions` `rmax` WHERE `rmax`.`dokumentid` = `r`.`dokumentid`)
+				AND " . $this->parseDokumentMatcher($matcher);
 		if ($limit !== null or $offset !== null) {
 			$sql .= " LIMIT ";
 			if ($offset !== null) {
@@ -1927,7 +1944,7 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 	public function getDokumentIdentifierMaxNumber($identifierPrefix, $identifierNumberCount) {
 		$identifierPrefixEscaped = str_replace(array("/", "%", "?", "_"), array("//", "/%", "/?", "/_"), $identifierPrefix);
-		$sql = "SELECT `identifier` FROM `dokument` WHERE `identifier` LIKE '" . $this->escape($identifierPrefixEscaped) . str_repeat("_", $identifierNumberCount) . "' ESCAPE '/' ORDER BY `identifier` DESC LIMIT 1";
+		$sql = "SELECT `identifier` FROM `dokumentrevisions` WHERE `identifier` LIKE '" . $this->escape($identifierPrefixEscaped) . str_repeat("_", $identifierNumberCount) . "' ESCAPE '/' ORDER BY `identifier` DESC LIMIT 1";
 		$rslt = $this->getResult($sql);
 		if ($rslt->getCount() == 0) {
 			return 0;
@@ -1935,36 +1952,33 @@ abstract class SQLStorage extends AbstractStorage {
 		$row = $rslt->fetchRow();
 		return intval(substr($row["identifier"], strlen($identifierPrefix)));
 	}
-	public function getDokumentByMitgliedResult($mitgliedid) {
-		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` LEFT JOIN `mitglieddokument` USING (`dokumentid`) WHERE `mitgliedid` = " . intval($mitgliedid);
-		return $this->getResult($sql, array($this, "parseDokument"));
-	}
 	public function getDokument($dokumentid) {
-		$sql = "SELECT `dokumentid`, `gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid` FROM `dokument` WHERE `dokumentid` = " . intval($dokumentid);
+		$sql = "SELECT	`r`.`timestamp` AS `null`,
+				`d`.`dokumentid` AS `d_dokumentid`,
+				`r`.`revisionid` as `r_revisionid`,
+				UNIX_TIMESTAMP(`r`.`timestamp`) as `r_timestamp`,
+				`r`.`userid` as `r_userid`,
+				`r`.`dokumentid` as `r_dokumentid`,
+				`r`.`gliederungid` as `r_gliederungid`,
+				`r`.`kategorieid` as `r_kategorieid`,
+				`r`.`statusid` as `r_statusid`,
+				`r`.`identifier` as `r_identifier`,
+				`r`.`label` as `r_label`,
+				`r`.`content` as `r_content`,
+				`r`.`data` as `r_data`,
+				`r`.`fileid` as `r_fileid`,
+				`r`.`kommentar` AS `r_kommentar`
+			FROM	`dokument` `d`
+			LEFT JOIN `dokumentrevisions` `r` USING (`dokumentid`)
+			WHERE	`r`.`timestamp` = (SELECT MAX(`rmax`.`timestamp`) FROM `dokumentrevisions` `rmax` WHERE `rmax`.`dokumentid` = `r`.`dokumentid`)
+				AND `d`.`dokumentid` = " . intval($dokumentid);
 		return $this->getResult($sql, array($this, "parseDokument"))->fetchRow();
 	}
-	public function setDokument($dokumentid, $gliederungid, $dokumentkategorieid, $dokumentstatusid, $identifier, $label, $content, $data, $fileid) {
+	public function setDokument($dokumentid) {
 		if ($dokumentid == null) {
-			$sql = "INSERT INTO `dokument`
-				(`gliederungid`, `dokumentkategorieid`, `dokumentstatusid`, `identifier`, `label`, `content`, `data`, `fileid`) VALUES
-				(" . intval($gliederungid) . ",
-				 " . intval($dokumentkategorieid) . ",
-				 " . intval($dokumentstatusid) . ",
-				 '" . $this->escape($identifier) . "',
-				 '" . $this->escape($label) . "',
-				 '" . $this->escape($content) . "',
-				 '" . $this->escape($data) . "',
-				 " . intval($fileid) . ")";
+			$sql = "INSERT INTO `dokument` () VALUES ()";
 		} else {
 			$sql = "UPDATE `dokument`
-				SET	`gliederungid` = " . intval($gliederungid) . ",
-					`dokumentkategorieid` = " . intval($dokumentkategorieid) . ",
-					`dokumentstatusid` = " . intval($dokumentstatusid) . ",
-					`identifier` = '" . $this->escape($identifier) . "',
-					`label` = '" . $this->escape($label) . "',
-					`content` = '" . $this->escape($content) . "',
-					`data` = '" . $this->escape($data) . "',
-					`fileid` = " . intval($fileid) . "
 				WHERE `dokumentid` = " . intval($dokumentid);
 		}
 		$this->query($sql);
@@ -1976,30 +1990,6 @@ abstract class SQLStorage extends AbstractStorage {
 	public function delDokument($dokumentid) {
 		$sql = "DELETE FROM `dokument` WHERE `dokumentid` = " . intval($dokumentid);
 		return $this->query($sql);
-	}
-
-	/**
-	 * DokumentDokumentFlag
-	 **/
-	public function getDokumentDokumentFlagResult($dokumentid) {
-		$sql = "SELECT	`dokumentflags`.`flagid`, `dokumentflags`.`label`
-			FROM	`dokumentdokumentflags`
-			LEFT JOIN `dokumentflags` USING (`flagid`)
-			WHERE	`dokumentdokumentflags`.`dokumentid` = " . intval($dokumentid);
-		return $this->getResult($sql, array($this, "parseDokumentFlag"));
-	}
-
-	public function setDokumentDokumentFlagList($dokumentid, $flagids) {
-		$sql = "DELETE FROM `dokumentdokumentflags` WHERE `dokumentid` = " . intval($dokumentid);
-		$this->query($sql);
-		$sqlinserts = array();
-		foreach ($flagids as $flagid) {
-			$sqlinserts[] = "(" . intval($dokumentid) . ", " . intval($flagid) . ")";
-		}
-		if (count($sqlinserts) > 0) {
-			$sql = "INSERT INTO `dokumentdokumentflags` (`dokumentid`, `flagid`) VALUES " . implode(", ", $sqlinserts);
-			$this->query($sql);
-		}
 	}
 
 	/**
@@ -2143,100 +2133,73 @@ abstract class SQLStorage extends AbstractStorage {
 	}
 
 	/**
-	 * DokumentNotiz
+	 * DokumentRevision
 	 **/
-	public function parseDokumentNotiz($row) {
-		return $this->parseRow($row, null, "DokumentNotiz");
+	public function parseDokumentRevision($row) {
+		return $this->parseRow($row, null, "DokumentRevision");
 	}
-	public function getDokumentNotizResultTimeline($gliederungids, $start, $count) {
-		$sql = "SELECT `dokumentnotizid`, `dokumentid`, `author`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `nextState`, `nextKategorie`, `nextLabel`, `nextIdentifier`, `kommentar` FROM `dokumentnotizen` ORDER BY `timestamp` DESC LIMIT " . intval($start) . "," . intval($count);
-		return $this->getResult($sql, array($this, "parseDokumentNotiz"));
+	public function getDokumentRevisionResultTimeline($gliederungids, $start, $count) {
+		$sql = "SELECT	`revisionid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `userid`, `dokumentid`, `gliederungid`, `kategorieid`, `statusid`, `identifier`, `label`, `content`, `data`, `fileid`, `kommentar`
+			FROM	`dokumentrevisions`
+			WHERE	`gliederungid` IN (" . implode(",", array_map("intval", $gliederungids)) . ")
+			ORDER BY `timestamp` DESC LIMIT " . intval($start) . "," . intval($count);
+		return $this->getResult($sql, array($this, "parseDokumentRevision"));
 	}
-	public function getDokumentNotizResult($dokumentid = null) {
-		$sql = "SELECT `dokumentnotizid`, `dokumentid`, `author`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `nextState`, `nextKategorie`, `nextLabel`, `nextIdentifier`, `kommentar` FROM `dokumentnotizen` WHERE 1=1";
+	public function getDokumentRevisionResult($dokumentid = null) {
+		$sql = "SELECT	`revisionid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `userid`, `dokumentid`, `gliederungid`, `kategorieid`, `statusid`, `identifier`, `label`, `content`, `data`, `fileid`, `kommentar`
+			FROM	`dokumentrevisions` WHERE 1=1";
 		if ($dokumentid != null) {
 			$sql .= " AND `dokumentid` = " . intval($dokumentid);
 		}
-		$sql .= " ORDER BY `timestamp` ASC";
-		return $this->getResult($sql, array($this, "parseDokumentNotiz"));
+		$sql .= " ORDER BY `timestamp`";
+		return $this->getResult($sql, array($this, "parseDokumentRevision"));
 	}
-	public function getDokumentNotiz($dokumentnotizid) {
-		$sql = "SELECT `dokumentnotizid`, `dokumentid`, `author`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `nextState`, `nextKategorie`, `nextLabel`, `nextIdentifier`, `kommentar` FROM `dokumentnotizen` WHERE `dokumentnotizid` = " . intval($dokumentnotizid);
-		return $this->getResult($sql, array($this, "parseDokumentNotiz"))->fetchRow();
+	public function getDokumentRevision($revisionid) {
+		$sql = "SELECT	`revisionid`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `userid`, `dokumentid`, `gliederungid`, `kategorieid`, `statusid`, `identifier`, `label`, `content`, `data`, `fileid`, `kommentar`
+			FROM	`dokumentrevisions` WHERE `revisionid` = " . intval($revisionid);
+		return $this->getResult($sql, array($this, "parseDokumentRevision"))->fetchRow();
 	}
-	public function setDokumentNotiz($dokumentnotizid, $dokumentid, $author, $timestamp, $nextKategorie, $nextState, $nextLabel, $nextIdentifier, $kommentar) {
-		if ($dokumentnotizid == null) {
-			$sql = "INSERT INTO `dokumentnotizen`
-				(`dokumentid`, `author`, `timestamp`, `nextState`, `nextKategorie`, `nextLabel`, `nextIdentifier`, `kommentar`) VALUES
-				(" . intval($dokumentid) . ",
-				 " . intval($author) . ",
-				 '" . date("Y-m-d H:i:s", $timestamp) . "',
-				 " . ($nextState == null ? "NULL" : intval($nextState)) . ",
-				 " . ($nextKategorie == null ? "NULL" : intval($nextKategorie)) . ",
-				 " . ($nextLabel == null ? "NULL" : "'".$this->escape($nextLabel)."'") . ",
-				 " . ($nextIdentifier == null ? "NULL" : "'".$this->escape($nextIdentifier)."'") . ",
-				 '" . $this->escape($kommentar) . "')";
+	public function setDokumentRevision($revisionid, $timestamp, $userid, $dokumentid, $gliederungid, $kategorieid, $statusid, $identifier, $label, $content, $data, $fileid, $kommentar) {
+		if ($revisionid == null) {
+			$sql = "INSERT INTO `dokumentrevisions` (`timestamp`, `userid`, `dokumentid`, `gliederungid`, `kategorieid`, `statusid`, `identifier`, `label`, `content`, `data`, `fileid`, `kommentar`) VALUES (
+				'" . date("Y-m-d H:i:s", $timestamp) . "', " . intval($userid) . ", " . intval($dokumentid) . ", " . intval($gliederungid) . ", " . intval($kategorieid) . ", " . intval($statusid) . ",
+				'" . $this->escape($identifier) . "', '" . $this->escape($label) . "', '" . $this->escape($content) . "', '" . $this->escape($data) . "', " . intval($fileid) . ", '" . $this->escape($kommentar) . "')";
 		} else {
-			$sql = "UPDATE	`dokumentnotizen`
-				SET	`dokumentid` = " . intval($dokumentid) . ",
-					`author` = " . intval($author) . ",
-					`timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "',
-					`nextState` = " . ($nextState == null ? "NULL" : intval($nextState)) . ",
-					`nextKategorie` = " . ($nextKategorie == null ? "NULL" : intval($nextKategorie)) . ",
-					`nextLabel` = " . ($nextLabel == null ? "NULL" : "'".$this->escape($nextLabel)."'") . ",
-					`nextIdentifier` = " . ($nextIdentifier == null ? "NULL" : "'".$this->escape($nextIdentifier)."'") . ",
-					`kommentar` = '" . $this->escape($kommentar) . "'
-				WHERE `dokumentnotizid` = " . intval($dokumentnotizid);
+			$sql = "UPDATE `dokumentrevisions` SET `timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "', `userid` = " . intval($userid) . ", `dokumentid` = " . intval($dokumentid) . ",
+					`gliederungid` = " . intval($gliederungid) . ", `kategorieid` = " . intval($kategorieid) . ", `statusid` = " . intval($statusid) . ",
+					`identifier` = '" . $this->escape($identifier) . "', `label` = '" . $this->escape($label) . "', `content` = '" . $this->escape($content) . "',
+					`data` = '" . $this->escape($data) . "', `fileid` = " . intval($fileid) . ", `kommentar` = '" . $this->escape($kommentar) . "' WHERE `revisionid` = " . intval($revisionid);
 		}
 		$this->query($sql);
-		if ($dokumentnotizid == null) {
-			$dokumentnotizid = $this->getInsertID();
+		if ($revisionid == null) {
+			$revisionid = $this->getInsertID();
 		}
-		return $dokumentnotizid;
+		return $revisionid;
 	}
-	public function delDokumentNotiz($dokumentnotizid) {
-		$sql = "DELETE FROM `dokumentnotizen` WHERE `dokumentnotizid` = " . intval($dokumentnotizid);
-		return $this->query($sql);
+	public function delDokumentRevision($revisionid) {
+		$sql = "DELETE FROM `dokumentrevisions` WHERE `revisionid` = " . intval($revisionid);
+		$this->query($sql);
 	}
 
 	/**
-	 * DokumentNotizFlags
+	 * DokumentRevisionFlags
 	 **/
-	public function getDokumentNotizFlagResultAdd($notizid) {
+	public function getDokumentRevisionFlagResult($revisionid) {
 		$sql = "SELECT	`dokumentflags`.`flagid`, `dokumentflags`.`label`
-			FROM	`dokumentnotizflags`
-			LEFT JOIN	`dokumentflags` ON (`dokumentnotizflags`.`flagid` = `dokumentflags`.`flagid`)
-			WHERE	`dokumentnotizflags`.`notizid` = " . intval($notizid) . " AND `dokumentnotizflags`.`change` = 'add'";
+			FROM	`dokumentrevisionflags`
+			LEFT JOIN	`dokumentflags` USING (`flagid`)
+			WHERE	`dokumentrevisionflags`.`revisionid` = " . intval($revisionid);
 		return $this->getResult($sql, array($this, "parseDokumentFlag"));
 	}
-	public function setDokumentNotizFlagListAdd($notizid, $flags) {
-		$sql = "DELETE FROM `dokumentnotizflags` WHERE `notizid` = " . intval($notizid) . " AND `change` = 'add'";
+	public function setDokumentRevisionFlagList($revisionid, $flags) {
+		$sql = "DELETE FROM `dokumentrevisionflags` WHERE `revisionid` = " . intval($revisionid);
 		$this->query($sql);
 		$sqlinserts = array();
 		while (count($flags) > 0) {
-			$sqlinserts[] = "(" . intval($notizid) . ", " . intval(array_shift($flags)) . ", 'add')";
+			$sqlinserts[] = "(" . intval($revisionid) . ", " . intval(array_shift($flags)) . ")";
 		}
 		if (count($sqlinserts) > 0) {
-			$sql = "INSERT INTO `dokumentnotizflags` (`notizid`, `flagid`, `change`) VALUES " . implode(", ", $sqlinserts);
-			$this->query($sql);
-		}
-	}
-	public function getDokumentNotizFlagResultDel($notizid) {
-		$sql = "SELECT	`dokumentflags`.`flagid`, `dokumentflags`.`label`
-			FROM	`dokumentnotizflags`
-			LEFT JOIN	`dokumentflags` ON (`dokumentnotizflags`.`flagid` = `dokumentflags`.`flagid`)
-			WHERE	`dokumentnotizflags`.`notizid` = " . intval($notizid) . " AND `dokumentnotizflags`.`change` = 'del'";
-		return $this->getResult($sql, array($this, "parseDokumentFlag"));
-	}
-	public function setDokumentNotizFlagListDel($notizid, $flags) {
-		$sql = "DELETE FROM `dokumentnotizflags` WHERE `notizid` = " . intval($notizid) . " AND `change` = 'del'";
-		$this->query($sql);
-		$sqlinserts = array();
-		while (count($flags) > 0) {
-			$sqlinserts[] = "(" . intval($notizid) . ", " . intval(array_shift($flags)) . ", 'del')";
-		}
-		if (count($sqlinserts) > 0) {
-			$sql = "INSERT INTO `dokumentnotizflags` (`notizid`, `flagid`, `change`) VALUES " . implode(", ", $sqlinserts);
+			$sql = "INSERT INTO `dokumentrevisionflags` (`revisionid`, `flagid`) VALUES " . implode(", ", $sqlinserts);
 			$this->query($sql);
 		}
 	}

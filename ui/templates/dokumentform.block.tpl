@@ -3,8 +3,8 @@
 <div class="control-group">
     <label class="control-label" for="gliederungid">{"Gliederung:"|__}</label>
     <div class="controls">
-        {if isset($dokument)}
-         {$dokument.gliederung.label|escape:html}
+        {if isset($revision)}
+         {$revision.gliederung.label|escape:html}
         {else}
          {include file=gliederungdropdown.block.tpl defaulttext="(auswählen)" selectedgliederungid=$gliederung.gliederungid}
         {/if}
@@ -13,8 +13,8 @@
 <div class="control-group">
     <label class="control-label" for="kategorieid">{"Kategorie:"|__}</label>
     <div class="controls">
-        {if isset($dokument)}
-         {include file=dokumentkategoriedropdown.block.tpl defaulttext="(auswählen)" selecteddokumentkategorieid=$dokument.dokumentkategorie.dokumentkategorieid}
+        {if isset($revision)}
+         {include file=dokumentkategoriedropdown.block.tpl defaulttext="(auswählen)" selecteddokumentkategorieid=$revision.kategorie.dokumentkategorieid}
         {else}
          {include file=dokumentkategoriedropdown.block.tpl defaulttext="(auswählen)" selecteddokumentkategorieid=$dokumentkategorie.dokumentkategorieid}
         {/if}
@@ -23,10 +23,10 @@
 <div class="control-group">
     <label class="control-label" for="statusid">{"Status:"|__}</label>
     <div class="controls">
-        {if isset($dokument)}
-         {include file=dokumentstatusdropdown.block.tpl defaulttext="(auswählen)" selecteddokumentstatusid=$dokument.dokumentstatus.dokumentstatusid}
+        {if isset($revision)}
+         {include file=dokumentstatusdropdown.block.tpl defaulttext="(auswählen)" selecteddokumentstatusid=$revision.status.dokumentstatusid}
         {else}
-         {include file=dokumentstatusdropdown.block.tpl defaulttext="(auswählen)" selecteddokumentstatusid=$dokumentstatus.dokumentstatusid}
+         {include file=dokumentstatusdropdown.block.tpl defaulttext="(auswählen)" selecteddokumentstatusid=$dokumentstatus.statusid}
         {/if}
     </div>
 </div>
@@ -35,15 +35,15 @@
 <div class="control-group">
     <label class="control-label" for="flags[{$flag.flagid}]">{$flag.label|escape:html}</label>
     <div class="controls">
-        <input type="checkbox" name="flags[{$flag.flagid}]" {if isset($dokument.flags.$flagid) or isset($data.flags.$flagid)}checked="checked"{/if} />
+        <input type="checkbox" name="flags[{$flag.flagid}]" {if isset($revision.flags.$flagid) or isset($data.flags.$flagid)}checked="checked"{/if} />
     </div>
 </div>
 {/foreach}
 <div class="control-group">
     <label class="control-label" for="file">{"Datei:"|__}</label>
     <div class="controls">
-        {if isset($dokument)}
-         <a href="{"dokumente_get"|___:$dokument.dokumentid}" class="btn btn-info">{"Download"|__}</a>
+        {if isset($revision)}
+         <a href="{"dokumentrevision_get"|___:$revision.revisionid}" class="btn btn-info">{"Download"|__}</a>
         {else}
          <input type="file" name="file" />
         {/if}
@@ -52,13 +52,13 @@
 <div class="control-group">
     <label class="control-label" for="identifier">{"Identifikation:"|__}</label>
     <div class="controls">
-        <input type="text" name="identifier" value="{if isset($dokument)}{$dokument.identifier|escape:html}{/if}" />
+        <input type="text" name="identifier" value="{if isset($revision)}{$revision.identifier|escape:html}{/if}" />
     </div>
 </div>
 <div class="control-group">
     <label class="control-label" for="label">{"Titel:"|__}</label>
     <div class="controls">
-        <input type="text" name="label" size="40" value="{if isset($dokument)}{$dokument.label}{/if}" />
+        <input type="text" name="label" size="40" value="{if isset($revision)}{$revision.label}{/if}" />
     </div>
 </div>
 <div class="control-group">

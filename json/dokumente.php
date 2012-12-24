@@ -23,7 +23,7 @@ foreach ($dokumente AS $dokument) {
 	$row = array();
 	$row["dokumentid"] = $dokument->getDokumentID();
 	$row["location"] = $session->getLink("dokumente_details", $dokument->getDokumentID());
-	$row["label"] = $dokument->getIdentifier() . " " . $dokument->getLabel();
+	$row["label"] = $dokument->getLatestRevision()->getIdentifier() . " " . $dokument->getLatestRevision()->getLabel();
 
 	$jsons[] = $row;
 }

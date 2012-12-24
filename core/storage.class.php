@@ -192,13 +192,25 @@ interface Storage {
 	public function getDokumentIdentifierMaxNumber($identifierPrefix, $identifierNumberLength);
 	public function getDokumentCount($matcher);
 	public function getDokument($dokumentid);
-	public function setDokument($dokumentid, $gliederungid, $dokumentkategorieid, $dokumentstatus, $identifier, $label, $content, $data, $fileid);
+	public function setDokument($dokumentid);
 	public function delDokument($dokumentid);
 
 	public function getDokumentNotifyResult($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null);
 	public function getDokumentNotifyList($gliederungid = null, $dokumentkategorieid = null, $dokumentstatusid = null);
 	public function getDokumentNotify($dokumentnotifyid);
 	public function setDokumentNotify($dokumentnotifyid, $gliederungid, $dokumentkategorieid, $dokumentstatusid, $emailid);
+
+	public function getDokumentRevisionResultTimeline($gliederungids, $start, $count);
+	public function getDokumentRevisionListTimeline($gliederungids, $start, $count);
+	public function getDokumentRevisionResult($dokumentid = null);
+	public function getDokumentRevisionList($dokumentid = null);
+	public function getDokumentRevision($revisionid);
+	public function setDokumentRevision($revisionid, $timestamp, $userid, $dokumentid, $gliederungid, $kategorieid, $statusid, $identifier, $label, $content, $data, $fileid, $kommentar);
+	public function delDokumentRevision($revisionid);
+
+	public function getDokumentRevisionFlagResult($revisionid);
+	public function getDokumentRevisionFlagList($revisionid);
+	public function setDokumentRevisionFlagList($revisionid, $flags);
 
 	public function getDokumentKategorieResult();
 	public function getDokumentKategorieList();
@@ -217,25 +229,6 @@ interface Storage {
 	public function getDokumentFlag($flagid);
 	public function setDokumentFlag($flagid, $status);
 	public function delDokumentFlag($flagid);
-
-	public function getDokumentDokumentFlagResult($dokumentid);
-	public function getDokumentDokumentFlagList($dokumentid);
-	public function setDokumentDokumentFlagList($dokumentid, $flagids);
-
-	public function getDokumentNotizResultTimeline($gliederungids, $start, $count);
-	public function getDokumentNotizListTimeline($gliederungids, $start, $count);
-	public function getDokumentNotizResult($dokumentid = null);
-	public function getDokumentNotizList($dokumentid = null);
-	public function getDokumentNotiz($dokumentnotizid);
-	public function setDokumentNotiz($dokumentnotizid, $dokumentid, $author, $timestamp, $nextState, $nextKategorie, $nextLabel, $nextIdentifier, $kommentar);
-	public function delDokumentNotiz($dokumentnotizid);
-
-	public function getDokumentNotizFlagResultAdd($notizid);
-	public function getDokumentNotizFlagListAdd($notizid);
-	public function setDokumentNotizFlagListAdd($notizid, $flags);
-	public function getDokumentNotizFlagResultDel($notizid);
-	public function getDokumentNotizFlagListDel($notizid);
-	public function setDokumentNotizFlagListDel($notizid, $flags);
 
 	public function getFileResult();
 	public function getFileList();
@@ -448,6 +441,18 @@ abstract class AbstractStorage implements Storage {
 		return $this->getDokumentNotizResultTimeline($gliederungids, $start, $count)->fetchAll();
 	}
 
+	public function getDokumentRevisionListTimeline($gliederungids, $start, $count) {
+		return $this->getDokumentRevisionResultTimeline($gliederungids, $start, $count)->fetchAll();
+	}
+
+	public function getDokumentRevisionList($dokumentid = null) {
+		return $this->getDokumentRevisionResult($dokumentid)->fetchAll();
+	}
+
+	public function getDokumentRevisionFlagList($revisionid) {
+		return $this->getDokumentRevisionFlagResult($revisionid)->fetchAll();
+	}
+
 	public function getDokumentNotizList($dokumentid = null) {
 		return $this->getDokumentNotizResult($dokumentid)->fetchAll();
 	}
@@ -613,7 +618,7 @@ abstract class AbstractStorage implements Storage {
 	public function getSingleDokumentTransitionList($session, $dokument) {
 		$transitionen = array();
 		foreach ($this->dokumenttransitionen as $transition) {
-			if ($transition instanceof SingleDokumentTransition && $transition->isMatching($session, $dokument->getDokumentKategorieID(), $dokument->getDokumentStatusID())) {
+			if ($transition instanceof SingleDokumentTransition && $transition->isMatching($session, $dokument->getLatestRevision()->getKategorieID(), $dokument->getLatestRevision()->getStatusID())) {
 				$transitionen[] = $transition;
 			}
 		}

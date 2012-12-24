@@ -999,3 +999,78 @@ INSERT INTO `users` (`userid`, `username`, `password`, `passwordsalt`, `apikey`,
 -- Update 2012-12-16
 
 ALTER TABLE  `kontakte` ADD  `iban` VARCHAR( 34 ) NULL;
+
+-- Update 2012-12-23
+
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `dokumentrevisions` (
+  `revisionid` int(10) unsigned NOT NULL auto_increment,
+  `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `userid` int(10) unsigned default NULL,
+  `dokumentid` int(10) unsigned NOT NULL,
+  `gliederungid` int(10) unsigned NOT NULL,
+  `kategorieid` int(10) unsigned NOT NULL,
+  `statusid` int(10) unsigned NOT NULL,
+  `identifier` varchar(30) NOT NULL,
+  `label` varchar(50) NOT NULL,
+  `content` text NOT NULL,
+  `data` blob,
+  `fileid` int(10) unsigned NOT NULL,
+  PRIMARY KEY  (`revisionid`),
+  KEY `userid` (`userid`),
+  KEY `dokumentid` (`dokumentid`),
+  KEY `gliederungid` (`gliederungid`),
+  KEY `kategorieid` (`kategorieid`),
+  KEY `statusid` (`statusid`),
+  KEY `identifier` (`identifier`),
+  KEY `fileid` (`fileid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+ALTER TABLE `dokumentrevisions`
+  ADD CONSTRAINT `dokumentrevisions_ibfk_6` FOREIGN KEY (`fileid`) REFERENCES `files` (`fileid`),
+  ADD CONSTRAINT `dokumentrevisions_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `users` (`userid`),
+  ADD CONSTRAINT `dokumentrevisions_ibfk_2` FOREIGN KEY (`dokumentid`) REFERENCES `dokument` (`dokumentid`),
+  ADD CONSTRAINT `dokumentrevisions_ibfk_3` FOREIGN KEY (`gliederungid`) REFERENCES `gliederungen` (`gliederungsid`),
+  ADD CONSTRAINT `dokumentrevisions_ibfk_4` FOREIGN KEY (`kategorieid`) REFERENCES `dokumentkategorien` (`dokumentkategorieid`),
+  ADD CONSTRAINT `dokumentrevisions_ibfk_5` FOREIGN KEY (`statusid`) REFERENCES `dokumentstatus` (`dokumentstatusid`);
+
+ALTER TABLE  `dokumentrevisions` ADD  `kommentar` TEXT NOT NULL;
+
+CREATE TABLE  `vpanel`.`dokumentrevisionflags` (
+`revisionid` INT UNSIGNED NOT NULL ,
+`flagid` INT UNSIGNED NOT NULL ,
+PRIMARY KEY (  `revisionid` ,  `flagid` )
+) ENGINE = INNODB;
+
+ALTER TABLE  `dokumentrevisionflags` ADD FOREIGN KEY (  `revisionid` ) REFERENCES  `vpanel`.`dokumentrevisions` (
+`revisionid`
+);
+
+ALTER TABLE  `dokumentrevisionflags` ADD FOREIGN KEY (  `flagid` ) REFERENCES  `vpanel`.`dokumentflags` (
+`flagid`
+);
+
+UPDATE `dashboardwidgets` SET `type` = 'DokumentRevisionTimelineDashboardWidget' WHERE `type` = 'DokumentNotizenTimelineDashboardWidget';
+
+-- (After migration)
+
+DROP TABLE `dokumentdokumentflags`, `dokumentnotizen`, `dokumentnotizflags`;
+
+ALTER TABLE  `dokument` DROP FOREIGN KEY  `dokument_ibfk_5` ;
+
+ALTER TABLE  `dokument` DROP FOREIGN KEY  `dokument_ibfk_1` ;
+
+ALTER TABLE  `dokument` DROP FOREIGN KEY  `dokument_ibfk_2` ;
+
+ALTER TABLE  `dokument` DROP FOREIGN KEY  `dokument_ibfk_4` ;
+
+ALTER TABLE `dokument`
+  DROP `gliederungid`,
+  DROP `dokumentkategorieid`,
+  DROP `dokumentstatusid`,
+  DROP `identifier`,
+  DROP `label`,
+  DROP `content`,
+  DROP `data`,
+  DROP `fileid`;

@@ -1,9 +1,9 @@
-{capture assign=ansicht}Dokument <em>&raquo;{$dokument.label|escape:html}&laquo;</em> anzeigen{/capture}
+{capture assign=ansicht}Dokument <em>&raquo;{$dokument.latest.label|escape:html}&laquo;</em> anzeigen{/capture}
 {include file="header.html.tpl" ansicht=$ansicht menupunkt="dokument"}
 <div>
 <div class="row-fluid">
 	<div class="span6">
-		{include file="dokumentform.block.tpl" dokument=$dokument dokumentkategorien=$dokumentkategorien dokumentstatuslist=$dokumentstatuslist}
+		{include file="dokumentform.block.tpl" dokument=$dokument revision=$dokument.latest dokumentkategorien=$dokumentkategorien dokumentstatuslist=$dokumentstatuslist}
 	</div>
 	<div class="span6">
 		<div class="btn-toolbar">
@@ -21,18 +21,25 @@
 		</div>
 		{include file="mitgliederlist.block.tpl" mitglieder=$mitglieder showmitglieddokumentdel=1}
 
-		{foreach from=$dokumentnotizen item=notiz}
+		{foreach from=$dokumentrevisionen item=revision}
 		<div class="well">
 			<ul style="font-size:0.8em; list-style-type:square;">
-				<li class="meta">{"Von %s"|__:$notiz.author.username} {include file="timestamp.tpl" timestamp=$notiz.timestamp}</li>
-				{if isset($notiz.nextkategorie)}<li class="nextkategorie">{"Unter %s abgelegt"|__:$notiz.nextkategorie.label}</li>{/if}
-				{if isset($notiz.nextstatus)}<li class="nextstatus">{"Als %s markiert"|__:$notiz.nextstatus.label}</li>{/if}
-				{if isset($notiz.nextlabel)}<li class="nextlabel">{"In %s umbenannt"|__:$notiz.nextlabel}</li>{/if}
-				{if isset($notiz.nextidentifier)}<li class="nextidentifier">{"Als %s abgeheftet"|__:$notiz.nextidentifier}</li>{/if}
-				{foreach from=$notiz.addFlags item=flag}<li class="nextaddflag">{$flag.label|escape:html} hinzugef&uuml;gt</li>{/foreach}
-				{foreach from=$notiz.delFlags item=flag}<li class="nextdelflag">{$flag.label|escape:html} entfernt</li>{/foreach}
+				<li class="meta">{"Von %s"|__:$revision.user.username} {include file="timestamp.tpl" timestamp=$revision.timestamp}</li>
+				{if !isset($revisionkategorie) || $revisionkategorie != $revision.kategorie.dokumentkategorieid}{assign var=revisionkategorie value=$revision.kategorie.dokumentkategorieid}
+					<li class="nextkategorie">{"Unter %s abgelegt"|__:$revision.kategorie.label}</li>{/if}
+				{if !isset($revisionstatus) || $revisionstatus != $revision.status.dokumentstatusid}{assign var=revisionstatus value=$revision.status.dokumentstatusid}
+					<li class="nextstatus">{"Als %s markiert"|__:$revision.status.label}</li>{/if}
+				{if !isset($revisionidentifier) || $revisionidentifier != $revision.identifier}{assign var=revisionidentifier value=$revision.identifier}
+					<li class="nextidentifier">{"Als %s abgeheftet"|__:$revision.identifier}</li>{/if}
+				{if !isset($revisionlabel) || $revisionlabel != $revision.label}{assign var=revisionlabel value=$revision.label}
+					<li class="nextlabel">{"In %s umbenannt"|__:$revision.label}</li>{/if}
+				{foreach from=$revision.flags key=flagid item=flag}{if !isset($revisionflags) || $revision.flags.$flagid != $revisionflags.$flagid}
+					<li class="nextaddflag">{$flag.label|escape:html} hinzugef&uuml;gt</li>{/if}{/foreach}
+				{if isset($revisionflags)}{foreach from=$revisionflags key=flagid item=flag}{if $revision.flags.$flagid != $revisionflags.$flagid}
+					<li class="nextdelflag">{$flag.label|escape:html} entfernt</li>{/if}{/foreach}{/if}
+				{assign var=revisionflags value=$revision.flags}
 			</ul>
-			<div class="kommentar" style="margin-top:0.5em;">{$notiz.kommentar}</div>
+			<div class="kommentar" style="margin-top:0.5em;">{$revision.kommentar}</div>
 		</div>
 		{/foreach}
 	</div>

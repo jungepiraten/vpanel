@@ -22,7 +22,7 @@ class MitgliedRevision extends GlobalClass {
 	private $natpersonid;
 	private $jurpersonid;
 	private $kontaktid;
-	
+
 	private $user;
 	private $mitglied;
 	private $mitgliedschaft;

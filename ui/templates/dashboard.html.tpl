@@ -60,7 +60,7 @@ function addWidget(column) {
 					$("<li>").append($("<a>").click(function(){setWidget(id,"static");checkWidgets(column);}).append("Statisch")),
 					$("<li>").append($("<a>").click(function(){setWidget(id,"mitgliederbeitragbuchung_timeline");checkWidgets(column);}).append("Beitragsbuchungen")),
 					$("<li>").append($("<a>").click(function(){setWidget(id,"mitgliederrevision_timeline");checkWidgets(column);}).append("Mitglieder")),
-					$("<li>").append($("<a>").click(function(){setWidget(id,"dokumentnotizen_timeline");checkWidgets(column);}).append("Dokumente"))
+					$("<li>").append($("<a>").click(function(){setWidget(id,"dokumentrevision_timeline");checkWidgets(column);}).append("Dokumente"))
 				)
 			)
 		)
@@ -89,7 +89,7 @@ function setWidget(id, type) {
 			)
 		));
 		break;
-	case "dokumentnotizen_timeline":
+	case "dokumentrevision_timeline":
 		content.append($("<div>").addClass("control-group").append(
 			$("<label>").addClass("control-label").text("Reloadzeit in Sekunden"),
 			$("<div>").addClass("controls").append(
