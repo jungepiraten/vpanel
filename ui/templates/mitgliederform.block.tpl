@@ -258,6 +258,11 @@ function saveIBanDE() {
             <input type="text" name="beitrag" value="{if isset($mitgliedrevision)}{$mitgliedrevision.beitrag|string_format:"%.2f"|escape:html}{elseif $data.beitrag != null}{$data.beitrag|string_format:"%.2f"|escape:html}{elseif isset($mitgliedtemplate)}{$mitgliedtemplate.beitrag|string_format:"%.2f"|escape:html}{/if}" style="width:4em;text-align:right;" />
             <span class="add-on">EUR</span>
         </div>
+        <select name="beitragtimeformatid">
+            {foreach from=$beitragtimeformats item=beitragtimeformat}
+                <option value="{$beitragtimeformat.beitragtimeformatid|escape:html}" {if (isset($mitgliedrevision) && $mitgliedrevision.beitragtimeformat.beitragtimeformatid == $beitragtimeformat.beitragtimeformatid) || $data.beitragtimeformatid == $beitragtimeformat.beitragtimeformatid}selected="selected"{/if}>{$beitragtimeformat.label|escape:html}</option>
+            {/foreach}
+        </select>
     </div>
 </div>
 

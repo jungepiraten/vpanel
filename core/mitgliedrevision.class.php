@@ -19,6 +19,7 @@ class MitgliedRevision extends GlobalClass {
 	private $gliederungid;
 	private $geloescht;
 	private $beitrag;
+	private $beitragtimeformatid;
 	private $natpersonid;
 	private $jurpersonid;
 	private $kontaktid;
@@ -27,6 +28,7 @@ class MitgliedRevision extends GlobalClass {
 	private $mitglied;
 	private $mitgliedschaft;
 	private $gliederung;
+	private $beitragtimeformat;
 	private $natperson;
 	private $jurperson;
 	private $kontakt;
@@ -44,6 +46,7 @@ class MitgliedRevision extends GlobalClass {
 		$revision->setGliederungID($row["gliederungsid"]);
 		$revision->isGeloescht($row["geloescht"]);
 		$revision->setBeitrag($row["beitrag"]);
+		$revision->setBeitragTimeFormatID($row["beitragtimeformatid"]);
 		$revision->setNatPersonID($row["natpersonid"]);
 		$revision->setJurPersonID($row["jurpersonid"]);
 		$revision->setKontaktID($row["kontaktid"]);
@@ -60,6 +63,7 @@ class MitgliedRevision extends GlobalClass {
 		$r->setGliederungID($this->getGliederungID());
 		$r->isGeloescht($this->isGeloescht());
 		$r->setBeitrag($this->getBeitrag());
+		$r->setBeitragTimeFormatID($this->getBeitragTimeFormatID());
 		$r->setNatPersonID($this->getNatPersonID());
 		$r->setJurPersonID($this->getJurPersonID());
 		$r->setKontaktID($this->getKontaktID());
@@ -193,6 +197,29 @@ class MitgliedRevision extends GlobalClass {
 
 	public function setBeitrag($beitrag) {
 		$this->beitrag = $beitrag;
+	}
+
+	public function getBeitragTimeFormatID() {
+		return $this->beitragtimeformatid;
+	}
+
+	public function setBeitragTimeFormatID($beitragtimeformatid) {
+		if ($beitragtimeformatid != $beitragtimeformatid) {
+			$this->beitragtimeformat = null;
+		}
+		$this->beitragtimeformatid = $beitragtimeformatid;
+	}
+
+	public function getBeitragTimeFormat() {
+		if ($this->beitragtimeformat == null) {
+			$this->beitragtimeformat = $this->getStorage()->getBeitragTimeFormat($this->getBeitragTimeFormatID());
+		}
+		return $this->beitragtimeformat;
+	}
+
+	public function setBeitragTimeFormat($beitragtimeformat) {
+		$this->setBeitragTimeFormatID($beitragtimeformat->getBeitragTimeFormatID());
+		$this->beitragtimeformat = $beitragtimeformat;
 	}
 
 	public function getKontakt() {
@@ -367,6 +394,7 @@ class MitgliedRevision extends GlobalClass {
 			$this->getGliederungID(),
 			$this->isGeloescht(),
 			$this->getBeitrag(),
+			$this->getBeitragTimeFormatID(),
 			$this->getNatPersonID(),
 			$this->getJurPersonID(),
 			$this->getKontaktID() ));

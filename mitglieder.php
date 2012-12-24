@@ -54,6 +54,7 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 	$mitgliedschaftid = $session->getIntVariable("mitgliedschaftid");
 	$mitgliedschaft = $session->getStorage()->getMitgliedschaft($mitgliedschaftid);
 	$beitrag = $session->getDoubleVariable("beitrag");
+	$beitragtimeformat = $session->getStorage()->getBeitragTimeFormat($session->getIntVariable("beitragtimeformatid"));
 	$flags = $session->getListVariable("flags");
 	$textfields = $session->getListVariable("textfields");
 
@@ -80,7 +81,7 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 		// Zwischenspeichern, um ersten Beitrag hinzuzufuegen
 		$mitglied->save();
 
-		$beitragobj = $session->getStorage()->searchBeitrag(date("Y",time()));
+		$beitragobj = $beitragtimeformat->getBeitrag();
 		if ($beitragobj != null) {
 			$mitgliedbeitrag = new MitgliedBeitrag($session->getStorage());
 			$mitgliedbeitrag->setMitglied($mitglied);
@@ -112,6 +113,7 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 	$revision->setMitgliedschaft($mitgliedschaft);
 	$revision->setGliederung($gliederung);
 	$revision->setBeitrag($beitrag);
+	$revision->setBeitragTimeFormat($beitragtimeformat);
 	$revision->setNatPerson($natperson);
 	$revision->setJurPerson($jurperson);
 	$revision->setKontakt($kontakt);
@@ -315,6 +317,7 @@ case "details":
 
 	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("mitglieder_show"));
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
+	$beitragtimeformats = $session->getStorage()->getBeitragTimeFormatList();
 	$mitgliederflags = $session->getStorage()->getMitgliedFlagList();
 	$mitgliedertextfields = $session->getStorage()->getMitgliedTextFieldList();
 	$mailtemplates = $session->getStorage()->getMailTemplateList($session->getAllowedGliederungIDs("mitglieder_show"));
@@ -322,7 +325,7 @@ case "details":
 	$states = $session->getStorage()->getStateList();
 	$beitraege = $session->getStorage()->getBeitragList();
 
-	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $mailtemplates, $filteractions, $states, $mitgliederflags, $mitgliedertextfields, $beitraege);
+	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $beitragtimeformats, $mailtemplates, $filteractions, $states, $mitgliederflags, $mitgliedertextfields, $beitraege);
 	exit;
 
 case "create":

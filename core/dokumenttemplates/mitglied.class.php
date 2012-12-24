@@ -43,6 +43,10 @@ class MitgliedDokumentTemplate extends NatPersonDokumentTemplate {
 		return $session->getVariable("beitrag");
 	}
 
+	private function getBeitragTimeFormatID($session) {
+		return $session->getIntVariable("beitragtimeformatid");
+	}
+
 	private function getFlags($session) {
 		return array_keys($session->getListVariable("flags"));
 	}
@@ -63,6 +67,7 @@ class MitgliedDokumentTemplate extends NatPersonDokumentTemplate {
 		$array["email"] = $this->getEMailAdresse($session);
 		$array["iban"] = $this->getIBan($session);
 		$array["beitrag"] = $this->getBeitrag($session);
+		$array["beitragtimeformatid"] = $this->getBeitragTimeFormatID($session);
 		$array["flags"] = array_flip($this->getFlags($session));
 		$array["textfields"] = $this->getTextFields($session);
 		return $array;

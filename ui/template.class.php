@@ -192,6 +192,18 @@ class Template {
 		return array_map(array($this, 'parseMailTemplate'), $rows);
 	}
 
+	protected function parseBeitragTimeFormat($beitragtimeformat) {
+		$row = array();
+		$row["beitragtimeformatid"] = $beitragtimeformat->getBeitragTimeFormatID();
+		$row["label"] = $beitragtimeformat->getLabel();
+		$row["format"] = $beitragtimeformat->getFormat();
+		return $row;
+	}
+
+	protected function parseBeitragTimeFormats($rows) {
+		return array_map(array($this, 'parseBeitragTimeFormat'), $rows);
+	}
+
 	protected function parseBeitrag($beitrag) {
 		$row = array();
 		$row["beitragid"] = $beitrag->getBeitragID();
@@ -365,6 +377,7 @@ class Template {
 		}
 		$row["kontakt"] = $this->parseKontakt($revision->getKontakt());
 		$row["beitrag"] = $revision->getBeitrag();
+		$row["beitragtimeformat"] = $this->parseBeitragTimeFormat($revision->getBeitragTimeFormat());
 		$row["flags"] = $this->parseMitgliederFlags($revision->getFlags());
 		$row["textfields"] = $this->parseMitgliederRevisionTextFields($revision->getTextFields());
 		$row["geloescht"] = $revision->isGeloescht();
@@ -824,7 +837,7 @@ class Template {
 		$this->smarty->display("mitgliederlist.html.tpl");
 	}
 
-	public function viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $mailtemplates, $filteractions, $states, $mitgliederflags, $mitgliedertextfields, $beitraege) {
+	public function viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $beitragtimeformats, $mailtemplates, $filteractions, $states, $mitgliederflags, $mitgliedertextfields, $beitraege) {
 		$this->smarty->assign("mitglied", $this->parseMitglied($mitglied));
 		$this->smarty->assign("mitgliedrevisions", $this->parseMitgliedRevisions($revisions));
 		$this->smarty->assign("mitgliedrevision", $this->parseMitgliedRevision($revision));
@@ -832,6 +845,7 @@ class Template {
 		$this->smarty->assign("dokumente", $this->parseDokumente($dokumente));
 		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
+		$this->smarty->assign("beitragtimeformats", $this->parseBeitragTimeFormats($beitragtimeformats));
 		$this->smarty->assign("mailtemplates", $this->parseMailTemplates($mailtemplates));
 		$this->smarty->assign("filteractions", $this->parseMitgliederFilterActions($filteractions));
 		$this->smarty->assign("states", $this->parseStates($states));

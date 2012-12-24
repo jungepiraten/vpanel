@@ -1074,3 +1074,37 @@ ALTER TABLE `dokument`
   DROP `content`,
   DROP `data`,
   DROP `fileid`;
+
+-- Update 2012-12-24
+
+CREATE TABLE  `vpanel`.`beitragtimeformat` (
+`beitragtimeformatid` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`label` VARCHAR( 50 ) NOT NULL ,
+`format` VARCHAR( 30 ) NOT NULL ,
+UNIQUE (
+`label`
+)
+) ENGINE = INNODB;
+
+INSERT INTO  `vpanel`.`beitragtimeformat` (
+`beitragtimeformatid` ,
+`label` ,
+`format`
+)
+VALUES (
+NULL ,  'jährlich',  'Jahresbeitrag %Y'
+);
+
+ALTER TABLE  `mitgliederrevisions` ADD  `beitragtimeformatid` INT UNSIGNED NOT NULL AFTER  `beitrag` ,
+ADD INDEX (  `beitragtimeformatid` );
+
+UPDATE `mitgliederrevisions` SET `beitragtimeformatid` = 1;
+
+ALTER TABLE  `mitgliederrevisions` ADD FOREIGN KEY (  `beitragtimeformatid` ) REFERENCES  `vpanel`.`beitragtimeformat` (
+`beitragtimeformatid`
+);
+
+UPDATE `beitraege` SET `label` = 'Jahresbeitrag 2010' WHERE `label` = '2010';
+UPDATE `beitraege` SET `label` = 'Jahresbeitrag 2011' WHERE `label` = '2011';
+UPDATE `beitraege` SET `label` = 'Jahresbeitrag 2012' WHERE `label` = '2012';
+

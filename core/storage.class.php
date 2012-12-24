@@ -46,6 +46,12 @@ interface Storage {
 	public function getGliederung($gliederungid);
 	public function setGliederung($gliederungid, $label, $parentid);
 
+	public function getBeitragTimeFormatResult();
+	public function getBeitragTimeFormatList();
+	public function getBeitragTimeFormat($beitragtimeformatid);
+	public function setBeitragTimeFormat($beitragtimeformatid, $label, $format);
+	public function delBeitragTimeFormat($beitragtimeformatid);
+
 	public function getBeitragResult();
 	public function getBeitragList();
 	public function getBeitrag($beitragid);
@@ -104,7 +110,7 @@ interface Storage {
 	public function getMitgliederRevisionsByMitgliedIDResult($mitgliedid);
 	public function getMitgliederRevisionsByMitgliedIDList($mitgliedid);
 	public function getMitgliederRevision($revisionid);
-	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $beitrag, $natpersonid, $jurpersonid, $kontaktid);
+	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $beitrag, $beitragtimeformatid, $natpersonid, $jurpersonid, $kontaktid);
 
 	public function getMitgliederRevisionFlagResult($revisionid);
 	public function getMitgliederRevisionFlagList($revisionid);
@@ -307,6 +313,10 @@ abstract class AbstractStorage implements Storage {
 
 	public function getGliederungList($gliederungids = null) {
 		return $this->getGliederungResult($gliederungids)->fetchAll();
+	}
+
+	public function getBeitragTimeFormatList() {
+		return $this->getBeitragTimeFormatResult()->fetchAll();
 	}
 
 	public function getBeitragList() {
