@@ -93,7 +93,7 @@ $config->getStorage()->registerMitgliederFilterAction(new CalculateBeitragMitgli
 $transitionid = 0;
 
 $config->getStorage()->registerDokumentTransition(new DownloadDokumentTransition(++$transitionid, false, null, null, 6, null, 4, "Gesammelt ausgedruckt"));
-$config->getStorage()->registerDokumentTransition(new MitgliedLinkDokumentTransition(++$transitionid, false, null, null, null, null, null, "Mitglied verlinkt"));
+$config->getStorage()->registerDokumentTransition(new MitgliedLinkDokumentTransition(++$transitionid, false, null, null, null, null, null, "Mitglied {BEZEICHNUNG} (#{MITGLIEDID}) verlinkt"));
 foreach ($config->getStorage()->getMitgliederTemplateList() as $mitgliedtemplate) {
 	$config->getStorage()->registerDokumentTransition(new MitgliedCreateDokumentTransition(++$transitionid, false, null, null, null, null, null, "Mitglied angelegt", $mitgliedtemplate->getMitgliedTemplateID(), $mitgliedtemplate->getLabel() . " anlegen"));
 }
