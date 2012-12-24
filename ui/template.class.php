@@ -1018,6 +1018,11 @@ class Template {
 		$this->smarty->assign("transition", $this->parseDokumentTransition($transition));
 		$this->smarty->assign("link", $link);
 		$this->smarty->assign("filter", $this->parseDokumentFilter($filter));
+		if ($transition instanceof MitgliedLinkDokumentTransition) {
+			if (isset($result["inputNeeded"])) {
+				$this->smarty->display("dokumenttransition_mitgliedlink.html.tpl");
+			}
+		}
 		if ($transition instanceof RenameDokumentTransition) {
 			if (isset($result["selectTransition"])) {
 				$this->smarty->assign("dokumenttemplates", $this->parseDokumentTemplates($result["templates"]));
