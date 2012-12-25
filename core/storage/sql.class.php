@@ -31,7 +31,6 @@ require_once(VPANEL_CORE . "/dokumentnotify.class.php");
 require_once(VPANEL_CORE . "/dokumentkategorie.class.php");
 require_once(VPANEL_CORE . "/dokumentstatus.class.php");
 require_once(VPANEL_CORE . "/dokumentflag.class.php");
-require_once(VPANEL_CORE . "/dokumentnotiz.class.php");
 require_once(VPANEL_CORE . "/file.class.php");
 require_once(VPANEL_CORE . "/tempfile.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/mitglied.class.php");
