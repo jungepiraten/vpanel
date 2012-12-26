@@ -452,7 +452,8 @@ abstract class SQLStorage extends AbstractStorage {
 			WHERE	`r`.`timestamp` = (	SELECT	MAX(`rmax`.`timestamp`)
 							FROM	`mitgliederrevisions` `rmax`
 							WHERE   `r`.`mitgliedid` = `rmax`.`mitgliedid`)
-				AND `r`.`gliederungsid` IN (" . implode(",", array_map("intval", $gliederungids)) . ") ORDER BY `mbb`.`timestamp` DESC LIMIT " . intval($start) . "," . intval($count);
+				AND `r`.`gliederungsid` IN (" . implode(",", array_map("intval", $gliederungids)) . ")
+			GROUP BY `r`.`mitgliedid`  ORDER BY `mbb`.`timestamp` DESC LIMIT " . intval($start) . "," . intval($count);
 		return $this->getResult($sql, array($this, "parseMitgliederBeitragBuchung"));
 	}
 	public function getMitgliederBeitragBuchungByBeitragResult($beitragid) {
@@ -626,7 +627,8 @@ abstract class SQLStorage extends AbstractStorage {
 					FROM	`mitglieddokument` `mdok`
 					LEFT JOIN	`dokumentrevisions` `dokr` USING (`dokumentid`)
 					WHERE	`dokr`.`timestamp` = (SELECT MAX(`dokrmax`.`timestamp`) FROM `dokumentrevisions` `dokrmax` WHERE `dokrmax`.`dokumentid` = `dokr`.`dokumentid`)
-						AND `dokr`.`kategorieid` = " . intval($matcher->getDokumentKategorieID()) . ")";
+						AND `dokr`.`kategorieid` = " . intval($matcher->getDokumentKategorieID()) . ")
+					GROUP BY	`dokr`.`dokumentid`";
 		}
 		if ($matcher instanceof DokumentStatusMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (
@@ -634,7 +636,8 @@ abstract class SQLStorage extends AbstractStorage {
 					FROM	`mitglieddokument` `mdok`
 					LEFT JOIN	`dokumentrevisions` `dokr` USING (`dokumentid`)
 					WHERE	`dokr`.`timestamp` = (SELECT MAX(`dokrmax`.`timestamp`) FROM `dokumentrevisions` `dokrmax` WHERE `dokrmax`.`dokumentid` = `dokr`.`dokumentid`)
-						AND `dokr`.`statusid` = " . intval($matcher->getDokumentStatusID()) . ")";
+						AND `dokr`.`statusid` = " . intval($matcher->getDokumentStatusID()) . ")
+					GROUP BY	`dokr`.`dokumentid`";
 		}
 		if ($matcher instanceof EintrittsdatumAfterMitgliederMatcher) {
 			return "`m`.`eintritt` >= '" . $this->escape(date("Y-m-d", $matcher->getTimestamp())) . "'";
@@ -689,7 +692,8 @@ abstract class SQLStorage extends AbstractStorage {
 				SELECT	MAX(`rmax`.`timestamp`)
 				FROM	`mitgliederrevisions` `rmax`
 				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)
-					AND ".$this->parseMitgliederMatcher($matcher);
+					AND ".$this->parseMitgliederMatcher($matcher) . "
+			GROUP BY `r`.`mitgliedid`";
 		return reset($this->getResult($sql)->fetchRow());
 	}
 	public function parseMitglied($row) {
@@ -798,6 +802,7 @@ abstract class SQLStorage extends AbstractStorage {
 				FROM	`mitgliederrevisions` `rmax`
 				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)
 					AND " . $this->parseMitgliederMatcher($matcher) . "
+			GROUP BY `r`.`mitgliedid`
 			ORDER BY `m`.`mitgliedid`";
 		if ($limit !== null or $offset !== null) {
 			$sql .= " LIMIT ";
@@ -1028,6 +1033,7 @@ abstract class SQLStorage extends AbstractStorage {
 			WHERE	`r`.`timestamp` = (	SELECT	MAX(`rmax`.`timestamp`)
 							FROM	`mitgliederrevisions` `rmax`
 							WHERE   `r`.`mitgliedid` = `rmax`.`mitgliedid`)
+			GROUP BY `r`.`mitgliedid`
 			ORDER BY `r`.`timestamp` DESC
 			LIMIT " . intval($start) . ",". intval($count);
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"));
@@ -1834,7 +1840,8 @@ abstract class SQLStorage extends AbstractStorage {
 			FROM	`dokument` `d`
 			LEFT JOIN `dokumentrevisions` `r` USING (`dokumentid`)
 			WHERE	`r`.`timestamp` = (SELECT MAX(`rmax`.`timestamp`) FROM `dokumentrevisions` `rmax` WHERE `rmax`.`dokumentid` = `r`.`dokumentid`)
-				AND " . $this->parseDokumentMatcher($matcher);
+				AND " . $this->parseDokumentMatcher($matcher) . "
+			GROUP BY `r`.`dokumentid`";
 		return reset($this->getResult($sql)->fetchRow());
 	}
 	public function getDokumentResult($matcher, $limit = null, $offset = null) {
@@ -1856,7 +1863,8 @@ abstract class SQLStorage extends AbstractStorage {
 			FROM	`dokument` `d`
 			LEFT JOIN `dokumentrevisions` `r` USING (`dokumentid`)
 			WHERE	`r`.`timestamp` = (SELECT MAX(`rmax`.`timestamp`) FROM `dokumentrevisions` `rmax` WHERE `rmax`.`dokumentid` = `r`.`dokumentid`)
-				AND " . $this->parseDokumentMatcher($matcher);
+				AND " . $this->parseDokumentMatcher($matcher) . "
+			GROUP BY `r`.`dokumentid`";
 		if ($limit !== null or $offset !== null) {
 			$sql .= " LIMIT ";
 			if ($offset !== null) {
@@ -1897,7 +1905,8 @@ abstract class SQLStorage extends AbstractStorage {
 			FROM	`dokument` `d`
 			LEFT JOIN `dokumentrevisions` `r` USING (`dokumentid`)
 			WHERE	`r`.`timestamp` = (SELECT MAX(`rmax`.`timestamp`) FROM `dokumentrevisions` `rmax` WHERE `rmax`.`dokumentid` = `r`.`dokumentid`)
-				AND `d`.`dokumentid` = " . intval($dokumentid);
+				AND `d`.`dokumentid` = " . intval($dokumentid) . "
+			GROUP BY `r`.`dokumentid`";
 		return $this->getResult($sql, array($this, "parseDokument"))->fetchRow();
 	}
 	public function setDokument($dokumentid) {
