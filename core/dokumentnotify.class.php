@@ -164,7 +164,7 @@ VPanel
 EOT
 );
 			} else {
-				$mail->setHeader("Subject", "[VPanel] [erledigt] Dokument " . $revision->getLabel());
+				$mail->setHeader("Subject", "[VPanel] [erledigt] Dokument " . $oldrevision->getLabel());
 				$mail->setHeader("Message-ID", "<dokumentnotify-" . $oldrevision->getRevisionID() . "-" . $revision->getRevisionID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
 				$mail->setHeader("References", "<dokumentnotify-" . $oldrevision->getRevisionID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
 				$mail->setBody(<<<EOT
@@ -188,7 +188,7 @@ VPanel
 EOT
 );
 			}
-			$mail->addAttachment($dokument->getFile());
+			$mail->addAttachment($revision->getFile());
 			$config->getSendMailBackend()->send($mail);
 		}
 	}
