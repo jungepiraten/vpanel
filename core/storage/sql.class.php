@@ -654,7 +654,7 @@ abstract class SQLStorage extends AbstractStorage {
 				}
 				$wordclauses[] = implode(" OR ", $clauses);
 			}
-			return "( (" . implode(") AND (", $wordclauses) . ")";
+			return "( (" . implode(") AND (", $wordclauses) . ") )";
 		}
 		throw new Exception("Not implemented: ".get_class($matcher));
 	}
