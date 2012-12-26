@@ -17,26 +17,29 @@ class ExportDebitsMitgliederFilterAction extends MitgliederFilterAction {
 		return $this->streamhandler;
 	}
 
-	protected function getBeitragID($session) {
+	protected function getBeitrag($session) {
 		if ($this->beitragid != null) {
-			return $this->beitragid;
+			return $session->getStorage()->getBeitrag($this->beitragid);
 		}
 		if ($session->hasVariable("beitragid")) {
-			return $session->getVariable("beitragid");
+			if ($session->getVariable("beitragid") == "-") {
+				return null;
+			}
+			return $session->getStorage()->getBeitrag($session->getVariable("beitragid"));
 		}
-		return null;
+		return false;
 	}
 
 	public function execute($config, $session, $filter, $matcher) {
-		$beitragid = $this->getBeitragID($session);
-		if ($beitragid == null) {
+		$beitrag = $this->getBeitrag($session);
+		if ($beitrag === false) {
 			$beitraglist = $session->getStorage()->getBeitragList();
 			return array("setbeitrag" => "select", "beitraglist" => $beitraglist);
 		}
 
 		$process = new MitgliederFilterExportDebitsProcess($session->getStorage());
 		$process->setStreamHandler($this->getStreamHandler($session));
-		$process->setBeitragID($beitragid);
+		$process->setBeitrag($beitrag);
 		return $this->executeProcess($session, $process, $filter, $matcher);
 	}
 

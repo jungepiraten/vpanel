@@ -34,7 +34,11 @@ class MitgliederFilterExportDebitsProcess extends MitgliederFilterProcess {
 	}
 
 	public function setBeitrag($beitrag) {
-		$this->setBeitragID($beitrag->getBeitragID());
+		if ($beitrag == null) {
+			$this->setBeitragID(null);
+		} else {
+			$this->setBeitragID($beitrag->getBeitragID());
+		}
 		$this->beitrag = $beitrag;
 	}
 
@@ -68,17 +72,29 @@ class MitgliederFilterExportDebitsProcess extends MitgliederFilterProcess {
 	}
 
 	protected function runProcessStep($mitglied) {
-		if ($mitglied->getLatestRevision()->getKontakt()->hasIBan() && $mitglied->hasBeitrag($this->getBeitragID())) {
-			$beitrag = $mitglied->getBeitrag($this->getBeitragID());
-			if ($beitrag->getRemainingHoehe() > 0) {
-				$row = array();
-				$row["mitgliedid"] = $mitglied->getMitgliedID();
-				$row["mitglied"] = $mitglied->replaceText("{BEZEICHNUNG}");
-				$row["iban"] = $mitglied->getLatestRevision()->getKontakt()->getIBan();
-				$row["beitrag"] = $this->getBeitrag()->getLabel();
-				$row["betrag"] = $beitrag->getRemainingHoehe();
-				$this->getStreamHandler()->writeFile($row);
+		if ($mitglied->getLatestRevision()->getKontakt()->hasIBan()) {
+			if ($this->getBeitragID() != null) {
+				if ($mitglied->hasBeitrag($this->getBeitragID())) {
+					$beitrag = $mitglied->getBeitrag($this->getBeitragID());
+					$this->handleMitgliedBeitrag($mitglied, $beitrag);
+				}
+			} else {
+				foreach ($mitglied->getBeitragList() as $mitgliedbeitrag) {
+					$this->handleMitgliedBeitrag($mitglied, $mitgliedbeitrag);
+				}
 			}
+		}
+	}
+
+	private function handleMitgliedBeitrag($mitglied, $mitgliedbeitrag) {
+		if ($mitgliedbeitrag->getRemainingHoehe() > 0) {
+			$row = array();
+			$row["mitgliedid"] = $mitglied->getMitgliedID();
+			$row["mitglied"] = $mitglied->replaceText("{BEZEICHNUNG}");
+			$row["iban"] = $mitglied->getLatestRevision()->getKontakt()->getIBan();
+			$row["beitrag"] = $mitgliedbeitrag->getBeitrag()->getLabel();
+			$row["betrag"] = $mitgliedbeitrag->getRemainingHoehe();
+			$this->getStreamHandler()->writeFile($row);
 		}
 	}
 

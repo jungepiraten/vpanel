@@ -911,7 +911,7 @@ class Template {
 		}
 		if ($action instanceof ExportDebitsMitgliederFilterAction) {
 			$this->smarty->assign("beitraglist", $this->parseBeitragList($result["beitraglist"]));
-			$this->smarty->display("mitgliedersetbeitragselect.html.tpl");
+			$this->smarty->display("mitgliederexportdebitsbeitragselect.html.tpl");
 			return;
 		}
 		if ($action instanceof SetBeitragMitgliederFilterAction) {
