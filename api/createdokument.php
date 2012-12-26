@@ -50,7 +50,7 @@ if ($file == null) {
 
 	foreach ($dokumenttemplate->getDokumentFlags($session) as $flagid) {
 		$flag = $session->getStorage()->getDokumentFlag($flagid);
-		$notiz->setFlag($flag);
+		$revision->setFlag($flag);
 	}
 
 	$revision->save();

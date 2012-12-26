@@ -10,7 +10,6 @@ require_once(VPANEL_CORE . "/mitglied.class.php");
 require_once(VPANEL_CORE . "/mitgliedflag.class.php");
 require_once(VPANEL_CORE . "/mitgliedtextfield.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevisiontextfield.class.php");
-require_once(VPANEL_CORE . "/mitgliednotiz.class.php");
 require_once(VPANEL_CORE . "/beitragtimeformat.class.php");
 require_once(VPANEL_CORE . "/beitrag.class.php");
 require_once(VPANEL_CORE . "/mitgliedbeitrag.class.php");
@@ -644,7 +643,7 @@ abstract class SQLStorage extends AbstractStorage {
 			return "`m`.`austritt` >= '" . $this->escape(date("Y-m-d", $matcher->getTimestamp())) . "'";
 		}
 		if ($matcher instanceof SearchMitgliederMatcher) {
-			$fields = array("`m`.`mitgliedid`", "`m`.`globalid`", "`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`n`.`anrede`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`adresszusatz`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`k`.`iban`", "`e`.`email`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
+			$fields = array("`m`.`mitgliedid`", "`m`.`globalid`", "`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`r`.`kommentar`", "`n`.`anrede`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`adresszusatz`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`k`.`iban`", "`e`.`email`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
 			$wordclauses = array();
 			$escapedwords = array();
 			foreach ($matcher->getWords() as $word) {
@@ -655,7 +654,7 @@ abstract class SQLStorage extends AbstractStorage {
 				}
 				$wordclauses[] = implode(" OR ", $clauses);
 			}
-			return "( (" . implode(") AND (", $wordclauses) . ") OR `m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitgliedernotizen` WHERE `kommentar` LIKE '%" . implode("%' AND `kommentar` LIKE '%", $escapedwords) . "%') )";
+			return "( (" . implode(") AND (", $wordclauses) . ")";
 		}
 		throw new Exception("Not implemented: ".get_class($matcher));
 	}
@@ -1006,50 +1005,6 @@ abstract class SQLStorage extends AbstractStorage {
 			$sql = "INSERT INTO `mitgliederrevisiontextfields` (`revisionid`, `textfieldid`, `value`) VALUES " . implode(", ", $sqlinserts);
 			$this->query($sql);
 		}
-	}
-
-	/**
-	 * MitgliedNotiz
-	 **/
-	public function parseMitgliedNotiz($row) {
-		return $this->parseRow($row, null, "MitgliedNotiz");
-	}
-	public function getMitgliedNotizResult($mitgliedid = null) {
-		$sql = "SELECT `mitgliednotizid`, `mitgliedid`, `author`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `kommentar` FROM `mitgliedernotizen` WHERE 1=1";
-		if ($mitgliedid != null) {
-			$sql .= " AND `mitgliedid` = " . intval($mitgliedid);
-		}
-		return $this->getResult($sql, array($this, "parseMitgliedNotiz"));
-	}
-	public function getMitgliedNotiz($mitgliednotizid) {
-		$sql = "SELECT `mitgliednotizid`, `mitgliedid`, `author`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `kommentar` FROM `mitgliedernotizen` WHERE `mitgliednotizid` = " . intval($mitgliednotizid);
-		return $this->getResult($sql, array($this, "parseMitgliedNotiz"))->fetchRow();
-	}
-	public function setMitgliedNotiz($mitgliednotizid, $mitgliedid, $author, $timestamp, $kommentar) {
-		if ($mitgliednotizid == null) {
-			$sql = "INSERT INTO `mitgliedernotizen`
-				(`mitgliedid`, `author`, `timestamp`, `kommentar`) VALUES
-				(" . intval($mitgliedid) . ",
-				 " . ($author == NULL ? "NULL" : intval($author)) . ",
-				 '" . date("Y-m-d H:i:s", $timestamp) . "',
-				 '" . $this->escape($kommentar) . "')";
-		} else {
-			$sql = "UPDATE	`mitgliedernotizen`
-				SET	`mitgliedid` = " . intval($mitgliedid) . ",
-					`author` = " . ($author == NULL ? "NULL" : intval($author)) . ",
-					`timestamp` = " . date("Y-m-d H:i:s", $timestamp) . ",
-					`kommentar` = '" . $this->escape($kommentar) . "'
-				WHERE `mitgliednotizid` = " . intval($mitgliednotizid);
-		}
-		$this->query($sql);
-		if ($mitgliednotizid == null) {
-			$mitgliednotizid = $this->getInsertID();
-		}
-		return $mitgliednotizid;
-	}
-	public function delMitgliedNotiz($mitgliednotizid) {
-		$sql = "DELETE FROM `mitgliedernotizen` WHERE `mitgliednotizid` = " . intval($mitgliednotizid);
-		return $this->query($sql);
 	}
 
 	/**

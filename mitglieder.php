@@ -12,7 +12,6 @@ if (!$session->isSignedIn()) {
 }
 
 require_once(VPANEL_CORE . "/mitglied.class.php");
-require_once(VPANEL_CORE . "/mitgliednotiz.class.php");
 require_once(VPANEL_CORE . "/mitgliedrevision.class.php");
 require_once(VPANEL_CORE . "/mitgliedbeitrag.class.php");
 require_once(VPANEL_CORE . "/mitgliedbeitragbuchung.class.php");
@@ -138,22 +137,6 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 			$config->getSendMailBackend()->send($mail);
 		}
 	}
-}
-
-function parseAddMitgliederNotizFormular($ui, $session, $mitglied) {
-	$kommentar = $session->getVariable("kommentar");
-
-	if (!$session->isAllowed("mitglieder_beitrag", $mitglied->getLatestRevision()->getGliederungID())) {
-		$ui->viewLogin();
-		exit;
-	}
-
-	$notiz = new MitgliedNotiz($session->getStorage());
-	$notiz->setMitglied($mitglied);
-	$notiz->setAuthor($session->getUser());
-	$notiz->setTimestamp(time());
-	$notiz->setKommentar($kommentar);
-	$notiz->save();
 }
 
 function parseMitgliederBeitraegeFormular($ui, $session, &$mitglied) {
@@ -306,12 +289,6 @@ case "details":
 		parseMitgliederFormular($ui, $session, $mitglied);
 
 		$ui->redirect($session->getLink("mitglieder_details", $mitglied->getMitgliedID()));
-	}
-
-	if ($session->getBoolVariable("addnotiz")) {
-		parseAddMitgliederNotizFormular($ui, $session, $mitglied);
-
-		$ui->redirect();
 	}
 
 	$dokumente = $session->getStorage()->getDokumentList(new MitgliedDokumentMatcher($mitglied->getMitgliedID()));

@@ -136,16 +136,13 @@ class DokumentNotify extends StorageClass {
 			$this->getEMailID() ));
 	}
 
-	public function notify($dokument, $notiz, $oldnotiz = null) {
+	public function notify($dokument, $revision, $oldrevision = null) {
 		global $config;
-		/**
-		 * Do not use DokumentNotiz::next* here, as it might be NULL
-		 **/
 		if ($this->getEMail() != null) {
 			$mail = $config->createMail($this->getEMail());
-			if ($oldnotiz == null) {
+			if ($oldrevision == null) {
 				$mail->setHeader("Subject", "[VPanel] Dokument " . $dokument->getLabel());
-				$mail->setHeader("Message-ID", "<dokumentnotify-" . $notiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
+				$mail->setHeader("Message-ID", "<dokumentnotify-" . $revision->getRevisionID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
 				$mail->setBody(<<<EOT
 Hallo,
 
@@ -154,12 +151,12 @@ bitte beachte das folgende Dokument:
 Dokument ansehen:
 {$config->getLink("dokumente_details", $dokument->getDokumentID())}
 
-Gliederung:     {$dokument->getGliederung()->getLabel()}
-Kategorie:      {$dokument->getDokumentKategorie()->getLabel()}
-Status:         {$dokument->getDokumentStatus()->getLabel()}
-Identifikation: {$dokument->getIdentifier()}
-Titel:          {$dokument->getLabel()}
-Kommentar:      {$notiz->getKommentar()}
+Gliederung:     {$revision->getGliederung()->getLabel()}
+Kategorie:      {$revision->getKategorie()->getLabel()}
+Status:         {$revision->getStatus()->getLabel()}
+Identifikation: {$revision->getIdentifier()}
+Titel:          {$revision->getLabel()}
+Kommentar:      {$revision->getKommentar()}
 
 Viele Grüße,
 
@@ -168,8 +165,8 @@ EOT
 );
 			} else {
 				$mail->setHeader("Subject", "[VPanel] [erledigt] Dokument " . $dokument->getLabel());
-				$mail->setHeader("Message-ID", "<dokumentnotify-" . $oldnotiz->getDokumentNotizID() . "-" . $notiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
-				$mail->setHeader("References", "<dokumentnotify-" . $oldnotiz->getDokumentNotizID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
+				$mail->setHeader("Message-ID", "<dokumentnotify-" . $oldrevision->getRevisionID() . "-" . $revision->getRevisionID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
+				$mail->setHeader("References", "<dokumentnotify-" . $oldrevision->getRevisionID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
 				$mail->setBody(<<<EOT
 Hallo,
 
@@ -178,12 +175,12 @@ das Dokument wurde bearbeitet:
 Dokument ansehen:
 {$config->getLink("dokumente_details", $dokument->getDokumentID())}
 
-Gliederung:     {$dokument->getGliederung()->getLabel()}
-Kategorie:      {$dokument->getDokumentKategorie()->getLabel()}
-Status:         {$dokument->getDokumentStatus()->getLabel()}
-Identifikation: {$dokument->getIdentifier()}
-Titel:          {$dokument->getLabel()}
-Kommentar:      {$notiz->getKommentar()}
+Gliederung:     {$revision->getGliederung()->getLabel()}
+Kategorie:      {$revision->getKategorie()->getLabel()}
+Status:         {$revision->getStatus()->getLabel()}
+Identifikation: {$revision->getIdentifier()}
+Titel:          {$revision->getLabel()}
+Kommentar:      {$revision->getKommentar()}
 
 Viele Grüße,
 

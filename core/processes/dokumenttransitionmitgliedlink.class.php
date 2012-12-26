@@ -42,8 +42,8 @@ class DokumentTransaktionMitgliedLinkProcess extends DokumentTransitionProcess {
 		return $data;
 	}
 
-	public function getNotizKommentar() {
-		return $this->getMitglied()->replaceText(parent::getNotizKommentar());
+	public function getKommentar() {
+		return $this->getMitglied()->replaceText(parent::getKommentar());
 	}
 
 	public function initProcess() {

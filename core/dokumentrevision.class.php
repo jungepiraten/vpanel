@@ -283,7 +283,7 @@ class DokumentRevision extends StorageClass {
 			$storage = $this->getStorage();
 		}
 		$storage->setDokumentRevisionFlagList($this->getRevisionID(), array());
-		$storage->delDokumentRevision($this->getDokumentNotizID());
+		$storage->delDokumentRevision($this->getRevisionID());
 	}
 
 	public function hasPrevRevision() {

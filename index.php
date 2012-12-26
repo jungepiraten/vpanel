@@ -39,12 +39,6 @@ if ($session->hasVariable("widgets")) {
 					$w->setReload($widget["reload"]);
 				}
 				break;
-			case "dokumentnotizen_timeline":
-				$w = new DokumentNotizenTimelineDashboardWidget($session->getStorage());
-				if ($widget["reload"] > 0) {
-					$w->setReload($widget["reload"]);
-				}
-				break;
 			}
 			if (isset($w)) {
 				$w->setColumn($widget["column"]);

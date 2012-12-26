@@ -1113,3 +1113,5 @@ UPDATE `beitraege` SET `label` = 'Jahresbeitrag 2012' WHERE `label` = '2012';
 ALTER TABLE  `mitgliederrevisions` ADD  `kommentar` TEXT NOT NULL;
 
 -- after update
+
+DROP TABLE `dokumentnotizen`;

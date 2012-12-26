@@ -29,7 +29,7 @@ class RenameDokumentTransition extends DokumentTransition implements SingleDokum
 		return $this->getDokumentTemplate($session)->getDokumentKategorieID($session);
 	}
 
-	public function getNotizKommentar($session) {
+	public function getKommentar($session) {
 		return $this->getDokumentTemplate($session)->getDokumentKommentar($session);
 	}
 

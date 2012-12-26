@@ -9,7 +9,7 @@ class DokumentTransitionProcess extends Process {
 	private $nextidentifier;
 	private $nextlabel;
 	private $nextdata;
-	private $notizkommentar;
+	private $kommentar;
 
 	public static function factory(Storage $storage, $row) {
 		$process = new $row["class"]($storage);
@@ -19,7 +19,7 @@ class DokumentTransitionProcess extends Process {
 		$process->setNextIdentifier($row["nextidentifier"]);
 		$process->setNextLabel($row["nextlabel"]);
 		$process->setNextData($row["nextdata"]);
-		$process->setNotizKommentar($row["notizkommentar"]);
+		$process->setKommentar($row["kommentar"]);
 		return $process;
 	}
 
@@ -71,12 +71,12 @@ class DokumentTransitionProcess extends Process {
 		$this->nextdata = $data;
 	}
 
-	public function getNotizKommentar() {
-		return $this->notizkommentar;
+	public function getKommentar() {
+		return $this->kommentar;
 	}
 
-	public function setNotizKommentar($kommentar) {
-		$this->notizkommentar = $kommentar;
+	public function setKommentar($kommentar) {
+		$this->kommentar = $kommentar;
 	}
 
 	protected function getData() {
@@ -88,7 +88,7 @@ class DokumentTransitionProcess extends Process {
 		$data["nextidentifier"] = $this->nextidentifier;
 		$data["nextlabel"] = $this->nextlabel;
 		$data["nextdata"] = $this->nextdata;
-		$data["notizkommentar"] = $this->notizkommentar;
+		$data["kommentar"] = $this->kommentar;
 		return $data;
 	}
 
@@ -125,7 +125,7 @@ class DokumentTransitionProcess extends Process {
 		$revision = $item->getLatestRevision()->fork();
 		$revision->setUserID($this->getUserID());
 		$revision->setTimestamp(time());
-		$revision->setKommentar($this->getNotizKommentar());
+		$revision->setKommentar($this->getKommentar());
 
 		if ($this->getNextKategorieID() != null) {
 			$revision->setKategorieID($this->getNextKategorieID());

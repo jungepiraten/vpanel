@@ -97,12 +97,6 @@ interface Storage {
 	public function getMitgliedTextField($flagid);
 	public function setMitgliedTextField($flagid, $label);
 
-	public function getMitgliedNotizResult($mitgliedid = null);
-	public function getMitgliedNotizList($mitgliedid = null);
-	public function getMitgliedNotiz($mitgliednotizid);
-	public function setMitgliedNotiz($mitgliednotizid, $mitgliedid, $author, $timestamp, $kommentar);
-	public function delMitgliedNotiz($mitgliednotizid);
-
 	public function getMitgliederRevisionResultTimeline($gliederungids, $start, $count);
 	public function getMitgliederRevisionListTimeline($gliederungids, $start, $count);
 	public function getMitgliederRevisionResult();
@@ -355,10 +349,6 @@ abstract class AbstractStorage implements Storage {
 		return $this->getMitgliedTextFieldResult()->fetchAll();
 	}
 
-	public function getMitgliedNotizList($mitgliedid = null) {
-		return $this->getMitgliedNotizResult($mitgliedid)->fetchAll();
-	}
-
 	public function getMitgliederRevisionListTimeline($gliederungids, $start, $count) {
 		return $this->getMitgliederRevisionResultTimeline($gliederungids, $start, $count)->fetchAll();
 	}
@@ -447,10 +437,6 @@ abstract class AbstractStorage implements Storage {
 		return $this->getDokumentFlagResult()->fetchAll();
 	}
 
-	public function getDokumentNotizListTimeline($gliederungids, $start, $count) {
-		return $this->getDokumentNotizResultTimeline($gliederungids, $start, $count)->fetchAll();
-	}
-
 	public function getDokumentRevisionListTimeline($gliederungids, $start, $count) {
 		return $this->getDokumentRevisionResultTimeline($gliederungids, $start, $count)->fetchAll();
 	}
@@ -461,18 +447,6 @@ abstract class AbstractStorage implements Storage {
 
 	public function getDokumentRevisionFlagList($revisionid) {
 		return $this->getDokumentRevisionFlagResult($revisionid)->fetchAll();
-	}
-
-	public function getDokumentNotizList($dokumentid = null) {
-		return $this->getDokumentNotizResult($dokumentid)->fetchAll();
-	}
-
-	public function getDokumentNotizFlagListAdd($notizid) {
-		return $this->getDokumentNotizFlagResultAdd($notizid)->fetchAll();
-	}
-
-	public function getDokumentNotizFlagListDel($notizid) {
-		return $this->getDokumentNotizFlagResultDel($notizid)->fetchAll();
 	}
 
 	public function getFileList() {
