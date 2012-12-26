@@ -312,7 +312,7 @@ case "create":
 	$dokument = null;
 	if ($session->hasVariable("dokumentid")) {
 		$dokument = $session->getStorage()->getDokument($session->getVariable("dokumentid"));
-		$data = $dokument->getData();
+		$data = $dokument->getLatestRevision()->getData();
 	}
 
 	$template = null;
