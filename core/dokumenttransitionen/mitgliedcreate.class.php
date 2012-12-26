@@ -11,8 +11,9 @@ class MitgliedCreateDokumentTransition extends StaticDokumentTransition implemen
 	}
 
 	public function execute($config, $session, $filter, $matcher) {
+		$dokumentid = array_pop($matcher->getConditions());
 		// TODO hacky and needs to be rewritten
-		return array("redirect" => $session->getLink("dokumente_mitglied_create", $matcher->getDokumentID(), $this->mitgliedtemplateid));
+		return array("redirect" => $session->getLink("dokumente_mitglied_create", $dokumentid, $this->mitgliedtemplateid));
 	}
 
 	public function show($config, $session, $process) {
@@ -26,8 +27,9 @@ class DynamicMitgliedCreateDokumentTransition extends StaticDokumentTransition i
 	}
 
 	public function execute($config, $session, $filter, $matcher) {
+		$dokumentid = array_pop($matcher->getConditions());
 		// TODO hacky and needs to be rewritten
-		$dokument = $session->getStorage()->getDokument($matcher->getDokumentID());
+		$dokument = $session->getStorage()->getDokument($dokumentid);
 		$mitgliedtemplateid = $this->mitgliedtemplatechooser->getMitgliedTemplateID($session->getStorage(), $dokument);
 		if (is_array($mitgliedtemplateid)) {
 			if (count($mitgliedtemplateid) == 1) {
@@ -40,7 +42,7 @@ class DynamicMitgliedCreateDokumentTransition extends StaticDokumentTransition i
 				}
 			}
 		}
-		return array("redirect" => $session->getLink("dokumente_mitglied_create", $matcher->getDokumentID(), $mitgliedtemplateid));
+		return array("redirect" => $session->getLink("dokumente_mitglied_create", $dokumentid, $mitgliedtemplateid));
 	}
 
 	public function show($config, $session, $process) {
