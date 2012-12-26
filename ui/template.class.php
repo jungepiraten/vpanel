@@ -812,7 +812,7 @@ class Template {
 		$this->smarty->display("mitgliederdetails.html.tpl");
 	}
 
-	public function viewMitgliedCreate($mitgliedtemplate, $dokument, $data, $gliederungen, $mitgliedschaften, $mailtemplates, $states, $mitgliederflags, $mitgliedertextfields) {
+	public function viewMitgliedCreate($mitgliedtemplate, $dokument, $data, $gliederungen, $mitgliedschaften, $beitragtimeformat, $mailtemplates, $states, $mitgliederflags, $mitgliedertextfields) {
 		if ($mitgliedtemplate != null) {
 			$this->smarty->assign("mitgliedtemplate", $this->parseMitgliedTemplate($mitgliedtemplate));
 		}
@@ -825,6 +825,7 @@ class Template {
 		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));
 		$this->smarty->assign("mailtemplates", $this->parseMailTemplates($mailtemplates));
+		$this->smarty->assign("beitragtimeformats", $this->parseBeitragTimeFormats($beitragtimeformats));
 		$this->smarty->assign("states", $this->parseStates($states));
 		$this->smarty->assign("flags", $this->parseMitgliederFlags($mitgliederflags));
 		$this->smarty->assign("textfields", $this->parseMitgliederTextFields($mitgliedertextfields));

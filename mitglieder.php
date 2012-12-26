@@ -335,12 +335,13 @@ case "create":
 
 	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("mitglieder_create"));
 	$mitgliedschaften = $session->getStorage()->getMitgliedschaftList();
+	$beitragtimeformats = $session->getStorage()->getBeitragTimeFormatList();
 	$mailtemplates = $session->getStorage()->getMailTemplateList($session->getAllowedGliederungIDs("mitglieder_create"));
 	$mitgliederflags = $session->getStorage()->getMitgliedFlagList();
 	$mitgliedertextfields = $session->getStorage()->getMitgliedTextFieldList();
 	$states = $session->getStorage()->getStateList();
 
-	$ui->viewMitgliedCreate($template, $dokument, $data, $gliederungen, $mitgliedschaften, $mailtemplates, $states, $mitgliederflags, $mitgliedertextfields);
+	$ui->viewMitgliedCreate($template, $dokument, $data, $gliederungen, $mitgliedschaften, $beitragtimeformats, $mailtemplates, $states, $mitgliederflags, $mitgliedertextfields);
 	exit;
 
 case "filteraction":
