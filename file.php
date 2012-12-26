@@ -24,18 +24,18 @@ if ($session->hasVariable("tempfileid")) {
 	}
 
 	$file = $tempfile->getFile();
-} elseif ($session->hasVariable("dokumentid")) {
-	$dokument = $session->getStorage()->getDokument($session->getIntVariable("dokumentid"));
+} elseif ($session->hasVariable("dokumentrevisionid")) {
+	$revision = $session->getStorage()->getDokumentRevision($session->getIntVariable("dokumentrevisionid"));
 
-	if ($dokument === null) {
+	if ($revision === null) {
 		die("<h1>404 Not Found</h1>");
 	}
 
-	if (!$session->isAllowed("dokumente_show", $dokument->getGliederungID())) {
+	if (!$session->isAllowed("dokumente_show", $revision->getGliederungID())) {
 		die("<h1>403 Forbidden</h1>");
 	}
 
-	$file = $dokument->getFile();
+	$file = $revision->getFile();
 } elseif ($session->hasVariable("mailtemplateid") && $session->hasVariable("fileid")) {
 	if (!$session->isAllowed("mailtemplates_show")) {
 		die("<h1>403 Forbidden</h1>");
