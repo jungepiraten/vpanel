@@ -4,7 +4,7 @@
 		<div class="control-group">
 			<label for="timestamp" class="control-label">Austrittsdatum</label>
 			<div class="controls">
-				<input type="text" name="timestamp" value="{$smarty.now|date_format:"%d.%m.%Y"}" />
+				<input type="date" name="timestamp" value="{$smarty.now|date_format:"%Y-%m-%d"}" />
 			</div>
 		</div>
 
