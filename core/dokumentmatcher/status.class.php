@@ -17,7 +17,7 @@ class StatusDokumentMatcher extends DokumentMatcher {
 	}
 
 	public function match(Dokument $dokument) {
-		return $dokument->getDokumentStatusID() == $this->getStatusID();
+		return $dokument->getLatestRevision()->getStatusID() == $this->getStatusID();
 	}
 }
 

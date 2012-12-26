@@ -17,7 +17,7 @@ class KategorieDokumentMatcher extends DokumentMatcher {
 	}
 
 	public function match(Dokument $dokument) {
-		return $dokument->getDokumentKategorieID() == $this->getKategorieID();
+		return $dokument->getLatestRevision()->getKategorieID() == $this->getKategorieID();
 	}
 }
 

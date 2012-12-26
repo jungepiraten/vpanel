@@ -24,7 +24,7 @@ class GliederungDokumentMatcher extends DokumentMatcher {
 	}
 
 	public function match(Dokument $dokument) {
-		return in_array($dokument->getGliederungID(), $this->gliederungids);
+		return in_array($dokument->getLatestRevision()->getGliederungID(), $this->gliederungids);
 	}
 }
 

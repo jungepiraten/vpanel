@@ -14,12 +14,6 @@ abstract class DokumentTemplate extends GliederungAktion {
 		return $this->templateid;
 	}
 
-	protected function getDokumentPrototype($session) {
-		$dokument = new Dokument($session->getStorage());
-		$dokument->setGliederungID($this->getGliederungID());
-		return $dokument;
-	}
-
 	public function getDokumentGliederungID($session) {
 		return $this->getGliederungID();
 	}

@@ -165,7 +165,7 @@ case "transitionprocess":
 case "delete":
 	$dokument = $session->getStorage()->getDokument($session->getVariable("dokumentid"));
 
-	if (!$session->isAllowed("dokumente_delete", $dokument->getGliederungID())) {
+	if (!$session->isAllowed("dokumente_delete", $dokument->getLatestRevision()->getGliederungID())) {
 		$ui->viewLogin();
 		exit;
 	}
