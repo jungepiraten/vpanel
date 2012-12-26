@@ -141,7 +141,7 @@ class DokumentNotify extends StorageClass {
 		if ($this->getEMail() != null) {
 			$mail = $config->createMail($this->getEMail());
 			if ($oldrevision == null) {
-				$mail->setHeader("Subject", "[VPanel] Dokument " . $dokument->getLabel());
+				$mail->setHeader("Subject", "[VPanel] Dokument " . $revision->getLabel());
 				$mail->setHeader("Message-ID", "<dokumentnotify-" . $revision->getRevisionID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
 				$mail->setBody(<<<EOT
 Hallo,
@@ -164,7 +164,7 @@ VPanel
 EOT
 );
 			} else {
-				$mail->setHeader("Subject", "[VPanel] [erledigt] Dokument " . $dokument->getLabel());
+				$mail->setHeader("Subject", "[VPanel] [erledigt] Dokument " . $revision->getLabel());
 				$mail->setHeader("Message-ID", "<dokumentnotify-" . $oldrevision->getRevisionID() . "-" . $revision->getRevisionID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
 				$mail->setHeader("References", "<dokumentnotify-" . $oldrevision->getRevisionID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
 				$mail->setBody(<<<EOT
