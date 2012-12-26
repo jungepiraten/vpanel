@@ -1108,3 +1108,8 @@ UPDATE `beitraege` SET `label` = 'Jahresbeitrag 2010' WHERE `label` = '2010';
 UPDATE `beitraege` SET `label` = 'Jahresbeitrag 2011' WHERE `label` = '2011';
 UPDATE `beitraege` SET `label` = 'Jahresbeitrag 2012' WHERE `label` = '2012';
 
+-- update 2012-12-26
+
+ALTER TABLE  `mitgliederrevisions` ADD  `kommentar` TEXT NOT NULL;
+
+-- after update

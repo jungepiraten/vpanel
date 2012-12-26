@@ -341,22 +341,6 @@ class Template {
 		return array_map(array($this, 'parseMitgliederRevisionTextField'), $rows);
 	}
 
-	protected function parseMitgliedNotiz($notiz) {
-		$row = array();
-		$row["mitgliednotizid"] = $notiz->getMitgliedNotizID();
-		$row["mitgliedid"] = $notiz->getMitgliedID();
-		if ($notiz->getAuthor() != null) {
-			$row["author"] = $this->parseUser($notiz->getAuthor());
-		}
-		$row["timestamp"] = $notiz->getTimestamp();
-		$row["kommentar"] = $notiz->getKommentar();
-		return $row;
-	}
-
-	protected function parseMitgliedNotizen($rows) {
-		return array_map(array($this, 'parseMitgliedNotiz'), $rows);
-	}
-
 	protected function parseMitgliedRevision($revision) {
 		$row = array();
 		$row["revisionid"] = $revision->getRevisionID();
@@ -381,6 +365,7 @@ class Template {
 		$row["flags"] = $this->parseMitgliederFlags($revision->getFlags());
 		$row["textfields"] = $this->parseMitgliederRevisionTextFields($revision->getTextFields());
 		$row["geloescht"] = $revision->isGeloescht();
+		$row["kommentar"] = $revision->getKommentar();
 		return $row;
 	}
 
@@ -610,33 +595,6 @@ class Template {
 		return array_map(array($this, 'parseDokumentFlag'), $rows);
 	}
 
-	protected function parseDokumentNotiz($notiz) {
-		$row = array();
-		$row["dokumentnotizid"] = $notiz->getDokumentNotizID();
-		$row["author"] = $this->parseUser($notiz->getAuthor());
-		$row["timestamp"] = $notiz->getTimestamp();
-		if ($notiz->getNextKategorieID() != null) {
-			$row["nextkategorie"] = $this->parseDokumentKategorie($notiz->getNextKategorie());
-		}
-		if ($notiz->getNextStatusID() != null) {
-			$row["nextstatus"] = $this->parseDokumentStatus($notiz->getNextStatus());
-		}
-		$row["addFlags"] = $this->parseDokumentFlags($notiz->getAddFlags());
-		$row["delFlags"] = $this->parseDokumentFlags($notiz->getDelFlags());
-		if ($notiz->getNextLabel() != null) {
-			$row["nextlabel"] = $notiz->getNextLabel();
-		}
-		if ($notiz->getNextIdentifier() != null) {
-			$row["nextidentifier"] = $notiz->getNextIdentifier();
-		}
-		$row["kommentar"] = $notiz->getKommentar();
-		return $row;
-	}
-
-	protected function parseDokumentNotizen($rows) {
-		return array_map(array($this, 'parseDokumentNotiz'), $rows);
-	}
-
 	protected function parseFile($file) {
 		$row = array();
 		$row["fileid"] = $file->getFileID();
@@ -837,11 +795,10 @@ class Template {
 		$this->smarty->display("mitgliederlist.html.tpl");
 	}
 
-	public function viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $beitragtimeformats, $mailtemplates, $filteractions, $states, $mitgliederflags, $mitgliedertextfields, $beitraege) {
+	public function viewMitgliedDetails($mitglied, $revisions, $revision, $dokumente, $gliederungen, $mitgliedschaften, $beitragtimeformats, $mailtemplates, $filteractions, $states, $mitgliederflags, $mitgliedertextfields, $beitraege) {
 		$this->smarty->assign("mitglied", $this->parseMitglied($mitglied));
 		$this->smarty->assign("mitgliedrevisions", $this->parseMitgliedRevisions($revisions));
 		$this->smarty->assign("mitgliedrevision", $this->parseMitgliedRevision($revision));
-		$this->smarty->assign("mitgliednotizen", $this->parseMitgliedNotizen($notizen));
 		$this->smarty->assign("dokumente", $this->parseDokumente($dokumente));
 		$this->smarty->assign("gliederungen", $this->parseGliederungen($gliederungen));
 		$this->smarty->assign("mitgliedschaften", $this->parseMitgliedschaften($mitgliedschaften));

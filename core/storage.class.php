@@ -110,7 +110,7 @@ interface Storage {
 	public function getMitgliederRevisionsByMitgliedIDResult($mitgliedid);
 	public function getMitgliederRevisionsByMitgliedIDList($mitgliedid);
 	public function getMitgliederRevision($revisionid);
-	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $beitrag, $beitragtimeformatid, $natpersonid, $jurpersonid, $kontaktid);
+	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $beitrag, $beitragtimeformatid, $natpersonid, $jurpersonid, $kontaktid, $kommentar);
 
 	public function getMitgliederRevisionFlagResult($revisionid);
 	public function getMitgliederRevisionFlagList($revisionid);

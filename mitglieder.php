@@ -57,6 +57,7 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 	$beitragtimeformat = $session->getStorage()->getBeitragTimeFormat($session->getIntVariable("beitragtimeformatid"));
 	$flags = $session->getListVariable("flags");
 	$textfields = $session->getListVariable("textfields");
+	$kommentar = $session->getVariable("kommentar");
 
 	$natperson = null;
 	$jurperson = null;
@@ -117,6 +118,7 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 	$revision->setNatPerson($natperson);
 	$revision->setJurPerson($jurperson);
 	$revision->setKontakt($kontakt);
+	$revision->setKommentar($kommentar);
 	foreach ($flags as $flagid => $selected) {
 		$revision->setFlag($session->getStorage()->getMitgliedFlag($flagid));
 	}
@@ -227,14 +229,14 @@ case "beitragdelete":
 	}
 
 	$beitrag->delete();
-	
+
 	$ui->redirect();
 	break;
 
 case "beitraege_buchungen":
 	$beitrag = $session->getStorage()->getMitgliederBeitrag($session->getIntVariable("mitgliedbeitragid"));
 	$buchungen = $beitrag->getBuchungen();
-	
+
 	if ($session->getBoolVariable("add")) {
 		$timestamp = $session->getTimestampVariable("timestamp");
 		$gliederung = $session->getStorage()->getGliederung($session->getIntVariable("gliederungid"));
@@ -312,7 +314,6 @@ case "details":
 		$ui->redirect();
 	}
 
-	$notizen = $session->getStorage()->getMitgliedNotizList($mitglied->getMitgliedID());
 	$dokumente = $session->getStorage()->getDokumentList(new MitgliedDokumentMatcher($mitglied->getMitgliedID()));
 
 	$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs("mitglieder_show"));
@@ -325,7 +326,7 @@ case "details":
 	$states = $session->getStorage()->getStateList();
 	$beitraege = $session->getStorage()->getBeitragList();
 
-	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $notizen, $dokumente, $gliederungen, $mitgliedschaften, $beitragtimeformats, $mailtemplates, $filteractions, $states, $mitgliederflags, $mitgliedertextfields, $beitraege);
+	$ui->viewMitgliedDetails($mitglied, $revisions, $revision, $dokumente, $gliederungen, $mitgliedschaften, $beitragtimeformats, $mailtemplates, $filteractions, $states, $mitgliederflags, $mitgliedertextfields, $beitraege);
 	exit;
 
 case "create":

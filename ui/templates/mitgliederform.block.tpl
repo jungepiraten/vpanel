@@ -235,15 +235,17 @@ function showIBanDE() {
 
 function saveIBanDE() {
 	var blz = $("#ibanControlGroup .controls.iban-de .blz").val();
-	var konto = $("#ibanControlGroup .controls.iban-de .konto").val();
-	while (konto.length < 10) {
-		konto = "0" + konto;
+	if (blz.length == 8 && konto.length > 0) {
+		var konto = $("#ibanControlGroup .controls.iban-de .konto").val();
+		while (konto.length < 10) {
+			konto = "0" + konto;
+		}
+		var check = 98 - mod97(iban2ibancheck("DE00" + blz + konto));
+		if (check < 10) {
+			check = "0" + check;
+		}
+		$("#ibanControlGroup .controls.iban .iban").val("DE" + check + blz + konto);
 	}
-	var check = 98 - mod97(iban2ibancheck("DE00" + blz + konto));
-	if (check < 10) {
-		check = "0" + check;
-	}
-	$("#ibanControlGroup .controls.iban .iban").val("DE" + check + blz + konto);
 
 	$("#ibanControlGroup .controls.iban-de").hide();
 	$("#ibanControlGroup .controls.iban").show();
@@ -282,11 +284,17 @@ function saveIBanDE() {
 <div class="control-group">
     <label class="control-label" for="textfields[{$textfield.textfieldid}]">{$textfield.label|escape:html}</label>
     <div class="controls">
-        <input type="text" name="textfields[{$textfield.textfieldid}]" value="{if isset($mitgliedrevision.textfields.$textfieldid)}{$revisiontextfield.value|escape:html}
-                                                                              {elseif isset($data.textfields.$textfieldid)}{$data.textfields.$textfieldid}{/if}" />
+        <input type="text" name="textfields[{$textfield.textfieldid}]" value="{if isset($mitgliedrevision.textfields.$textfieldid)}{$revisiontextfield.value|escape:html}{elseif isset($data.textfields.$textfieldid)}{$data.textfields.$textfieldid}{/if}" />
     </div>
 </div>
 {/foreach}
+
+<div class="control-group">
+    <label class="control-label" for="kommentar">{"Kommentar:"|__}</label>
+    <div class="controls">
+        <textarea name="kommentar" cols="10" rows="3"></textarea>
+    </div>
+</div>
 
 {if !isset($mitglied)}
 <div class="control-group">

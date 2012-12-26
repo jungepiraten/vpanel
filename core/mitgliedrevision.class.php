@@ -23,6 +23,7 @@ class MitgliedRevision extends GlobalClass {
 	private $natpersonid;
 	private $jurpersonid;
 	private $kontaktid;
+	private $kommentar;
 
 	private $user;
 	private $mitglied;
@@ -50,6 +51,7 @@ class MitgliedRevision extends GlobalClass {
 		$revision->setNatPersonID($row["natpersonid"]);
 		$revision->setJurPersonID($row["jurpersonid"]);
 		$revision->setKontaktID($row["kontaktid"]);
+		$revision->setKommentar($row["kommentar"]);
 		return $revision;
 	}
 
@@ -299,6 +301,14 @@ class MitgliedRevision extends GlobalClass {
 		return $this->jurpersonid;
 	}
 
+	public function getKommentar() {
+		return $this->kommentar;
+	}
+
+	public function setKommentar($kommentar) {
+		$this->kommentar = $kommentar;
+	}
+
 	public function getFlags() {
 		if ($this->flags === null) {
 			$flags = $this->getStorage()->getMitgliederRevisionFlagList($this->getRevisionID());
@@ -397,7 +407,8 @@ class MitgliedRevision extends GlobalClass {
 			$this->getBeitragTimeFormatID(),
 			$this->getNatPersonID(),
 			$this->getJurPersonID(),
-			$this->getKontaktID() ));
+			$this->getKontaktID(),
+			$this->getKommentar() ));
 
 		if ($this->flags != null) {
 			$storage->setMitgliederRevisionFlagList($this->getRevisionID(), $this->getFlagIDs());

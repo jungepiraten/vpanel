@@ -4,7 +4,7 @@
 <div class="tabbable">
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="#mitgliederdetails-kartei" data-toggle="tab">{"Kartei"|__}</a></li>
-		<li><a href="#mitgliederdetails-notizen" data-toggle="tab">{"Notizen"|__}</a></li>
+		<li><a href="#mitgliederdetails-historie" data-toggle="tab">{"Historie"|__}</a></li>
 		<li><a href="#mitgliederdetails-dokumente" data-toggle="tab">{"Dokumente"|__}</a></li>
 		<li><a href="#mitgliederdetails-beitraege" data-toggle="tab">{"Beiträge"|__}</a></li>
 	</ul>
@@ -27,34 +27,114 @@
 
 			{include file="mitgliederform.block.tpl" mitglied=$mitglied}
 		</div>
-		<div class="tab-pane" id="mitgliederdetails-notizen">
-			<div class="btn-toolbar">
-				<div class="btn-group">
-					<a data-toggle="modal" href="#notiz-add" class="btn btn-primary">Notiz hinzufügen</a>
-				</div>
-			</div>
-			<form action="{"mitglieder_details"|___:$mitglied.mitgliedid}" method="post" class="form-horizontal modal" style="display:none;" id="notiz-add">
-				<div class="modal-header">
-					<a class="close" data-dismiss="modal">×</a>
-					<h3>Notiz hinzufügen</h3>
-				</div>
-				<fieldset class="modal-body">
-					<div class="control-group">
-						<label class="control-label" for="kommentar">{"Notiz:"|__}</label>
-						<div class="controls">
-							<textarea cols="35" rows="2" name="kommentar"></textarea>
-						</div>
-					</div>
-				</fieldset>
-				<div class="modal-footer">
-					<button class="btn btn-success submit" type="submit" name="addnotiz" value="1">{"Hinzufügen"|__}</button>
-				</div>
-			</form>
-			{foreach from=$mitgliednotizen item=notiz}
+		<div class="tab-pane" id="mitgliederdetails-historie">
+			{foreach from=$mitgliedrevisions item=revision}
 				<div class="well">
-					<span class="meta">{if isset($notiz.author)}{"Von %s"|__:$notiz.author.username}{/if}</span>
-					{include file="timestamp.tpl" timestamp=$notiz.timestamp}
-					<div class="kommentar">{$notiz.kommentar}</div>
+					<ul style="font-size:0.8em; list-style-type:square;">
+						<li class="meta">{if isset($revision.user)}{"Von %s"|__:$revision.user.username}{/if} {include file="timestamp.tpl" timestamp=$revision.timestamp}</li>
+						{if !isset($revisiongliederung) || $revisiongliederung != $revision.gliederung.gliederungid}{assign var=revisiongliederung value=$revision.gliederung.gliederungid}
+							<li>{"Gliederung auf %s gesetzt"|__:$revision.gliederung.label}</li>{/if}
+						{if !isset($revisionmitgliedschaft) || $revisionmitgliedschaft != $revision.mitgliedschaft.mitgliedschaftid}{assign var=revisionmitgliedschaft value=$revision.mitgliedschaft.mitgliedschaftid}
+							<li>{"Mitgliedschaft auf %s gesetzt"|__:$revision.mitgliedschaft.label}</li>{/if}
+						{if isset($revision.natperson) && (!isset($revisionnatperson) || $revisionnatperson != isset($revision.natperson))}{assign var=revisionnatperson value=isset($revision.natperson)}
+							<li>{"Auf Natürliche Person gesetzt"|__}</li>
+							{assign var=revisionnatanrede value=$revision.natperson.anrede}
+							{assign var=revisionnatvorname value=$revision.natperson.vorname}
+							{assign var=revisionnatname value=$revision.natperson.name}
+							<li>{"Name auf %s %s %s gesetzt"|__:$revision.natperson.anrede:$revision.natperson.vorname:$revision.natperson.name}</li>
+							{assign var=revisionnatgeburt value=$revision.natperson.geburtsdatum}
+							<li>{"Geburtsdatum auf %s gesetzt"|__:$revision.natperson.geburtsdatum}</li>
+							{assign var=revisionnatnationalitaet value=$revision.natperson.nationalitaet}
+							{if $revision.natperson.nationalitaet != ""}<li>{"Nationalitaet auf %s gesetzt"|__:$revision.natperson.nationalitaet}</li>{/if}
+						{else}
+							{if $revisionnatanrede != $revision.natperson.anrede
+							 || $revisionnatvorname != $revision.natperson.vorname
+							 || $revisionnatname != $revision.natperson.name}
+							 	{assign var=revisionnatanrede value=$revision.natperson.anrede}
+							 	{assign var=revisionnatvorname value=$revision.natperson.vorname}
+							 	{assign var=revisionnatname value=$revision.natperson.name}
+								<li>{"Name auf %s %s %s gesetzt"|__:$revision.natperson.anrede:$revision.natperson.vorname:$revision.natperson.name}</li>{/if}
+							{if $revisionnatgeburt != $revision.natperson.geburtsdatum}{assign var=revisionnatgeburt value=$revision.natperson.geburtsdatum}
+								<li>{"Geburtsdatum auf %s gesetzt"|__:$revision.natperson.geburtsdatum}</li>{/if}
+							{if $revisionnatnationalitaet != $revision.natperson.nationalitaet}{assign var=revisionnatnationalitaet value=$revision.natperson.nationalitaet}
+								<li>{"Nationalitaet auf %s gesetzt"|__:$revision.natperson.nationalitaet}</li>{/if}	
+						{/if}
+						{if isset($revision.jurperson) && (!isset($revisionjurperson) || $revisionjurperson != isset($revision.jurperson))}{assign var=revisionjurperson value=isset($revision.jurperson)}
+							<li>{"Auf Juristische Person gesetzt"|__}</li>
+							{assign var=revisionjurpersonlabel value=$revision.jurperson.label}
+							<li>{"Firma auf %s gesetzt"|__:$revision.jurperson.label}</li>
+						{else}
+							{if $revisionjurpersonlabel != $revision.jurperson.label}{assign var=revisionjurpersonlabel value=$revision.jurperson.label}
+								<li>{"Firma auf %s gesetzt"|__:$revision.jurperson.label}</li>{/if}
+						{/if}
+						{if !isset($revisionadresszusatz) || $revisionadresszusatz != $revision.kontakt.adresszusatz
+						 || !isset($revisionstrasse) || $revisionstrasse != $revision.kontakt.strasse
+						 || !isset($revisionhausnummer) || $revisionhausnummer != $revision.kontakt.hausnummer
+						 || !isset($revisionort) || $revisionort != $revision.kontakt.ort.ortid}
+							{assign var=revisionadresszusatz value=$revision.kontakt.adresszusatz}
+							{assign var=revisionstrasse value=$revision.kontakt.strasse}
+							{assign var=revisionhausnummer value=$revision.kontakt.hausnummer}
+							{assign var=revisionort value=$revision.kontakt.ort.ortid}
+							{if $revision.kontakt.adresszusatz != ""}
+								<li>{"Adresse auf %s, %s %s, %s %s in %s gesetzt"|__:$revision.kontakt.adresszusatz:$revision.kontakt.strasse:$revision.kontakt.hausnummer:$revision.kontakt.ort.plz:$revision.kontakt.ort.label:$revision.kontakt.ort.state.label}</li>
+							{else}
+								<li>{"Adresse auf %s %s, %s %s in %s gesetzt"|__:$revision.kontakt.strasse:$revision.kontakt.hausnummer:$revision.kontakt.ort.plz:$revision.kontakt.ort.label:$revision.kontakt.ort.state.label}</li>
+							{/if}
+						{/if}
+						{if $revision.kontakt.telefon != ""}
+							{if !isset($revisiontelefon) || $revisiontelefon != $revision.kontakt.telefon}{assign var=revisiontelefon value=$revision.kontakt.telefon}
+								<li>{"Telefonnummer auf %s gesetzt"|__:$revision.kontakt.telefon}</li>{/if}
+						{else}
+							{if isset($revisiontelefon) && $revisiontelefon != $revision.kontakt.telefon}{assign var=revisiontelefon value=$revision.kontakt.telefon}
+								<li>{"Telefonnummer entfernt"|__:$revision.kontakt.telefon}</li>{/if}
+						{/if}
+						{if $revision.kontakt.handy != ""}
+							{if !isset($revisionhandy) || $revisionhandy != $revision.kontakt.handy}{assign var=revisionhandy value=$revision.kontakt.handy}
+								<li>{"Handynummer auf %s gesetzt"|__:$revision.kontakt.handy}</li>{/if}
+						{else}
+							{if isset($revisionhandy) && $revisionhandy != $revision.kontakt.handy}{assign var=revisionhandy value=$revision.kontakt.handy}
+								<li>{"Handynummer entfernt"|__:$revision.kontakt.handy}</li>{/if}
+						{/if}
+						{if $revision.kontakt.email != ""}
+							{if !isset($revisionemail) || $revisionemail != $revision.kontakt.email.email}{assign var=revisionemail value=$revision.kontakt.email.email}
+								<li>{"EMail-Adresse auf %s gesetzt"|__:$revision.kontakt.email.email}</li>{/if}
+						{else}
+							{if isset($revisionemail) && $revisionemail != $revision.kontakt.email.email}{assign var=revisionemail value=$revision.kontakt.email.email}
+								<li>{"EMail-Adresse entfernt"|__:$revision.kontakt.email.email}</li>{/if}
+						{/if}
+						{if $revision.kontakt.iban != ""}
+							{if !isset($revisioniban) || $revisioniban != $revision.kontakt.iban}{assign var=revisioniban value=$revision.kontakt.iban}
+								<li>{"Bankverbindung auf %s gesetzt"|__:$revision.kontakt.iban}</li>{/if}
+						{else}
+							{if isset($revisioniban) && $revisioniban != $revision.kontakt.iban}{assign var=revisioniban value=$revision.kontakt.iban}
+								<li>{"Bankverbindung entfernt"|__:$revision.kontakt.iban}</li>{/if}
+						{/if}
+						{if !isset($revisionbeitrag) || $revisionbeitrag != $revision.beitrag
+						 || !isset($revisionbeitragtimeformat) || $revisionbeitragtimeformat != $revision.beitragtimeformat.beitragtimeformatid}
+							{assign var=revisionbeitrag value=$revision.beitrag}
+							{assign var=revisionbeitragtimeformat value=$revision.beitragtimeformat.beitragtimeformatid}
+							<li>{"Beitrag auf %.2f EUR %s gesetzt"|__:$revision.beitrag:$revision.beitragtimeformat.label}</li>{/if}
+						{foreach from=$revision.flags key=flagid item=flag}{if !isset($revisionflags) || $revision.flags.$flagid != $revisionflags.$flagid}
+							<li>{"%s hinzugefügt"|__:$flag.label}</li>{/if}{/foreach}
+						{if isset($revisionflags)}{foreach from=$revisionflags key=flagid item=flag}{if $revision.flags.$flagid != $revisionflags.$flagid}
+							<li>{"%s entfernt"|__:$flag.label}</li>{/if}{/foreach}{/if}
+						{assign var=revisionflags value=$revision.flags}
+						{foreach from=$revision.textfields key=textfieldid item=textfield}
+							{if $textfield.value != ""}
+								{if !isset($revisiontextfields.$textfieldid) || $revisiontextfields.$textfieldid.value != $textfield.value}
+									<li>{"%s auf %s gesetzt"|__:$textfield.textfield.label:$textfield.value}</li>{/if}
+							{else}
+								{if isset($revisiontextfields.$textfieldid) && $revisiontextfields.$textfieldid.value != $textfield.value}
+									<li>{"%s entfernt"|__:$textfield.textfield.label:$textfield.value}</li>{/if}
+							{/if}
+						{/foreach}
+						{if isset($revisiontextfields)}{foreach from=$revisiontextfields key=textfieldid item=textfield}
+							{if !isset($revision.textfields.$textfieldid)}
+								<li>{"%s entfernt"|__:$textfield.textfield.label:$textfield.value}</li>{/if}
+						{/foreach}{/if}
+						{assign var=revisiontextfields value=$revision.textfields}
+					</ul>
+					<div class="kommentar" style="margin-top:0.5em;">{$revision.kommentar}</div>
 				</div>
 			{/foreach}
 		</div>

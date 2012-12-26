@@ -720,6 +720,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`natpersonid` AS `r_natpersonid`,
 				`r`.`jurpersonid` AS `r_jurpersonid`,
 				`r`.`kontaktid` AS `r_kontaktid`,
+				`r`.`kommentar` AS `r_kommentar`,
 				`n`.`natpersonid` AS `n_natpersonid`,
 				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
@@ -814,6 +815,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`natpersonid` AS `r_natpersonid`,
 				`r`.`jurpersonid` AS `r_jurpersonid`,
 				`r`.`kontaktid` AS `r_kontaktid`,
+				`r`.`kommentar` AS `r_kommentar`,
 				`n`.`natpersonid` AS `n_natpersonid`,
 				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
@@ -1013,14 +1015,14 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "MitgliedNotiz");
 	}
 	public function getMitgliedNotizResult($mitgliedid = null) {
-		$sql = "SELECT `mitgliednotizid`, `mitgliedid`, `author`, `timestamp`, `kommentar` FROM `mitgliedernotizen` WHERE 1=1";
+		$sql = "SELECT `mitgliednotizid`, `mitgliedid`, `author`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `kommentar` FROM `mitgliedernotizen` WHERE 1=1";
 		if ($mitgliedid != null) {
 			$sql .= " AND `mitgliedid` = " . intval($mitgliedid);
 		}
 		return $this->getResult($sql, array($this, "parseMitgliedNotiz"));
 	}
 	public function getMitgliedNotiz($mitgliednotizid) {
-		$sql = "SELECT `mitgliednotizid`, `mitgliedid`, `author`, `timestamp`, `kommentar` FROM `mitgliedernotizen` WHERE `mitgliednotizid` = " . intval($mitgliednotizid);
+		$sql = "SELECT `mitgliednotizid`, `mitgliedid`, `author`, UNIX_TIMESTAMP(`timestamp`) AS `timestamp`, `kommentar` FROM `mitgliedernotizen` WHERE `mitgliednotizid` = " . intval($mitgliednotizid);
 		return $this->getResult($sql, array($this, "parseMitgliedNotiz"))->fetchRow();
 	}
 	public function setMitgliedNotiz($mitgliednotizid, $mitgliedid, $author, $timestamp, $kommentar) {
@@ -1082,6 +1084,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`natpersonid` AS `r_natpersonid`,
 				`r`.`jurpersonid` AS `r_jurpersonid`,
 				`r`.`kontaktid` AS `r_kontaktid`,
+				`r`.`kommentar` AS `r_kommentar`,
 				`n`.`natpersonid` AS `n_natpersonid`,
 				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
@@ -1160,6 +1163,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`natpersonid` AS `r_natpersonid`,
 				`r`.`jurpersonid` AS `r_jurpersonid`,
 				`r`.`kontaktid` AS `r_kontaktid`,
+				`r`.`kommentar` AS `r_kommentar`,
 				`n`.`natpersonid` AS `n_natpersonid`,
 				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
@@ -1234,6 +1238,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`natpersonid` AS `r_natpersonid`,
 				`r`.`jurpersonid` AS `r_jurpersonid`,
 				`r`.`kontaktid` AS `r_kontaktid`,
+				`r`.`kommentar` AS `r_kommentar`,
 				`n`.`natpersonid` AS `n_natpersonid`,
 				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
@@ -1309,6 +1314,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`r`.`natpersonid` AS `r_natpersonid`,
 				`r`.`jurpersonid` AS `r_jurpersonid`,
 				`r`.`kontaktid` AS `r_kontaktid`,
+				`r`.`kommentar` AS `r_kommentar`,
 				`n`.`natpersonid` AS `n_natpersonid`,
 				`n`.`anrede` AS `n_anrede`,
 				`n`.`name` AS `n_name`,
@@ -1369,11 +1375,11 @@ abstract class SQLStorage extends AbstractStorage {
 			WHERE	`r`.`revisionid` = " . intval($revisionid);
 		return $this->getResult($sql, array($this, "parseMitgliederRevision"))->fetchRow();
 	}
-	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $beitrag, $beitragtimeformatid, $natpersonid, $jurpersonid, $kontaktid) {
+	public function setMitgliederRevision($revisionid, $globalid, $timestamp, $userid, $mitgliedid, $mitgliedschaftid, $gliederungid, $geloescht, $beitrag, $beitragtimeformatid, $natpersonid, $jurpersonid, $kontaktid, $kommentar) {
 		if ($revisionid == null) {
-			$sql = "INSERT INTO `mitgliederrevisions` (`globaleid`, `timestamp`, `userid`, `mitgliedid`, `mitgliedschaftid`, `gliederungsid`, `geloescht`, `beitrag`, `beitragtimeformatid`, `natpersonid`, `jurpersonid`, `kontaktid`) VALUES ('" . $this->escape($globalid) . "', '" . date("Y-m-d H:i:s", $timestamp) . "', " . ($userid === null ? "NULL" : intval($userid)) . ", " . intval($mitgliedid) . ", " . intval($mitgliedschaftid) . ", " . intval($gliederungid) . ", " . ($geloescht ? 1 : 0) . ", " . doubleval($beitrag) . ", " . intval($beitragtimeformatid) . ", " . ($natpersonid == null ? "NULL" : intval($natpersonid)) . ", " . ($jurpersonid == null ? "NULL" : intval($jurpersonid)) . ", " . intval($kontaktid) . ")";
+			$sql = "INSERT INTO `mitgliederrevisions` (`globaleid`, `timestamp`, `userid`, `mitgliedid`, `mitgliedschaftid`, `gliederungsid`, `geloescht`, `beitrag`, `beitragtimeformatid`, `natpersonid`, `jurpersonid`, `kontaktid`, `kommentar`) VALUES ('" . $this->escape($globalid) . "', '" . date("Y-m-d H:i:s", $timestamp) . "', " . ($userid === null ? "NULL" : intval($userid)) . ", " . intval($mitgliedid) . ", " . intval($mitgliedschaftid) . ", " . intval($gliederungid) . ", " . ($geloescht ? 1 : 0) . ", " . doubleval($beitrag) . ", " . intval($beitragtimeformatid) . ", " . ($natpersonid == null ? "NULL" : intval($natpersonid)) . ", " . ($jurpersonid == null ? "NULL" : intval($jurpersonid)) . ", " . intval($kontaktid) . ", '" . $this->escape($kommentar) . "')";
 		} else {
-			$sql = "UPDATE `mitgliederrevisions` SET `globaleid` = '" . $this->escape($globalid) . "', `timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "', `userid` = " . ($userid === NULL ? "NULL" : intval($userid)) . ", `mitgliedid` = " . intval($mitgliedid) . ", `mitgliedschaftid` = " . intval($mitgliedschaftid) . ", `gliederungsid` = " . intval($gliederungid) . ", `geloescht` = " . ($geloescht ? 1 : 0) . ", " . doubleval($beitrag) . ", `beitragtimeformatid` = " . intval($beitragtimeformatid) . ", `natpersonid` = " . ($natpersonid == null ? "NULL" : intval($natpersonid)) . ",`jurpersonid` = " . ($jurpersonid == null ? "NULL" : intval($jurpersonid)) . ", `kontaktid` = " . intval($kontaktid) . " WHERE `revisionid` = " . intval($revisionid);
+			$sql = "UPDATE `mitgliederrevisions` SET `globaleid` = '" . $this->escape($globalid) . "', `timestamp` = '" . date("Y-m-d H:i:s", $timestamp) . "', `userid` = " . ($userid === NULL ? "NULL" : intval($userid)) . ", `mitgliedid` = " . intval($mitgliedid) . ", `mitgliedschaftid` = " . intval($mitgliedschaftid) . ", `gliederungsid` = " . intval($gliederungid) . ", `geloescht` = " . ($geloescht ? 1 : 0) . ", " . doubleval($beitrag) . ", `beitragtimeformatid` = " . intval($beitragtimeformatid) . ", `natpersonid` = " . ($natpersonid == null ? "NULL" : intval($natpersonid)) . ",`jurpersonid` = " . ($jurpersonid == null ? "NULL" : intval($jurpersonid)) . ", `kontaktid` = " . intval($kontaktid) . ", `kommentar` = '" . $this->escape($kommentar) . "' WHERE `revisionid` = " . intval($revisionid);
 		}
 		$this->query($sql);
 		if ($revisionid == null) {
