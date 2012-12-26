@@ -643,18 +643,33 @@ abstract class SQLStorage extends AbstractStorage {
 			return "`m`.`austritt` >= '" . $this->escape(date("Y-m-d", $matcher->getTimestamp())) . "'";
 		}
 		if ($matcher instanceof SearchMitgliederMatcher) {
-			$fields = array("`m`.`mitgliedid`", "`m`.`globalid`", "`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`r`.`kommentar`", "`n`.`anrede`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`adresszusatz`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`k`.`iban`", "`e`.`email`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
+			$fields = array("`m`.`mitgliedid`", "`m`.`globalid`");
+			$revision_fields = array("`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`r`.`kommentar`", "`n`.`anrede`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`adresszusatz`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`k`.`iban`", "`e`.`email`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
 			$wordclauses = array();
-			$escapedwords = array();
+			$revision_wordclauses = array();
 			foreach ($matcher->getWords() as $word) {
-				$escapedwords[] = $this->escape($word);
 				$clauses = array();
 				foreach ($fields as $field) {
 					$clauses[] = $field . " LIKE '%" . $this->escape($word) . "%'";
 				}
 				$wordclauses[] = implode(" OR ", $clauses);
+
+				$clauses = array();
+				foreach ($revision_fields as $field) {
+					$clauses[] = $field . " LIKE '%" . $this->escape($word) . "%'";
+				}
+				$revision_wordclauses[] = implode(" OR ", $clauses);
 			}
-			return "( (" . implode(") AND (", $wordclauses) . ") )";
+			return "( ( (" . implode(") AND (", $wordclauses) . ") ) OR
+				(`m`.`mitgliedid` IN	(SELECT `r`.`mitgliedid`
+							 FROM `mitgliederrevisions` `r`
+							 LEFT JOIN `mitglieder` `m` USING (`mitgliedid`)
+							 LEFT JOIN `natperson` `n` USING (`natpersonid`)
+							 LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
+							 LEFT JOIN `kontakte` `k` USING (`kontaktid`)
+							 LEFT JOIN `orte` `o` USING (`ortid`)
+							 LEFT JOIN `emails` `e` USING (`emailid`)
+							 WHERE (" . implode(") AND (", $revision_wordclauses) . ") ) ) )";
 		}
 		throw new Exception("Not implemented: ".get_class($matcher));
 	}
