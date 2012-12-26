@@ -11,7 +11,7 @@ class MitgliedCreateDokumentTransition extends StaticDokumentTransition implemen
 	}
 
 	public function execute($config, $session, $filter, $matcher) {
-		$dokumentid = array_pop($matcher->getConditions());
+		$dokumentid = array_pop($matcher->getConditions())->getDokumentID();
 		// TODO hacky and needs to be rewritten
 		return array("redirect" => $session->getLink("dokumente_mitglied_create", $dokumentid, $this->mitgliedtemplateid));
 	}
@@ -27,7 +27,7 @@ class DynamicMitgliedCreateDokumentTransition extends StaticDokumentTransition i
 	}
 
 	public function execute($config, $session, $filter, $matcher) {
-		$dokumentid = array_pop($matcher->getConditions());
+		$dokumentid = array_pop($matcher->getConditions())->getDokumentID();
 		// TODO hacky and needs to be rewritten
 		$dokument = $session->getStorage()->getDokument($dokumentid);
 		$mitgliedtemplateid = $this->mitgliedtemplatechooser->getMitgliedTemplateID($session->getStorage(), $dokument);
