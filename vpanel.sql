@@ -1115,3 +1115,7 @@ ALTER TABLE  `mitgliederrevisions` ADD  `kommentar` TEXT NOT NULL;
 -- after update
 
 DROP TABLE `dokumentnotizen`;
+
+-- update 2012-12-27
+
+ALTER TABLE  `mitgliederbeitragbuchung` DROP FOREIGN KEY  `mitgliederbeitragbuchung_ibfk_5` ;
