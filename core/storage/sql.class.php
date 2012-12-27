@@ -627,8 +627,8 @@ abstract class SQLStorage extends AbstractStorage {
 					FROM	`mitglieddokument` `mdok`
 					LEFT JOIN	`dokumentrevisions` `dokr` USING (`dokumentid`)
 					WHERE	`dokr`.`timestamp` = (SELECT MAX(`dokrmax`.`timestamp`) FROM `dokumentrevisions` `dokrmax` WHERE `dokrmax`.`dokumentid` = `dokr`.`dokumentid`)
-						AND `dokr`.`kategorieid` = " . intval($matcher->getDokumentKategorieID()) . ")
-					GROUP BY	`dokr`.`dokumentid`";
+						AND `dokr`.`kategorieid` = " . intval($matcher->getDokumentKategorieID()) . "
+					GROUP BY	`dokr`.`dokumentid`)";
 		}
 		if ($matcher instanceof DokumentStatusMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (
@@ -636,8 +636,8 @@ abstract class SQLStorage extends AbstractStorage {
 					FROM	`mitglieddokument` `mdok`
 					LEFT JOIN	`dokumentrevisions` `dokr` USING (`dokumentid`)
 					WHERE	`dokr`.`timestamp` = (SELECT MAX(`dokrmax`.`timestamp`) FROM `dokumentrevisions` `dokrmax` WHERE `dokrmax`.`dokumentid` = `dokr`.`dokumentid`)
-						AND `dokr`.`statusid` = " . intval($matcher->getDokumentStatusID()) . ")
-					GROUP BY	`dokr`.`dokumentid`";
+						AND `dokr`.`statusid` = " . intval($matcher->getDokumentStatusID()) . "
+					GROUP BY	`dokr`.`dokumentid`)";
 		}
 		if ($matcher instanceof EintrittsdatumAfterMitgliederMatcher) {
 			return "`m`.`eintritt` >= '" . $this->escape(date("Y-m-d", $matcher->getTimestamp())) . "'";
