@@ -1835,12 +1835,11 @@ abstract class SQLStorage extends AbstractStorage {
 		return $o["d"];
 	}
 	public function getDokumentCount($matcher) {
-		$sql = "SELECT	COUNT(`d`.`dokumentid`)
+		$sql = "SELECT	COUNT(DISTINCT `d`.`dokumentid`)
 			FROM	`dokument` `d`
 			LEFT JOIN `dokumentrevisions` `r` USING (`dokumentid`)
 			WHERE	`r`.`timestamp` = (SELECT MAX(`rmax`.`timestamp`) FROM `dokumentrevisions` `rmax` WHERE `rmax`.`dokumentid` = `r`.`dokumentid`)
-				AND " . $this->parseDokumentMatcher($matcher) . "
-			GROUP BY `r`.`dokumentid`";
+				AND " . $this->parseDokumentMatcher($matcher);
 		$row = $this->getResult($sql)->fetchRow();
 		if ($row == null) {
 			return 0;
