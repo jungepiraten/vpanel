@@ -680,7 +680,7 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof MitgliederFilter) {
 			$matcher = $matcher->getMatcher();
 		}
-		$sql = "SELECT	COUNT(`r`.`revisionid`) as `count`
+		$sql = "SELECT	COUNT(DISTINCT `r`.`revisionid`) as `count`
 			FROM `mitglieder` `m`
 			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
 			LEFT JOIN `natperson` `n` USING (`natpersonid`)
@@ -692,8 +692,7 @@ abstract class SQLStorage extends AbstractStorage {
 				SELECT	MAX(`rmax`.`timestamp`)
 				FROM	`mitgliederrevisions` `rmax`
 				WHERE	`r`.`mitgliedid` = `rmax`.`mitgliedid`)
-					AND ".$this->parseMitgliederMatcher($matcher) . "
-			GROUP BY `r`.`mitgliedid`";
+					AND ".$this->parseMitgliederMatcher($matcher);
 		return reset($this->getResult($sql)->fetchRow());
 	}
 	public function parseMitglied($row) {
