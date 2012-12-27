@@ -1841,7 +1841,11 @@ abstract class SQLStorage extends AbstractStorage {
 			WHERE	`r`.`timestamp` = (SELECT MAX(`rmax`.`timestamp`) FROM `dokumentrevisions` `rmax` WHERE `rmax`.`dokumentid` = `r`.`dokumentid`)
 				AND " . $this->parseDokumentMatcher($matcher) . "
 			GROUP BY `r`.`dokumentid`";
-		return reset($this->getResult($sql)->fetchRow());
+		$row = $this->getResult($sql)->fetchRow();
+		if ($row == null) {
+			return 0;
+		}
+		return reset($row);
 	}
 	public function getDokumentResult($matcher, $limit = null, $offset = null) {
 		$sql = "SELECT	`r`.`timestamp` AS `null`,
