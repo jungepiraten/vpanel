@@ -29,6 +29,8 @@
 					<li class="nextkategorie">{"Unter %s abgelegt"|__:$revision.kategorie.label}</li>{/if}
 				{if !isset($revisionstatus) || $revisionstatus != $revision.status.dokumentstatusid}{assign var=revisionstatus value=$revision.status.dokumentstatusid}
 					<li class="nextstatus">{"Als %s markiert"|__:$revision.status.label}</li>{/if}
+				{if !isset($revisionfile) || $revisionfile != $revision.file.fileid}{assign var=revisionfile value=$revision.file.fileid}
+					<li class="nextfile"><a href="{"dokumentrevision_get"|___:$revision.revisionid}">{"Neue Datei hochgeladen"|__}</a></li>{/if}
 				{if !isset($revisionidentifier) || $revisionidentifier != $revision.identifier}{assign var=revisionidentifier value=$revision.identifier}
 					<li class="nextidentifier">{"Als %s abgeheftet"|__:$revision.identifier}</li>{/if}
 				{if !isset($revisionlabel) || $revisionlabel != $revision.label}{assign var=revisionlabel value=$revision.label}

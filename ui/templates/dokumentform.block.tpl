@@ -44,6 +44,7 @@
     <div class="controls">
         {if isset($revision)}
          <a href="{"dokumentrevision_get"|___:$revision.revisionid}" class="btn btn-info">{"Download"|__}</a>
+         <button class="btn btn-success" onClick="$(this).parent().empty().append($('<input>').attr('type','file').attr('name','file'))">{"Neu hochladen"|__}</button>
         {else}
          <input type="file" name="file" />
         {/if}

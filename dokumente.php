@@ -22,7 +22,11 @@ require_once(VPANEL_DOKUMENTMATCHER . "/search.class.php");
 
 function parseDokumentFormular($ui, $session, &$dokument = null) {
 	$gliederungid = $dokument->getLatestRevision()->getGliederungID();
-	$fileid = $dokument->getLatestRevision()->getFileID();
+	if ($session->hasFileVariable("file")) {
+		$file = $session->getFileVariable("file");
+	} else {
+		$file = $dokument->getLatestRevision()->getFile();
+	}
 	$data = $dokument->getLatestRevision()->getData();
 	$content = $dokument->getLatestRevision()->getContent();
 	$kategorieid = $session->getIntVariable("kategorieid");
@@ -46,7 +50,7 @@ function parseDokumentFormular($ui, $session, &$dokument = null) {
 	$revision->setStatusID($statusid);
 	$revision->setIdentifier($identifier);
 	$revision->setLabel($label);
-	$revision->setFileID($fileid);
+	$revision->setFile($file);
 	foreach ($flagids as $flagid) {
 		$flag = $session->getStorage()->getDokumentFlag($flagid);
 		$revision->setFlag($flag);
