@@ -30,7 +30,7 @@ class MitgliederFilterDeleteProcess extends MitgliederFilterProcess {
 		$mitglied->save();
 
 		$revision = $mitglied->getLatestRevision()->fork();
-		$revision->setTimestamp($this->getTimestamp());
+		$revision->setTimestamp(time());
 		$revision->setUserID($this->getUserID());
 		$revision->isGeloescht(true);
 		$revision->save();
