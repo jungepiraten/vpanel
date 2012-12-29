@@ -680,7 +680,7 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof MitgliederFilter) {
 			$matcher = $matcher->getMatcher();
 		}
-		$sql = "SELECT	COUNT(DISTINCT `r`.`revisionid`) as `count`
+		$sql = "SELECT	COUNT(DISTINCT `m`.`mitgliedid`) as `count`
 			FROM `mitglieder` `m`
 			LEFT JOIN `mitgliederrevisions` `r` USING (`mitgliedid`)
 			LEFT JOIN `natperson` `n` USING (`natpersonid`)
