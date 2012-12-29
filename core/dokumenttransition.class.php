@@ -28,6 +28,7 @@ abstract class DokumentTransition extends GliederungAktion {
 
 	abstract public function getNextKategorieID($session);
 	abstract public function getNextStatusID($session);
+	abstract public function getNextFlags($session);
 	abstract public function getKommentar($session);
 
 	public function isMatching($session, $kategorieid, $statusid) {
@@ -44,6 +45,7 @@ abstract class DokumentTransition extends GliederungAktion {
 		$process->setUser($session->getUser());
 		$process->setNextKategorieID($this->getNextKategorieID($session));
 		$process->setNextStatusID($this->getNextStatusID($session));
+		$process->setNextFlags($this->getNextFlags($session));
 		$process->setKommentar($this->getKommentar($session));
 		// Zwischenspeichern, um ProzessID zu erhalten
 		$process->save();
@@ -71,12 +73,14 @@ abstract class DokumentTransition extends GliederungAktion {
 abstract class StaticDokumentTransition extends DokumentTransition {
 	private $nextkategorieid;
 	private $nextstatusid;
+	private $nextflags;
 	private $kommentar;
 
-	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar) {
+	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $nextflags, $kommentar) {
 		parent::__construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid);
 		$this->nextkategorieid = $nextkategorieid;
 		$this->nextstatusid = $nextstatusid;
+		$this->nextflags = $nextflags;
 		$this->kommentar = $kommentar;
 	}
 
@@ -86,6 +90,10 @@ abstract class StaticDokumentTransition extends DokumentTransition {
 
 	public function getNextStatusID($session) {
 		return $this->nextstatusid;
+	}
+
+	public function getNextFlags($session) {
+		return $this->nextflags;
 	}
 
 	public function getKommentar($session) {

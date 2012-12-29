@@ -6,8 +6,8 @@ require_once(VPANEL_PROCESSES . "/dokumenttransitionforward.class.php");
 class ForwardDokumentTransition extends StaticDokumentTransition implements SingleDokumentTransition, MultiDokumentTransition {
 	private $email;
 
-	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar, $email = null) {
-		parent::__construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar);
+	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $nextflagids, $kommentar, $email = null) {
+		parent::__construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $nextflagids, $kommentar);
 		$this->email = $email;
 	}
 

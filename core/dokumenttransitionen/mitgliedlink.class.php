@@ -4,8 +4,8 @@ require_once(VPANEL_CORE . "/dokumenttransition.class.php");
 require_once(VPANEL_PROCESSES . "/dokumenttransitionmitgliedlink.class.php");
 
 class MitgliedLinkDokumentTransition extends StaticDokumentTransition implements SingleDokumentTransition, MultiDokumentTransition {
-	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar) {
-		parent::__construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar);
+	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $nextflagids, $kommentar) {
+		parent::__construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $nextflagids, $kommentar);
 	}
 
 	private function getMitgliedID($session) {

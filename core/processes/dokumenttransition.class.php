@@ -6,6 +6,7 @@ class DokumentTransitionProcess extends Process {
 	private $matcher;
 	private $nextkategorieid;
 	private $nextstatusid;
+	private $nextflags;
 	private $nextidentifier;
 	private $nextlabel;
 	private $nextdata;
@@ -16,6 +17,7 @@ class DokumentTransitionProcess extends Process {
 		$process->setMatcher($row["matcher"]);
 		$process->setNextKategorieID($row["nextkategorieid"]);
 		$process->setNextStatusID($row["nextstatusid"]);
+		$process->setNextFlags($row["nextflags"]);
 		$process->setNextIdentifier($row["nextidentifier"]);
 		$process->setNextLabel($row["nextlabel"]);
 		$process->setNextData($row["nextdata"]);
@@ -45,6 +47,14 @@ class DokumentTransitionProcess extends Process {
 
 	public function setNextStatusID($statusid) {
 		$this->nextstatusid = $statusid;
+	}
+
+	public function getNextFlags() {
+		return $this->nextflags;
+	}
+
+	public function setNextFlags($flags) {
+		$this->nextflags = $flags;
 	}
 
 	public function getNextIdentifier() {
@@ -85,6 +95,7 @@ class DokumentTransitionProcess extends Process {
 		$data["matcher"] = $this->matcher;
 		$data["nextkategorieid"] = $this->nextkategorieid;
 		$data["nextstatusid"] = $this->nextstatusid;
+		$data["nextflags"] = $this->nextflags;
 		$data["nextidentifier"] = $this->nextidentifier;
 		$data["nextlabel"] = $this->nextlabel;
 		$data["nextdata"] = $this->nextdata;
@@ -133,6 +144,17 @@ class DokumentTransitionProcess extends Process {
 
 		if ($this->getNextStatusID() != null) {
 			$revision->setStatusID($this->getNextStatusID());
+		}
+
+		if ($this->getNextFlags() != null) {
+			foreach ($this->getNextFlags() as $flagid => $set) {
+				$flag = $this->getStorage()->getDokumentFlag($flagid);
+				if ($set) {
+					$revision->setFlag($flag);
+				} else {
+					$revision->delFlag($flagid);
+				}
+			}
 		}
 
 		if ($this->getNextIdentifier() != null) {

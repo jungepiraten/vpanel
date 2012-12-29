@@ -45,7 +45,8 @@ class DokumentTransaktionDownloadProcess extends DokumentTransitionProcess {
 	}
 
 	public function runProcessStep($dokument) {
-		$this->ziphandler->addFile($dokument->getFile()->getAbsoluteFilename(), $dokument->getFile()->getExportFilename());
+		$file = $dokument->getLatestRevision()->getFile();
+		$this->ziphandler->addFile($file->getAbsoluteFilename(), $file->getExportFilename());
 	}
 
 	public function finalizeProcess() {

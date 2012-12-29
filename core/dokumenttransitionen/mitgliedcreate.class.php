@@ -5,8 +5,8 @@ require_once(VPANEL_CORE . "/dokumenttransition.class.php");
 class MitgliedCreateDokumentTransition extends StaticDokumentTransition implements SingleDokumentTransition {
 	private $mitgliedtemplateid;
 
-	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar, $mitgliedtemplateid) {
-		parent::__construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar);
+	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $nextflagids, $kommentar, $mitgliedtemplateid) {
+		parent::__construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $nextflagids, $kommentar);
 		$this->mitgliedtemplateid = $mitgliedtemplateid;
 	}
 
@@ -21,8 +21,8 @@ class MitgliedCreateDokumentTransition extends StaticDokumentTransition implemen
 }
 
 class DynamicMitgliedCreateDokumentTransition extends StaticDokumentTransition implements SingleDokumentTransition {
-	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar, $mitgliedtemplatechooser) {
-		parent::__construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $kommentar);
+	public function __construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $nextflagids, $kommentar, $mitgliedtemplatechooser) {
+		parent::__construct($transitionid, $label, $permission, $gliederungid, $kategorieid, $statusid, $nextkategorieid, $nextstatusid, $nextflagids, $kommentar);
 		$this->mitgliedtemplatechooser = $mitgliedtemplatechooser;
 	}
 

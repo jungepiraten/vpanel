@@ -29,6 +29,11 @@ class RenameDokumentTransition extends DokumentTransition implements SingleDokum
 		return $this->getDokumentTemplate($session)->getDokumentKategorieID($session);
 	}
 
+	public function getNextFlags($session) {
+		$flags = $this->getDokumentTemplate($session)->getDokumentFlags($session);
+		return array_combine($flags, array_fill(0, count($flags), true));
+	}
+
 	public function getKommentar($session) {
 		return $this->getDokumentTemplate($session)->getDokumentKommentar($session);
 	}
