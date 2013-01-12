@@ -57,11 +57,11 @@ Hallo,
 
 anbei ein Dokument und Details dazu:
 
-Gliederung:     {$dokument->getGliederung()->getLabel()}
-Kategorie:      {$dokument->getDokumentKategorie()->getLabel()}
-Status:         {$dokument->getDokumentStatus()->getLabel()}
-Identifikation: {$dokument->getIdentifier()}
-Titel:          {$dokument->getLabel()}
+Gliederung:     {$dokument->getLatestRevision()->getGliederung()->getLabel()}
+Kategorie:      {$dokument->getLatestRevision()->getKategorie()->getLabel()}
+Status:         {$dokument->getLatestRevision()->getStatus()->getLabel()}
+Identifikation: {$dokument->getLatestRevision()->getIdentifier()}
+Titel:          {$dokument->getLatestRevision()->getLabel()}
 
 Viele Grüße,
 
