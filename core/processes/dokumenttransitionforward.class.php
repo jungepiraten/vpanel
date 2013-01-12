@@ -68,7 +68,7 @@ Viele Grüße,
 VPanel
 EOT
 );
-		$mail->addAttachment($dokument->getFile());
+		$mail->addAttachment($dokument->getLatestRevision()->getFile());
 		$config->getSendMailBackend()->send($mail);
 	}
 
