@@ -9,7 +9,7 @@
     </div>
 </div>
 <div class="control-group">
-    <label class="control-label" for="timestamp">{"Eingang:"|__}</label>
+    <label class="control-label" for="timestamp">{$datefield|escape:html}</label>
     <div class="controls">
         <input type="date" name="timestamp" value="{$smarty.now|date_format:"%Y-%m-%d"}" />
     </div>

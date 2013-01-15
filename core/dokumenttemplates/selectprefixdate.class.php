@@ -5,11 +5,17 @@ require_once(VPANEL_DOKUMENTTEMPLATES . "/identifier.class.php");
 class SelectPrefixDateDokumentTemplate extends IdentifierDokumentTemplate {
 	private $prefixes;
 	private $dateFormat;
+	private $dateField;
 
-	public function __construct($templateid, $label, $permissoin, $gliederungid, $prefixes, $dateFormat, $identifierNumberLength = 3) {
+	public function __construct($templateid, $label, $permissoin, $gliederungid, $prefixes, $dateFormat, $dateField, $identifierNumberLength = 3) {
 		parent::__construct($templateid, $label, $permissoin, $gliederungid, $identifierNumberLength);
 		$this->prefixes = $prefixes;
 		$this->dateFormat = $dateFormat;
+		$this->dateField = $dateField;
+	}
+
+	public function getDateFieldLabel() {
+		return $this->dateField;
 	}
 
 	public function getPrefixOptions() {

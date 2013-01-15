@@ -933,10 +933,12 @@ class Template {
 		if ($dokumenttemplate instanceof NatPersonDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_person.html.tpl");
 		} else if ($dokumenttemplate instanceof DefaultDateDokumentTemplate) {
+			$this->smarty->assign("datefield", $dokumenttemplate->getDateFieldLabel());
 			$this->smarty->display("dokumentcreate_defaultdate.html.tpl");
 		} else if ($dokumenttemplate instanceof DefaultDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_default.html.tpl");
 		} else if ($dokumenttemplate instanceof SelectPrefixDateDokumentTemplate) {
+			$this->smarty->assign("datefield", $dokumenttemplate->getDateFieldLabel());
 			$this->smarty->assign("options", $dokumenttemplate->getPrefixOptions());
 			$this->smarty->display("dokumentcreate_selectprefixdate.html.tpl");
 		}
