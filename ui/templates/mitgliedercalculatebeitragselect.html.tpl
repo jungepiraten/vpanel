@@ -40,7 +40,7 @@
 						{foreach from=$gliederungen item=g2}
 							<td>
 								<div class="input-append">
-									<input type="text" name="gliederungsAnteil[{$gliederung.gliederungid|escape:html}][{$g2.gliederungid|escape:html}]" class="span1" value="0" />
+									<input type="text" name="gliederungsAnteil[{$gliederung.gliederungid|escape:html}][{$g2.gliederungid|escape:html}]" style="width:2em" value="0" />
 									<span class="add-on">%</span>
 								</div>
 							</td>
