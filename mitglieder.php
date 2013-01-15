@@ -102,7 +102,7 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 	}
 
 	$mitglied->setEintrittsdatum($eintritt);
-	$mitglied->setAustrittsdatum(null);
+	$mitglied->setAustrittsdatum($austritt);
 	$mitglied->save();
 
 	$revision = new MitgliedRevision($session->getStorage());
