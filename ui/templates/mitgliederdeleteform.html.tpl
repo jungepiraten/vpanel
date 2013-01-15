@@ -8,6 +8,13 @@
 			</div>
 		</div>
 
+		<div class="control-group">
+			<label class="control-label" for="kommentar">{"Kommentar:"|__}</label>
+			<div class="controls">
+				<textarea name="kommentar" cols="10" rows="3"></textarea>
+			</div>
+		</div>
+
 		<div class="form-actions">
 			<input class="btn btn-danger" type="submit" name="save" value="{"Löschen"|__}" />
 		</div>

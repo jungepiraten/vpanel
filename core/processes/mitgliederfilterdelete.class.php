@@ -4,10 +4,12 @@ require_once(VPANEL_PROCESSES . "/mitgliederfilter.class.php");
 
 class MitgliederFilterDeleteProcess extends MitgliederFilterProcess {
 	private $timestamp;
+	private $kommentar;
 
 	public static function factory(Storage $storage, $row) {
 		$process = parent::factory($storage, $row);
 		$process->setTimestamp($row["timestamp"]);
+		$process->setKommentar($row["kommentar"]);
 		return $process;
 	}
 
@@ -19,9 +21,18 @@ class MitgliederFilterDeleteProcess extends MitgliederFilterProcess {
 		$this->timestamp = $timestamp;
 	}
 
+	public function getKommentar() {
+		return $this->kommentar;
+	}
+
+	public function setKommentar($kommentar) {
+		$this->kommentar = $kommentar;
+	}
+
 	protected function getData() {
 		$data = parent::getData();
 		$data["timestamp"] = $this->getTimestamp();
+		$data["kommentar"] = $this->getKommentar();
 		return $data;
 	}
 
@@ -33,6 +44,7 @@ class MitgliederFilterDeleteProcess extends MitgliederFilterProcess {
 		$revision->setTimestamp(time());
 		$revision->setUserID($this->getUserID());
 		$revision->isGeloescht(true);
+		$revision->setKommentar($kommentar);
 		$revision->save();
 	}
 }
