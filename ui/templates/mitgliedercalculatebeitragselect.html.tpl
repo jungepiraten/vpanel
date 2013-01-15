@@ -38,9 +38,11 @@
 					<tr>
 						<th>Mitglied bei {$gliederung.label|escape:html}</th>
 						{foreach from=$gliederungen item=g2}
-							<td class="input-append">
-								<input type="text" name="gliederungsAnteil[{$gliederung.gliederungid|escape:html}][{$g2.gliederungid|escape:html}]" class="span1" value="0" />
-								<span class="add-on">%</span>
+							<td>
+								<div class="input-append">
+									<input type="text" name="gliederungsAnteil[{$gliederung.gliederungid|escape:html}][{$g2.gliederungid|escape:html}]" class="span1" value="0" />
+									<span class="add-on">%</span>
+								</div>
 							</td>
 						{/foreach}
 					</tr>
