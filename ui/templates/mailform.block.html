@@ -61,7 +61,7 @@ function mailCheckHeader() {
 mailClearHeader();
 {if isset($headers)}
 {foreach from=$headers key=headerfield item=headervalue}
-mailAddHeader("{$headerfield|escape:html}", "{$headervalue|escape:html}");
+mailAddHeader("{$headerfield|escape:quotes}", "{$headervalue|escape:quotes}");
 {/foreach}
 {/if}
 -->
