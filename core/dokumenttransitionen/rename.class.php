@@ -31,6 +31,9 @@ class RenameDokumentTransition extends DokumentTransition implements SingleDokum
 
 	public function getNextFlags($session) {
 		$flags = $this->getDokumentTemplate($session)->getDokumentFlags($session);
+		if (count($flags) == 0) {
+			return array();
+		}
 		return array_combine($flags, array_fill(0, count($flags), true));
 	}
 
