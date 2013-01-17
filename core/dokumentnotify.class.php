@@ -142,7 +142,7 @@ class DokumentNotify extends StorageClass {
 			$mail = $config->createMail($this->getEMail());
 			if ($oldrevision == null) {
 				$mail->setHeader("Subject", "[VPanel] Dokument " . $revision->getLabel());
-				$mail->setHeader("Message-ID", "<dokumentnotify-" . $revision->getRevisionID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
+				$mail->setHeader("Message-ID", "<dokumentnotify-" . $this->getDokumentNotifyID() . "-" . $revision->getRevisionID() . "@" . $config->getHostPart() . ">");
 				$mail->setBody(<<<EOT
 Hallo,
 
@@ -165,8 +165,8 @@ EOT
 );
 			} else {
 				$mail->setHeader("Subject", "[VPanel] [erledigt] Dokument " . $oldrevision->getLabel());
-				$mail->setHeader("Message-ID", "<dokumentnotify-" . $oldrevision->getRevisionID() . "-" . $revision->getRevisionID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
-				$mail->setHeader("References", "<dokumentnotify-" . $oldrevision->getRevisionID() . "-" . $this->getEMail()->getEMailID() . "@" . $config->getHostPart() . ">");
+				$mail->setHeader("Message-ID", "<dokumentnotify-" . $this->getDokumentNotifyID() . "-" . $oldrevision->getRevisionID() . "-" . $revision->getRevisionID() . "@" . $config->getHostPart() . ">");
+				$mail->setHeader("References", "<dokumentnotify-" . $this->getDokumentNotifyID() . "-" . $oldrevision->getRevisionID() . "@" . $config->getHostPart() . ">");
 				$mail->setBody(<<<EOT
 Hallo,
 
