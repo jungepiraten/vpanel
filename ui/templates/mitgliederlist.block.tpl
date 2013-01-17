@@ -10,7 +10,7 @@
 			<td>{$mitglied.mitgliedid|escape:html}</td>
 			<td>
 				{if isset($mitglied.austritt)}
-				<span class="close">Ausgetreten</span>
+				<span class="label label-important" style="float:right;">Ausgetreten</span>
 				{/if}
 				{if $showmitglieddokumentdel and isset($dokument)}
 				<a href="{"mitglieddokument_delete"|___:$mitglied.mitgliedid:$dokument.dokumentid}" class="close">&times;</a>
