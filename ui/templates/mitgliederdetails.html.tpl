@@ -1,7 +1,7 @@
 {capture assign="ansicht"}Mitglied #{$mitglied.mitgliedid} ({if isset($mitglied.latest.natperson)}{$mitglied.latest.natperson.vorname|escape:html} {$mitglied.latest.natperson.name|escape:html}{/if}{if isset($mitglied.latest.jurperson)}{$mitglied.latest.jurperson.label|escape:html}{/if}) bearbeiten{/capture}
 {include file="header.html.tpl" ansicht=$ansicht menupunkt="mitglied"}
 
-{if isset($mitglied.austritt)}<span class="label label-important">Ausgetreten</span>{/if}
+{if isset($mitglied.austritt)}<span class="label label-important" style="float:right;">Ausgetreten</span>{/if}
 
 <div class="tabbable">
 	<ul class="nav nav-tabs">
