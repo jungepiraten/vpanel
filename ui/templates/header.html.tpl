@@ -11,7 +11,8 @@
 <script type="text/javascript" src="ui/bootstrap/js/bootstrap.js"></script>
 {literal}<script type="text/javascript">
 function doNav(url) {
-  document.location.href = url;
+	if (event.which != 1) return;
+	document.location.href = url;
 }
 </script>{/literal}
 <title>{$ansicht|strip_tags:false} &bull; VPanel</title>
