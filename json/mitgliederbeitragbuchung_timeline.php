@@ -24,7 +24,7 @@ foreach ($buchungen as $buchung) {
 	$row["mitgliedid"] = $buchung->getMitgliederBeitrag()->getMitgliedID();
 	$row["mitgliedlabel"] = $buchung->getMitgliederBeitrag()->getMitglied()->replaceText("{BEZEICHNUNG}");
 	$row["userid"] = $buchung->getUserID();
-	if ($buchung->getUserID() != null) {
+	if ($buchung->getUser() != null) {
 		$row["username"] = $buchung->getUser()->getUsername();
 	}
 	$row["gliederungid"] = $buchung->getGliederungID();

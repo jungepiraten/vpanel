@@ -9,7 +9,7 @@
 		<tr onclick="doNav('{"roles_details"|___:$role.roleid}')">
 			<td>{$role.roleid}</td>
 			<td>
-				{$role.label}
+				<a href="{"roles_details"|___:$role.roleid}">{$role.label}</a>
 				{if $showroledel}
 					<a class="close delete" href="{"roles_del"|___:$role.roleid}">&times;</a>
 				{/if}

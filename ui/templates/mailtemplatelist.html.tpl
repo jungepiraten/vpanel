@@ -31,7 +31,7 @@
 			<td>{$template.templateid}</td>
 			<td>
 				<a href="{"mailtemplates_del"|___:$template.templateid}" class="close delete">&times;</a>
-				{$template.label|escape:html}
+				<a href="{"mailtemplates_details"|___:$template.templateid}">{$template.label|escape:html}</a>
 			</td>
 		</tr>
 	{/foreach}

@@ -9,7 +9,7 @@
 		<tr onclick="doNav('{"beitraege_details"|___:$beitrag.beitragid}')">
 			<td>{$beitrag.beitragid}</td>
 			<td>
-				{$beitrag.label}
+				<a href="{"beitraege_details"|___:$beitrag.beitragid}">{$beitrag.label}</a>
 				<a class="close delete"  href="{"beitraege_del"|___:$beitrag.beitragid}">&times;</a>
 			</td>
 		</tr>

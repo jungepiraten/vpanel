@@ -10,7 +10,7 @@
 			<td>{$dokument.latest.identifier|escape:html}</td>
 			<td>
 				{include file="dokumentbadges.block.tpl" badges=$dokument.badges}
-				{$dokument.latest.label|escape:html}
+				<a href="{"dokumente_details"|___:$dokument.dokumentid}">{$dokument.latest.label|escape:html}</a>
 				{if $showmitglieddokumentdel && isset($mitglied)}
 				<a href="{"mitglieddokument_delete"|___:$mitglied.mitgliedid:$dokument.dokumentid}" class="close">&times;</a>
 				{/if}

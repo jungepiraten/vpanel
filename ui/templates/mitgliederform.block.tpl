@@ -235,8 +235,9 @@ function showIBanDE() {
 
 function saveIBanDE() {
 	var blz = $("#ibanControlGroup .controls.iban-de .blz").val();
+	var konto = $("#ibanControlGroup .controls.iban-de .konto").val();
+
 	if (blz.length == 8 && konto.length > 0) {
-		var konto = $("#ibanControlGroup .controls.iban-de .konto").val();
 		while (konto.length < 10) {
 			konto = "0" + konto;
 		}
