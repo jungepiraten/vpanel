@@ -41,7 +41,7 @@ class BeitragPaidMitgliederMatcher extends MitgliederMatcher {
 		if ($beitrag == null) {
 			return false;
 		}
-		return $beitrag->getRemaining() <= 0;
+		return $beitrag->getRemainingHoehe() <= 0;
 	}
 }
 
@@ -104,7 +104,7 @@ class BeitragMissingMitgliederMatcher extends MitgliederMatcher {
 		if ($beitrag == null) {
 			return false;
 		}
-		return $beitrag->getRemaining() > 0;
+		return $beitrag->getRemainingHoehe() > 0;
 	}
 }
 
@@ -122,7 +122,7 @@ class BeitragMissingAboveMitgliederMatcher extends MitgliederMatcher {
 	public function match(Mitglied $mitglied) {
 		$beitragmissing = 0;
 		foreach ($mitglied->getBeitragList() as $beitrag) {
-			$beitragmissing += abs($beitrag->getRemaining());
+			$beitragmissing += abs($beitrag->getRemainingHoehe());
 		}
 		return $beitragmissing > $this->getBeitragMark();
 	}
@@ -142,7 +142,7 @@ class BeitragMissingBelowMitgliederMatcher extends MitgliederMatcher {
 	public function match(Mitglied $mitglied) {
 		$beitragmissing = 0;
 		foreach ($mitglied->getBeitragList() as $beitrag) {
-			$beitragmissing += abs($beitrag->getRemaining());
+			$beitragmissing += abs($beitrag->getRemainingHoehe());
 		}
 		return $beitragmissing <= $this->getBeitragMark();
 	}
