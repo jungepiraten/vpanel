@@ -9,9 +9,7 @@
 		<tr onclick="doNav('{"mitglieder_details"|___:$mitglied.mitgliedid}');" {if isset($mitglied.austritt)}id="ex"{/if}>
 			<td>{$mitglied.mitgliedid|escape:html}</td>
 			<td>
-				{if isset($mitglied.austritt)}
-				<span class="label label-important" style="float:right;">Ausgetreten</span>
-				{/if}
+				{include file=mitgliederbadges.block.tpl badges=$mitglied.badges}
 				{if $showmitglieddokumentdel and isset($dokument)}
 				<a href="{"mitglieddokument_delete"|___:$mitglied.mitgliedid:$dokument.dokumentid}" class="close">&times;</a>
 				{/if}

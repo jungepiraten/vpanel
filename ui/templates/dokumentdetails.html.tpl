@@ -1,6 +1,8 @@
 {capture assign=ansicht}Dokument <em>&raquo;{$dokument.latest.label|escape:html}&laquo;</em> anzeigen{/capture}
 {include file="header.html.tpl" ansicht=$ansicht menupunkt="dokument"}
-<div>
+
+{include file="dokumentbadges.block.tpl" badges=$dokument.badges}
+
 <div class="row-fluid">
 	<div class="span6">
 		{include file="dokumentform.block.tpl" dokument=$dokument revision=$dokument.latest dokumentkategorien=$dokumentkategorien dokumentstatuslist=$dokumentstatuslist}

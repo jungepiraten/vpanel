@@ -55,7 +55,7 @@ class Template {
 	}
 
 	private function getStorage() {
-		return $this->session->getConfig()->getStorage();
+		return $this->session->getStorage();
 	}
 
 	protected function parseUser($user) {
@@ -299,6 +299,7 @@ class Template {
 			$row["beitraege_bezahlt"] += $beitrag["bezahlt"];
 		}
 		$row["latest"] = $this->parseMitgliedRevision($mitglied->getLatestRevision());
+		$row["badges"] = $this->parseMitgliederBadges($this->getStorage()->getMitgliederBadgeList(), $mitglied);
 		return $row;
 	}
 
@@ -500,6 +501,7 @@ class Template {
 		$row["dokumentid"] = $dokument->getDokumentID();
 		$row["filterid"] = $this->session->addDokumentMatcher(new DokumentDokumentMatcher($dokument->getDokumentID()))->getFilterID();
 		$row["latest"] = $this->parseDokumentRevision($dokument->getLatestRevision());
+		$row["badges"] = $this->parseDokumentBadges($this->getStorage()->getDokumentBadgeList(), $dokument);
 		return $row;
 	}
 
@@ -617,6 +619,44 @@ class Template {
 
 	protected function parseTempFiles($rows) {
 		return array_map(array($this, 'parseTempFile'), $rows);
+	}
+
+	protected function parseMitgliederBadge($badge) {
+		$row = array();
+		$row["badgeid"] = $badge->getBadgeID();
+		$row["label"] = $badge->getLabel();
+		$row["color"] = $badge->getColor();
+		return $row;
+	}
+
+	protected function parseMitgliederBadges($rows, $mitglied = null) {
+		if ($mitglied != null) {
+			foreach ($rows as $i => $badge) {
+				if (!$badge->match($mitglied)) {
+					unset($rows[$i]);
+				}
+			}
+		}
+		return array_map(array($this, 'parseMitgliederBadge'), $rows);
+	}
+
+	protected function parseDokumentBadge($badge) {
+		$row = array();
+		$row["badgeid"] = $badge->getBadgeID();
+		$row["label"] = $badge->getLabel();
+		$row["color"] = $badge->getColor();
+		return $row;
+	}
+
+	protected function parseDokumentBadges($rows, $dokument = null) {
+		if ($dokument != null) {
+			foreach ($rows as $i => $badge) {
+				if (!$badge->match($dokument)) {
+					unset($rows[$i]);
+				}
+			}
+		}
+		return array_map(array($this, 'parseDokumentBadge'), $rows);
 	}
 
 

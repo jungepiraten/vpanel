@@ -266,6 +266,14 @@ interface Storage {
 	public function getMultiDokumentTransitionList($session, $kategorieid, $statusid);
 	public function hasDokumentTransition($transitionid);
 	public function getDokumentTransition($transitionid);
+
+	public function getMitgliederBadgeList();
+	public function hasMitgliederBadge($badgeid);
+	public function getMitgliederBadge($badgeid);
+
+	public function getDokumentBadgeList();
+	public function hasDokumentBadge($badgeid);
+	public function getDokumentBadge($badgeid);
 }
 
 abstract class AbstractStorage implements Storage {
@@ -636,6 +644,36 @@ abstract class AbstractStorage implements Storage {
 	public function registerDokumentTransition($transition) {
 		$transition->setStorage($this);
 		$this->dokumenttransitionen[$transition->getDokumentTransitionID()] = $transition;
+	}
+
+	/** MitgliederBadge **/
+	private $mitgliederbadges = array();
+	public function getMitgliederBadgeList() {
+		return $this->mitgliederbadges;
+	}
+	public function hasMitgliederBadge($badgeid) {
+		return isset($this->mitgliederbadges[$badgeid]);
+	}
+	public function getMitgliederBadge($badgeid) {
+		return $this->mitgliederbadges[$badgeid];
+	}
+	public function registerMitgliederBadge($badge) {
+		$this->mitgliederbadges[$badge->getBadgeID()] = $badge;
+	}
+
+	/** DokumentBadge **/
+	private $dokumentbadges = array();
+	public function getDokumentBadgeList() {
+		return $this->dokumentbadges;
+	}
+	public function hasDokumentBadge($badgeid) {
+		return isset($this->dokumentbadges[$badgeid]);
+	}
+	public function getDokumentBadge($badgeid) {
+		return $this->dokumentbadges[$badgeid];
+	}
+	public function registerDokumentBadge($badge) {
+		$this->dokumentbadges[$badge->getBadgeID()] = $badge;
 	}
 }
 

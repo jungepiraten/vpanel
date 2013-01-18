@@ -5,6 +5,7 @@ require_once(VPANEL_UI . "/language.class.php");
 require_once(VPANEL_STORAGE . "/mysql.class.php");
 require_once(VPANEL_SENDMAILBACKEND . "/sleep.class.php");
 require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
+require_once(VPANEL_CORE . "/mitgliederbadge.class.php");
 foreach (glob(VPANEL_MITGLIEDERMATCHER . "/*.class.php") as $matcherfile) {
 	require_once($matcherfile);
 }
@@ -100,5 +101,9 @@ $config->getStorage()->registerDokumentTransition(new MitgliedLinkDokumentTransi
 foreach ($config->getStorage()->getMitgliederTemplateList() as $mitgliedtemplate) {
 	$config->getStorage()->registerDokumentTransition(new MitgliedCreateDokumentTransition(++$transitionid, false, null, null, null, null, null, null, "Mitglied angelegt", $mitgliedtemplate->getMitgliedTemplateID(), $mitgliedtemplate->getLabel() . " anlegen"));
 }
+
+$mitgliederbadgeid = 0;
+
+$config->getStorage()->registerMitgliederBadge(new MitgliederBadge(++$mitgliederbadgeid, "Ausgetreten", "#cc0000", new AusgetretenMitgliederMatcher()));
 
 ?>
