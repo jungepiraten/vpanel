@@ -20,10 +20,10 @@ class RevisionTextFieldMitgliederMatcher extends MitgliederMatcher {
 	}
 
 	public function match(Mitglied $mitglied) {
-		if (! $mitglied->getLatestRevisions()->hasTextField($this->textfieldid)) {
+		if (! $mitglied->getLatestRevision()->hasTextField($this->textfieldid)) {
 			return false;
 		}
-		return $mitglied->getLatestRevisions()->getTextField($this->textfieldid)->getValue() == $this->value;
+		return $mitglied->getLatestRevision()->getTextField($this->textfieldid)->getValue() == $this->value;
 	}
 }
 

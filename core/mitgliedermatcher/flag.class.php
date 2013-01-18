@@ -14,7 +14,7 @@ class RevisionFlagMitgliederMatcher extends MitgliederMatcher {
 	}
 
 	public function match(Mitglied $mitglied) {
-		return $mitglied->getLatestRevisions()->hasFlag($this->flagid);
+		return $mitglied->getLatestRevision()->hasFlag($this->flagid);
 	}
 }
 
