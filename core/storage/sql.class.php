@@ -453,7 +453,7 @@ abstract class SQLStorage extends AbstractStorage {
 							FROM	`mitgliederrevisions` `rmax`
 							WHERE   `r`.`mitgliedid` = `rmax`.`mitgliedid`)
 				AND `r`.`gliederungsid` IN (" . implode(",", array_map("intval", $gliederungids)) . ")
-			GROUP BY `r`.`mitgliedid`  ORDER BY `mbb`.`timestamp` DESC LIMIT " . intval($start) . "," . intval($count);
+			GROUP BY `mbb`.`buchungid`  ORDER BY `mbb`.`timestamp` DESC LIMIT " . intval($start) . "," . intval($count);
 		return $this->getResult($sql, array($this, "parseMitgliederBeitragBuchung"));
 	}
 	public function getMitgliederBeitragBuchungByBeitragResult($beitragid) {
