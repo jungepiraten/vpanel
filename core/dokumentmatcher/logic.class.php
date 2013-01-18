@@ -34,7 +34,7 @@ class AndDokumentMatcher extends LinkedLogicDokumentMatcher {
 	public function match(Dokument $dokument) {
 		$m = true;
 		foreach ($this->getConditions() as $filter) {
-			$m = $m && $filter->match($mitglied);
+			$m = $m && $filter->match($dokument);
 		}
 		return $m;
 	}
@@ -44,7 +44,7 @@ class OrDokumentMatcher extends LinkedLogicDokumentMatcher {
 	public function match(Dokument $dokument) {
 		$m = false;
 		foreach ($this->getConditions() as $filter) {
-			$m = $m || $filter->match($mitglied);
+			$m = $m || $filter->match($dokument);
 		}
 		return $m;
 	}
@@ -64,7 +64,7 @@ abstract class SingleLogicDokumentMatcher extends DokumentMatcher {
 
 class NotDokumentMatcher extends SingleLogicDokumentMatcher {
 	public function match(Dokument $dokument) {
-		return !$this->getCondition()->match($mitglied);
+		return !$this->getCondition()->match($dokument);
 	}
 }
 
