@@ -116,6 +116,11 @@
 							{assign var=revisionbeitrag value=$revision.beitrag}
 							{assign var=revisionbeitragtimeformat value=$revision.beitragtimeformat.beitragtimeformatid}
 							<li>{"Beitrag auf %.2f EUR %s gesetzt"|__:$revision.beitrag:$revision.beitragtimeformat.label}</li>{/if}
+						{if !isset($revisiongeloescht) || $revision.geloescht != $revisiongeloescht}{assign var=revisiongeloescht value=$revision.geloescht}
+							{if $revision.geloescht}
+								<li>{"Als Ausgetreten markiert"|__}</li>{else}
+								<li>{"Austrittsflag entfernt"|__}</li>{/if}
+						{/if}
 						{foreach from=$revision.flags key=flagid item=flag}{if !isset($revisionflags) || $revision.flags.$flagid != $revisionflags.$flagid}
 							<li>{"%s hinzugefügt"|__:$flag.label}</li>{/if}{/foreach}
 						{if isset($revisionflags)}{foreach from=$revisionflags key=flagid item=flag}{if $revision.flags.$flagid != $revisionflags.$flagid}

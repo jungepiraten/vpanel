@@ -107,6 +107,7 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 
 	$revision = new MitgliedRevision($session->getStorage());
 	$revision->setTimestamp(time());
+	$revision->isGeloescht($austritt != null);
 	$revision->setGlobalID($config->generateGlobalID());
 	$revision->setUser($session->getUser());
 	$revision->setMitglied($mitglied);
