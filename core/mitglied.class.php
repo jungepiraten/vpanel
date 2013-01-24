@@ -152,7 +152,7 @@ class Mitglied extends GlobalClass {
 			$tuple = explode(".", $keyword, 2);
 			if (isset($tuple[1])) {
 				foreach ($this->getBeitragList() as $beitrag) {
-					if ($beitrag->getBeitrag()->getLabel() == $tuple[1]) {
+					if (strtoupper($beitrag->getBeitrag()->getLabel()) == $tuple[1]) {
 						return $beitrag->getHoehe();
 					}
 				}
