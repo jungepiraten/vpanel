@@ -1032,6 +1032,7 @@ abstract class SQLStorage extends AbstractStorage {
 			WHERE	`r`.`timestamp` = (	SELECT	MAX(`rmax`.`timestamp`)
 							FROM	`mitgliederrevisions` `rmax`
 							WHERE   `r`.`mitgliedid` = `rmax`.`mitgliedid`)
+				AND `r`.`gliederungid` IN (" . implode(",", array_map("intval", $gliederungids)) . ")
 			GROUP BY `r`.`mitgliedid`
 			ORDER BY `r`.`timestamp` DESC
 			LIMIT " . intval($start) . ",". intval($count);
