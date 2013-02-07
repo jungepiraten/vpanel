@@ -22,11 +22,13 @@ require_once(VPANEL_DOKUMENTMATCHER . "/search.class.php");
 
 function parseDokumentFormular($ui, $session, &$dokument = null) {
 	$gliederungid = $dokument->getLatestRevision()->getGliederungID();
+
 	if ($session->hasFileVariable("file")) {
 		$file = $session->getFileVariable("file");
 	} else {
 		$file = $dokument->getLatestRevision()->getFile();
 	}
+
 	$data = $dokument->getLatestRevision()->getData();
 	$content = $dokument->getLatestRevision()->getContent();
 	$kategorieid = $session->getIntVariable("kategorieid");
@@ -111,6 +113,7 @@ case "create":
 
 	$ui->viewDokumentCreate($dokumenttemplate);
 	exit;
+
 case "details":
 	$dokument = $session->getStorage()->getDokument($session->getIntVariable("dokumentid"));
 
@@ -140,6 +143,7 @@ case "details":
 	$mitgliedtemplates = $session->getStorage()->getMitgliederTemplateList($session);
 	$ui->viewDokumentDetails($dokument, $dokumentrevisionen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $flags, $mitgliedtemplates);
 	exit;
+
 case "transition":
 	$transition = $session->getStorage()->getDokumentTransition($session->getVariable("transitionid"));
 
@@ -154,6 +158,7 @@ case "transition":
 	$result = $transition->execute($config, $session, $filter, $matcher);
 	$ui->viewDokumentTransition($transition, $filter, $matcher, $result);
 	exit;
+
 case "transitionprocess":
 	$transition = $session->getStorage()->getDokumentTransition($session->getVariable("transitionid"));
 	$process = $session->getStorage()->getProcess($session->getVariable("processid"));
@@ -166,6 +171,7 @@ case "transitionprocess":
 	$result = $transition->show($config, $session, $process);
 	$ui->viewDokumentTransitionProcess($transition, $process, $result);
 	exit;
+
 case "delete":
 	$dokument = $session->getStorage()->getDokument($session->getVariable("dokumentid"));
 
@@ -178,6 +184,7 @@ case "delete":
 
 	$ui->redirect($session->getLink("dokumente"));
 	exit;
+
 default:
 	if ($session->hasVariable("gliederungid")) {
 		$gliederung = $session->getStorage()->getGliederung($session->getVariable("gliederungid"));
@@ -207,15 +214,18 @@ default:
 		($dokumentkategorie == null ? new TrueDokumentMatcher() : new KategorieDokumentMatcher($dokumentkategorie)),
 		($dokumentstatus == null ? new TrueDokumentMatcher() : new StatusDokumentMatcher($dokumentstatus)),
 		($session->hasVariable("dokumentsuche") ? new SearchDokumentMatcher($session->getVariable("dokumentsuche")) : new TrueDokumentMatcher()) );
+
 	$filter = $session->addDokumentMatcher($matcher);
 
 	$dokumentcount = $session->getStorage()->getDokumentCount($matcher);
 	$pagesize = 20;
 	$pagecount = ceil($dokumentcount / $pagesize);
 	$page = 0;
+
 	if ($session->hasVariable("page") and $session->getVariable("page") >= 0 and $session->getVariable("page") < $pagecount) {
 		$page = intval($session->getVariable("page"));
 	}
+	
 	$offset = $page * $pagesize;
 
 	$dokumente = $session->getStorage()->getDokumentList($matcher, $pagesize, $offset);

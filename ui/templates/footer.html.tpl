@@ -8,10 +8,6 @@
 
 <hr />
 
-<footer>
-	<p>&copy; Junge Piraten e.V. 2012</p>
-</footer>
-
 <div class="modal fade" id="delModal">
 	<div class="modal-header">
 		<a class="close" data-dismiss="modal">×</a>
