@@ -22,7 +22,7 @@ function doNav(url) {
 	<div class="navbar navbar-fixed-top navbar-inverse">
 		<div class="navbar-inner">
 			<div class="container-fluid">
-				<a class="brand" href="{"index"|___}"><span style="color:#ff8d00; font-weight:bolder;">V</span>Panel</a>
+				<a class="brand" href="{"index"|___}"><span style="color: #F7931E; font-weight: bold;">V</span>Panel</a>
 				<ul class="nav pull-right">
 				{if $session->isSignedIn()}
 					<li><a href="{"einstellungen"|___}">{"Einstellungen"|__}</a></li>
