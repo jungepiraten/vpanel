@@ -44,27 +44,27 @@ function doNav(url) {
 		<div class="span3">
 			<div class="well sidebar-nav">
 				<ul class="nav nav-list">
-					<li {if $menupunkt == "dashboard"}class="active"{/if}><a href="{"index"|___}">{"Dashboard"|__}</a></li>
+					<li {if $menupunkt == "dashboard"}class="active"{/if}><a href="{"index"|___}"><i class='icon-dashboard'></i> {"Dashboard"|__}</a></li>
 					{if $session->isAllowed("users_show")}
-						<li {if $menupunkt == "user"}class="active"{/if}><a href="{"users"|___}">{"Benutzer"|__}</a></li>
+						<li {if $menupunkt == "user"}class="active"{/if}><a href="{"users"|___}"><i class='icon-user'></i> {"Benutzer"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("roles_show")}
-						<li {if $menupunkt == "role"}class="active"{/if}><a href="{"roles"|___}">{"Rollen"|__}</a></li>
+						<li {if $menupunkt == "role"}class="active"{/if}><a href="{"roles"|___}"><i class='icon-tags'></i> {"Rollen"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("dokumente_show")}
-						<li {if $menupunkt == "dokument"}class="active"{/if}><a href="{"dokumente"|___}">{"Dokumente"|__}</a></li>
+						<li {if $menupunkt == "dokument"}class="active"{/if}><a href="{"dokumente"|___}"><i class='icon-file-alt'></i> {"Dokumente"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("mitglieder_show")}
-						<li {if $menupunkt == "mitglied"}class="active"{/if}><a href="{"mitglieder"|___}">{"Mitglieder"|__}</a></li>
+						<li {if $menupunkt == "mitglied"}class="active"{/if}><a href="{"mitglieder"|___}"><i class='icon-group'></i> {"Mitglieder"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("beitraege_show")}
-						<li {if $menupunkt == "beitrag"}class="active"{/if}><a href="{"beitraege"|___}">{"Beiträge"|__}</a></li>
+						<li {if $menupunkt == "beitrag"}class="active"{/if}><a href="{"beitraege"|___}"><i class='icon-money'></i> {"Beiträge"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("mailtemplates_show")}
-						<li {if $menupunkt == "mail"}class="active"{/if}><a href="{"mailtemplates"|___}">{"Mails"|__}</a></li>
+						<li {if $menupunkt == "mail"}class="active"{/if}><a href="{"mailtemplates"|___}"><i class='icon-envelope'></i> {"Mails"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("stats_show")}
-						<li {if $menupunkt == "stats"}class="active"{/if}><a href="{"stats"|___}">{"Mitgliederstats"|__}</a></li>
+						<li {if $menupunkt == "stats"}class="active"{/if}><a href="{"stats"|___}"><i class='icon-bar-chart'></i> {"Mitgliederstats"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("dokumente_show")}
 						<li class="nav-header">Dokumentensuche</li>
