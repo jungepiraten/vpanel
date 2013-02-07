@@ -4,12 +4,12 @@
 <link href="ui/bootstrap/css/bootstrap.css" rel="stylesheet" />
 <link rel="icon" type="image/png" href="ui/images/favicon.png" />
 <link rel="stylesheet" type="text/css" href="ui/style.css" />
+<link rel="stylesheet" type="text/css" href="ui/fontawesome/css/font-awesome.min.css" />
 <meta http-equiv="Content-Type" content="text/html; charset={$charset}" />
 <script type="text/javascript" src="ui/jquery-1.7.1.js"></script>
 <script type="text/javascript" src="ui/jquery.timeago.js"></script>
 <script type="text/javascript" src="ui/jquery.timeago.de.js"></script>
 <script type="text/javascript" src="ui/bootstrap/js/bootstrap.js"></script>
-<script type="text/javascript" src="ui/fontawesome/css/font-awesome.min.css"></script>
 {literal}<script type="text/javascript">
 function doNav(url) {
 	if (event.which != 1) return;
