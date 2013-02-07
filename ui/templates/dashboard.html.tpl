@@ -1,22 +1,35 @@
 {include file="header.html.tpl" ansicht="Dashboard" menupunkt="dashboard"}
+
 <form action="{"index"|___}" method="post">
 	<div class="btn-group pull-right">
 		<button onClick="addColumn();return false;" class="btn">Spalte hinzufügen</button>
 		<button type="submit" name="addWidgets" class="btn btn-success">Speichern</button>
 	</div>
+
 	<div id="widgets"></div>
 </form>
-<style type="text/css">
+
+<style>
 {literal}
-.widget
-	{border:2px solid black; margin:0.5em; padding:0.5em;}
-.newwidget
-	{border-style:dashed;}
-.newwidget>.content>ul
-	{list-style:none; margin:0; padding:0;}
+.widget {
+	border: 2px solid #ddd;
+	margin: 0.5em;
+	padding: 0.5em;
+}
+
+.newwidget {
+	border-style: dashed;
+}
+
+.newwidget > .content > ul { 
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
 {/literal}
 </style>
-<script type="text/javascript">
+
+<script>
 {literal}
 
 var maxColumn = 0;
@@ -37,6 +50,7 @@ function addColumn(index) {
 		index = ++maxColumn;
 	}
 	maxColumn = Math.max(index, maxColumn);
+
 	$("#widgets").append(
 		$("<div>").attr("id", "column-" + index).css("float", "left").append($("<div>").addClass("widgets"))
 	);
@@ -70,9 +84,11 @@ function addWidget(column) {
 function setWidget(id, type) {
 	var content = $("<div>").addClass("form-horizontal");
 	switch (type) {
+
 	case "static":
 		content.append($("<textarea>").attr("name","widgets[" + id + "][text]"));
 		break;
+
 	case "mitgliederbeitragbuchung_timeline":
 		content.append($("<div>").addClass("control-group").append(
 			$("<label>").addClass("control-label").text("Reloadzeit in Sekunden"),
@@ -81,6 +97,7 @@ function setWidget(id, type) {
 			)
 		));
 		break;
+
 	case "mitgliederrevision_timeline":
 		content.append($("<div>").addClass("control-group").append(
 			$("<label>").addClass("control-label").text("Reloadzeit in Sekunden"),
@@ -89,6 +106,7 @@ function setWidget(id, type) {
 			)
 		));
 		break;
+
 	case "dokumentrevision_timeline":
 		content.append($("<div>").addClass("control-group").append(
 			$("<label>").addClass("control-label").text("Reloadzeit in Sekunden"),
@@ -98,6 +116,7 @@ function setWidget(id, type) {
 		));
 		break;
 	}
+
 	$("#widgets .widget-" + id)
 		.removeClass("newwidget")
 		.append($("<input>").attr("type","hidden").attr("name","widgets["+id+"][type]").attr("value",type))
@@ -106,7 +125,8 @@ function setWidget(id, type) {
 
 {/literal}
 </script>
-<script type="text/javascript">
+
+<script>
 {literal}
 var callbacks = [];
 {/literal}
@@ -127,4 +147,6 @@ $.get("{"dashboard_widget_json"|___:$widget.widgetid}", function (res) {literal}
 addColumn();
 {/foreach}
 </script>
+
 {include file="footer.html.tpl"}
+
