@@ -1,7 +1,7 @@
 {include file="header.html.tpl" ansicht="Dashboard" menupunkt="dashboard"}
 
 <form action="{"index"|___}" method="post">
-	<div class="btn-group pull-right">
+	<div class="btn-group">
 		<button onClick="addColumn();return false;" class="btn">Spalte hinzufügen</button>
 		<button type="submit" name="addWidgets" class="btn btn-success">Speichern</button>
 	</div>

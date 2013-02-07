@@ -45,22 +45,22 @@ function doNav(url) {
 				<ul class="nav nav-list">
 					<li {if $menupunkt == "dashboard"}class="active"{/if}><a href="{"index"|___}">{"Dashboard"|__}</a></li>
 					{if $session->isAllowed("users_show")}
-						<li {if $menupunkt == "user"}class="active"{/if}><a href="{"users"|___}">{"Benutzerverwaltung"|__}</a></li>
+						<li {if $menupunkt == "user"}class="active"{/if}><a href="{"users"|___}">{"Benutzer"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("roles_show")}
-						<li {if $menupunkt == "role"}class="active"{/if}><a href="{"roles"|___}">{"Rollenverwaltung"|__}</a></li>
+						<li {if $menupunkt == "role"}class="active"{/if}><a href="{"roles"|___}">{"Rollen"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("dokumente_show")}
-						<li {if $menupunkt == "dokument"}class="active"{/if}><a href="{"dokumente"|___}">{"Dokumentenverwaltung"|__}</a></li>
+						<li {if $menupunkt == "dokument"}class="active"{/if}><a href="{"dokumente"|___}">{"Dokumente"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("mitglieder_show")}
-						<li {if $menupunkt == "mitglied"}class="active"{/if}><a href="{"mitglieder"|___}">{"Mitgliederverwaltung"|__}</a></li>
+						<li {if $menupunkt == "mitglied"}class="active"{/if}><a href="{"mitglieder"|___}">{"Mitglieder"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("beitraege_show")}
-						<li {if $menupunkt == "beitrag"}class="active"{/if}><a href="{"beitraege"|___}">{"Beitragsverwaltung"|__}</a></li>
+						<li {if $menupunkt == "beitrag"}class="active"{/if}><a href="{"beitraege"|___}">{"Beiträge"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("mailtemplates_show")}
-						<li {if $menupunkt == "mail"}class="active"{/if}><a href="{"mailtemplates"|___}">{"Mailverwaltung"|__}</a></li>
+						<li {if $menupunkt == "mail"}class="active"{/if}><a href="{"mailtemplates"|___}">{"Mails"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("stats_show")}
 						<li {if $menupunkt == "stats"}class="active"{/if}><a href="{"stats"|___}">{"Mitgliederstats"|__}</a></li>
