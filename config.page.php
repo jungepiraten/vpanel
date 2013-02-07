@@ -6,7 +6,7 @@ $config->registerPage("dashboard_widget_del", "index.php?delWidget&widgetid=%d")
 
 $config->registerPage("login", "login.php");
 $config->registerPage("logout", "login.php?logout=1");
-$config->registerPage("einstellungen", "einstellungen.php");
+$config->registerPage("einstellungen", "settings.php");
 
 $config->registerPage("users", "user.php");
 $config->registerPage("users_create", "user.php?mode=create");
@@ -21,18 +21,18 @@ $config->registerPage("roles_del", "roles.php?mode=delete&roleid=%d");
 $config->registerPage("roles_adduser", "user.php?mode=addrole&roleid=%d");
 $config->registerPage("roles_deluser", "user.php?mode=delrole&roleid=%d&userid=%d");
 
-$config->registerPage("dokumente", "dokumente.php");
-$config->registerPage("dokumente_page", "dokumente.php?gliederungid=%d&kategorieid=%d&statusid=%d&page=%d");
-$config->registerPage("dokumente_del", "dokumente.php?mode=delete&dokumentid=%d");
+$config->registerPage("dokumente", "documents.php");
+$config->registerPage("dokumente_page", "documents.php?gliederungid=%d&kategorieid=%d&statusid=%d&page=%d");
+$config->registerPage("dokumente_del", "documents.php?mode=delete&dokumentid=%d");
 $config->registerPage("dokumente_json", "json/dokumente.php");
-$config->registerPage("dokumente_create", "dokumente.php?mode=create&dokumenttemplateid=%d");
-$config->registerPage("dokumente_details", "dokumente.php?mode=details&dokumentid=%d");
+$config->registerPage("dokumente_create", "documents.php?mode=create&dokumenttemplateid=%d");
+$config->registerPage("dokumente_details", "documents.php?mode=details&dokumentid=%d");
 $config->registerPage("dokumente_mitglied", "mitglieddokument.php?mode=add&dokumentid=%d");
 $config->registerPage("dokumente_mitglied_create", "mitglieder.php?mode=create&dokumentid=%d&mitgliedtemplateid=%d");
 $config->registerPage("dokumente_get", "file.php?mode=get&dokumentid=%d");
 $config->registerPage("dokumente_view", "file.php?mode=view&dokumentid=%d");
-$config->registerPage("dokumente_transitionaction", "dokumente.php?mode=transition&transitionid=%s&filterid=%s");
-$config->registerPage("dokumente_transitionprocess", "dokumente.php?mode=transitionprocess&transitionid=%s&processid=%d");
+$config->registerPage("dokumente_transitionaction", "documents.php?mode=transition&transitionid=%s&filterid=%s");
+$config->registerPage("dokumente_transitionprocess", "documents.php?mode=transitionprocess&transitionid=%s&processid=%d");
 $config->registerPage("dokumente_timeline_json", "json/dokumentrevisions_timeline.php");
 $config->registerPage("dokumentrevision_get", "file.php?mode=get&dokumentrevisionid=%d");
 
