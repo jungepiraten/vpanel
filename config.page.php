@@ -27,8 +27,8 @@ $config->registerPage("dokumente_del", "documents.php?mode=delete&dokumentid=%d"
 $config->registerPage("dokumente_json", "json/dokumente.php");
 $config->registerPage("dokumente_create", "documents.php?mode=create&dokumenttemplateid=%d");
 $config->registerPage("dokumente_details", "documents.php?mode=details&dokumentid=%d");
-$config->registerPage("dokumente_mitglied", "mitglieddokument.php?mode=add&dokumentid=%d");
-$config->registerPage("dokumente_mitglied_create", "mitglieder.php?mode=create&dokumentid=%d&mitgliedtemplateid=%d");
+$config->registerPage("dokumente_mitglied", "member_document.php?mode=add&dokumentid=%d");
+$config->registerPage("dokumente_mitglied_create", "members.php?mode=create&dokumentid=%d&mitgliedtemplateid=%d");
 $config->registerPage("dokumente_get", "file.php?mode=get&dokumentid=%d");
 $config->registerPage("dokumente_view", "file.php?mode=view&dokumentid=%d");
 $config->registerPage("dokumente_transitionaction", "documents.php?mode=transition&transitionid=%s&filterid=%s");
@@ -36,36 +36,36 @@ $config->registerPage("dokumente_transitionprocess", "documents.php?mode=transit
 $config->registerPage("dokumente_timeline_json", "json/dokumentrevisions_timeline.php");
 $config->registerPage("dokumentrevision_get", "file.php?mode=get&dokumentrevisionid=%d");
 
-$config->registerPage("mitglieddokument", "mitglieddokument.php");
-$config->registerPage("mitglieddokument_delete", "mitglieddokument.php?mode=delete&mitgliedid=%d&dokumentid=%d");
+$config->registerPage("mitglieddokument", "member_document.php");
+$config->registerPage("mitglieddokument_delete", "member_document.php?mode=delete&mitgliedid=%d&dokumentid=%d");
 
 $config->registerPage("orte_json", "json/orte.php");
 
-$config->registerPage("mitglieder", "mitglieder.php");
+$config->registerPage("mitglieder", "members.php");
 $config->registerPage("mitglieder_json", "json/mitglieder.php");
-$config->registerPage("mitglieder_page", "mitglieder.php?filterid=%s&page=%d");
-$config->registerPage("mitglieder_create", "mitglieder.php?mode=create&mitgliedtemplateid=%d");
-$config->registerPage("mitglieder_details", "mitglieder.php?mode=details&mitgliedid=%d");
-$config->registerPage("mitglieder_details_revision", "mitglieder.php?mode=details&revisionid=%d");
+$config->registerPage("mitglieder_page", "members.php?filterid=%s&page=%d");
+$config->registerPage("mitglieder_create", "members.php?mode=create&mitgliedtemplateid=%d");
+$config->registerPage("mitglieder_details", "members.php?mode=details&mitgliedid=%d");
+$config->registerPage("mitglieder_details_revision", "members.php?mode=details&revisionid=%d");
 $config->registerPage("mitglieder_bouncelist", "emails.php?mode=listbounces&mitgliederrevisionid=%d");
-$config->registerPage("mitglieder_dokument", "mitglieddokument.php?mode=add&mitgliedid=%d");
-$config->registerPage("mitglieder_beitraege", "mitglieder.php?mode=beitraege&mitgliedid=%d");
-$config->registerPage("mitglieder_beitraege_del", "mitglieder.php?mode=beitragdelete&mitgliedbeitragid=%d");
-$config->registerPage("mitglieder_beitraege_buchungen", "mitglieder.php?mode=beitraege_buchungen&mitgliedbeitragid=%d");
+$config->registerPage("mitglieder_dokument", "member_document.php?mode=add&mitgliedid=%d");
+$config->registerPage("mitglieder_beitraege", "members.php?mode=beitraege&mitgliedid=%d");
+$config->registerPage("mitglieder_beitraege_del", "members.php?mode=beitragdelete&mitgliedbeitragid=%d");
+$config->registerPage("mitglieder_beitraege_buchungen", "members.php?mode=beitraege_buchungen&mitgliedbeitragid=%d");
 $config->registerPage("mitglieder_beitraege_buchungen_timeline_json", "json/mitgliederbeitragbuchung_timeline.php");
-$config->registerPage("mitglieder_beitraege_buchungen_del", "mitglieder.php?mode=beitraege_buchungen_delete&buchungid=%d");
-$config->registerPage("mitglieder_filteraction", "mitglieder.php?mode=filteraction&actionid=%s&filterid=%s");
-$config->registerPage("mitglieder_filterprocess", "mitglieder.php?mode=filterprocess&actionid=%s&processid=%d");
-$config->registerPage("mitglieder_composefilter", "mitglieder.php?mode=composefilter");
+$config->registerPage("mitglieder_beitraege_buchungen_del", "members.php?mode=beitraege_buchungen_delete&buchungid=%d");
+$config->registerPage("mitglieder_filteraction", "members.php?mode=filteraction&actionid=%s&filterid=%s");
+$config->registerPage("mitglieder_filterprocess", "members.php?mode=filterprocess&actionid=%s&processid=%d");
+$config->registerPage("mitglieder_composefilter", "members.php?mode=composefilter");
 $config->registerPage("mitglieder_revision_timeline_json", "json/mitgliederrevisions_timeline.php");
 
 $config->registerPage("emailbounces_delete", "emails.php?mode=delbounce&bounceid=%d");
 
-$config->registerPage("beitraege", "beitraege.php");
-$config->registerPage("beitraege_create", "beitraege.php?mode=create");
-$config->registerPage("beitraege_details", "beitraege.php?mode=details&beitragid=%d");
-$config->registerPage("beitraege_details_page", "beitraege.php?mode=details&beitragid=%d&page=%d");
-$config->registerPage("beitraege_del", "beitraege.php?mode=delete&beitragid=%d");
+$config->registerPage("beitraege", "fees.php");
+$config->registerPage("beitraege_create", "fees.php?mode=create");
+$config->registerPage("beitraege_details", "fees.php?mode=details&beitragid=%d");
+$config->registerPage("beitraege_details_page", "fees.php?mode=details&beitragid=%d&page=%d");
+$config->registerPage("beitraege_del", "fees.php?mode=delete&beitragid=%d");
 
 $config->registerPage("mailtemplates", "mailtemplates.php");
 $config->registerPage("mailtemplates_gliederungid", "mailtemplates.php?gliederungid=%d");
