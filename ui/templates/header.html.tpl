@@ -44,7 +44,7 @@ function doNav(url) {
 		<div class="span3">
 			<div class="well sidebar-nav">
 				<ul class="nav nav-list">
-					<li {if $menupunkt == "dashboard"}class="active"{/if}><a href="{"index"|___}"><i class='icon-dashboard'></i> {"Dashboard"|__}</a></li>
+					<li {if $menupunkt == "dashboard"}class="active"{/if}><a href="{"index"|___}"><i class='icon-home'></i> {"Dashboard"|__}</a></li>
 					{if $session->isAllowed("users_show")}
 						<li {if $menupunkt == "user"}class="active"{/if}><a href="{"users"|___}"><i class='icon-user'></i> {"Benutzer"|__}</a></li>
 					{/if}
