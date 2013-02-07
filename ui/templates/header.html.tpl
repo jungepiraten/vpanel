@@ -9,6 +9,7 @@
 <script type="text/javascript" src="ui/jquery.timeago.js"></script>
 <script type="text/javascript" src="ui/jquery.timeago.de.js"></script>
 <script type="text/javascript" src="ui/bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript" src="ui/fontawesome/css/font-awesome.min.css"></script>
 {literal}<script type="text/javascript">
 function doNav(url) {
 	if (event.which != 1) return;
