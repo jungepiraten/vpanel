@@ -15,6 +15,21 @@
 			</div>
 		</div>
 
+		<div class="control-group">
+			<label class="control-label" for="mailtemplateid">{"Mail versenden:"|__}</label>
+			<div class="controls">
+				<select>
+					<option value="">{"(keine)"|__}</option>
+					{foreach from=$mailtemplates item=mt}
+						<option value="{$mt.templateid|escape:html}"
+						        {if (isset($smarty.request.mailtemplateid) && $smarty.request.mailtemplateid == $mt.templateid) || ($mailtemplate.templateid == $mt.templateid)}selected="selected"{/if}>
+							{$mt.label|escape:html}
+						</option>
+					{/foreach}
+				</select>
+			</div>
+		</div>
+
 		<div class="form-actions">
 			<input class="btn btn-danger" type="submit" name="save" value="{"Löschen"|__}" />
 		</div>

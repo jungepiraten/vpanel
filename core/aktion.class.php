@@ -27,6 +27,10 @@ abstract class Aktion {
 		return $this->permission;
 	}
 
+	public function getAllowedGliederungIDs($session) {
+		return $session->getAllowedGliederungIDs($this->getPermission());
+	}
+
 	public function isAllowed($session, $gliederungid = null) {
 		return $session->isAllowed($this->getPermission(), $gliederungid);
 	}
