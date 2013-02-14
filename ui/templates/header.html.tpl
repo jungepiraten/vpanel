@@ -12,7 +12,7 @@
 <script type="text/javascript" src="ui/bootstrap/js/bootstrap.js"></script>
 {literal}<script type="text/javascript">
 function doNav(url) {
-	if (event.which != 1) return;
+	if (typeof(event) != "undefined" && event.which != 1) return;
 	document.location.href = url;
 }
 </script>{/literal}
