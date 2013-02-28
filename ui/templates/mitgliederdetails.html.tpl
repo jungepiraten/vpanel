@@ -7,7 +7,7 @@
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="#mitgliederdetails-kartei" data-toggle="tab">{"Kartei"|__}</a></li>
 		<li><a href="#mitgliederdetails-historie" data-toggle="tab">{"Historie"|__}</a></li>
-		<li><a href="#mitgliederdetails-dokumente" data-toggle="tab">{"Dokumente"|__}</a></li>
+		<li><a href="#mitgliederdetails-links" data-toggle="tab">{"Verknüpfungen"|__}</a></li>
 		<li><a href="#mitgliederdetails-beitraege" data-toggle="tab">{"Beiträge"|__}</a></li>
 	</ul>
 	<div class="tab-content">
@@ -145,7 +145,7 @@
 				</div>
 			{/foreach}
 		</div>
-		<div class="tab-pane" id="mitgliederdetails-dokumente">
+		<div class="tab-pane" id="mitgliederdetails-links">
 			<div class="btn-toolbar">
 				<div class="btn-group">
 					<a href="{"mitglieder_dokument"|___:$mitglied.mitgliedid}" class="btn btn-primary">Dokument verlinken</a>
