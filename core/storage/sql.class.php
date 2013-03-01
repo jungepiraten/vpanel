@@ -1800,10 +1800,13 @@ abstract class SQLStorage extends AbstractStorage {
 			return "(" . implode(" OR ",array_map(array($this,'parseDokumentMatcher'), $matcher->getConditions())) . ")";
 		}
 		if ($matcher instanceof NotDokumentMatcher) {
-			return "NOT (" . $this->parseDokumentMatcher . ")";
+			return "NOT (" . $this->parseDokumentMatcher($matcher->getCondition()) . ")";
 		}
 		if ($matcher instanceof DokumentDokumentMatcher) {
 			return "`d`.`dokumentid` = " . intval($matcher->getDokumentID());
+		}
+		if ($matcher instanceof IdentifierDokumentMatcher) {
+			return "`r`.`identifier` LIKE '%" . $this->escape($matcher->getIdentifier()) . "%'";
 		}
 		if ($matcher instanceof GliederungDokumentMatcher) {
 			return "`r`.`gliederungid` IN (" . implode(",", array_map("intval", $matcher->getGliederungIDs())) . ")";

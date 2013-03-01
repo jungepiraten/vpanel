@@ -53,6 +53,9 @@
 			{/foreach}
 		</div>
 		<div class="tab-pane" id="dokumentdetails-links">
+			<h2>Ähnliche Dokumente</h2>
+			{include file="dokumentlist.block.tpl" dokumente=$similardocuments}
+			<h2>Verknüpfte Mitglieder</h2>
 			{include file="mitgliederlist.block.tpl" mitglieder=$mitglieder showmitglieddokumentdel=1}
 		</div>
 	</div>

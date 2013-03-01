@@ -1016,10 +1016,11 @@ class Template {
 		$this->viewDokumentTemplate($dokumenttemplate, $this->link("dokumente_create", $dokumenttemplate->getDokumentTemplateID()), $this->translate("%s anlegen", $dokumenttemplate->getLabel()) );
 	}
 
-	public function viewDokumentDetails($dokument, $dokumentrevisionen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $flags, $mitgliedtemplates) {
+	public function viewDokumentDetails($dokument, $dokumentrevisionen, $mitglieder, $similardocuments, $transitionen, $dokumentkategorien, $dokumentstatuslist, $flags, $mitgliedtemplates) {
 		$this->smarty->assign("dokument", $this->parseDokument($dokument));
 		$this->smarty->assign("dokumentrevisionen", $this->parseDokumentRevisions($dokumentrevisionen));
 		$this->smarty->assign("mitglieder", $this->parseMitglieder($mitglieder));
+		$this->smarty->assign("similardocuments", $this->parseDokumente($similardocuments));
 		$this->smarty->assign("dokumenttransitionen", $this->parseDokumentTransitionen($transitionen));
 		$this->smarty->assign("dokumentkategorien", $this->parseDokumentKategorien($dokumentkategorien));
 		$this->smarty->assign("dokumentstatuslist", $this->parseDokumentStatusList($dokumentstatuslist));

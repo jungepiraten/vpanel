@@ -14,6 +14,7 @@ if (!$session->isSignedIn()) {
 require_once(VPANEL_CORE . "/dokument.class.php");
 require_once(VPANEL_MITGLIEDERMATCHER . "/dokument.class.php");
 require_once(VPANEL_DOKUMENTMATCHER . "/dokument.class.php");
+require_once(VPANEL_DOKUMENTMATCHER . "/identifier.class.php");
 require_once(VPANEL_DOKUMENTMATCHER . "/logic.class.php");
 require_once(VPANEL_DOKUMENTMATCHER . "/gliederung.class.php");
 require_once(VPANEL_DOKUMENTMATCHER . "/kategorie.class.php");
@@ -135,13 +136,15 @@ case "details":
 
 	$dokumentrevisionen = $session->getStorage()->getDokumentRevisionList($dokument->getDokumentID());
 	$mitglieder = $session->getStorage()->getMitgliederList(new DokumentMitgliederMatcher($dokument->getDokumentID()));
+	$similardocuments = $session->getStorage()->getDokumentList(new AndDokumentMatcher(new IdentifierDokumentMatcher($dokument->getLatestRevision()->getIdentifier()),
+	                                                                                   new NotDokumentMatcher(new DokumentDokumentMatcher($dokument->getDokumentID()))));
 
 	$transitionen = $session->getStorage()->getSingleDokumentTransitionList($session, $dokument);
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
 	$flags = $session->getStorage()->getDokumentFlagList();
 	$mitgliedtemplates = $session->getStorage()->getMitgliederTemplateList($session);
-	$ui->viewDokumentDetails($dokument, $dokumentrevisionen, $mitglieder, $transitionen, $dokumentkategorien, $dokumentstatuslist, $flags, $mitgliedtemplates);
+	$ui->viewDokumentDetails($dokument, $dokumentrevisionen, $mitglieder, $similardocuments, $transitionen, $dokumentkategorien, $dokumentstatuslist, $flags, $mitgliedtemplates);
 	exit;
 
 case "transition":
