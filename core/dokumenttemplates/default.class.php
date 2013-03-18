@@ -42,7 +42,7 @@ class DefaultDokumentTemplate extends IdentifierDokumentTemplate {
 
 	public function getDokumentData($session) {
 		if ($session->hasVariable("data")) {
-			return $session->getVariable("data");
+			return $session->getRawVariable("data");
 		}
 		return array();
 	}
