@@ -23,6 +23,13 @@ class MitgliederFilterConsecutiveProcess extends MitgliederFilterProcess {
 		$this->processes[] = $process;
 	}
 
+	public function setUserID($userid) {
+		parent::setUserID($userid);
+		foreach ($this->processes as $process) {
+			$process->setUserID($userid);
+		}
+	}
+
 	protected function getData() {
 		$data = parent::getData();
 		$data["processes"] = $this->getProcesses();
