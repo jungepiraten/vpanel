@@ -59,7 +59,7 @@ class DokumentTransaktionDownloadProcess extends DokumentTransitionProcess {
 			$fpdf->SetFont('Courier','',8);
 			$fpdf->SetTextColor(0,0,0);
 			for ($i=0;$i<$pagecount;$i++) {
-				$string = $dokument->getLatestRevision()->getIdentifier() . " (Seite " . ($i+1) . " von " . $pagecount . ", Revision " . $dokument->getLatestRevision()->getRevisionID() . ")");
+				$string = $dokument->getLatestRevision()->getIdentifier() . " (Seite " . ($i+1) . " von " . $pagecount . ", Revision " . $dokument->getLatestRevision()->getRevisionID() . ")";
 				$fpdf->AddPage();
 				$tpl = $fpdf->importPage($i + 1);
 				$size = $fpdf->useTemplate($tpl,0,0,0,0,true);
