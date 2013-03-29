@@ -53,19 +53,23 @@ class DokumentTransaktionDownloadProcess extends DokumentTransitionProcess {
 
 		// Print Metainfo for PDFs
 		if (strtolower($extension) == "pdf") {
-			$fpdf =& new FPDI();
-			$pagecount = $fpdf->setSourceFile($file->getAbsoluteFilename());
-			$fpdf->SetMargins(0,0,0);
-			$fpdf->SetFont('Courier','',8);
-			$fpdf->SetTextColor(0,0,0);
-			for ($i=0;$i<$pagecount;$i++) {
-				$string = $dokument->getLatestRevision()->getIdentifier() . " (Seite " . ($i+1) . " von " . $pagecount . ", Revision " . $dokument->getLatestRevision()->getRevisionID() . ")";
-				$fpdf->AddPage();
-				$tpl = $fpdf->importPage($i + 1);
-				$size = $fpdf->useTemplate($tpl,0,0,0,0,true);
-				$fpdf->Text(intval($size["w"]) - 10 - $fpdf->GetStringWidth($string), 5, $string);
+			try {
+				$fpdf =& new FPDI();
+				$pagecount = $fpdf->setSourceFile($file->getAbsoluteFilename());
+				$fpdf->SetMargins(0,0,0);
+				$fpdf->SetFont('Courier','',8);
+				$fpdf->SetTextColor(0,0,0);
+				for ($i=0;$i<$pagecount;$i++) {
+					$string = $dokument->getLatestRevision()->getIdentifier() . " (Seite " . ($i+1) . " von " . $pagecount . ", Revision " . $dokument->getLatestRevision()->getRevisionID() . ")";
+					$fpdf->AddPage();
+					$tpl = $fpdf->importPage($i + 1);
+					$size = $fpdf->useTemplate($tpl,0,0,0,0,true);
+					$fpdf->Text(intval($size["w"]) - 10 - $fpdf->GetStringWidth($string), 5, $string);
+				}
+				$this->ziphandler->addFromString($dokument->getLatestRevision()->getIdentifier() . "." . $extension, $fpdf->Output("", "S"));
+			} catch (Exception $e) {
+				$this->ziphandler->addFile($file->getAbsoluteFilename(), $dokument->getLatestRevision()->getIdentifier() . "." . $extension);
 			}
-			$this->ziphandler->addFromString($dokument->getLatestRevision()->getIdentifier() . "." . $extension, $fpdf->Output("", "S"));
 		} else {
 			$this->ziphandler->addFile($file->getAbsoluteFilename(), $dokument->getLatestRevision()->getIdentifier() . "." . $extension);
 		}

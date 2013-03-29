@@ -137,7 +137,7 @@ if (!class_exists('pdf_parser', false)) {
          * @param string $msg  Error-Message
          */
         function error($msg) {
-        	die('<b>PDF-Parser Error:</b> ' . $msg);	
+        	throw new Exception('<b>PDF-Parser Error:</b> ' . $msg);	
         }
         
         /**
