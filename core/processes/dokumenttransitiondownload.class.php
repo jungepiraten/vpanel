@@ -1,5 +1,7 @@
 <?php
 
+require_once(VPANEL_LIBS . "/fpdf/fpdf.php");
+require_once(VPANEL_LIBS . "/fpdf/fpdi.php");
 require_once(VPANEL_PROCESSES . "/dokumenttransition.class.php");
 
 class DokumentTransaktionDownloadProcess extends DokumentTransitionProcess {
@@ -48,7 +50,25 @@ class DokumentTransaktionDownloadProcess extends DokumentTransitionProcess {
 		$file = $dokument->getLatestRevision()->getFile();
 		$extension = array_pop(explode(".", $file->getExportFilename()));
 		#$this->ziphandler->addFile($file->getAbsoluteFilename(), $file->getExportFilename());
-		$this->ziphandler->addFile($file->getAbsoluteFilename(), $dokument->getLatestRevision()->getIdentifier() . "." . $extension);
+
+		// Print Metainfo for PDFs
+		if (strtolower($extension) == "pdf") {
+			$fpdf =& new FPDI();
+			$pagecount = $fpdf->setSourceFile($file->getAbsoluteFilename());
+			$fpdf->SetMargins(0,0,0);
+			$fpdf->SetFont('Courier','',8);
+			$fpdf->SetTextColor(0,0,0);
+			for ($i=0;$i<$pagecount;$i++) {
+				$string = $dokument->getLatestRevision()->getIdentifier() . " (Seite " . ($i+1) . " von " . $pagecount . ", Revision " . $dokument->getLatestRevision()->getRevisionID() . ")");
+				$fpdf->AddPage();
+				$tpl = $fpdf->importPage($i + 1);
+				$size = $fpdf->useTemplate($tpl,0,0,0,0,true);
+				$fpdf->Text(intval($size["w"]) - 10 - $fpdf->GetStringWidth($string), 5, $string);
+			}
+			$this->ziphandler->addFromString($dokument->getLatestRevision()->getIdentifier() . "." . $extension, $fpdf->Output("", "S"));
+		} else {
+			$this->ziphandler->addFile($file->getAbsoluteFilename(), $dokument->getLatestRevision()->getIdentifier() . "." . $extension);
+		}
 	}
 
 	public function finalizeProcess() {
