@@ -43,7 +43,7 @@
 
 <script type="text/javascript">
 {literal}
-$("input[name=partner]").typeahead({source: {$knownPartner|@json_encode});
+$("input[name=partner]").typeahead({source: {/literal}{$knownPartner|@json_encode}{literal}});
 {/literal}
 </script>
 
