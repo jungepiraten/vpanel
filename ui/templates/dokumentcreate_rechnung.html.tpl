@@ -17,13 +17,13 @@
 </div>
 {/if}
 <div class="control-group">
-    <label class="control-label" for="partner">{$partnerfield|__}</label>
+    <label class="control-label" for="partner">{$partnerfield|escape:html}</label>
     <div class="controls">
         <input type="text" name="partner" size="20" autocomplete="off" />
     </div>
 </div>
 <div class="control-group">
-    <label class="control-label" for="rechnung">{$rechnungfield|__}</label>
+    <label class="control-label" for="rechnung">{$rechnungfield|escape:html}</label>
     <div class="controls">
         <input type="text" name="rechnung" size="20" />
     </div>

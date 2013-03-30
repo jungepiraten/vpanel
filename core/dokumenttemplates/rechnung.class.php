@@ -24,11 +24,11 @@ class RechnungDokumentTemplate extends DefaultDateDokumentTemplate {
 		return $this->knownPartner;
 	}
 
-	public function getPartnerField() {
+	public function getPartnerFieldLabel() {
 		return $this->partnerField;
 	}
 
-	public function getRechnungField() {
+	public function getRechnungFieldLabel() {
 		return $this->rechnungField;
 	}
 }
