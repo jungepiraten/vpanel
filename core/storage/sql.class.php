@@ -1809,7 +1809,7 @@ abstract class SQLStorage extends AbstractStorage {
 			return "`r`.`identifier` LIKE '%" . $this->escape($matcher->getIdentifier()) . "%'";
 		}
 		if ($matcher instanceof IdentifierParentDokumentMatcher) {
-			return "SUBSTRING(" . $this->escape($matcher->getIdentifier()) . ",0,STRLEN(`r`.`identifier`)) = `r`.`identifier`";
+			return "SUBSTRING(" . $this->escape($matcher->getIdentifier()) . ",1,STRLEN(`r`.`identifier`)) = `r`.`identifier`";
 		}
 		if ($matcher instanceof GliederungDokumentMatcher) {
 			return "`r`.`gliederungid` IN (" . implode(",", array_map("intval", $matcher->getGliederungIDs())) . ")";
