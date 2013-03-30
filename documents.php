@@ -139,7 +139,7 @@ case "details":
 	$similardocuments = $session->getStorage()->getDokumentList(
 		new AndDokumentMatcher(
 			new NotDokumentMatcher(new DokumentDokumentMatcher($dokument->getDokumentID())),
-			new OrMitgliederMatcher(
+			new OrDokumentMatcher(
 				new IdentifierDokumentMatcher($dokument->getLatestRevision()->getIdentifier()),
 				new IdentifierParentDokumentMatcher($dokument->getLatestRevision()->getIdentifier()) )));
 
