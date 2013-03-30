@@ -976,6 +976,10 @@ class Template {
 		$this->smarty->assign("dokumenttemplate", $this->parseDokumentTemplate($dokumenttemplate));
 		if ($dokumenttemplate instanceof NatPersonDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_person.html.tpl");
+		} else if ($dokumenttemplate instanceof RechnungDokumentTemplate) {
+			$this->smarty->assign("datefield", $dokumenttemplate->getDateFieldLabel());
+			$this->smarty->assign("knownPartner", $dokumenttemplate->getKnownPartner());
+			$this->smarty->display("dokumentcreate_rechnung.html.tpl");
 		} else if ($dokumenttemplate instanceof DefaultDateDokumentTemplate) {
 			$this->smarty->assign("datefield", $dokumenttemplate->getDateFieldLabel());
 			$this->smarty->display("dokumentcreate_defaultdate.html.tpl");
