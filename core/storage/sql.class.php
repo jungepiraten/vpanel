@@ -1805,11 +1805,11 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof DokumentDokumentMatcher) {
 			return "`d`.`dokumentid` = " . intval($matcher->getDokumentID());
 		}
-		if ($matcher instanceof IdentifierDokumentMatcher) {
-			return "`r`.`identifier` LIKE '%" . $this->escape($matcher->getIdentifier()) . "%'";
-		}
 		if ($matcher instanceof IdentifierParentDokumentMatcher) {
 			return "SUBSTRING(" . $this->escape($matcher->getIdentifier()) . ",1,STRLEN(`r`.`identifier`)) = `r`.`identifier`";
+		}
+		if ($matcher instanceof IdentifierDokumentMatcher) {
+			return "`r`.`identifier` LIKE '%" . $this->escape($matcher->getIdentifier()) . "%'";
 		}
 		if ($matcher instanceof GliederungDokumentMatcher) {
 			return "`r`.`gliederungid` IN (" . implode(",", array_map("intval", $matcher->getGliederungIDs())) . ")";
