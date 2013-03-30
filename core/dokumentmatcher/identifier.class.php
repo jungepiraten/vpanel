@@ -18,4 +18,10 @@ class IdentifierDokumentMatcher extends DokumentMatcher {
 	}
 }
 
+class IdentifierParentDokumentMatcher extends IdentifierDokumentMatcher {
+	public function match(Dokument $dokument) {
+		return $dokument->getLatestRevision()->getIdentifier() == substr($this->getIdentifier(), 0, strlen($dokument->getLatestRevision()->getIdentifier()));
+	}
+}
+
 ?>

@@ -136,8 +136,12 @@ case "details":
 
 	$dokumentrevisionen = $session->getStorage()->getDokumentRevisionList($dokument->getDokumentID());
 	$mitglieder = $session->getStorage()->getMitgliederList(new DokumentMitgliederMatcher($dokument->getDokumentID()));
-	$similardocuments = $session->getStorage()->getDokumentList(new AndDokumentMatcher(new IdentifierDokumentMatcher($dokument->getLatestRevision()->getIdentifier()),
-	                                                                                   new NotDokumentMatcher(new DokumentDokumentMatcher($dokument->getDokumentID()))));
+	$similardocuments = $session->getStorage()->getDokumentList(
+		new AndDokumentMatcher(
+			new NotDokumentMatcher(new DokumentDokumentMatcher($dokument->getDokumentID())),
+			new OrMitgliederMatcher(
+				new IdentifierDokumentMatcher($dokument->getLatestRevision()->getIdentifier()),
+				new IdentifierParentDokumentMatcher($dokument->getLatestRevision()->getIdentifier()) )));
 
 	$transitionen = $session->getStorage()->getSingleDokumentTransitionList($session, $dokument);
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
@@ -228,7 +232,7 @@ default:
 	if ($session->hasVariable("page") and $session->getVariable("page") >= 0 and $session->getVariable("page") < $pagecount) {
 		$page = intval($session->getVariable("page"));
 	}
-	
+
 	$offset = $page * $pagesize;
 
 	$dokumente = $session->getStorage()->getDokumentList($matcher, $pagesize, $offset);
