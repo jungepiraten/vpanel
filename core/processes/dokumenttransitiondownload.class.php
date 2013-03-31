@@ -59,12 +59,23 @@ class DokumentTransaktionDownloadProcess extends DokumentTransitionProcess {
 				$fpdf->SetMargins(0,0,0);
 				$fpdf->SetFont('Courier','',8);
 				$fpdf->SetTextColor(0,0,0);
+				$documentSize = null;
 				for ($i=0;$i<$pagecount;$i++) {
 					$string = $dokument->getLatestRevision()->getIdentifier() . " (Seite " . ($i+1) . " von " . $pagecount . ", Revision " . $dokument->getLatestRevision()->getRevisionID() . ")";
 					$fpdf->AddPage();
 					$tpl = $fpdf->importPage($i + 1);
-					$size = $fpdf->useTemplate($tpl,0,0,0,0,true);
-					$fpdf->Text(intval($size["w"]) - 10 - $fpdf->GetStringWidth($string), 5, $string);
+					$size = $fpdf->getTemplateSize($tpl);
+					// First Page defines documentSize
+					if ($documentSize === null) {
+						$documentSize = $size;
+					}
+
+					// Center Template on Document
+					$fpdf->useTemplate($tpl,
+						intval(($documentSize["w"] - $size["w"]) / 2),
+						intval(($documentSize["h"] - $size["h"]) / 2),
+						0, 0, true);
+					$fpdf->Text(intval($documentSize["w"]) - 10 - $fpdf->GetStringWidth($string), 5, $string);
 				}
 				$this->ziphandler->addFromString($dokument->getLatestRevision()->getIdentifier() . "." . $extension, $fpdf->Output("", "S"));
 			} catch (Exception $e) {
