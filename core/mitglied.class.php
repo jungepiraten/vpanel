@@ -192,6 +192,8 @@ class Mitglied extends GlobalClass {
 			return $kontakt->getHandynummer();
 		case "EMAIL":
 			return $kontakt->getEMail()->getEMail();
+		case "IBAN":
+			return $kontakt->getIBan();
 		case "MITGLIEDSCHAFT":
 			return $revision->getMitgliedschaft()->getLabel();
 		}
