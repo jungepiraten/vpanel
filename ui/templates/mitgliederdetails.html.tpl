@@ -339,7 +339,7 @@ $(function () {
 						<thead>
 							<tr>
 								<th>Datum</th>
-								<th>Bearbeiter</th>
+								<th>Bearbeiter*in</th>
 								<th>Gliederung</th>
 								<th>Vermerk</th>
 								<th>Betrag</th>

@@ -1,22 +1,27 @@
 <!DOCTYPE html> 
 <html>
 <head>
-<link href="ui/bootstrap/css/bootstrap.css" rel="stylesheet" />
-<link rel="icon" type="image/png" href="ui/images/favicon.png" />
-<link rel="stylesheet" type="text/css" href="ui/style.css" />
-<link rel="stylesheet" type="text/css" href="ui/fontawesome/css/font-awesome.min.css" />
-<meta http-equiv="Content-Type" content="text/html; charset={$charset}" />
-<script type="text/javascript" src="ui/jquery-1.7.1.js"></script>
-<script type="text/javascript" src="ui/jquery.timeago.js"></script>
-<script type="text/javascript" src="ui/jquery.timeago.de.js"></script>
-<script type="text/javascript" src="ui/bootstrap/js/bootstrap.js"></script>
-{literal}<script type="text/javascript">
-function doNav(url) {
-	if (typeof(event) != "undefined" && event.which != 1) return;
-	document.location.href = url;
-}
-</script>{/literal}
-<title>{$ansicht|strip_tags:false} &bull; VPanel</title>
+
+	<link href="ui/bootstrap/css/bootstrap.css" rel="stylesheet" />
+	<link rel="icon" type="image/png" href="ui/images/favicon.png" />
+	<link rel="stylesheet" type="text/css" href="ui/style.css" />
+	<link rel="stylesheet" type="text/css" href="ui/fontawesome/css/font-awesome.min.css" />
+
+	<meta http-equiv="Content-Type" content="text/html; charset={$charset}" />
+
+	<script type="text/javascript" src="ui/jquery-1.7.1.js"></script>
+	<script type="text/javascript" src="ui/jquery.timeago.js"></script>
+	<script type="text/javascript" src="ui/jquery.timeago.de.js"></script>
+	<script type="text/javascript" src="ui/bootstrap/js/bootstrap.js"></script>
+
+	{literal}<script type="text/javascript">
+	function doNav(url) {
+		if (typeof(event) != "undefined" && event.which != 1) return;
+		document.location.href = url;
+	}
+	</script>{/literal}
+
+	<title>{$ansicht|strip_tags:false} &bull; VPanel</title>
 </head>
 <body>
 <div class="container-fluid">
@@ -46,7 +51,7 @@ function doNav(url) {
 				<ul class="nav nav-list">
 					<li {if $menupunkt == "dashboard"}class="active"{/if}><a href="{"index"|___}"><i class='icon-home'></i> {"Dashboard"|__}</a></li>
 					{if $session->isAllowed("users_show")}
-						<li {if $menupunkt == "user"}class="active"{/if}><a href="{"users"|___}"><i class='icon-user'></i> {"Benutzer"|__}</a></li>
+						<li {if $menupunkt == "user"}class="active"{/if}><a href="{"users"|___}"><i class='icon-user'></i> {"Benutzer*innen"|__}</a></li>
 					{/if}
 					{if $session->isAllowed("roles_show")}
 						<li {if $menupunkt == "role"}class="active"{/if}><a href="{"roles"|___}"><i class='icon-tags'></i> {"Rollen"|__}</a></li>

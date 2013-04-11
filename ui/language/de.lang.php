@@ -1,30 +1,30 @@
 <?php
 
 $lang['Startseite']		= 'Startseite';
-$lang['Benutzerverwaltung']	= 'Benutzerverwaltung';
+$lang['Benutzerverwaltung']	= 'Benutzer*innenverwaltung';
 $lang['Rollenverwaltung']	= 'Rollenverwaltung';
 $lang['Mitgliederverwaltung']	= 'Mitgliederverwaltung';
 $lang['Abmelden']		= 'Logout';
 $lang['Anmelden']		= 'Login';
-$lang['Username:']		= 'Benutzername:';
+$lang['Username:']		= 'Benutzer*innenname:';
 $lang['Passwort:']		= 'Kennwort:';
 $lang['Speichern']		= 'Speichern';
 $lang['Hinzufuegen']		= 'Hinzufügen';
 $lang['Bezeichnung:']		= 'Bezeichnung:';
 $lang['Beschreibung:']		= 'Beschreibung:';
 $lang['entfernen']		= '[löschen]';
-$lang['Neue Rolle']		= 'Neue Benutzerrolle anlegen';
-$lang['Neuer Benutzer']		= 'Neuen Benutzer anlegen';
+$lang['Neue Rolle']		= 'Neue Benutzer*innenrolle anlegen';
+$lang['Neuer Benutzer']		= 'Neue*n Benutzer*in anlegen';
 $lang['Login failed']		= 'Login fehlgeschlagen';
 
-$lang['users_show']		= 'Benutzer anzeigen';
-$lang['users_modify']		= 'Benutzer bearbeiten';
-$lang['users_create']		= 'Benutzer erstellen';
-$lang['users_delete']		= 'Benutzer löschen';
-$lang['roles_show']		= 'Benutzerrollen anzeigen';
-$lang['roles_modify']		= 'Benutzerrollen bearbeiten';
-$lang['roles_create']		= 'Benutzerrollen anlegen';
-$lang['roles_delete']		= 'Benutzerrollen löschen';
+$lang['users_show']		= 'Benutzer*in anzeigen';
+$lang['users_modify']		= 'Benutzer*in bearbeiten';
+$lang['users_create']		= 'Benutzer*in erstellen';
+$lang['users_delete']		= 'Benutzer*in löschen';
+$lang['roles_show']		= 'Benutzer*innenrollen anzeigen';
+$lang['roles_modify']		= 'Benutzer*innenrollen bearbeiten';
+$lang['roles_create']		= 'Benutzer*innenrollen anlegen';
+$lang['roles_delete']		= 'Benutzer*innenrollen löschen';
 $lang['mitglieder_show']	= 'Mitglieder anzeigen';
 $lang['mitglieder_modify']	= 'Mitglied bearbeiten';
 $lang['mitglieder_create']	= 'Mitglied anlegen';

@@ -2,7 +2,7 @@
 {include file="header.html.tpl" ansicht=$ansicht menupunkt=user}
 <div class="row-fluid">
 	<div class="span6">
-		<h2>{"Benutzerdaten"|__}</h2>
+		<h2>{"Benutzer*innendaten"|__}</h2>
 		{include file="userform.block.tpl" user=$user}
 	</div>
 	<div class="span6">

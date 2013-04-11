@@ -10,7 +10,7 @@
 		{include file="userlist.block.tpl" roleid=$role.roleid showroledel=1 users=$roleusers}
 		<div class="btn-group">
 			<a class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="#">
-				{"Benutzer hinzufügen"|__}
+				{"Benutzer*in hinzufügen"|__}
 				<span class="caret"></span>
 				</a>
 			<ul class="dropdown-menu">
@@ -22,7 +22,7 @@
 	</div>
 
 	<div class="span6">
-		<h2>Benutzerrechte</h2>
+		<h2>Benutzer*innenrechte</h2>
 		<form action="{"roles_details"|___:$role.roleid}" method="post" class="form-inline">
 			<fieldset>
 				<select name="gliederungid" onChange="selectPermissionList(this)">
