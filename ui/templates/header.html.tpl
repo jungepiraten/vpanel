@@ -1,13 +1,13 @@
 <!DOCTYPE html> 
 <html>
 <head>
+	<meta charset="{$charset}" />
+	<meta name="viewport" content="width=device-width" />
 
 	<link href="ui/bootstrap/css/bootstrap.css" rel="stylesheet" />
 	<link rel="icon" type="image/png" href="ui/images/favicon.png" />
 	<link rel="stylesheet" type="text/css" href="ui/style.css" />
 	<link rel="stylesheet" type="text/css" href="ui/fontawesome/css/font-awesome.min.css" />
-
-	<meta http-equiv="Content-Type" content="text/html; charset={$charset}" />
 
 	<script type="text/javascript" src="ui/jquery-1.7.1.js"></script>
 	<script type="text/javascript" src="ui/jquery.timeago.js"></script>
@@ -21,7 +21,7 @@
 	}
 	</script>{/literal}
 
-	<title>{$ansicht|strip_tags:false} &bull; VPanel</title>
+	<title>{$ansicht|strip_tags:false} – VPanel</title>
 </head>
 <body>
 <div class="container-fluid">
