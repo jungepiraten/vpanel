@@ -55,7 +55,7 @@ class DTAUSTempFileStreamHandler extends TempFileStreamHandler {
 
 	public function writeFile($row) {
 		$iban = $row["iban"];
-		if (substr($iban,0,2) == "DE") {
+		if (substr(strtoupper($iban),0,2) == "DE") {
 			$bankcode = substr($iban, 4, 8);
 			$account = substr($iban, 12);
 			$this->handler->addTransaction($row["mitglied"], $bankcode, $account, $row["betrag"], $row["beitrag"] . " #" . $row["mitgliedid"]);
