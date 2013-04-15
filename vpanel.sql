@@ -860,12 +860,33 @@ INSERT INTO `countries` (`countryid`, `label`) VALUES
 (1, 'Deutschland');
 
 --
+-- Dumping data for table `states`
+--
+
+INSERT INTO `states` (`stateid`, `label`, `population`, `countryid`) VALUES
+(1, 'Baden-Württemberg', 10745000, 1),
+(2, 'Bayern', 12510000, 1),
+(3, 'Berlin', 3443000, 1),
+(4, 'Brandenburg', 2512000, 1),
+(5, 'Bremen', 662000, 1),
+(6, 'Hamburg', 1774000, 1),
+(7, 'Hessen', 6062000, 1),
+(8, 'Mecklenburg-Vorpommern', 1651000, 1),
+(9, 'Niedersachsen', 7929000, 1),
+(10, 'Nordrhein-Westfalen', 17873000, 1),
+(11, 'Rheinland-Pfalz', 4013000, 1),
+(12, 'Saarland', 1023000, 1),
+(13, 'Sachsen', 4169000, 1),
+(14, 'Sachsen-Anhalt', 2356000, 1),
+(15, 'Schleswig-Holstein', 2832000, 1),
+(16, 'Thüringen', 2250000, 1);
+
+--
 -- Dumping data for table `gliederungen`
 --
 
 INSERT INTO `gliederungen` (`gliederungsid`, `label`, `parentid`) VALUES
-(1, 'Bundesverband', NULL),
-(2, 'Trollgliederung', NULL);
+(1, 'Bundesverband', NULL);
 
 --
 -- Dumping data for table `permissions`
@@ -901,6 +922,14 @@ INSERT INTO `permissions` (`permissionid`, `label`, `description`, `global`) VAL
 (27, 'dokumente_delete', NULL, 0);
 
 --
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`roleid`, `label`, `description`) VALUES
+(6, 'User', 'Grundlegende Rechte für alle Benutzer'),
+(7, 'Administrator', 'Systemadministratoren zur Verwaltung von Zugriffsrechten');
+
+--
 -- Dumping data for table `rolepermissions`
 --
 
@@ -912,80 +941,7 @@ INSERT INTO `rolepermissions` (`roleid`, `permissionid`, `gliederungid`, `transi
 (7, 5, NULL, 0),
 (7, 6, NULL, 0),
 (7, 7, NULL, 0),
-(7, 8, NULL, 0),
-(8, 9, 1, 1),
-(8, 10, 1, 1),
-(8, 11, 1, 1),
-(8, 18, 1, 1),
-(8, 19, 1, 1),
-(8, 20, 1, 1),
-(8, 16, 1, 0),
-(8, 17, 1, 0),
-(8, 25, 1, 1),
-(8, 26, 1, 1),
-(8, 9, 2, 0),
-(8, 10, 2, 0),
-(8, 11, 2, 0),
-(8, 12, 2, 0),
-(8, 13, 2, 0),
-(8, 14, 2, 0),
-(8, 15, 2, 0),
-(8, 16, 2, 0),
-(8, 17, 2, 0),
-(8, 18, 2, 0),
-(8, 19, 2, 0),
-(8, 20, 2, 0),
-(8, 25, 2, 0),
-(8, 26, 2, 0),
-(8, 12, 1, 1),
-(8, 13, 1, 1),
-(8, 14, 1, 0),
-(8, 15, 1, 0),
-(8, 21, NULL, 0),
-(8, 22, NULL, 0),
-(8, 23, NULL, 0),
-(8, 24, NULL, 0),
-(8, 27, 1, 1);
-
---
--- Dumping data for table `roles`
---
-
-INSERT INTO `roles` (`roleid`, `label`, `description`) VALUES
-(6, 'User', 'Grundlegende Rechte für alle Benutzer'),
-(7, 'Administrator', 'Systemadministratoren zur Verwaltung von Zugriffsrechten'),
-(8, 'Mensch', '');
-
---
--- Dumping data for table `states`
---
-
-INSERT INTO `states` (`stateid`, `label`, `population`, `countryid`) VALUES
-(1, 'Baden-Württemberg', 10745000, 1),
-(2, 'Bayern', 12510000, 1),
-(3, 'Berlin', 3443000, 1),
-(4, 'Brandenburg', 2512000, 1),
-(5, 'Bremen', 662000, 1),
-(6, 'Hamburg', 1774000, 1),
-(7, 'Hessen', 6062000, 1),
-(8, 'Mecklenburg-Vorpommern', 1651000, 1),
-(9, 'Niedersachsen', 7929000, 1),
-(10, 'Nordrhein-Westfalen', 17873000, 1),
-(11, 'Rheinland-Pfalz', 4013000, 1),
-(12, 'Saarland', 1023000, 1),
-(13, 'Sachsen', 4169000, 1),
-(14, 'Sachsen-Anhalt', 2356000, 1),
-(15, 'Schleswig-Holstein', 2832000, 1),
-(16, 'Thüringen', 2250000, 1);
-
---
--- Dumping data for table `userroles`
---
-
-INSERT INTO `userroles` (`userid`, `roleid`) VALUES
-(1, 6),
-(1, 7),
-(1, 8);
+(7, 8, NULL, 0);
 
 --
 -- Dumping data for table `users`
@@ -993,6 +949,14 @@ INSERT INTO `userroles` (`userid`, `roleid`) VALUES
 
 INSERT INTO `users` (`userid`, `username`, `password`, `passwordsalt`, `apikey`, `aktiv`, `defaultgliederungid`, `defaultdokumentkategorieid`, `defaultdokumentstatusid`) VALUES
 (1, 'admin', 'dfd51bf440807bf20c3b3d0eee11929cc0f701b3280c7fe20fbe1bd135054e8d', '*I;V,', NULL, 1, 1, NULL, NULL);
+
+--
+-- Dumping data for table `userroles`
+--
+
+INSERT INTO `userroles` (`userid`, `roleid`) VALUES
+(1, 6),
+(1, 7);
 
 -- Username: admin / admin
 
@@ -1037,17 +1001,17 @@ ALTER TABLE `dokumentrevisions`
 
 ALTER TABLE  `dokumentrevisions` ADD  `kommentar` TEXT NOT NULL;
 
-CREATE TABLE  `vpanel`.`dokumentrevisionflags` (
+CREATE TABLE  `dokumentrevisionflags` (
 `revisionid` INT UNSIGNED NOT NULL ,
 `flagid` INT UNSIGNED NOT NULL ,
 PRIMARY KEY (  `revisionid` ,  `flagid` )
 ) ENGINE = INNODB;
 
-ALTER TABLE  `dokumentrevisionflags` ADD FOREIGN KEY (  `revisionid` ) REFERENCES  `vpanel`.`dokumentrevisions` (
+ALTER TABLE  `dokumentrevisionflags` ADD FOREIGN KEY (  `revisionid` ) REFERENCES  `dokumentrevisions` (
 `revisionid`
 );
 
-ALTER TABLE  `dokumentrevisionflags` ADD FOREIGN KEY (  `flagid` ) REFERENCES  `vpanel`.`dokumentflags` (
+ALTER TABLE  `dokumentrevisionflags` ADD FOREIGN KEY (  `flagid` ) REFERENCES  `dokumentflags` (
 `flagid`
 );
 
@@ -1077,7 +1041,7 @@ ALTER TABLE `dokument`
 
 -- Update 2012-12-24
 
-CREATE TABLE  `vpanel`.`beitragtimeformat` (
+CREATE TABLE  `beitragtimeformat` (
 `beitragtimeformatid` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `label` VARCHAR( 50 ) NOT NULL ,
 `format` VARCHAR( 30 ) NOT NULL ,
@@ -1086,7 +1050,7 @@ UNIQUE (
 )
 ) ENGINE = INNODB;
 
-INSERT INTO  `vpanel`.`beitragtimeformat` (
+INSERT INTO  `beitragtimeformat` (
 `beitragtimeformatid` ,
 `label` ,
 `format`
@@ -1100,7 +1064,7 @@ ADD INDEX (  `beitragtimeformatid` );
 
 UPDATE `mitgliederrevisions` SET `beitragtimeformatid` = 1;
 
-ALTER TABLE  `mitgliederrevisions` ADD FOREIGN KEY (  `beitragtimeformatid` ) REFERENCES  `vpanel`.`beitragtimeformat` (
+ALTER TABLE  `mitgliederrevisions` ADD FOREIGN KEY (  `beitragtimeformatid` ) REFERENCES  `beitragtimeformat` (
 `beitragtimeformatid`
 );
 
@@ -1114,7 +1078,7 @@ ALTER TABLE  `mitgliederrevisions` ADD  `kommentar` TEXT NOT NULL;
 
 -- after update
 
-DROP TABLE `dokumentnotizen`;
+DROP TABLE `mitgliedernotizen`;
 
 -- update 2012-12-27
 
@@ -1132,6 +1096,6 @@ CREATE TABLE IF NOT EXISTS `konto` (
 
 ALTER TABLE  `kontakte` ADD `kontoid` int(10) unsigned DEFAULT NULL, ADD KEY `kontoid` (`kontoid`);
 
-ALTER TABLE  `kontakte` ADD FOREIGN KEY (  `kontoid` ) REFERENCES  `vpanel`.`konto` (
+ALTER TABLE  `kontakte` ADD FOREIGN KEY (  `kontoid` ) REFERENCES  `konto` (
 `kontoid`
 ) ON DELETE RESTRICT ON UPDATE RESTRICT ;
