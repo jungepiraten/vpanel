@@ -8,7 +8,7 @@ initWidgetTable_{/literal}{$widget.widgetid}{literal}({
 			var timestamp = new Date(1000 * res.timestamp).toISOString();
 			return $("<time>").attr("datetime", timestamp).attr("title", timestamp).timeago();
 		},
-		"Benutzer": function (res) {return res.username;},
+		"Benutzer*in": function (res) {return res.username;},
 		"Dokument": function (res) {return $("<a>").attr("href",res.location).text(res.dokumentidentifier + " " + res.dokumentlabel);}
 	},
 	{/literal}{if isset($reload)}reload: {$reload}{/if}{literal}
