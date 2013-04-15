@@ -1119,3 +1119,19 @@ DROP TABLE `dokumentnotizen`;
 -- update 2012-12-27
 
 ALTER TABLE  `mitgliederbeitragbuchung` DROP FOREIGN KEY  `mitgliederbeitragbuchung_ibfk_5` ;
+
+-- update 2013-04-15
+
+CREATE TABLE IF NOT EXISTS `konto` (
+  `kontoid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `inhaber` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `iban` varchar(34) COLLATE utf8_unicode_ci NOT NULL,
+  `bic` varchar(11) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`kontoid`)
+) ENGINE=InnoDB ;
+
+ALTER TABLE  `kontakte` ADD `kontoid` int(10) unsigned DEFAULT NULL, ADD KEY `kontoid` (`kontoid`);
+
+ALTER TABLE  `kontakte` ADD FOREIGN KEY (  `kontoid` ) REFERENCES  `vpanel`.`konto` (
+`kontoid`
+) ON DELETE RESTRICT ON UPDATE RESTRICT ;

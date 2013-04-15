@@ -68,11 +68,11 @@ class MitgliederFilterExportDebitsProcess extends MitgliederFilterProcess {
 	}
 
 	protected function initProcess() {
-		$this->getStreamHandler()->openFile(array("mitgliedid", "mitglied", "iban", "beitrag", "betrag"));
+		$this->getStreamHandler()->openFile(array("mitgliedid", "mitglied", "inhaber", "iban", "bic", "beitrag", "betrag"));
 	}
 
 	protected function runProcessStep($mitglied) {
-		if ($mitglied->getLatestRevision()->getKontakt()->hasIBan()) {
+		if ($mitglied->getLatestRevision()->getKontakt()->hasKonto()) {
 			if ($this->getBeitragID() != null) {
 				if ($mitglied->hasBeitrag($this->getBeitragID())) {
 					$beitrag = $mitglied->getBeitrag($this->getBeitragID());
@@ -91,7 +91,9 @@ class MitgliederFilterExportDebitsProcess extends MitgliederFilterProcess {
 			$row = array();
 			$row["mitgliedid"] = $mitglied->getMitgliedID();
 			$row["mitglied"] = $mitglied->replaceText("{BEZEICHNUNG}");
-			$row["iban"] = $mitglied->getLatestRevision()->getKontakt()->getIBan();
+			$row["kontoinhaber"] = $mitglied->getLatestRevision()->getKonto()->getInhaber();
+			$row["iban"] = $mitglied->getLatestRevision()->getKonto()->getIBan();
+			$row["bic"] = $mitglied->getLatestRevision()->getKonto()->getBIC();
 			$row["beitrag"] = $mitgliedbeitrag->getBeitrag()->getLabel();
 			$row["betrag"] = $mitgliedbeitrag->getRemainingHoehe();
 			$this->getStreamHandler()->writeFile($row);
