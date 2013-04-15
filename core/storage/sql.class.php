@@ -1954,8 +1954,8 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parseDokument"));
 	}
 	public function getDokumentIdentifierMaxNumber($identifierPrefix, $identifierNumberCount) {
-		$identifierPrefixEscaped = str_replace(array("/", "%", "?", "_"), array("//", "/%", "/?", "/_"), $identifierPrefix);
-		$sql = "SELECT `identifier` FROM `dokumentrevisions` WHERE `identifier` LIKE '" . $this->escape($identifierPrefixEscaped) . str_repeat("_", $identifierNumberCount) . "' ESCAPE '/' ORDER BY `identifier` DESC LIMIT 1";
+		$identifierPrefixEscaped = str_replace(array("\\", "^", '$', ".", "*", "+", "|", "(", ")", "{", "}", "[", "]"), array("\\\\", "\\^", '\\$', "\\.", "\\*", "\\+", "\\|", "\\(", "\\)", "\\{", "\\}", "\\[", "\\]"), $identifierPrefix);
+		$sql = "SELECT `identifier` FROM `dokumentrevisions` WHERE `identifier` REGEXP '" . $this->escape($identifierPrefixEscaped) . "[0-9]{".intval($identifierNumberCount)."}" . "' ORDER BY `identifier` DESC LIMIT 1";
 		$rslt = $this->getResult($sql);
 		if ($rslt->getCount() == 0) {
 			return 0;
