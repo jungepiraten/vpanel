@@ -46,8 +46,9 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 	$telefon = $session->getVariable("telefon");
 	$handy = $session->getVariable("handy");
 	$email = $session->getVariable("email");
+	$kontoinhaber = $session->getVariable("kontoinhaber");
 	$iban = $session->getVariable("iban");
-	$iban = empty($iban) ? null : $iban;
+	$bic = $session->getVariable("bic");
 	$gliederungid = intval($session->getVariable("gliederungid"));
 	$gliederung = $session->getStorage()->getGliederung($gliederungid);
 	$mitgliedschaftid = $session->getIntVariable("mitgliedschaftid");
@@ -66,9 +67,17 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 		$jurperson = $session->getStorage()->searchJurPerson($firma);
 	}
 
+	$konto = null;
+	if ($iban != null) {
+		if (trim($kontoinhaber) == "") {
+			$kontoinhaber = ($persontyp == "nat" ? $vorname . " " . $name : $firma);
+		}
+		$konto = $session->getStorage()->searchKonto($kontoinhaber, $iban, $bic);
+	}
+
 	$ort = $session->getStorage()->searchOrt($plz, $ortname, $stateid);
 	$email = $session->getStorage()->searchEMail($email);
-	$kontakt = $session->getStorage()->searchKontakt($adresszusatz, $strasse, $hausnummer, $ort->getOrtID(), $telefon, $handy, $email->getEMailID(), $iban);
+	$kontakt = $session->getStorage()->searchKontakt($adresszusatz, $strasse, $hausnummer, $ort->getOrtID(), $telefon, $handy, $email->getEMailID(), $konto->getKontoID());
 
 	if ($mitglied == null) {
 		if (!$session->isAllowed("mitglieder_create", $gliederung->getGliederungID())) {

@@ -402,7 +402,9 @@ class Template {
 		$row["telefon"] = $kontakt->getTelefonnummer();
 		$row["handy"] = $kontakt->getHandynummer();
 		$row["email"] = $this->parseEMail($kontakt->getEMail());
-		$row["iban"] = $kontakt->getIBan();
+		if ($kontakt->hasKonto()) {
+			$row["konto"] = $this->parseKonto($kontakt->getKonto());
+		}
 		return $row;
 	}
 
@@ -411,6 +413,15 @@ class Template {
 		$row["emailid"] = $email->getEMailID();
 		$row["email"] = $email->getEMail();
 		$row["bounces"] = $this->parseEMailBounces($email->getBounces(), &$row);
+		return $row;
+	}
+
+	protected function parseKonto($konto) {
+		$row = array();
+		$row["kontoid"] = $konto->getKontoID();
+		$row["inhaber"] = $konto->getInhaber();
+		$row["iban"] = $konto->getIBan();
+		$row["bic"] = $konto->getBIC();
 		return $row;
 	}
 

@@ -115,14 +115,19 @@ interface Storage {
 	public function setMitgliederRevisionTextFieldList($revisionid, $textfieldids, $textfieldvalues);
 
 	public function getKontakt($kontaktid);
-	public function setKontakt($kontaktid, $adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $email, $iban);
+	public function setKontakt($kontaktid, $adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $email, $kontoid);
 	public function delKontakt($kontaktid);
-	public function searchKontakt($strasse, $adresszusatz, $hausnummer, $ortid, $telefon, $handy, $email, $iban);
+	public function searchKontakt($strasse, $adresszusatz, $hausnummer, $ortid, $telefon, $handy, $email, $kontoid);
 
 	public function getEMail($emailid);
 	public function setEMail($emailid, $email);
 	public function delEMail($emailid);
 	public function searchEMail($email);
+
+	public function getKonto($kontoid);
+	public function setKonto($kontoid, $inhaber, $iban, $bic);
+	public function delKonto($kontoid);
+	public function searchKonto($inhaber, $iban, $bic);
 
 	public function getEMailBounceResultTimeline($start, $count);
 	public function getEMailBounceListTimeline($start, $count);

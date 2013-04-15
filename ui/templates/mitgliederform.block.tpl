@@ -151,11 +151,18 @@
     </div>
 </div>
 
+<div class="control-group">
+    <label class="control-label" for="kontoinhaber">{"Kontoinhaber:"|__}</label>
+    <div class="controls">
+        <input type="text" name="kontoinhaber" value="{if isset($mitgliedrevision.kontakt) && isset($mitgliedrevision.kontakt.konto)}{$mitgliedrevision.kontakt.konto.inhaber|escape:html}{else}{$data.kontoinhaber|escape:html}{/if}" />
+    </div>
+</div>
+
 <div class="control-group" id="ibanControlGroup">
     <label class="control-label" for="iban">{"Konto (IBAN):"|__}</label>
     <div class="controls iban">
         <div class="input-append">
-            <input type="text" class="iban" name="iban" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.iban|escape:html}{else}{$data.iban|escape:html}{/if}" onChange="checkIBan(this)" />
+            <input type="text" class="iban" name="iban" value="{if isset($mitgliedrevision.kontakt) && isset($mitgliedrevision.kontakt.konto)}{$mitgliedrevision.kontakt.konto.iban|escape:html}{else}{$data.iban|escape:html}{/if}" onChange="checkIBan(this)" />
             <button type="button" class="btn btn-info" onClick="showIBanDE()">{"Generieren"|__}</button>
         </div>
         <span class="help-inline"></span>
@@ -253,6 +260,13 @@ function saveIBanDE() {
 }
 
 //--> </script> {/literal}
+
+<div class="control-group">
+    <label class="control-label" for="bic">{"BIC:"|__}</label>
+    <div class="controls">
+        <input type="text" name="bic" value="{if isset($mitgliedrevision.kontakt) && isset($mitgliedrevision.kontakt.konto)}{$mitgliedrevision.kontakt.konto.bic|escape:html}{else}{$data.bic|escape:html}{/if}" />
+    </div>
+</div>
 
 <div class="control-group">
     <label class="control-label" for="beitrag">{"Beitrag:"|__}</label>

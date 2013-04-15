@@ -19,6 +19,7 @@ require_once(VPANEL_CORE . "/mitgliedschaft.class.php");
 require_once(VPANEL_CORE . "/natperson.class.php");
 require_once(VPANEL_CORE . "/jurperson.class.php");
 require_once(VPANEL_CORE . "/kontakt.class.php");
+require_once(VPANEL_CORE . "/konto.class.php");
 require_once(VPANEL_CORE . "/email.class.php");
 require_once(VPANEL_CORE . "/emailbounce.class.php");
 require_once(VPANEL_CORE . "/mailtemplate.class.php");
@@ -543,8 +544,8 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof AusgetretenMitgliederMatcher) {
 			return "`m`.`austritt` IS NOT NULL";
 		}
-		if ($matcher instanceof IBANMitgliederMatcher) {
-			return "`k`.`iban` IS NOT NULL";
+		if ($matcher instanceof KontoMitgliederMatcher) {
+			return "`k`.`kontoid` IS NOT NULL";
 		}
 		if ($matcher instanceof MitgliedMitgliederMatcher) {
 			return "`m`.`mitgliedid` = " . intval($matcher->getMitgliedID());
@@ -647,7 +648,7 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		if ($matcher instanceof SearchMitgliederMatcher) {
 			$fields = array("`m`.`mitgliedid`", "`m`.`globalid`");
-			$revision_fields = array("`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`r`.`kommentar`", "`n`.`anrede`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`adresszusatz`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`k`.`iban`", "`e`.`email`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
+			$revision_fields = array("`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`r`.`kommentar`", "`n`.`anrede`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`adresszusatz`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`kto`.`inhaber`", "`kto`.`iban`", "`kto`.`bic`", "`e`.`email`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
 			$wordclauses = array();
 			$revision_wordclauses = array();
 			foreach ($matcher->getWords() as $word) {
@@ -671,6 +672,7 @@ abstract class SQLStorage extends AbstractStorage {
 							 LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
 							 LEFT JOIN `kontakte` `k` USING (`kontaktid`)
 							 LEFT JOIN `orte` `o` USING (`ortid`)
+							 LEFT JOIN `konto` `kto` USING (`kontoid`)
 							 LEFT JOIN `emails` `e` USING (`emailid`)
 							 WHERE (" . implode(") AND (", $revision_wordclauses) . ") ) ) )";
 		}
@@ -687,6 +689,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
 			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
 			LEFT JOIN `orte` `o` USING (`ortid`)
+			LEFT JOIN `konto` `kto` USING (`kontoid`)
 			LEFT JOIN `emails` `e` USING (`emailid`)
 			WHERE	`r`.`timestamp` = (
 				SELECT	MAX(`rmax`.`timestamp`)
@@ -754,7 +757,11 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`emailid` AS `k_emailid`,
-				`k`.`iban` AS `k_iban`,
+				`k`.`kontoid` AS `k_kontoid`,
+				`kto`.`kontoid` AS `kto_kontoid`,
+				`kto`.`inhaber` AS `kto_inhaber`,
+				`kto`.`iban` AS `kto_iban`,
+				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
 				`o`.`ortid` AS `o_ortid`,
@@ -789,6 +796,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `natperson` `n` USING (`natpersonid`)
 			LEFT JOIN `jurperson` `j` USING (`jurpersonid`)
 			LEFT JOIN `kontakte` `k` USING (`kontaktid`)
+			LEFT JOIN `konto` `kto` USING (`kontoid`)
 			LEFT JOIN `emails` `e` USING (`emailid`)
 			LEFT JOIN `orte` `o` USING (`ortid`)
 			LEFT JOIN `states` `s` USING (`stateid`)
@@ -988,7 +996,11 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`emailid` AS `k_emailid`,
-				`k`.`iban` AS `k_iban`,
+				`k`.`kontoid` AS `k_kontoid`,
+				`kto`.`kontoid` AS `kto_kontoid`,
+				`kto`.`inhaber` AS `kto_inhaber`,
+				`kto`.`iban` AS `kto_iban`,
+				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
 				`o`.`ortid` AS `o_ortid`,
@@ -1026,6 +1038,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `states` `s` USING (`stateid`)
 			LEFT JOIN `countries` `c` USING (`countryid`)
 			LEFT JOIN `gliederungen` `g` USING (`gliederungsid`)
+			LEFT JOIN `konto` `kto` USING (`kontoid`)
 			LEFT JOIN `emails` `e` USING (`emailid`)
 			LEFT JOIN `mitgliedschaften` `t` USING (`mitgliedschaftid`)
 			LEFT JOIN `users` `u` USING (`userid`)
@@ -1069,7 +1082,11 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`emailid` AS `k_emailid`,
-				`k`.`iban` AS `k_iban`,
+				`k`.`kontoid` AS `k_kontoid`,
+				`kto`.`kontoid` AS `kto_kontoid`,
+				`kto`.`inhaber` AS `kto_inhaber`,
+				`kto`.`iban` AS `kto_iban`,
+				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
 				`o`.`ortid` AS `o_ortid`,
@@ -1107,6 +1124,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `states` `s` USING (`stateid`)
 			LEFT JOIN `countries` `c` USING (`countryid`)
 			LEFT JOIN `gliederungen` `g` USING (`gliederungsid`)
+			LEFT JOIN `konto` `kto` USING (`kontoid`)
 			LEFT JOIN `emails` `e` USING (`emailid`)
 			LEFT JOIN `mitgliedschaften` `t` USING (`mitgliedschaftid`)
 			LEFT JOIN `users` `u` USING (`userid`)
@@ -1144,7 +1162,11 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`emailid` AS `k_emailid`,
-				`k`.`iban` AS `k_iban`,
+				`k`.`kontoid` AS `k_kontoid`,
+				`kto`.`kontoid` AS `kto_kontoid`,
+				`kto`.`inhaber` AS `kto_inhaber`,
+				`kto`.`iban` AS `kto_iban`,
+				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
 				`o`.`ortid` AS `o_ortid`,
@@ -1182,6 +1204,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `states` `s` USING (`stateid`)
 			LEFT JOIN `countries` `c` USING (`countryid`)
 			LEFT JOIN `gliederungen` `g` USING (`gliederungsid`)
+			LEFT JOIN `konto` `kto` USING (`kontoid`)
 			LEFT JOIN `emails` `e` USING (`emailid`)
 			LEFT JOIN `mitgliedschaften` `t` USING (`mitgliedschaftid`)
 			LEFT JOIN `users` `u` USING (`userid`)
@@ -1220,7 +1243,11 @@ abstract class SQLStorage extends AbstractStorage {
 				`k`.`telefonnummer` AS `k_telefonnummer`,
 				`k`.`handynummer` AS `k_handynummer`,
 				`k`.`emailid` AS `k_emailid`,
-				`k`.`iban` AS `k_iban`,
+				`k`.`kontoid` AS `k_kontoid`,
+				`kto`.`kontoid` AS `kto_kontoid`,
+				`kto`.`inhaber` AS `kto_inhaber`,
+				`kto`.`iban` AS `kto_iban`,
+				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
 				`o`.`ortid` AS `o_ortid`,
@@ -1258,6 +1285,7 @@ abstract class SQLStorage extends AbstractStorage {
 			LEFT JOIN `states` `s` USING (`stateid`)
 			LEFT JOIN `countries` `c` USING (`countryid`)
 			LEFT JOIN `gliederungen` `g` USING (`gliederungsid`)
+			LEFT JOIN `konto` `kto` USING (`kontoid`)
 			LEFT JOIN `emails` `e` USING (`emailid`)
 			LEFT JOIN `mitgliedschaften` `t` USING (`mitgliedschaftid`)
 			LEFT JOIN `users` `u` USING (`userid`)
@@ -1284,14 +1312,14 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "Kontakt");
 	}
 	public function getKontakt($kontaktid) {
-		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid`, `iban` FROM `kontakt` WHERE `kontaktid` = " . intval($kontaktid);
+		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid`, `kontoid` FROM `kontakt` WHERE `kontaktid` = " . intval($kontaktid);
 		return $this->getResult($sql, array($this, "parseKontakt"))->fetchRow();
 	}
-	public function setKontakt($kontaktid, $adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $emailid, $iban) {
+	public function setKontakt($kontaktid, $adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $emailid, $kontoid) {
 		if ($kontaktid == null) {
-			$sql = "INSERT INTO `kontakte` (`adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid`, `iban`) VALUES ('" . $this->escape($adresszusatz) . "', '" . $this->escape($strasse) . "', '" . $this->escape($hausnummer) . "', " . intval($ortid) . ", '" . $this->escape($telefon) . "', '" . $this->escape($handy) . "', " . intval($emailid) . ", " . ($iban == null ? "NULL" : "'" . $this->escape($iban) . "'") . ")";
+			$sql = "INSERT INTO `kontakte` (`adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid`, `kontoid`) VALUES ('" . $this->escape($adresszusatz) . "', '" . $this->escape($strasse) . "', '" . $this->escape($hausnummer) . "', " . intval($ortid) . ", '" . $this->escape($telefon) . "', '" . $this->escape($handy) . "', " . intval($emailid) . ", " . ($kontoid == null ? "NULL" : intval($kontoid)) . ")";
 		} else {
-			$sql = "UPDATE `kontakte` SET `adresszusatz` = '" . $this->escape($adresszusatz) . "', `strasse` = '" . $this->escape($strasse) . "', `hausnummer` = '" . $this->escape($hausnummer) . "', `ortid` = " . intval($ortid) . ", `telefonnummer` = '" . $this->escape($telefon) . "', `handynummer` = '" . $this->escape($handy) . "', `emailid` = " . intval($emailid) . ", `iban` = " . ($iban == null ? "NULL" : "'" . $this->escape($iban) . "'") . " WHERE `kontaktid` = " . intval($kontaktid);
+			$sql = "UPDATE `kontakte` SET `adresszusatz` = '" . $this->escape($adresszusatz) . "', `strasse` = '" . $this->escape($strasse) . "', `hausnummer` = '" . $this->escape($hausnummer) . "', `ortid` = " . intval($ortid) . ", `telefonnummer` = '" . $this->escape($telefon) . "', `handynummer` = '" . $this->escape($handy) . "', `emailid` = " . intval($emailid) . ", `kontoid` = " . ($kontoid == null ? "NULL" : intval($kontoid)) . ") WHERE `kontaktid` = " . intval($kontaktid);
 		}
 		$this->query($sql);
 		if ($kontaktid == null) {
@@ -1303,8 +1331,8 @@ abstract class SQLStorage extends AbstractStorage {
 		$sql = "DELETE FROM `kontakte` WHERE `kontaktid` = " . intval($kontaktid);
 		return $this->query($sql);
 	}
-	public function searchKontakt($adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $emailid, $iban) {
-		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid`, `iban` FROM `kontakte` WHERE `adresszusatz` = '" . $this->escape($adresszusatz) . "' AND `strasse` = '" . $this->escape($strasse) . "' AND `hausnummer` = '" . $this->escape($hausnummer) . "' AND `ortid` = " . intval($ortid) . " AND `telefonnummer` = '" . $this->escape($telefon) . "' AND `handynummer` = '" . $this->escape($handy) . "' AND `emailid` = '" . intval($emailid) . "' AND `iban` = '" . $this->escape($iban) . "'";
+	public function searchKontakt($adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $emailid, $kontoid) {
+		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid`, `kontoid` FROM `kontakte` WHERE `adresszusatz` = '" . $this->escape($adresszusatz) . "' AND `strasse` = '" . $this->escape($strasse) . "' AND `hausnummer` = '" . $this->escape($hausnummer) . "' AND `ortid` = " . intval($ortid) . " AND `telefonnummer` = '" . $this->escape($telefon) . "' AND `handynummer` = '" . $this->escape($handy) . "' AND `emailid` = '" . intval($emailid) . "' AND `kontoid` " . ($kontoid == null ? "IS NULL" : "= " . intval($kontoid));
 		$result = $this->getResult($sql, array($this, "parseKontakt"));
 		if ($result->getCount() > 0) {
 			return $result->fetchRow();
@@ -1317,7 +1345,7 @@ abstract class SQLStorage extends AbstractStorage {
 		$kontakt->setTelefonnummer($telefon);
 		$kontakt->setHandynummer($handy);
 		$kontakt->setEMailID($emailid);
-		$kontakt->setIBan($iban);
+		$kontakt->setKontoID($kontoid);
 		$kontakt->save();
 		return $kontakt;
 	}
@@ -1358,6 +1386,46 @@ abstract class SQLStorage extends AbstractStorage {
 		$email->setEMail($address);
 		$email->save();
 		return $email;
+	}
+
+	/**
+	 * Konto
+	 **/
+	public function parseKonto($row) {
+		return $this->parseRow($row, null, "Konto");
+	}
+	public function getKonto($kontoid) {
+		$sql = "SELECT `kontoid`, `inhaber`, `iban`, `bic` FROM `konto` WHERE `kontoid` = " . intval($kontoid);
+		return $this->getResult($sql, array($this, "parseKonto"))->fetchRow();
+	}
+	public function setKonto($kontoid, $inhaber, $iban, $bic) {
+		if ($kontoid == null) {
+			$sql = "INSERT INTO `konto` (`inhaber`, `iban`, `bic`) VALUES ('" . $this->escape($inhaber) . "', '" . $this->escape($iban) . "', '" . $this->escape($bic) . "')";
+		} else {
+			$sql = "UPDATE `konto` SET `inhaber` = '" . $this->escape($inhaber) . "', `iban` = '" . $this->escape($iban) . "', `bic` = '" . $this->escape($bic) . "' WHERE `kontoid` = " . intval($kontoid);
+		}
+		$this->query($sql);
+		if ($kontoid == null) {
+			$kontoid = $this->getInsertID();
+		}
+		return $kontoid;
+	}
+	public function delKonto($kontoid) {
+		$sql = "DELETE FROM `konto` WHERE `kontoid` = " . intval($kontoid);
+		return $this->query($sql);
+	}
+	public function searchKonto($inhaber, $iban, $bic) {
+		$sql = "SELECT `kontoid`, `inhaber`, `iban`, `bic` FROM `konto` WHERE `inhaber` = '" . $this->escape($inhaber) . "' AND `iban` = '" . $this->escape($iban) . "' AND `bic` = '" . $this->escape($bic) . "'";
+		$result = $this->getResult($sql, array($this, "parseKonto"));
+		if ($result->getCount() > 0) {
+			return $result->fetchRow();
+		}
+		$konto = new Konto($this);
+		$konto->setInhaber($inhaber);
+		$konto->setIBan($iban);
+		$konto->setBIC($bic);
+		$konto->save();
+		return $konto;
 	}
 
 	/**

@@ -13,10 +13,11 @@ class Kontakt extends GlobalClass {
 	private $telefonnummer;
 	private $handynummer;
 	private $emailid;
-	private $iban;
+	private $kontoid;
 
 	private $ort;
 	private $email;
+	private $konto;
 
 	public static function factory(Storage $storage, $row) {
 		$kontakt = new Kontakt($storage);
@@ -28,7 +29,7 @@ class Kontakt extends GlobalClass {
 		$kontakt->setTelefonnummer($row["telefonnummer"]);
 		$kontakt->setHandynummer($row["handynummer"]);
 		$kontakt->setEMailID($row["emailid"]);
-		$kontakt->setIBan($row["iban"]);
+		$kontakt->setKontoID($row["kontoid"]);
 		return $kontakt;
 	}
 
@@ -126,22 +127,38 @@ class Kontakt extends GlobalClass {
 		$this->email = $email;
 	}
 
-	public function getIBan() {
-		return $this->iban;
+	public function getKontoID() {
+		return $this->kontoid;
 	}
 
-	public function setIBan($iban) {
-		$this->iban = $iban;
+	public function setKontoID($kontoid) {
+		if ($this->kontoid != $kontoid) {
+			$this->konto = null;
+		}
+		$this->kontoid = $kontoid;
 	}
 
-	public function hasIBan() {
-		return $this->iban != null;
+	public function getKonto() {
+		if ($this->konto == null) {
+			$this->konto = $this->getStorage()->getKonto($this->kontoid);
+		}
+		return $this->konto;
+	}
+
+	public function setKonto($konto) {
+		$this->setKontoID($konto == null ? null : $konto->getKontoID());
+		$this->konto = $konto;
+	}
+
+	public function hasKonto() {
+		return $this->kontoid != null;
 	}
 
 	public function save(Storage $storage = null) {
 		if ($storage === null) {
 			$storage = $this->getStorage();
 		}
+		var_dump($this->getKontoID());
 		$this->setKontaktID( $storage->setKontakt(
 			$this->getKontaktID(),
 			$this->getAdresszusatz(),
@@ -151,7 +168,7 @@ class Kontakt extends GlobalClass {
 			$this->getTelefonnummer(),
 			$this->getHandynummer(),
 			$this->getEMailID(),
-			$this->getIBan() ));
+			$this->getKontoID() ));
 	}
 }
 

@@ -104,12 +104,12 @@
 							{if isset($revisionemail) && $revisionemail != $revision.kontakt.email.email}{assign var=revisionemail value=$revision.kontakt.email.email}
 								<li>{"EMail-Adresse entfernt"|__:$revision.kontakt.email.email}</li>{/if}
 						{/if}
-						{if $revision.kontakt.iban != ""}
-							{if !isset($revisioniban) || $revisioniban != $revision.kontakt.iban}{assign var=revisioniban value=$revision.kontakt.iban}
-								<li>{"Bankverbindung auf %s gesetzt"|__:$revision.kontakt.iban}</li>{/if}
+						{if $revision.kontakt.kontoid != null}
+							{if !isset($revisionkontoid) || $revisionkontoid != $revision.kontakt.kontoid}{assign var=revisionkontoid value=$revision.kontakt.kontoid}
+								<li>{"Bankverbindung auf %s, %s, %s gesetzt"|__:$revision.kontakt.konto.iban:$revision.kontakt.konto.inhaber:$revision.kontakt.konto.bic}</li>{/if}
 						{else}
-							{if isset($revisioniban) && $revisioniban != $revision.kontakt.iban}{assign var=revisioniban value=$revision.kontakt.iban}
-								<li>{"Bankverbindung entfernt"|__:$revision.kontakt.iban}</li>{/if}
+							{if isset($revisionkontoid) && $revisionkontoid != $revision.kontakt.kontoid}{assign var=revisionkontoid value=$revision.kontakt.kontoid}
+								<li>{"Bankverbindung entfernt"|__:$revision.kontakt.kontoid}</li>{/if}
 						{/if}
 						{if !isset($revisionbeitrag) || $revisionbeitrag != $revision.beitrag
 						 || !isset($revisionbeitragtimeformat) || $revisionbeitragtimeformat != $revision.beitragtimeformat.beitragtimeformatid}

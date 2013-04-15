@@ -54,7 +54,7 @@ class DokumentTransaktionDownloadProcess extends DokumentTransitionProcess {
 		// Print Metainfo for PDFs
 		if (strtolower($extension) == "pdf") {
 			try {
-				$fpdf =& new FPDI();
+				$fpdf = new FPDI();
 				$pagecount = $fpdf->setSourceFile($file->getAbsoluteFilename());
 				$fpdf->SetMargins(0,0,0);
 				$fpdf->SetFont('Courier','',8);
