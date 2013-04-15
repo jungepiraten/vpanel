@@ -77,7 +77,7 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 
 	$ort = $session->getStorage()->searchOrt($plz, $ortname, $stateid);
 	$email = $session->getStorage()->searchEMail($email);
-	$kontakt = $session->getStorage()->searchKontakt($adresszusatz, $strasse, $hausnummer, $ort->getOrtID(), $telefon, $handy, $email->getEMailID(), $konto->getKontoID());
+	$kontakt = $session->getStorage()->searchKontakt($adresszusatz, $strasse, $hausnummer, $ort->getOrtID(), $telefon, $handy, $email->getEMailID(), ($konto == null ? null : $konto->getKontoID()));
 
 	if ($mitglied == null) {
 		if (!$session->isAllowed("mitglieder_create", $gliederung->getGliederungID())) {
