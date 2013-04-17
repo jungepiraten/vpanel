@@ -554,14 +554,14 @@ abstract class SQLStorage extends AbstractStorage {
 			if ($matcher->countOldBounces()) {
 				return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` GROUP BY `emailid` HAVING COUNT(`bounceid`) > " . intval($matcher->getCountLimit()) . ")";
 			} else {
-				return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` LEFT JOIN `emails` USING (`emailid`) WHERE `emails`.`lastSend` < `emailbounces`.`timestamp` GROUP BY `emailid` HAVING COUNT(`emailbounces`.`bounceid`) > " . intval($matcher->getCountLimit()) . ")";
+				return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` LEFT JOIN `emails` USING (`emailid`) WHERE `emails`.`lastSend` IS NULL or `emails`.`lastSend` < `emailbounces`.`timestamp` GROUP BY `emailid` HAVING COUNT(`emailbounces`.`bounceid`) > " . intval($matcher->getCountLimit()) . ")";
 			}
 		}
 		if ($matcher instanceof EMailBounceCountBelowMitgliederMatcher) {
 			if ($matcher->countOldBounces()) {
 				return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` GROUP BY `emailid` HAVING COUNT(`bounceid`) <= " . intval($matcher->getCountLimit()) . ")";
 			} else {
-				return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` LEFT JOIN `emails` USING (`emailid`) WHERE `emails`.`lastSend` < `emailbounces`.`timestamp` GROUP BY `emailid` HAVING COUNT(`emailbounces`.`bounceid`) <= " . intval($matcher->getCountLimit()) . ")";
+				return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` LEFT JOIN `emails` USING (`emailid`) WHERE `emails`.`lastSend` IS NULL or `emails`.`lastSend` < `emailbounces`.`timestamp` GROUP BY `emailid` HAVING COUNT(`emailbounces`.`bounceid`) <= " . intval($matcher->getCountLimit()) . ")";
 			}
 		}
 		if ($matcher instanceof RevisionFlagMitgliederMatcher) {
