@@ -120,7 +120,7 @@ interface Storage {
 	public function searchKontakt($strasse, $adresszusatz, $hausnummer, $ortid, $telefon, $handy, $email, $kontoid);
 
 	public function getEMail($emailid);
-	public function setEMail($emailid, $email);
+	public function setEMail($emailid, $email, $lastSend);
 	public function delEMail($emailid);
 	public function searchEMail($email);
 

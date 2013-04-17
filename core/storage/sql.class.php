@@ -551,10 +551,18 @@ abstract class SQLStorage extends AbstractStorage {
 			return "`m`.`mitgliedid` = " . intval($matcher->getMitgliedID());
 		}
 		if ($matcher instanceof EMailBounceCountAboveMitgliederMatcher) {
-			return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` GROUP BY `emailid` HAVING COUNT(`bounceid`) > " . intval($matcher->getCountLimit()) . ")";
+			if ($matcher->countOldBounces()) {
+				return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` GROUP BY `emailid` HAVING COUNT(`bounceid`) > " . intval($matcher->getCountLimit()) . ")";
+			} else {
+				return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` LEFT JOIN `emails` USING (`emailid`) WHERE `emails`.`lastSend` < `emailbounces`.`timestamp` GROUP BY `emailid` HAVING COUNT(`emailbounces`.`bounceid`) > " . intval($matcher->getCountLimit()) . ")";
+			}
 		}
 		if ($matcher instanceof EMailBounceCountBelowMitgliederMatcher) {
-			return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` GROUP BY `emailid` HAVING COUNT(`bounceid`) <= " . intval($matcher->getCountLimit()) . ")";
+			if ($matcher->countOldBounces()) {
+				return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` GROUP BY `emailid` HAVING COUNT(`bounceid`) <= " . intval($matcher->getCountLimit()) . ")";
+			} else {
+				return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` LEFT JOIN `emails` USING (`emailid`) WHERE `emails`.`lastSend` < `emailbounces`.`timestamp` GROUP BY `emailid` HAVING COUNT(`emailbounces`.`bounceid`) <= " . intval($matcher->getCountLimit()) . ")";
+			}
 		}
 		if ($matcher instanceof RevisionFlagMitgliederMatcher) {
 			return "`r`.`revisionid` IN (SELECT `revisionid` FROM `mitgliederrevisionflags` WHERE `flagid` = " . intval($matcher->getFlagID()) . ")";
@@ -764,6 +772,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
+				UNIX_TIMESTAMP(`e`.`lastSend`) AS `e_lastSend`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -1003,6 +1012,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
+				UNIX_TIMESTAMP(`e`.`lastSend`) AS `e_lastSend`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -1089,6 +1099,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
+				UNIX_TIMESTAMP(`e`.`lastSend`) AS `e_lastSend`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -1169,6 +1180,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
+				UNIX_TIMESTAMP(`e`.`lastSend`) AS `e_lastSend`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -1250,6 +1262,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
+				UNIX_TIMESTAMP(`e`.`lastSend`) AS `e_lastSend`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
 				`o`.`label` AS `o_label`,
@@ -1357,14 +1370,14 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "EMail");
 	}
 	public function getEMail($emailid) {
-		$sql = "SELECT `emailid`, `email` FROM `emails` WHERE `emailid` = " . intval($emailid);
+		$sql = "SELECT `emailid`, `email`, UNIX_TIMESTAMP(`lastSend`) AS `lastSend` FROM `emails` WHERE `emailid` = " . intval($emailid);
 		return $this->getResult($sql, array($this, "parseEMail"))->fetchRow();
 	}
-	public function setEMail($emailid, $email) {
+	public function setEMail($emailid, $email, $lastSend) {
 		if ($emailid == null) {
-			$sql = "INSERT INTO `emails` (`email`) VALUES ('" . $this->escape($email) . "')";
+			$sql = "INSERT INTO `emails` (`email`, `lastSend`) VALUES ('" . $this->escape($email) . "', " . ($lastSend == null ? "NULL" : "'" . date("Y-m-d H:i:s", $lastSend) . "'") . ")";
 		} else {
-			$sql = "UPDATE `emails` SET `email` = '" . $this->escape($email) . "' WHERE `emailid` = " . intval($emailid);
+			$sql = "UPDATE `emails` SET `email` = '" . $this->escape($email) . "', `lastSend` = " . ($lastSend == null ? "NULL" : "'" . date("Y-m-d H:i:s", $lastSend) . "'") . " WHERE `emailid` = " . intval($emailid);
 		}
 		$this->query($sql);
 		if ($emailid == null) {

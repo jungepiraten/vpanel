@@ -5,6 +5,7 @@ require_once(VPANEL_CORE . "/storageobject.class.php");
 class EMail extends StorageClass {
 	private $emailid;
 	private $email;
+	private $lastSend;
 
 	private $bounces;
 
@@ -12,6 +13,7 @@ class EMail extends StorageClass {
 		$email = new EMail($storage);
 		$email->setEMailID($row["emailid"]);
 		$email->setEMail($row["email"]);
+		$email->setLastSend($row["lastSend"]);
 		return $email;
 	}
 
@@ -31,6 +33,14 @@ class EMail extends StorageClass {
 		$this->email = $email;
 	}
 
+	public function getLastSend() {
+		return $this->lastSend;
+	}
+
+	public function setLastSend($lastSend) {
+		$this->lastSend = $lastSend;
+	}
+
 	public function getBounces() {
 		if ($this->bounces == null) {
 			$this->bounces = $this->getStorage()->getEMailBounceListByEMail($this->getEMailID());
@@ -44,7 +54,8 @@ class EMail extends StorageClass {
 		}
 		$this->setEMailID( $storage->setEMail(
 			$this->getEMailID(),
-			$this->getEMail() ));
+			$this->getEMail(),
+			$this->getLastSend() ));
 	}
 
 	public function delete(Storage $storage = null) {

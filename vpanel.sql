@@ -1099,3 +1099,7 @@ ALTER TABLE  `kontakte` ADD `kontoid` int(10) unsigned DEFAULT NULL, ADD KEY `ko
 ALTER TABLE  `kontakte` ADD FOREIGN KEY (  `kontoid` ) REFERENCES  `konto` (
 `kontoid`
 ) ON DELETE RESTRICT ON UPDATE RESTRICT ;
+
+-- update 2013-04-17
+
+ALTER TABLE  `emails` ADD  `lastSend` TIMESTAMP NULL DEFAULT NULL;
