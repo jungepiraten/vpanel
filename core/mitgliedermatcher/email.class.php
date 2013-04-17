@@ -15,7 +15,7 @@ abstract class EMailBounceCountMitgliederMatcher extends MitgliederMatcher {
 		$bounces = $mitglied->getLatestRevision()->getKontakt()->getEMail()->getBounces();
 		if (! $this->countOldBounces()) {
 			$lastSend = $mitglied->getLatestRevision()->getKontakt()->getEMail()->getLastSend();
-			$bounces = array_filter($bounces, create_function('$b', 'return ' . ($lastSend == null ? "true" : "false") . ' || $b->getTimestamp() > ' . $lastSend . ';'));
+			$bounces = array_filter($bounces, create_function('$b', 'return ' . ($lastSend == null ? "true" : '$b->getTimestamp() > ' . $lastSend) . ';'));
 		}
 		return count($bounces);
 	}
