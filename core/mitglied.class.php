@@ -193,7 +193,7 @@ class Mitglied extends GlobalClass {
 		case "EMAIL":
 			return $kontakt->getEMail()->getEMail();
 		case "IBAN":
-			if ($konto->hasKonto()) {
+			if ($kontakt->hasKonto()) {
 				return $kontakt->getKonto()->getIBan();
 			}
 			return "";
