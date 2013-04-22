@@ -1901,6 +1901,9 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof StatusDokumentMatcher) {
 			return "`r`.`statusid` = " . intval($matcher->getStatusID());
 		}
+		if ($matcher instanceof RevisionFlagDokumentMatcher) {
+			return "`r`.`revisionid` IN (SELECT `revisionid` FROM `dokumentrevisionflags` WHERE `flagid` = " . intval($matcher->getFlagID()) . ")";
+		}
 		if ($matcher instanceof MitgliedDokumentMatcher) {
 			return "`d`.`dokumentid` IN (SELECT `dokumentid` FROM `mitglieddokument` WHERE `mitgliedid` = " . intval($matcher->getMitgliedID()) . ")";
 		}
