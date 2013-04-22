@@ -18,5 +18,3 @@ class RevisionFlagDokumentMatcher extends DokumentMatcher {
 	}
 }
 
-?>
-
