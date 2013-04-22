@@ -125,11 +125,11 @@ class Mitglied extends GlobalClass {
 	}
 
 	public function getPaidBeitrag() {
-		return array_reduce($this->getBeitragList(), create_function('$beitrag,$value', 'return $value + $beitrag->getBuchungenHoehe();'), 0);
+		return array_reduce($this->getBeitragList(), create_function('$value, $beitrag', 'return $value + $beitrag->getBuchungenHoehe();'), 0);
 	}
 
 	public function getSchulden() {
-		return array_reduce($this->getBeitragList(), create_function('$beitrag,$value', 'return $value + $beitrag->getRemainingHoehe();'), 0);
+		return array_reduce($this->getBeitragList(), create_function('$value, $beitrag', 'return $value + $beitrag->getRemainingHoehe();'), 0);
 	}
 
 	public function save(Storage $storage = null) {
