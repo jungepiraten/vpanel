@@ -30,9 +30,11 @@ class ExportMitgliederFilterAction extends MitgliederFilterAction {
 			array("label" => "Telefonnummer",	"template" => "{TELEFONNUMMER}"),
 			array("label" => "Handynummer",		"template" => "{HANDYNUMMER}"),
 			array("label" => "E-Mail",		"template" => "{EMAIL}"),
+			array("label" => "Mailbounces",		"template" => "{BOUNCES-NEW}"),
 			array("label" => "Beitrag",		"template" => "{BEITRAG}"),
+			array("label" => "Offene Beiträge",	"template" => "{SCHULDEN}"),
 			array("label" => "Gliederung",		"template" => "{GLIEDERUNG}"),
-			array("label" => "Mitgliedschaft",	"template" => "{MITGLIEDSCHAFT}")
+			array("label" => "Mitgliedschaft",	"template" => "{MITGLIEDSCHAFT}"),
 		);
 	}
 
