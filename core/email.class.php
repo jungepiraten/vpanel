@@ -48,6 +48,10 @@ class EMail extends StorageClass {
 		return $this->bounces;
 	}
 
+	public function getNewBounces() {
+		return array_filter($this->getBounces(), create_function('$bounce', ($this->getLastSend() == null ? 'return true;' : 'return $bounce->getTimestamp() > ' . $this->getLastSend() . ';')));
+	}
+
 	public function save(Storage $storage = null) {
 		if ($storage == null) {
 			$storage = $this->getStorage();

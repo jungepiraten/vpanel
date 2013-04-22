@@ -124,6 +124,14 @@ class Mitglied extends GlobalClass {
 		unset($this->beitraglist[$beitragid]);
 	}
 
+	public function getPaidBeitrag() {
+		return array_reduce($this->getBeitragList(), create_function('$beitrag,$value', 'return $value + $beitrag->getBuchungenHoehe();'), 0);
+	}
+
+	public function getSchulden() {
+		return array_reduce($this->getBeitragList(), create_function('$beitrag,$value', 'return $value + $beitrag->getRemainingHoehe();'), 0);
+	}
+
 	public function save(Storage $storage = null) {
 		if ($storage === null) {
 			$storage = $this->getStorage();
@@ -192,6 +200,10 @@ class Mitglied extends GlobalClass {
 			return $kontakt->getHandynummer();
 		case "EMAIL":
 			return $kontakt->getEMail()->getEMail();
+		case "BOUNCES-TOTAL":
+			return count($kontakt->getEMail()->getBounces());
+		case "BOUNCES-NEW":
+			return count($kontakt->getEMail()->getNewBounces());
 		case "IBAN":
 			if ($kontakt->hasKonto()) {
 				return $kontakt->getKonto()->getIBan();
@@ -199,6 +211,8 @@ class Mitglied extends GlobalClass {
 			return "";
 		case "MITGLIEDSCHAFT":
 			return $revision->getMitgliedschaft()->getLabel();
+		case "SCHULDEN":
+			return $this->getSchulden();
 		}
 		if ($revision->isNatPerson()) {
 			$natperson = $revision->getNatPerson();

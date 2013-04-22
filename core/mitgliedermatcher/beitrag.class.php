@@ -4,7 +4,7 @@ require_once(VPANEL_CORE . "/mitgliederfilter.class.php");
 
 class BeitragMitgliederMatcher extends MitgliederMatcher {
 	private $beitragid;
-	
+
 	public function __construct($beitragid) {
 		$this->beitragid = $beitragid;
 	}
@@ -57,11 +57,7 @@ class BeitragPaidAboveMitgliederMatcher extends MitgliederMatcher {
 	}
 
 	public function match(Mitglied $mitglied) {
-		$beitragpaid = 0;
-		foreach ($mitglied->getBeitragList() as $beitrag) {
-			$beitragpaid += $beitrag->getBuchungenHoehe();
-		}
-		return $beitragpaid > $this->getBeitragMark();
+		return $mitglied->getPaidBeitrag() > $this->getBeitragMark();
 	}
 }
 
@@ -77,11 +73,7 @@ class BeitragPaidBelowMitgliederMatcher extends MitgliederMatcher {
 	}
 
 	public function match(Mitglied $mitglied) {
-		$beitragpaid = 0;
-		foreach ($mitglied->getBeitragList() as $beitrag) {
-			$beitragpaid += $beitrag->getBuchungenHoehe();
-		}
-		return $beitragpaid <= $this->getBeitragMark();
+		return $mitglied->getPaidBeitrag() <= $this->getBeitragMark();
 	}
 }
 
@@ -100,11 +92,7 @@ class BeitragMissingMitgliederMatcher extends MitgliederMatcher {
 	}
 
 	public function match(Mitglied $mitglied) {
-		$beitrag = $mitglied->getBeitrag($this->getBeitragID());
-		if ($beitrag == null) {
-			return false;
-		}
-		return $beitrag->getRemainingHoehe() > 0;
+		return $mitglied->getSchulden() > 0;
 	}
 }
 
@@ -120,11 +108,7 @@ class BeitragMissingAboveMitgliederMatcher extends MitgliederMatcher {
 	}
 
 	public function match(Mitglied $mitglied) {
-		$beitragmissing = 0;
-		foreach ($mitglied->getBeitragList() as $beitrag) {
-			$beitragmissing += abs($beitrag->getRemainingHoehe());
-		}
-		return $beitragmissing > $this->getBeitragMark();
+		return $mitglied->getSchulden() > $this->getBeitragMark();
 	}
 }
 
@@ -140,11 +124,7 @@ class BeitragMissingBelowMitgliederMatcher extends MitgliederMatcher {
 	}
 
 	public function match(Mitglied $mitglied) {
-		$beitragmissing = 0;
-		foreach ($mitglied->getBeitragList() as $beitrag) {
-			$beitragmissing += abs($beitrag->getRemainingHoehe());
-		}
-		return $beitragmissing <= $this->getBeitragMark();
+		return $mitglied->getSchulden() <= $this->getBeitragMark();
 	}
 }
 
