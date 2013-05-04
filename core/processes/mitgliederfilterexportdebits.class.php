@@ -91,9 +91,9 @@ class MitgliederFilterExportDebitsProcess extends MitgliederFilterProcess {
 			$row = array();
 			$row["mitgliedid"] = $mitglied->getMitgliedID();
 			$row["mitglied"] = $mitglied->replaceText("{BEZEICHNUNG}");
-			$row["kontoinhaber"] = $mitglied->getLatestRevision()->getKonto()->getInhaber();
-			$row["iban"] = $mitglied->getLatestRevision()->getKonto()->getIBan();
-			$row["bic"] = $mitglied->getLatestRevision()->getKonto()->getBIC();
+			$row["kontoinhaber"] = $mitglied->getLatestRevision()->getKontakt()->getKonto()->getInhaber();
+			$row["iban"] = $mitglied->getLatestRevision()->getKontakt()->getKonto()->getIBan();
+			$row["bic"] = $mitglied->getLatestRevision()->getKontakt()->getKonto()->getBIC();
 			$row["beitrag"] = $mitgliedbeitrag->getBeitrag()->getLabel();
 			$row["betrag"] = $mitgliedbeitrag->getRemainingHoehe();
 			$this->getStreamHandler()->writeFile($row);
