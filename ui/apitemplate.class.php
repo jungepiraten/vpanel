@@ -19,6 +19,14 @@ class APITemplate {
 		return $u;
 	}
 
+	private function parseBeitrag($beitrag) {
+		$b = array();
+		$b["beitragid"] = $beitrag->getBeitragID();
+		$b["label"] = $beitrag->getLabel();
+		$b["hoehe"] = $beitrag->getHoehe();
+		return $b;
+	}
+
 	private function parseMitgliedBeitragList($rows) {
 		return array_map(array($this, 'parseMitgliedBeitrag'), $rows);
 	}
