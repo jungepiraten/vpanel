@@ -27,6 +27,14 @@ class APITemplate {
 		return $u;
 	}
 
+	protected function parseMitgliedschaft($mitgliedschaft) {
+	        $m = array();
+		$m["mitgliedschaftid"] = $mitgliedschaft->getMitgliedschaftID();
+		$m["label"] = $mitgliedschaft->getLabel();
+		$m["description"] = $mitgliedschaft->getDescription();
+		return $m;
+	}
+
 	private function parseBeitrag($beitrag) {
 		$b = array();
 		$b["beitragid"] = $beitrag->getBeitragID();
@@ -69,6 +77,7 @@ class APITemplate {
 	private function parseMitgliedRevision($revision) {
 		$r = array();
 		$r["gliederung"] = $this->parseGliederung($revision->getGliederung());
+		$r["mitgliedschaft"] = $this->parseMitgliedschaft($revision->getMitgliedschaft());
 		if ($revision->isNatPerson()) {
 			$r["natperson"] = array();
 		}
