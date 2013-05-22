@@ -79,12 +79,30 @@ class APITemplate {
 		$r["gliederung"] = $this->parseGliederung($revision->getGliederung());
 		$r["mitgliedschaft"] = $this->parseMitgliedschaft($revision->getMitgliedschaft());
 		if ($revision->isNatPerson()) {
-			$r["natperson"] = array();
+			$r["natperson"] = $this->parseNatPerson($revision->getNatPerson());
 		}
 		if ($revision->isJurPerson()) {
-			$r["jurperson"] = array();
+			$r["jurperson"] = $this->parseJurPerson($revision->getJurPerson());
 		}
 		return $r;
+	}
+
+	private function parseNatPerson($natperson) {
+		$row = array();
+		$row["natpersonid"] = $natperson->getNatPersonID();
+		$row["anrede"] = $natperson->getAnrede();
+		$row["vorname"] = $natperson->getVorname();
+		$row["name"] = $natperson->getName();
+		$row["geburtsdatum"] = $natperson->getGeburtsdatum();
+		$row["nationalitaet"] = $natperson->getNationalitaet();
+		return $row;
+	}
+
+	private function parseJurPerson($jurperson) {
+		$row = array();
+		$row["jurpersonid"] = $jurperson->getJurPersonID();
+		$row["label"] = $jurperson->getLabel();
+		return $row;
 	}
 
 	private function parseMitglied($mitglied) {
