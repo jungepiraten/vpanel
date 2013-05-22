@@ -84,7 +84,68 @@ class APITemplate {
 		if ($revision->isJurPerson()) {
 			$r["jurperson"] = $this->parseJurPerson($revision->getJurPerson());
 		}
+		$r["kontakt"] = $this->parseKontakt($revision->getKontakt());
+		$r["beitrag"] = $revision->getBeitrag();
+		$r["geloescht"] = $revision->isGeloescht();
+		$r["kommentar"] = $revision->getKommentar();
 		return $r;
+	}
+
+	private function parseKontakt($kontakt) {
+		$row = array();
+		$row["kontaktid"] = $kontakt->getKontaktID();
+		$row["adresszusatz"] = $kontakt->getAdresszusatz();
+		$row["strasse"] = $kontakt->getStrasse();
+		$row["hausnummer"] = $kontakt->getHausnummer();
+		$row["ort"] = $this->parseOrt($kontakt->getOrt());
+		$row["telefon"] = $kontakt->getTelefonnummer();
+		$row["handy"] = $kontakt->getHandynummer();
+		$row["email"] = $this->parseEMail($kontakt->getEMail());
+		if ($kontakt->hasKonto()) {
+			$row["konto"] = $this->parseKonto($kontakt->getKonto());
+		}
+		return $row;
+	}
+
+	private function parseOrt($ort) {
+		$row = array();
+		$row["ortid"] = $ort->getOrtID();
+		$row["label"] = $ort->getLabel();
+		$row["plz"] = $ort->getPLZ();
+		$row["state"] = $this->parseState($ort->getState());
+		return $row;
+	}
+
+	private function parseState($state) {
+		$row = array();
+		$row["stateid"] = $state->getStateID();
+		$row["label"] = $state->getLabel();
+		$row["population"] = $state->getPopulation();
+		$row["country"] = $this->parseCountry($state->getCountry());
+		return $row;
+	}
+
+	private function parseCountry($country) {
+		$row = array();
+		$row["countryid"] = $country->getCountryID();
+		$row["label"] = $country->getLabel();
+		return $row;
+	}
+
+	private function parseEMail($email) {
+		$row = array();
+		$row["emailid"] = $email->getEMailID();
+		$row["email"] = $email->getEMail();
+		return $row;
+	}
+
+	private function parseKonto($konto) {
+		$row = array();
+		$row["kontoid"] = $konto->getKontoID();
+		$row["inhaber"] = $konto->getInhaber();
+		$row["iban"] = $konto->getIBan();
+		$row["bic"] = $konto->getBIC();
+		return $row;
 	}
 
 	private function parseNatPerson($natperson) {
