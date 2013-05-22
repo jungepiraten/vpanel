@@ -74,6 +74,18 @@ class APITemplate {
 		return $m;
 	}
 
+	private function parseResult($result) {
+		if (is_array($result)) {
+			return array_map(array($this, "parseResult"), $result);
+		} else if ($result instanceof Gliederung) {
+			return $this->parseGliederung($result);
+		} else if ($result instanceof User) {
+			return $this->parseUser($result);
+		} else if ($result instanceof Mitglied) {
+			return $this->parseMitglied($result);
+		}
+	}
+
 	public function output($result = null, $httpcode = 200) {
 		$data = array();
 		if ($this->session->isActive()) {
@@ -81,7 +93,7 @@ class APITemplate {
 			$data["challenge"] = $this->session->getChallenge();
 		}
 		if ($result != null) {
-			$data["result"] = $result;
+			$data["result"] = $this->parseResult($result);
 		}
 		header("Status: " . $httpcode, true, $httpcode);
 		print(json_encode($data));
