@@ -7,6 +7,14 @@ class APITemplate {
 		$this->session = $session;
 	}
 
+	private function parseTimestamp($timestamp) {
+		return strftime("%Y-%m-%d %T", $timestamp);
+	}
+
+	private function parseDatestamp($datestamp) {
+		return strftime("%Y-%m-%d", $datestamp);
+	}
+
 	private function parseGliederung($gliederung) {
 		$g = array();
 		$g["gliederungid"] = $gliederung->getGliederungID();
@@ -52,7 +60,7 @@ class APITemplate {
 			$b["user"] = $this->parseUser($buchung->getUser());
 		}
 		if ($buchung->getTimestamp() != null) {
-			$b["timestamp"] = $buchung->getTimestamp();
+			$b["timestamp"] = $this->parseTimestamp($buchung->getTimestamp());
 		}
 		$b["hoehe"] = $buchung->getHoehe();
 		return $b;
@@ -73,9 +81,9 @@ class APITemplate {
 	private function parseMitglied($mitglied) {
 		$m = array();
 		$m["mitgliedid"] = $mitglied->getMitgliedID();
-		$m["eintritt"] = $mitglied->getEintrittsdatum();
+		$m["eintritt"] = $this->parseDatestamp($mitglied->getEintrittsdatum());
 		if ($mitglied->isAusgetreten()) {
-			$row["austritt"] = $mitglied->getAustrittsdatum();
+			$row["austritt"] = $this->parseDatestamp($mitglied->getAustrittsdatum());
 		}
 		$m["beitraege"] = $this->parseMitgliedBeitragList($mitglied->getBeitragList());
 		$m["latest"] = $this->parseMitgliedRevision($mitglied->getLatestRevision());
