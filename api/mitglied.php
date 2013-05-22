@@ -17,7 +17,7 @@ if ($mitglied == null) {
 	exit;
 }
 
-if (!$session->isAllowed("mitglieder_details", $mitglied->getLatestRevision()->getGliederungID())) {
+if (!$session->isAllowed("mitglieder_show", $mitglied->getLatestRevision()->getGliederungID())) {
 	$api->output(array("failed" => "PERMISSION_DENIED"), 403);
 	exit;
 }
