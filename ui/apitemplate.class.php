@@ -61,10 +61,10 @@ class APITemplate {
 	private function parseMitgliedRevision($revision) {
 		$r = array();
 		$r["gliederung"] = $this->parseGliederung($revision->getGliederung());
-		if ($mitglied->isNatPerson()) {
+		if ($revision->isNatPerson()) {
 			$r["natperson"] = array();
 		}
-		if ($mitglied->isJurPerson()) {
+		if ($revision->isJurPerson()) {
 			$r["jurperson"] = array();
 		}
 		return $r;
