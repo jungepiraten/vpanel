@@ -54,6 +54,10 @@ class MitgliedDokumentTemplate extends DefaultDokumentTemplate {
 		return $this->getLabelPrefix($session) . " " . $this->getVorname($session) . " " . $this->getName($session);
 	}
 
+	public function postCreateHook($session, $dokument, $revision) {
+		$this->getStorage()->addMitgliedDokument($this->getMitglied($session)->getMitgliedID(), $dokument->getDokumentID());
+	}
+
 	public function getDokumentFile($session) {
 		return $session->getFileVariable("file");
 	}

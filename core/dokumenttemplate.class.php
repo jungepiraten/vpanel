@@ -26,6 +26,8 @@ abstract class DokumentTemplate extends GliederungAktion {
 	abstract public function getDokumentFile($session);
 	abstract public function getDokumentData($session);
 	abstract public function getDokumentKommentar($session);
+
+	public function postCreateHook($session, $dokument, $revision) {}
 }
 
 ?>

@@ -108,6 +108,11 @@ case "create":
 			$revision->save();
 			$revision->notify();
 
+			// Nachdem wir alle IDs haben ggf. Nachbehandlung
+			$dokumenttemplate->postCreateHook($session, $dokument, $revision);
+			$dokument->save();
+			$revision->save();
+
 			$ui->redirect($session->getLink("dokumente_details", $dokument->getDokumentID()));
 		}
 	}

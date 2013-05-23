@@ -56,6 +56,11 @@ if ($file == null) {
 	$revision->save();
 	$revision->notify();
 
+	// Nachdem wir alle IDs haben ggf. Nachbehandlung
+	$dokumenttemplate->postCreateHook($session, $dokument, $revision);
+	$dokument->save();
+	$revision->save();
+
 	$api->output(array("success" => "1"));
 }
 

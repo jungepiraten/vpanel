@@ -2007,6 +2007,7 @@ abstract class SQLStorage extends AbstractStorage {
 			$sql = "INSERT INTO `dokument` () VALUES ()";
 		} else {
 			$sql = "UPDATE `dokument`
+				SET    `dokumentid` = " . intval($dokumentid) . "
 				WHERE `dokumentid` = " . intval($dokumentid);
 		}
 		$this->query($sql);
