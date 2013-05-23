@@ -987,6 +987,8 @@ class Template {
 		$this->smarty->assign("dokumenttemplate", $this->parseDokumentTemplate($dokumenttemplate));
 		if ($dokumenttemplate instanceof NatPersonDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_person.html.tpl");
+		} else if ($dokumenttemplate instanceof MitgliedDokumentTemplate) {
+			$this->smarty->display("dokumentcreate_mitglied.html.tpl");
 		} else if ($dokumenttemplate instanceof RechnungDokumentTemplate) {
 			$this->smarty->assign("partnerfield", $dokumenttemplate->getPartnerFieldLabel());
 			$this->smarty->assign("rechnungfield", $dokumenttemplate->getRechnungFieldLabel());

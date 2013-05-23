@@ -1,76 +1,75 @@
 <?php
 
-require_once(VPANEL_DOKUMENTTEMPLATES . "/person.class.php");
+require_once(VPANEL_DOKUMENTTEMPLATES . "/default.class.php");
 
-class MitgliedDokumentTemplate extends NatPersonDokumentTemplate {
-	private function getAdresszusatz($session) {
-		return $session->getVariable("adresszusatz");
+class MitgliedDokumentTemplate extends DefaultDokumentTemplate {
+	private $labelPrefix;
+
+	public function __construct($templateid, $label, $permission, $gliederungid, $kategorieid, $statusid, $flags, $identifierPrefix, $labelPrefix) {
+		parent::__construct($templateid, $label, $permission, $gliederungid, $kategorieid, $statusid, $flags, $identifierPrefix, 1);
+		$this->labelPrefix = $labelPrefix;
 	}
 
-	private function getStrasse($session) {
-		return $session->getVariable("strasse");
+	private function getLabelPrefix($session) {
+		return $this->labelPrefix;
 	}
 
-	private function getHausnummer($session) {
-		return $session->getVariable("hausnummer");
+	private function getMitglied($session) {
+		return $session->getStorage()->getMitglied($session->getIntVariable("mitgliedid"));
 	}
 
-	private function getPLZ($session) {
-		return $session->getVariable("plz");
+	private function getNatPerson($session) {
+		return $this->getMitglied($session)->getLatestRevision()->getNatPerson();
 	}
 
-	private function getOrt($session) {
-		return $session->getVariable("ort");
+	private function getAnrede($session) {
+		return $this->getNatPerson($session)->getAnrede();
 	}
 
-	private function getTelefonnummer($session) {
-		return $session->getVariable("telefon");
+	private function getVorname($session) {
+		return $this->getNatPerson($session)->getVorname();
 	}
 
-	private function getHandynummer($session) {
-		return $session->getVariable("handy");
+	private function getName($session) {
+		return $this->getNatPerson($session)->getName();
 	}
 
-	private function getEMailAdresse($session) {
-		return $session->getVariable("email");
+	private function getGeburtsdatum($session) {
+		return $this->getNatPerson($session)->getGeburtsdatum();
 	}
 
-	private function getIBan($session) {
-		return $session->getVariable("iban");
+	private function getNationalitaet($session) {
+		return $this->getNatPerson($session)->getNationalitaet();
 	}
 
-	private function getBeitrag($session) {
-		return $session->getVariable("beitrag");
+	private function formatIdentifierName($value) {
+		return strtoupper(substr(str_replace(array('ä', 'ö', 'ü', 'ß'), array('ae', 'oe', 'ue', 'ss'), strtolower($value)), 0, 3));
 	}
 
-	private function getBeitragTimeFormatID($session) {
-		return $session->getIntVariable("beitragtimeformatid");
+	protected function getIdentifierPrefix($session) {
+		return parent::getIdentifierPrefix($session) . $this->formatIdentifierName($this->getName($session)) . "_" . $this->formatIdentifierName($this->getVorname($session)) . "_" . date("Ymd", $this->getGeburtsdatum($session));
 	}
 
-	private function getFlags($session) {
-		return array_keys($session->getListVariable("flags"));
+	public function getDokumentLabel($session) {
+		return $this->getLabelPrefix($session) . " " . $this->getVorname($session) . " " . $this->getName($session);
 	}
 
-	private function getTextFields($session) {
-		return $session->getListVariable("textfields");
+	public function getDokumentFile($session) {
+		return $session->getFileVariable("file");
 	}
 
 	public function getDokumentData($session) {
-		$array = parent::getDokumentData($session);
-		$array["addresszusatz"] = $this->getAdresszusatz($session);
-		$array["strasse"] = $this->getStrasse($session);
-		$array["hausnummer"] = $this->getHausnummer($session);
-		$array["plz"] = $this->getPLZ($session);
-		$array["ort"] = $this->getOrt($session);
-		$array["telefon"] = $this->getTelefonnummer($session);
-		$array["handy"] = $this->getHandynummer($session);
-		$array["email"] = $this->getEMailAdresse($session);
-		$array["iban"] = $this->getIBan($session);
-		$array["beitrag"] = $this->getBeitrag($session);
-		$array["beitragtimeformatid"] = $this->getBeitragTimeFormatID($session);
-		$array["flags"] = array_flip($this->getFlags($session));
-		$array["textfields"] = $this->getTextFields($session);
-		return $array;
+		return array(	"gliederungid"		=> $this->getDokumentGliederungID($session),
+				"natperson"		=> true,
+				"anrede"		=> $this->getAnrede($session),
+				"vorname"		=> $this->getVorname($session),
+				"name"			=> $this->getName($session),
+				"nationalitaet"		=> $this->getNationalitaet($session),
+				"geburtsdatum"		=> date("Y-m-d", $this->getGeburtsdatum($session)) );
+	}
+
+	public function getDokumentKommentar($session) {
+		return $session->getVariable("kommentar");
 	}
 }
 
