@@ -288,7 +288,7 @@ class Template {
 		$row["filterid"] = $this->session->addMitgliederMatcher(new MitgliedMitgliederMatcher($mitglied->getMitgliedID()))->getFilterID();
 		$row["globalid"] = $mitglied->getGlobalID();
 		$row["eintritt"] = $mitglied->getEintrittsdatum();
-		if ($mitglied->isAusgetreten()) {
+		if ($mitglied->hasAustrittsdatum()) {
 			$row["austritt"] = $mitglied->getAustrittsdatum();
 		}
 		$row["beitraege"] = $this->parseMitgliedBeitragList($mitglied->getBeitragList(), $row);
