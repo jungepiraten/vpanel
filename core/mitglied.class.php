@@ -47,7 +47,7 @@ class Mitglied extends GlobalClass {
 	}
 
 	public function isAusgetreten() {
-		return $this->austrittsdatum != null;
+		return $this->austrittsdatum != null && $this->austrittsdatum < time();
 	}
 
 	public function isMitglied() {
