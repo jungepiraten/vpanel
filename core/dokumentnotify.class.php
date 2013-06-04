@@ -158,6 +158,10 @@ Identifikation: {$revision->getIdentifier()}
 Titel:          {$revision->getLabel()}
 Kommentar:      {$revision->getKommentar()}
 
+Wichtig: Bitte beantworte diese Mail nicht und schliesse das Ticket nicht!
+Bearbeite das Dokument im VPanel (über o.g. Link), dann wird das Ticket
+automatisch geschlossen!
+
 Viele Grüße,
 
 VPanel
