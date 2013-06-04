@@ -2,7 +2,7 @@
 
 require_once(VPANEL_CORE . "/storageobject.class.php");
 
-class Mail extends StorageObject {
+class Mail extends StorageClass {
 	private $backend;
 
 	private $headers;

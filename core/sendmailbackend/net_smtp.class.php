@@ -11,7 +11,7 @@ class NetSMTPSendMailBackend extends SendMailBackend {
 		$this->conn = new Net_SMTP($host, $port, $helo);
 	}
 
-	protected function sendMail(Mail $mail) {
+	public function send(Mail $mail) {
 		$this->conn->connect();
 		$this->conn->mailFrom($mail->getBounceAddress());
 		$this->conn->rcptTo($mail->getRecipient()->getEMail());
