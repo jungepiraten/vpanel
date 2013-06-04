@@ -189,7 +189,7 @@ EOT
 );
 			}
 			$mail->addAttachment($revision->getFile());
-			$config->getSendMailBackend()->send($mail);
+			$config->sendMail($mail);
 		}
 	}
 }

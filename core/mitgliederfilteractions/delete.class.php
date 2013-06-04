@@ -38,7 +38,6 @@ class DeleteMitgliederFilterAction extends MitgliederFilterAction {
 
 			if ($mailtemplate != null) {
 				$p2 = new MitgliederFilterSendMailProcess($session->getStorage());
-				$p2->setBackend($config->getSendMailBackend());
 				$p2->setTemplate($mailtemplate);
 				$process->addProcess($p2);
 			}

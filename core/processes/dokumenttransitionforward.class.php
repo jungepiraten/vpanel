@@ -69,7 +69,7 @@ VPanel
 EOT
 );
 		$mail->addAttachment($dokument->getLatestRevision()->getFile());
-		$config->getSendMailBackend()->send($mail);
+		$config->sendMail($mail);
 	}
 
 	public function finalizeProcess() {

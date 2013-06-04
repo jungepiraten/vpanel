@@ -60,7 +60,6 @@ class SendMailMitgliederFilterAction extends MitgliederFilterAction {
 			return array("sendmail" => "preview", "mailtemplatecode" => $mailtemplatecode, "mail" => $mail);
 		case "send":
 			$process = new MitgliederFilterSendMailProcess($session->getStorage());
-			$process->setBackend($config->getSendMailBackend());
 			$process->setTemplate($mailtemplate);
 			return $this->executeProcess($session, $process, $filter, $matcher);
 		}

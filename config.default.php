@@ -75,7 +75,10 @@ class DefaultConfig {
 	public function setSendMailBackend($sendmailbackend) {
 		$this->sendmailbackend = $sendmailbackend;
 	}
-	public function getSendMailBackend() {
+	public function sendMail(Mail $mail) {
+		$this->getSendMailBackend()->send($mail);
+	}
+	private function getSendMailBackend() {
 		return $this->sendmailbackend;
 	}
 	public function addGlobalMailHeader($field, $value) {
