@@ -1,6 +1,10 @@
 <?php
 
-class Mail {
+require_once(VPANEL_CORE . "/storageobject.class.php");
+
+class Mail extends StorageObject {
+	private $backend;
+
 	private $headers;
 	private $body;
 	private $attachments;
@@ -9,10 +13,20 @@ class Mail {
 	private $recipient;
 	private $bounceaddress;
 
-	public function __construct($headers = array(), $body = "", $attachments = array()) {
+	public function __construct(Storage $storage, $headers = array(), $body = "", $attachments = array()) {
+		parent::__construct($storage);
+
 		$this->headers = $headers;
 		$this->body = $body;
 		$this->attachments = $attachments;
+	}
+
+	private function getBackend() {
+		return $this->backend;
+	}
+
+	public function setBackend($backend) {
+		$this->backend = $backend;
 	}
 
 	public function setRecipient($mail) {
@@ -70,6 +84,14 @@ class Mail {
 			$this->boundary = "---vpanel" . md5(microtime());
 		}
 		return $this->boundary;
+	}
+
+	public function send() {
+		$this->getBackend()->send($this);
+
+		// To detect if we get new bounces
+		$this->getRecipient()->setLastSend(time());
+		$this->getRecipient()->save();
 	}
 
 	/**

@@ -144,7 +144,7 @@ function parseMitgliederFormular($ui, $session, &$mitglied = null, $dokument = n
 		$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("mailtemplateid"));
 		if ($mailtemplate != null) {
 			$mail = $mailtemplate->generateMail($mitglied);
-			$config->sendMail($mail);
+			$mail->send();
 		}
 	}
 }
@@ -255,7 +255,7 @@ case "beitraege_buchungen":
 				$mailtemplate = $session->getStorage()->getMailTemplate($session->getVariable("mailtemplateid"));
 				if ($mailtemplate != null) {
 					$mail = $mailtemplate->generateMail($beitrag->getMitglied());
-					$config->sendMail($mail);
+					$mail->send();
 				}
 			}
 			$ui->redirect();

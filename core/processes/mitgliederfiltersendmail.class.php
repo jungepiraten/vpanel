@@ -28,9 +28,8 @@ class MitgliederFilterSendMailProcess extends MitgliederFilterProcess {
 	}
 
 	protected function runProcessStep($mitglied) {
-		global $config;
 		$mail = $this->getTemplate()->generateMail($mitglied);
-		$config->sendMail($mail);
+		$mail->send();
 	}
 }
 

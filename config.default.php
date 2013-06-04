@@ -75,9 +75,6 @@ class DefaultConfig {
 	public function setSendMailBackend($sendmailbackend) {
 		$this->sendmailbackend = $sendmailbackend;
 	}
-	public function sendMail(Mail $mail) {
-		$this->getSendMailBackend()->send($mail);
-	}
 	private function getSendMailBackend() {
 		return $this->sendmailbackend;
 	}
@@ -94,7 +91,7 @@ class DefaultConfig {
 		return "vpanel@" . $this->getHostPart();
 	}
 	public function createMail($email) {
-		$mail = new Mail();
+		$mail = new Mail($this->getStorage());
 		$mail->setRecipient($email);
 		$mail->setBounceAddress($this->getBounceAddress($email));
 		$mail->setHeader("From", $this->getFromMailAddress());
@@ -102,6 +99,7 @@ class DefaultConfig {
 		foreach ($this->getGlobalMailHeader() as $header) {
 			$mail->setHeader($header["field"], $header["value"]);
 		}
+		$mail->setBackend($this->getSendMailBackend());
 		return $mail;
 	}
 }
