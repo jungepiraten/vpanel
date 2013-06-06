@@ -132,7 +132,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "RolePermission");
 	}
 	public function getRolePermissionResult($roleid) {
-		$sql = "SELECT `roleid`, `permissionid`, `gliederungid`, `transitive` FROM `rolepermissions` WHERE `roleid` = '" . $this->escape($roleid) . "'";
+		$sql = "SELECT `roleid`, `permissionid`, `gliederungid`, `transitive` FROM `rolepermissions` WHERE `roleid` = '" . intval($roleid) . "'";
 		return $this->getResult($sql, array($this, "parseRolePermission"));
 	}
 	public function setRolePermissionList($roleid, $permissions) {
