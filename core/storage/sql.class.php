@@ -1325,7 +1325,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "Kontakt");
 	}
 	public function getKontakt($kontaktid) {
-		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid`, `kontoid` FROM `kontakt` WHERE `kontaktid` = " . intval($kontaktid);
+		$sql = "SELECT `kontaktid`, `adresszusatz`, `strasse`, `hausnummer`, `ortid`, `telefonnummer`, `handynummer`, `emailid`, `kontoid` FROM `kontakte` WHERE `kontaktid` = " . intval($kontaktid);
 		return $this->getResult($sql, array($this, "parseKontakt"))->fetchRow();
 	}
 	public function setKontakt($kontaktid, $adresszusatz, $strasse, $hausnummer, $ortid, $telefon, $handy, $emailid, $kontoid) {
