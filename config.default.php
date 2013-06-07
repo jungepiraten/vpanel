@@ -38,7 +38,7 @@ class DefaultConfig {
 	}
 
 	public function getWebRoot() {
-		return "http://" . $this->getHostPart() . "/";
+		return "http" . (isset($_SERVER["HTTPS"]) ? "s" : "") . "://" . $this->getHostPart() . "/";
 	}
 
 	/** Mehrsprachen-Support **/
