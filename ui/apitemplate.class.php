@@ -187,6 +187,8 @@ class APITemplate {
 			return $this->parseUser($result);
 		} else if ($result instanceof Mitglied) {
 			return $this->parseMitglied($result);
+		} else {
+			return $result;
 		}
 	}
 
