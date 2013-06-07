@@ -1,6 +1,7 @@
 <?php
 
 require_once(VPANEL_PROCESSES . "/mitgliederfilter.class.php");
+require_once(VPANEL_TEXTREPLACER . "/mitglied.class.php");
 
 require_once(VPANEL_CORE . "/graph.class.php");
 require_once(VPANEL_CORE . "/chart.class.php");
@@ -131,8 +132,10 @@ class MitgliederFilterStatistikProcess extends MitgliederFilterProcess {
 			// Bis zum Ende des Graphen noch nicht Ausgetreten
 			if ($mitglied->getAustrittsdatum() == null || $mitglied->getAustrittsdatum() > $this->getMitgliederCountEnd()) {
 				$revision = $mitglied->getLatestRevision();
+				$replacer = new MitgliedTextReplacer($mitglied);
+
 				foreach ($this->factors as $i => $factorString) {
-					$mitgliedString = $mitglied->replaceText($factorString);
+					$mitgliedString = $replacer->replaceText($factorString);
 					$this->santizeArray($this->mitgliederFactorCount[$i], $mitgliedString);
 					$this->mitgliederFactorCount[$i][$mitgliedString] ++;
 				}

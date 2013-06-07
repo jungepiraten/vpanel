@@ -1,6 +1,7 @@
 <?php
 
 require_once(VPANEL_PROCESSES . "/mitgliederfilter.class.php");
+require_once(VPANEL_TEXTREPLACER . "/mitglied.class.php");
 
 class MitgliederFilterSendMailProcess extends MitgliederFilterProcess {
 	private $templateid;
@@ -28,7 +29,8 @@ class MitgliederFilterSendMailProcess extends MitgliederFilterProcess {
 	}
 
 	protected function runProcessStep($mitglied) {
-		$mail = $this->getTemplate()->generateMail($mitglied);
+		$replacer = new MitgliedTextReplacer($mitglied);
+		$mail = $this->getTemplate()->generateMail($mitglied->getLatestRevision()->getKontakt()->getEMail(), $replacer);
 		$mail->send();
 	}
 }

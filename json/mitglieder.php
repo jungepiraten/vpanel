@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . "/../config.inc.php");
+require_once(VPANEL_TEXTREPLACER . "/mitglied.class.php");
 
 require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
@@ -20,6 +21,7 @@ $mitglieder = $session->getStorage()->getMitgliederList($matcher, 5);
 $jsons = array();
 
 foreach ($mitglieder as $mitglied) {
+	$replacer = new MitgliedTextReplacer($mitglied);
 	$revision = $mitglied->getLatestRevision();
 
 	$row = array();
@@ -28,11 +30,7 @@ foreach ($mitglieder as $mitglied) {
 	if ($mitglied->isAusgetreten()) {
 		$row["austritt"] = true;
 	}
-	if ($revision->isJurPerson()) {
-		$row["label"] = $revision->getJurPerson()->getLabel();
-	} else if ($revision->isNatPerson()) {
-		$row["label"] = $revision->getNatPerson()->getVorname() . " " . $revision->getNatPerson()->getName();
-	}
+	$row["label"] = $replacer->replaceText("{BEZEICHNER}");
 
 	$jsons[] = $row;
 }

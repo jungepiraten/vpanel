@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . "/../config.inc.php");
+require_once(VPANEL_TEXTREPLACER . "/mitglied.class.php");
 
 require_once(VPANEL_UI . "/session.class.php");
 $session = $config->getSession();
@@ -16,11 +17,13 @@ $revisionen = $session->getStorage()->getMitgliederRevisionListTimeline($session
 $jsons = array();
 
 foreach ($revisionen as $revision) {
+	$mitgliedreplacer = new MitgliedTextReplacer($revision->getMitglied());
+
 	$row = array();
 	$row["timestamp"] = $revision->getTimestamp();
 	$row["revisionid"] = $revision->getRevisionID();
 	$row["mitgliedid"] = $revision->getMitgliedID();
-	$row["mitgliedlabel"] = $revision->getMitglied()->replaceText("{BEZEICHNUNG}");
+	$row["mitgliedlabel"] = $mitgliedreplacer->replaceText("{BEZEICHNUNG}");
 	$row["userid"] = $revision->getUserID();
 	if ($revision->getUser() !== null) {
 		$row["username"] = $revision->getUser()->getUsername();

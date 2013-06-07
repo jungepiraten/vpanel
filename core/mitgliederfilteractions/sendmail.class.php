@@ -2,6 +2,7 @@
 
 require_once(VPANEL_CORE . "/mailtemplate.class.php");
 require_once(VPANEL_CORE . "/mitgliederfilteraction.class.php");
+require_once(VPANEL_TEXTREPLACER . "/mitglied.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfiltersendmail.class.php");
 
 class SendMailMitgliederFilterAction extends MitgliederFilterAction {
@@ -55,7 +56,8 @@ class SendMailMitgliederFilterAction extends MitgliederFilterAction {
 		case "preview":
 			$mitgliedercount = $session->getStorage()->getMitgliederCount($filter);
 			$mitglied = array_shift($session->getStorage()->getMitgliederList($filter, 1, rand(0,$mitgliedercount-1)));
-			$mail = $mailtemplate->generateMail($mitglied);
+			$replacer = new MitgliedTextReplacer($mitglied);
+			$mail = $mailtemplate->generateMail($mitglied->getLatestRevision()->getKontakt()->getEMail(), $replacer);
 
 			return array("sendmail" => "preview", "mailtemplatecode" => $mailtemplatecode, "mail" => $mail);
 		case "send":

@@ -1,6 +1,7 @@
 <?php
 
 require_once(VPANEL_PROCESSES . "/dokumenttransition.class.php");
+require_once(VPANEL_TEXTREPLACER . "/mitglied.class.php");
 
 class DokumentTransaktionMitgliedLinkProcess extends DokumentTransitionProcess {
 	private $mitgliedid;
@@ -43,7 +44,8 @@ class DokumentTransaktionMitgliedLinkProcess extends DokumentTransitionProcess {
 	}
 
 	public function getKommentar() {
-		return $this->getMitglied()->replaceText(parent::getKommentar());
+		$replacer = new MitgliedTextReplacer($this->getMitglied());
+		return $replacer->replaceText(parent::getKommentar());
 	}
 
 	public function initProcess() {

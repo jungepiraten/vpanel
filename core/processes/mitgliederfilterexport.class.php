@@ -1,6 +1,7 @@
 <?php
 
 require_once(VPANEL_PROCESSES . "/mitgliederfilter.class.php");
+require_once(VPANEL_TEXTREPLACER . "/mitglied.class.php");
 
 class MitgliederFilterExportProcess extends MitgliederFilterProcess {
 	private $fields = array();
@@ -46,8 +47,9 @@ class MitgliederFilterExportProcess extends MitgliederFilterProcess {
 
 	protected function runProcessStep($mitglied) {
 		$row = array();
+		$replacer = new MitgliedTextReplacer($mitglied);
 		foreach ($this->getFields() as $field => $template) {
-			$row[$field] = $mitglied->replaceText($template);
+			$row[$field] = $replacer->replaceText($template);
 		}
 		$this->getStreamHandler()->writeFile($row);
 	}

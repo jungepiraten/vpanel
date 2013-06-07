@@ -154,23 +154,23 @@ class MailTemplate extends StorageClass {
 		$this->getAttachments();
 		$this->attachments[$attachment->getFileID()] = $attachment;
 	}
-	
-	public function generateMail(Mitglied $mitglied) {
+
+	public function generateMail(EMail $recipient, TextReplacer $replacer) {
 		global $config;
-		$mail = $config->createMail($mitglied->getLatestRevision()->getKontakt()->getEMail());
-		
+		$mail = $config->createMail($recipient);
+
 		$headers = array();
 		foreach ($this->getHeaders() as $header) {
-			$mail->setHeader($header->getField(), $mitglied->replaceText($header->getValue()));
+			$mail->setHeader($header->getField(), $replacer->replaceText($header->getValue()));
 		}
 
 		$body = $this->getBody();
-		$mail->setBody($mitglied->replaceText($body));
+		$mail->setBody($replacer->replaceText($body));
 
 		foreach ($this->getAttachments() as $attachment) {
 			$mail->addAttachment($attachment);
 		}
-		
+
 		return $mail;
 	}
 }

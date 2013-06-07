@@ -10,6 +10,7 @@ define("VPANEL_DOKUMENTTEMPLATES",		VPANEL_CORE . "/dokumenttemplates");
 define("VPANEL_DOKUMENTTRANSITIONEN",		VPANEL_CORE . "/dokumenttransitionen");
 define("VPANEL_SENDMAILBACKEND",		VPANEL_CORE . "/sendmailbackend");
 define("VPANEL_STREAMHANDLERS",			VPANEL_CORE . "/streamhandlers");
+define("VPANEL_TEXTREPLACER",			VPANEL_CORE . "/textreplacer");
 define("VPANEL_PROCESSES",			VPANEL_CORE . "/processes");
 define("VPANEL_UI",				VPANEL_ROOT . "/ui");
 define("VPANEL_LANGUAGE",			VPANEL_UI . "/language");

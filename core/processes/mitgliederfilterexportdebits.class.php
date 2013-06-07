@@ -1,6 +1,7 @@
 <?php
 
 require_once(VPANEL_PROCESSES . "/mitgliederfilter.class.php");
+require_once(VPANEL_TEXTREPLACER . "/mitglied.class.php");
 
 class MitgliederFilterExportDebitsProcess extends MitgliederFilterProcess {
 	private $streamhandler;
@@ -88,9 +89,11 @@ class MitgliederFilterExportDebitsProcess extends MitgliederFilterProcess {
 
 	private function handleMitgliedBeitrag($mitglied, $mitgliedbeitrag) {
 		if ($mitgliedbeitrag->getRemainingHoehe() > 0) {
+			$mitgliedreplacer = new MitgliedTextReplace($mitglied);
+
 			$row = array();
 			$row["mitgliedid"] = $mitglied->getMitgliedID();
-			$row["mitglied"] = $mitglied->replaceText("{BEZEICHNUNG}");
+			$row["mitglied"] = $mitgliedreplacer->replaceText("{BEZEICHNUNG}");
 			$row["kontoinhaber"] = $mitglied->getLatestRevision()->getKontakt()->getKonto()->getInhaber();
 			$row["iban"] = $mitglied->getLatestRevision()->getKontakt()->getKonto()->getIBan();
 			$row["bic"] = $mitglied->getLatestRevision()->getKontakt()->getKonto()->getBIC();
