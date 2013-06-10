@@ -894,6 +894,9 @@ class Template {
 		} else {
 			$this->smarty->assign("filterid", null);
 		}
+		if ($action instanceof UnDeleteMitgliederFilterAction) {
+			$this->smarty->display("mitgliederundeleteform.html.tpl");
+		}
 		if ($action instanceof DeleteMitgliederFilterAction) {
 			$this->smarty->assign("mailtemplates", $this->parseMailTemplates($result["mailtemplates"]));
 			if ($result["mailtemplate"] != null) {
