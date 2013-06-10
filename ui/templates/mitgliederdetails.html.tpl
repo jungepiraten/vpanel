@@ -99,7 +99,13 @@
 						{/if}
 						{if $revision.kontakt.email != ""}
 							{if !isset($revisionemail) || $revisionemail != $revision.kontakt.email.email}{assign var=revisionemail value=$revision.kontakt.email.email}
-								<li>{"EMail-Adresse auf %s gesetzt"|__:$revision.kontakt.email.email}</li>{/if}
+								<li>
+									{"EMail-Adresse auf %s gesetzt"|__:$revision.kontakt.email.email}
+									{if count($revision.kontakt.email.bounces) > 0}
+										(<a href="{"mitglieder_bouncelist"|___:$revision.revisionid}'">{$revision.kontakt.email.bounces|@count} Bounces</a>)
+									{/if}
+								</li>
+							{/if}
 						{else}
 							{if isset($revisionemail) && $revisionemail != $revision.kontakt.email.email}{assign var=revisionemail value=$revision.kontakt.email.email}
 								<li>{"EMail-Adresse entfernt"|__:$revision.kontakt.email.email}</li>{/if}
