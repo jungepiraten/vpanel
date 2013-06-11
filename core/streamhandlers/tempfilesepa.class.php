@@ -50,7 +50,7 @@ class SepaTempFileStreamHandler extends TempFileStreamHandler {
 		$this->handler->messageIdentification = uniqid();
 		$this->handler->initiatingPartyName = $this->name;
 
-		$this->handler->addPaymentTransfer(array(
+		$this->handler->addPaymentInfo(array(
 			"id"			=> uniqid(),
 			"debtorName"		=> $this->name,
 			"debtorAccountIBAN"	=> $this->iban,
