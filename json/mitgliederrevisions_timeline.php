@@ -17,13 +17,11 @@ $revisionen = $session->getStorage()->getMitgliederRevisionListTimeline($session
 $jsons = array();
 
 foreach ($revisionen as $revision) {
-	$mitgliedreplacer = new MitgliedTextReplacer($revision->getMitglied());
-
 	$row = array();
 	$row["timestamp"] = $revision->getTimestamp();
 	$row["revisionid"] = $revision->getRevisionID();
 	$row["mitgliedid"] = $revision->getMitgliedID();
-	$row["mitgliedlabel"] = $mitgliedreplacer->replaceText("{BEZEICHNUNG}");
+	$row["mitgliedlabel"] = $revision->getBezeichnung();
 	$row["userid"] = $revision->getUserID();
 	if ($revision->getUser() !== null) {
 		$row["username"] = $revision->getUser()->getUsername();

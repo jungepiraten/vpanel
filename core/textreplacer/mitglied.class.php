@@ -72,6 +72,8 @@ class MitgliedTextReplacer extends VariableTextReplacer {
 			return $revision->getMitgliedschaft()->getLabel();
 		case "SCHULDEN":
 			return $this->mitglied->getSchulden();
+		case "BEZEICHNUNG":
+			return $revision->getBezeichnung();
 		}
 		if ($revision->isNatPerson()) {
 			$natperson = $revision->getNatPerson();
@@ -84,8 +86,6 @@ class MitgliedTextReplacer extends VariableTextReplacer {
 				return $natperson->getAlter($timestamp);
 			}
 			switch ($keyword) {
-			case "BEZEICHNUNG":
-				return $natperson->getAnrede() . " " . $natperson->getVorname() . " " . $natperson->getName();
 			case "ANREDE":
 				return $natperson->getAnrede();
 			case "NAME":
@@ -101,8 +101,6 @@ class MitgliedTextReplacer extends VariableTextReplacer {
 		if ($revision->isJurPerson()) {
 			$jurperson = $revision->getJurPerson();
 			switch ($keyword) {
-			case "BEZEICHNUNG":
-				return $jurperson->getLabel();
 			case "FIRMA":
 				return $jurperson->getLabel();
 			}

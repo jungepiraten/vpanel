@@ -418,6 +418,15 @@ class MitgliedRevision extends GlobalClass {
 			$storage->setMitgliederRevisionTextFieldList($this->getRevisionID(), $this->getTextFieldIDs(), $this->getTextFieldValues());
 		}
 	}
+
+	public function getBezeichnung() {
+		if ($this->isNatPerson()) {
+			return $this->getNatPerson()->getAnrede() . " " . $this->getNatPerson()->getVorname() . " " . $this->getNatPerson()->getName();
+		}
+		if ($this->isJurPerson()) {
+			return $this->getJurPerson()->getLabel();
+		}
+	}
 }
 
 ?>

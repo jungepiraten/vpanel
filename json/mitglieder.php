@@ -21,7 +21,6 @@ $mitglieder = $session->getStorage()->getMitgliederList($matcher, 5);
 $jsons = array();
 
 foreach ($mitglieder as $mitglied) {
-	$replacer = new MitgliedTextReplacer($mitglied);
 	$revision = $mitglied->getLatestRevision();
 
 	$row = array();
@@ -30,7 +29,7 @@ foreach ($mitglieder as $mitglied) {
 	if ($mitglied->isAusgetreten()) {
 		$row["austritt"] = true;
 	}
-	$row["label"] = $replacer->replaceText("{BEZEICHNER}");
+	$row["label"] = $revision->getBezeichnung();
 
 	$jsons[] = $row;
 }

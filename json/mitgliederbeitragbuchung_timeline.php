@@ -17,15 +17,13 @@ $buchungen = $session->getStorage()->getMitgliederBeitragBuchungListTimeline($se
 $jsons = array();
 
 foreach ($buchungen as $buchung) {
-	$mitgliedreplacer = new MitgliedTextReplacer($buchung->getMitgliederBeitrag()->getMitglied());
-
 	$row = array();
 	$row["timestamp"] = $buchung->getTimestamp();
 	$row["buchungid"] = $buchung->getBuchungID();
 	$row["beitragid"] = $buchung->getMitgliederBeitrag()->getBeitragID();
 	$row["beitraglabel"] = $buchung->getMitgliederBeitrag()->getBeitrag()->getLabel();
 	$row["mitgliedid"] = $buchung->getMitgliederBeitrag()->getMitgliedID();
-	$row["mitgliedlabel"] = $mitgliedreplacer->replaceText("{BEZEICHNUNG}");
+	$row["mitgliedlabel"] = $buchung->getMitgliederBeitrag()->getMitglied()->getLatestRevision()->getBezeichnung();
 	$row["userid"] = $buchung->getUserID();
 	if ($buchung->getUser() != null) {
 		$row["username"] = $buchung->getUser()->getUsername();
