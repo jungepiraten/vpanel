@@ -16,7 +16,7 @@ class MitgliedTextReplacer extends VariableTextReplacer {
 		if (substr(strtoupper($keyword),0,7) == "BEITRAG") {
 			$tuple = explode(".", $keyword, 2);
 			if (isset($tuple[1])) {
-				foreach ($this->getBeitragList() as $beitrag) {
+				foreach ($this->mitglied->getBeitragList() as $beitrag) {
 					if (strtoupper($beitrag->getBeitrag()->getLabel()) == strtoupper($tuple[1])) {
 						return $beitrag->getHoehe();
 					}
