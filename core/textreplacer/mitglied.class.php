@@ -27,6 +27,10 @@ class MitgliedTextReplacer extends VariableTextReplacer {
 				return $revision->getBeitrag();
 			}
 		}
+		if (substr($keyword,0,5) == "TOKEN") {
+			list($k, $token) = explode(".", $keyword, 2);
+			return crypt($this->mitglied->getMitgliedID(), $token);
+		}
 		switch ($keyword) {
 		case "MITGLIEDID":
 			return $this->mitglied->getMitgliedID();
