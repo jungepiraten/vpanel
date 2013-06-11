@@ -12,7 +12,7 @@ abstract class VariableTextReplacer extends TextReplacer {
 			$words = explode("/", $keyword);
 			$replace = null;
 			for ($i=0; $i<count($words) && $replace == null; $i++) {
-				$replace = $this->getVariableValue($word);
+				$replace = $this->getVariableValue($words[$i]);
 			}
 			if ($replace !== null) {
 				$text = str_replace("{" . $keyword . "}", $replace, $text);
