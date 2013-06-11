@@ -29,7 +29,7 @@ class MitgliedTextReplacer extends VariableTextReplacer {
 		}
 		if (substr($keyword,0,5) == "TOKEN") {
 			list($k, $token) = explode(".", $keyword, 2);
-			return crypt($this->mitglied->getMitgliedID(), $token);
+			return hash_hmac("md5", $this->mitglied->getMitgliedID(), $token);
 		}
 		switch ($keyword) {
 		case "MITGLIEDID":
