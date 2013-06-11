@@ -9,6 +9,7 @@ class SepaTempFileStreamHandler extends TempFileStreamHandler {
 	private $bic;
 
 	private $handler;
+	private $payment;
 
 	public static function factory(Storage $storage, $process, $row) {
 		$handler = parent::factory($storage, $process, $row);
@@ -50,7 +51,7 @@ class SepaTempFileStreamHandler extends TempFileStreamHandler {
 		$this->handler->messageIdentification = uniqid();
 		$this->handler->initiatingPartyName = $this->name;
 
-		$this->handler->addPaymentInfo(array(
+		$this->payment = $this->handler->addPaymentInfo(array(
 			"id"			=> uniqid(),
 			"debtorName"		=> $this->name,
 			"debtorAccountIBAN"	=> $this->iban,
@@ -59,7 +60,7 @@ class SepaTempFileStreamHandler extends TempFileStreamHandler {
 	}
 
 	public function writeFile($row) {
-		$this->handler->addCreditTransfer(array(
+		$this->payment->addCreditTransfer(array(
 			"id"			=> $row["beitrag"] . " #" . $row["mitgliedid"],
 			"currency"		=> "EUR",
 			"amount"		=> $row["betrag"],
