@@ -74,7 +74,7 @@ if ($revision->isJurPerson()) {
 if ($revision->getKontakt()->hasKonto()) {
 	$konto = $revision->getKontakt()->getKonto();
 	$mitgliedValues = array_merge($mitgliedValues, array(
-		"kontoinhaber"	=> $konto->getKontoinhaber(),
+		"kontoinhaber"	=> $konto->getInhaber(),
 		"iban"		=> $konto->getIBan(),
 		"bic"		=> $konto->getBIC(),
 	));
