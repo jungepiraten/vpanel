@@ -8,7 +8,10 @@ abstract class VariableTextReplacer extends TextReplacer {
 		preg_match_all('/\\{(.*?)\\}/', $text, $matches);
 		$keywords = array_unique($matches[1]);
 		foreach ($keywords as $keyword) {
-			$text = str_replace("{" . $keyword . "}", $this->getVariableValue($keyword), $text);
+			$replace = $this->getVariableValue($keyword);
+			if ($replace !== null) {
+				$text = str_replace("{" . $keyword . "}", $replace, $text);
+			}
 		}
 		return $text;
 	}
