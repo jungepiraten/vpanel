@@ -10,16 +10,14 @@ class MitgliedTextReplacer extends VariableTextReplacer {
 	}
 
 	protected function getVariableValue($keyword) {
-		$keyword = strtoupper($keyword);
-
 		$revision = $this->mitglied->getLatestRevision();
 		$kontakt = $revision->getKontakt();
 
-		if (substr($keyword,0,7) == "BEITRAG") {
+		if (substr(strtoupper($keyword),0,7) == "BEITRAG") {
 			$tuple = explode(".", $keyword, 2);
 			if (isset($tuple[1])) {
 				foreach ($this->getBeitragList() as $beitrag) {
-					if (strtoupper($beitrag->getBeitrag()->getLabel()) == $tuple[1]) {
+					if (strtoupper($beitrag->getBeitrag()->getLabel()) == strtoupper($tuple[1])) {
 						return $beitrag->getHoehe();
 					}
 				}
@@ -27,10 +25,13 @@ class MitgliedTextReplacer extends VariableTextReplacer {
 				return $revision->getBeitrag();
 			}
 		}
-		if (substr($keyword,0,5) == "TOKEN") {
+		if (strtoupper(substr($keyword,0,5)) == "TOKEN") {
 			list($k, $token) = explode(".", $keyword, 2);
 			return hash_hmac("md5", $this->mitglied->getMitgliedID(), $token);
 		}
+
+		// If we do this earlier we get crappy tokens
+		$keyword = strtoupper($keyword);
 		switch ($keyword) {
 		case "MITGLIEDID":
 			return $this->mitglied->getMitgliedID();
