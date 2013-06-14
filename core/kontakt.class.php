@@ -158,7 +158,6 @@ class Kontakt extends GlobalClass {
 		if ($storage === null) {
 			$storage = $this->getStorage();
 		}
-		var_dump($this->getKontoID());
 		$this->setKontaktID( $storage->setKontakt(
 			$this->getKontaktID(),
 			$this->getAdresszusatz(),
