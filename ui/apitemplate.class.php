@@ -220,7 +220,7 @@ class APITemplate {
 		$m["mitgliedid"] = $mitglied->getMitgliedID();
 		$m["eintritt"] = $this->parseDatestamp($mitglied->getEintrittsdatum());
 		if ($mitglied->isAusgetreten()) {
-			$row["austritt"] = $this->parseDatestamp($mitglied->getAustrittsdatum());
+			$m["austritt"] = $this->parseDatestamp($mitglied->getAustrittsdatum());
 		}
 		$m["beitraege"] = $this->parseMitgliedBeitragList($mitglied->getBeitragList());
 		$m["schulden"] = $mitglied->getSchulden();
