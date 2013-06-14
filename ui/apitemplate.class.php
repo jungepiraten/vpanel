@@ -52,6 +52,8 @@ class APITemplate {
 		$mb["mitgliedbeitragid"] = $mitgliedbeitrag->getMitgliederBeitragID();
 		$mb["beitrag"] = $this->parseBeitrag($mitgliedbeitrag->getBeitrag());
 		$mb["hoehe"] = $mitgliedbeitrag->getHoehe();
+		$mb["ausstehend"] = $mitgliedbeitrag->getHoehe() - $mitgliedbeitrag->getBuchungenHoehe();
+		$mb["bezahlt"] = $mitgliedbeitrag->getBuchungenHoehe();
 		$mb["buchungen"] = $this->parseMitgliedBeitragBuchungList($mitgliedbeitrag->getBuchungen());
 		return $mb;
 	}
@@ -74,8 +76,21 @@ class APITemplate {
 		return $b;
 	}
 
+	private function parseBeitragTimeFormat($beitragtimeformat) {
+		$tf = array();
+		$tf["beitragtimeformatid"] = $beitragtimeformat->getBeitragTimeFormatID();
+		$tf["label"] = $beitragtimeformat->getLabel();
+		$tf["format"] = $beitragtimeformat->getFormat();
+		return $tf;
+	}
+
 	private function parseMitgliedRevision($revision) {
 		$r = array();
+		$r["revisionid"] = $revision->getRevisionID();
+		$r["timestamp"] = $revision->getTimestamp();
+		if ($revision->getUser() != null) {
+			$r["user"] = $this->parseUser($revision->getUser());
+		}
 		$r["gliederung"] = $this->parseGliederung($revision->getGliederung());
 		$r["mitgliedschaft"] = $this->parseMitgliedschaft($revision->getMitgliedschaft());
 		if ($revision->isNatPerson()) {
@@ -86,9 +101,25 @@ class APITemplate {
 		}
 		$r["kontakt"] = $this->parseKontakt($revision->getKontakt());
 		$r["beitrag"] = $revision->getBeitrag();
+		$r["beitragtimeformat"] = $this->parseBeitragTimeFormat($revision->getBeitragTimeFormat());
+		$r["flags"] = $this->parseMitgliederFlags($revision->getFlags());
+		$r["textfields"] = $this->parseMitgliederRevisionTextFields($revision->getTextFields());
 		$r["geloescht"] = $revision->isGeloescht();
 		$r["kommentar"] = $revision->getKommentar();
 		return $r;
+	}
+
+	private function parseMitgliederRevisionTextField($revisiontextfield) {
+		$tf = array();
+		$tf["textfield"] = $this->parseMitgliederTextField($revisiontextfield->getTextField());
+		// Infinite Loop else
+		// $row["revision"] = $this->parseMitgliederRevision($revisiontextfield->getRevision());
+		$tf["value"] = $revisiontextfield->getValue();
+		return $tf;
+	}
+
+	private function parseMitgliederRevisionTextFields($rows) {
+		return array_map(array($this, 'parseMitgliederRevisionTextField'), $rows);
 	}
 
 	private function parseKontakt($kontakt) {
@@ -166,6 +197,24 @@ class APITemplate {
 		return $row;
 	}
 
+	private function parseMitgliederFlag($flag) {
+		$row = array();
+		$row["flagid"] = $flag->getFlagID();
+		$row["label"] = $flag->getLabel();
+		return $row;
+	}
+
+	private function parseMitgliederFlags($rows) {
+		return array_map(array($this, 'parseMitgliederFlag'), $rows);
+	}
+
+	private function parseMitgliederTextField($textfield) {
+		$row = array();
+		$row["textfieldid"] = $textfield->getTextFieldID();
+		$row["label"] = $textfield->getLabel();
+		return $row;
+	}
+
 	private function parseMitglied($mitglied) {
 		$m = array();
 		$m["mitgliedid"] = $mitglied->getMitgliedID();
@@ -174,6 +223,8 @@ class APITemplate {
 			$row["austritt"] = $this->parseDatestamp($mitglied->getAustrittsdatum());
 		}
 		$m["beitraege"] = $this->parseMitgliedBeitragList($mitglied->getBeitragList());
+		$m["schulden"] = $mitglied->getSchulden();
+		$m["paidbeitrag"] = $mitglied->getPaidBeitrag();
 		$m["latest"] = $this->parseMitgliedRevision($mitglied->getLatestRevision());
 		return $m;
 	}

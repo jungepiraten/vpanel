@@ -92,7 +92,7 @@ foreach ($session->getListVariable("changes") as $changeVar => $changeValue) {
 
 // Save new Values
 $mitglied->setEintrittsdatum(strtotime($mitgliedValues["eintritt"]));
-$mitglied->setAustrittsdatum(strtotime($mitgliedValues["austritt"]));
+$mitglied->setAustrittsdatum($mitgliedValues["austritt"] != null ? strtotime($mitgliedValues["austritt"]) : null);
 
 $revision->setMitgliedschaftID($mitgliedValues["mitgliedschaftid"]);
 $revision->setGliederungID($mitgliedValues["gliederungid"]);
