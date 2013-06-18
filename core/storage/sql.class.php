@@ -542,7 +542,7 @@ abstract class SQLStorage extends AbstractStorage {
 			return "`r`.`jurpersonid` IS NOT NULL";
 		}
 		if ($matcher instanceof AusgetretenMitgliederMatcher) {
-			return "`m`.`austritt` IS NOT NULL";
+			return "(`m`.`austritt` IS NOT NULL AND `m`.`austritt` <= NOW())";
 		}
 		if ($matcher instanceof KontoMitgliederMatcher) {
 			return "`k`.`kontoid` IS NOT NULL";
