@@ -988,7 +988,9 @@ class Template {
 		$this->smarty->assign("link", $link);
 		$this->smarty->assign("showupload", ! in_array("hideupload", $options));
 		$this->smarty->assign("dokumenttemplate", $this->parseDokumentTemplate($dokumenttemplate));
-		if ($dokumenttemplate instanceof NatPersonDokumentTemplate) {
+		if ($dokumenttemplate instanceof ReadBarcodeDokumentTemplate) {
+			$this->smarty->display("dokumentcreate_readbarcode.html.tpl");
+		} else if ($dokumenttemplate instanceof NatPersonDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_person.html.tpl");
 		} else if ($dokumenttemplate instanceof MitgliedDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_mitglied.html.tpl");

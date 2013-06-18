@@ -35,7 +35,6 @@ $revision->setUser($session->getUser());
 // Read Defaultvalues. Keep in mind to apply the new Values below!
 $mitgliedValues = array(
 	"eintritt"		=> date("Y-m-d", $mitglied->getEintrittsdatum()),
-	"austritt"		=> date("Y-m-d", $mitglied->getAustrittsdatum()),
 	"mitgliedschaftid"	=> $revision->getMitgliedschaftID(),
 	"gliederungid"		=> $revision->getGliederungID(),
 	"beitrag"		=> $revision->getBeitrag(),
@@ -50,6 +49,12 @@ $mitgliedValues = array(
 	"handy"			=> $revision->getKontakt()->getHandynummer(),
 	"email"			=> $revision->getKontakt()->getEMail()->getEMail(),
 );
+
+if ($mitglied->isAusgetreten()) {
+	$mitgliedValues = array_merge($mitgliedValues, array(
+		"austritt"	=> date("Y-m-d", $mitglied->getAustrittsdatum()),
+	));
+}
 
 if ($revision->isNatPerson()) {
 	$natperson = $revision->getNatPerson();
@@ -92,11 +97,11 @@ foreach ($session->getListVariable("changes") as $changeVar => $changeValue) {
 
 // Save new Values
 $mitglied->setEintrittsdatum(strtotime($mitgliedValues["eintritt"]));
-$mitglied->setAustrittsdatum($mitgliedValues["austritt"] != null ? strtotime($mitgliedValues["austritt"]) : null);
+$mitglied->setAustrittsdatum(isset($mitgliedValues["austritt"]) ? strtotime($mitgliedValues["austritt"]) : null);
 
 $revision->setMitgliedschaftID($mitgliedValues["mitgliedschaftid"]);
 $revision->setGliederungID($mitgliedValues["gliederungid"]);
-$revision->isGeloescht($mitgliedValues["austritt"] != null);
+$revision->isGeloescht(isset($mitgliedValues["austritt"]));
 $revision->setBeitrag($mitgliedValues["beitrag"]);
 $revision->setBeitragTimeFormatID($mitgliedValues["beitragtimeformatid"]);
 $revision->setNatPerson($mitgliedValues["typ"] != "nat" ? null : $session->getStorage()->searchNatPerson(
