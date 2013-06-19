@@ -564,6 +564,9 @@ abstract class SQLStorage extends AbstractStorage {
 				return "`e`.`emailid` IN (SELECT `emailid` FROM `emailbounces` LEFT JOIN `emails` USING (`emailid`) WHERE `emails`.`lastSend` IS NULL or `emails`.`lastSend` < `emailbounces`.`timestamp` GROUP BY `emailid` HAVING COUNT(`emailbounces`.`bounceid`) <= " . intval($matcher->getCountLimit()) . ")";
 			}
 		}
+		if ($matcher instanceof EMailGPGMitgliederMatcher) {
+			return "`e`.`gpgfingerprint` IS NOT NULL";
+		}
 		if ($matcher instanceof RevisionFlagMitgliederMatcher) {
 			return "`r`.`revisionid` IN (SELECT `revisionid` FROM `mitgliederrevisionflags` WHERE `flagid` = " . intval($matcher->getFlagID()) . ")";
 		}
@@ -656,7 +659,7 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		if ($matcher instanceof SearchMitgliederMatcher) {
 			$fields = array("`m`.`mitgliedid`", "`m`.`globalid`");
-			$revision_fields = array("`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`r`.`kommentar`", "`n`.`anrede`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`adresszusatz`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`kto`.`inhaber`", "`kto`.`iban`", "`kto`.`bic`", "`e`.`email`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
+			$revision_fields = array("`r`.`revisionid`", "`r`.`globaleid`", "`r`.`userid`", "`r`.`mitgliedid`", "`r`.`mitgliedschaftid`", "`r`.`gliederungsid`", "`r`.`geloescht`", "`r`.`beitrag`", "`n`.`natpersonid`", "`r`.`kommentar`", "`n`.`anrede`", "`n`.`name`", "`n`.`vorname`", "`n`.`nationalitaet`", "`j`.`jurpersonid`", "`j`.`label`", "`k`.`kontaktid`", "`k`.`adresszusatz`", "`k`.`strasse`", "`k`.`hausnummer`", "`k`.`telefonnummer`", "`k`.`handynummer`", "`kto`.`inhaber`", "`kto`.`iban`", "`kto`.`bic`", "`e`.`email`", "`e`.`gpgfingerprint`", "`o`.`ortid`", "`o`.`plz`", "`o`.`label`", "`o`.`stateid`");
 			$wordclauses = array();
 			$revision_wordclauses = array();
 			foreach ($matcher->getWords() as $word) {
@@ -772,6 +775,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
+				`e`.`gpgfingerprint` as `e_gpgfingerprint`,
 				UNIX_TIMESTAMP(`e`.`lastSend`) AS `e_lastSend`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
@@ -1012,6 +1016,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
+				`e`.`gpgfingerprint` as `e_gpgfingerprint`,
 				UNIX_TIMESTAMP(`e`.`lastSend`) AS `e_lastSend`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
@@ -1099,6 +1104,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
+				`e`.`gpgfingerprint` as `e_gpgfingerprint`,
 				UNIX_TIMESTAMP(`e`.`lastSend`) AS `e_lastSend`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
@@ -1180,6 +1186,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
+				`e`.`gpgfingerprint` as `e_gpgfingerprint`,
 				UNIX_TIMESTAMP(`e`.`lastSend`) AS `e_lastSend`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
@@ -1262,6 +1269,7 @@ abstract class SQLStorage extends AbstractStorage {
 				`kto`.`bic` AS `kto_bic`,
 				`e`.`emailid` AS `e_emailid`,
 				`e`.`email` AS `e_email`,
+				`e`.`gpgfingerprint` as `e_gpgfingerprint`,
 				UNIX_TIMESTAMP(`e`.`lastSend`) AS `e_lastSend`,
 				`o`.`ortid` AS `o_ortid`,
 				`o`.`plz` AS `o_plz`,
@@ -1370,14 +1378,14 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->parseRow($row, null, "EMail");
 	}
 	public function getEMail($emailid) {
-		$sql = "SELECT `emailid`, `email`, UNIX_TIMESTAMP(`lastSend`) AS `lastSend` FROM `emails` WHERE `emailid` = " . intval($emailid);
+		$sql = "SELECT `emailid`, `email`, `gpgfingerprint`, UNIX_TIMESTAMP(`lastSend`) AS `lastSend` FROM `emails` WHERE `emailid` = " . intval($emailid);
 		return $this->getResult($sql, array($this, "parseEMail"))->fetchRow();
 	}
-	public function setEMail($emailid, $email, $lastSend) {
+	public function setEMail($emailid, $email, $gpgfingerprint, $lastSend) {
 		if ($emailid == null) {
-			$sql = "INSERT INTO `emails` (`email`, `lastSend`) VALUES ('" . $this->escape($email) . "', " . ($lastSend == null ? "NULL" : "'" . date("Y-m-d H:i:s", $lastSend) . "'") . ")";
+			$sql = "INSERT INTO `emails` (`email`, `gpgfingerprint`, `lastSend`) VALUES ('" . $this->escape($email) . "', " . ($gpgfingerprint == null ? "NULL" : "'" . preg_replace('/[^a-zA-Z0-9]/', '', $gpgfingerprint) . "'") . ", " . ($lastSend == null ? "NULL" : "'" . date("Y-m-d H:i:s", $lastSend) . "'") . ")";
 		} else {
-			$sql = "UPDATE `emails` SET `email` = '" . $this->escape($email) . "', `lastSend` = " . ($lastSend == null ? "NULL" : "'" . date("Y-m-d H:i:s", $lastSend) . "'") . " WHERE `emailid` = " . intval($emailid);
+			$sql = "UPDATE `emails` SET `email` = '" . $this->escape($email) . "', `gpgfingerprint` = " . ($gpgfingerprint == null ? "NULL" : "'" . preg_replace('/[^a-zA-Z0-9]/', '', $gpgfingerprint) . "'") . ", `lastSend` = " . ($lastSend == null ? "NULL" : "'" . date("Y-m-d H:i:s", $lastSend) . "'") . " WHERE `emailid` = " . intval($emailid);
 		}
 		$this->query($sql);
 		if ($emailid == null) {
@@ -1390,13 +1398,14 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->query($sql);
 	}
 	public function searchEMail($address) {
-		$sql = "SELECT `emailid`, `email`, `lastSend` FROM `emails` WHERE `email` = '" . $this->escape($address) . "'";
+		$sql = "SELECT `emailid`, `email`, `gpgfingerprint`, `lastSend` FROM `emails` WHERE `email` = '" . $this->escape($address) . "'";
 		$result = $this->getResult($sql, array($this, "parseEMail"));
 		if ($result->getCount() > 0) {
 			return $result->fetchRow();
 		}
 		$email = new EMail($this);
 		$email->setEMail($address);
+		$email->setGPGFingerprint(null);
 		$email->setLastSend(null);
 		$email->save();
 		return $email;

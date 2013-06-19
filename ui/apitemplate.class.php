@@ -167,6 +167,7 @@ class APITemplate {
 		$row = array();
 		$row["emailid"] = $email->getEMailID();
 		$row["email"] = $email->getEMail();
+		$row["gpgfingerprint"] = $email->getGPGFingerprint();
 		return $row;
 	}
 

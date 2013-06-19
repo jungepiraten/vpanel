@@ -5,6 +5,7 @@ require_once(VPANEL_CORE . "/storageobject.class.php");
 class EMail extends StorageClass {
 	private $emailid;
 	private $email;
+	private $gpgfingerprint;
 	private $lastSend;
 
 	private $bounces;
@@ -13,6 +14,7 @@ class EMail extends StorageClass {
 		$email = new EMail($storage);
 		$email->setEMailID($row["emailid"]);
 		$email->setEMail($row["email"]);
+		$email->setGPGFingerprint($row["gpgfingerprint"]);
 		$email->setLastSend($row["lastSend"]);
 		return $email;
 	}
@@ -31,6 +33,14 @@ class EMail extends StorageClass {
 
 	public function setEMail($email) {
 		$this->email = $email;
+	}
+
+	public function getGPGFingerprint() {
+		return $this->gpgfingerprint;
+	}
+
+	public function setGPGFingerprint($gpgfingerprint) {
+		$this->gpgfingerprint = $gpgfingerprint;
 	}
 
 	public function getLastSend() {
@@ -59,6 +69,7 @@ class EMail extends StorageClass {
 		$this->setEMailID( $storage->setEMail(
 			$this->getEMailID(),
 			$this->getEMail(),
+			$this->getGPGID(),
 			$this->getLastSend() ));
 	}
 

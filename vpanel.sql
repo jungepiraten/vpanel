@@ -1103,3 +1103,7 @@ ALTER TABLE  `kontakte` ADD FOREIGN KEY (  `kontoid` ) REFERENCES  `konto` (
 -- update 2013-04-17
 
 ALTER TABLE  `emails` ADD  `lastSend` TIMESTAMP NULL DEFAULT NULL;
+
+-- update 2013-06-19
+
+ALTER TABLE  `emails` ADD  `gpgfingerprint` VARCHAR( 48 ) NULL AFTER  `email`;

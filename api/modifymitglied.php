@@ -48,6 +48,7 @@ $mitgliedValues = array(
 	"telefon"		=> $revision->getKontakt()->getTelefonnummer(),
 	"handy"			=> $revision->getKontakt()->getHandynummer(),
 	"email"			=> $revision->getKontakt()->getEMail()->getEMail(),
+	"gpgfingerprint"	=> $revision->getKontakt()->getEMail()->getGPGFingerprint(),
 );
 
 if ($mitglied->isAusgetreten()) {

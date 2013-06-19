@@ -41,4 +41,10 @@ class EMailBounceCountBelowMitgliederMatcher extends EMailBounceCountMitgliederM
 	}
 }
 
+class EMailGPGMitgliederMatcher extends MitgliederMatcher {
+	public function match(Mitglied $mitglied) {
+		return $mitglied->getLatestRevision()->getKontakt()->getEMail()->getGPGID() != null;
+	}
+}
+
 ?>
