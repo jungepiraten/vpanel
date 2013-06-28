@@ -69,7 +69,7 @@ class EMail extends StorageClass {
 		$this->setEMailID( $storage->setEMail(
 			$this->getEMailID(),
 			$this->getEMail(),
-			$this->getGPGID(),
+			$this->getGPGFingerprint(),
 			$this->getLastSend() ));
 	}
 
