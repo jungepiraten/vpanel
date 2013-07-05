@@ -49,12 +49,20 @@ $mitgliedValues = array(
 	"handy"			=> $revision->getKontakt()->getHandynummer(),
 	"email"			=> $revision->getKontakt()->getEMail()->getEMail(),
 	"gpgfingerprint"	=> $revision->getKontakt()->getEMail()->getGPGFingerprint(),
+	"austritt"		=> null,
+	"typ"			=> null,
+	"anrede"		=> null,
+	"name"			=> null,
+	"vorname"		=> null,
+	"geburtsdatum"		=> null,
+	"nationalitaet"		=> null,
+	"kontoinhaber"		=> null,
+	"iban"			=> null,
+	"bic"			=> null,
 );
 
 if ($mitglied->isAusgetreten()) {
-	$mitgliedValues = array_merge($mitgliedValues, array(
-		"austritt"	=> date("Y-m-d", $mitglied->getAustrittsdatum()),
-	));
+	$mitgliedValues["austritt"] = date("Y-m-d", $mitglied->getAustrittsdatum());
 }
 
 if ($revision->isNatPerson()) {
