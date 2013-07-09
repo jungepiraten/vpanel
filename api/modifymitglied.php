@@ -96,7 +96,7 @@ if ($revision->getKontakt()->hasKonto()) {
 
 // Change some values
 foreach ($session->getListVariable("changes") as $changeVar => $changeValue) {
-	if (!isset($mitgliedValues[$changeVar])) {
+	if (!array_key_exists($changeVar, $mitgliedValues)) {
 		$api->output(array("failed" => "INVALID_CHANGE", "variable" => $changeVar), 400);
 		exit;
 	}
