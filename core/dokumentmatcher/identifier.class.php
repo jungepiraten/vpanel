@@ -24,4 +24,10 @@ class IdentifierParentDokumentMatcher extends IdentifierDokumentMatcher {
 	}
 }
 
+class IdentifierStartsWithDokumentMatcher extends IdentifierDokumentMatcher {
+	public function match(Dokument $dokument) {
+		return strpos($dokument->getLatestRevision()->getIdentifier(), $this->getIdentifier()) === 0;
+	}
+}
+
 ?>

@@ -1896,6 +1896,9 @@ abstract class SQLStorage extends AbstractStorage {
 		if ($matcher instanceof DokumentDokumentMatcher) {
 			return "`d`.`dokumentid` = " . intval($matcher->getDokumentID());
 		}
+		if ($matcher instanceof IdentifierStartsWithDokumentMatcher) {
+			return "SUBSTRING(`r`.`identifier`,1," . strlen($matcher->getIdentifier()) . ") = '" . $this->escape($matcher->getIdentifier()) . "'";
+		}
 		if ($matcher instanceof IdentifierParentDokumentMatcher) {
 			return "SUBSTRING('" . $this->escape($matcher->getIdentifier()) . "',1,LENGTH(`r`.`identifier`)) = `r`.`identifier`";
 		}
