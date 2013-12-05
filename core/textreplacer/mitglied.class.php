@@ -62,6 +62,8 @@ class MitgliedTextReplacer extends VariableTextReplacer {
 			return $kontakt->getTelefonnummer();
 		case "HANDYNUMMER":
 			return $kontakt->getHandynummer();
+		case "EMAILID":
+			return $kontakt->getEMailID();
 		case "EMAIL":
 			return $kontakt->getEMail()->getEMail();
 		case "BOUNCES-TOTAL":
