@@ -58,7 +58,7 @@ class DTAUSTempFileStreamHandler extends TempFileStreamHandler {
 		if (substr(strtoupper($iban),0,2) == "DE") {
 			$bankcode = substr($iban, 4, 8);
 			$account = substr($iban, 12);
-			$this->handler->addTransaction($row["kontoinhaber"], $bankcode, $account, $row["betrag"], $row["beitrag"] . " #" . $row["mitgliedid"]);
+			$this->handler->addTransaction($row["kontoinhaber"], $bankcode, $account, $row["betrag"], "Danke " . $row["beitrag"] . " #" . $row["mitgliedid"]);
 		}
 	}
 

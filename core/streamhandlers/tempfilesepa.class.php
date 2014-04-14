@@ -61,7 +61,7 @@ class SepaTempFileStreamHandler extends TempFileStreamHandler {
 
 	public function writeFile($row) {
 		$this->payment->addCreditTransfer(array(
-			"id"			=> $row["beitrag"] . " #" . $row["mitgliedid"],
+			"id"			=> "Danke " . $row["beitrag"] . " #" . $row["mitgliedid"],
 			"currency"		=> "EUR",
 			"amount"		=> $row["betrag"],
 			"creditorBIC"		=> $row["bic"],
