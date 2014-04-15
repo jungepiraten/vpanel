@@ -956,7 +956,6 @@ class Template {
 			return;
 		}
 		if ($action instanceof CalculateBeitragMitgliederFilterAction) {
-			$this->smarty->assign("beitrag", $this->parseBeitrag($result["beitrag"]));
 			$this->smarty->assign("gliederungen", $this->parseGliederungen($result["gliederungen"]));
 			$this->smarty->assign("anteile", $result["anteile"]);
 			$this->smarty->assign("istHoehe", $result["gliederungsBeitragHoehe"]);
