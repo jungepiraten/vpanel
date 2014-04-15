@@ -5,7 +5,7 @@ require_once(VPANEL_PROCESSES . "/mitgliederfilter.class.php");
 class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 	private $starttimestamp;
 	private $endtimestamp;
-	private $userid;
+	private $buchunguserid;
 	private $beitragids;
 	private $gliederungsAnteile;
 
@@ -21,7 +21,7 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 		$process = parent::factory($storage, $row);
 		$process->setStartTimestamp($row["starttimestamp"]);
 		$process->setEndTimestamp($row["endtimestamp"]);
-		$process->setUserID($row["userid"]);
+		$process->setBuchungUserID($row["buchunguserid"]);
 		$process->setBeitragIDs($row["beitragids"]);
 		$process->setGliederungsAnteile($row["gliederungsAnteile"]);
 		$process->setGliederungsMitgliedHoehe($row["gliederungsMitgliedHoehe"]);
@@ -46,12 +46,12 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 		$this->endtimestamp = $endtimestamp;
 	}
 
-	public function getUserID() {
-		return $this->userid;
+	public function getBuchungUserID() {
+		return $this->buchunguserid;
 	}
 
-	public function setUserID($userid) {
-		$this->userid = $userid;
+	public function setBuchungUserID($buchunguserid) {
+		$this->buchunguserid = $buchunguserid;
 	}
 
 	public function getBeitragIDs() {
@@ -106,7 +106,7 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 		$data = parent::getData();
 		$data["starttimestamp"] = $this->getStartTimestamp();
 		$data["endtimestamp"] = $this->getEndTimestamp();
-		$data["userid"] = $this->getUserID();
+		$data["buchunguserid"] = $this->getBuchungUserID();
 		$data["beitragids"] = $this->getBeitragIDs();
 		$data["gliederungsAnteile"] = $this->getGliederungsAnteile();
 		$data["gliederungsMitgliedHoehe"] = $this->getGliederungsMitgliedHoehe();
@@ -124,7 +124,7 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 		foreach ($this->getBeitragIDs() as $beitragid) {
 			$mitgliedbeitrag = $mitglied->getBeitrag($beitragid);
 			foreach ($mitgliedbeitrag->getBuchungen() as $buchung) {
-				if ( ( $this->getUserID() == NULL         || $this->getUserID() == $buchung->getUserID() )
+				if ( ( $this->getBuchungUserID() == NULL  || $this->getBuchungUserID() == $buchung->getUserID() )
 				  && ( $this->getStartTimestamp() == NULL || $this->getStartTimestamp() <= $buchung->getTimestamp() )
 				  && ( $this->getEndTimestamp() == NULL   || $buchung->getTimestamp() < $this->getEndTimestamp() + 24*60*60 ) ) {
 					if (!isset($this->gliederungsBeitragHoehe[$buchung->getGliederungID()])) {

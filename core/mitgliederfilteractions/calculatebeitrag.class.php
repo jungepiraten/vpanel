@@ -77,7 +77,7 @@ class CalculateBeitragMitgliederFilterAction extends MitgliederFilterAction {
 		$process = new MitgliederFilterCalculateBeitragProcess($session->getStorage());
 		$process->setStartTimestamp($starttimestamp);
 		$process->setEndTimestamp($endtimestamp);
-		$process->setUserID($userid);
+		$process->setBuchungUserID($userid);
 		$process->setBeitragIDs($beitragids);
 		$process->setGliederungsAnteile($gliederungsAnteile);
 		return $this->executeProcess($session, $process, $filter, $matcher);
