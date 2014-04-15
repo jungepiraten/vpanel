@@ -44,7 +44,7 @@ class CalculateBeitragMitgliederFilterAction extends MitgliederFilterAction {
 			return $this->beitragids;
 		}
 		if ($session->hasVariable("beitragid")) {
-			return $session->getVariable("beitragid");
+			return $session->getListVariable("beitragid");
 		}
 		return null;
 	}
