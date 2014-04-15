@@ -4,12 +4,14 @@ require_once(VPANEL_CORE . "/mitgliederfilteraction.class.php");
 require_once(VPANEL_PROCESSES . "/mitgliederfiltercalculatebeitrag.class.php");
 
 class CalculateBeitragMitgliederFilterAction extends MitgliederFilterAction {
-	private $beitragid;
+	private $beitragids;
+	private $userid;
 	private $gliederungsAnteil;
 
-	public function __construct($actionid, $label, $permission, $beitragid = null, $gliederungsAnteil = null) {
+	public function __construct($actionid, $label, $permission, $beitragids = null, $userid = null, $gliederungsAnteil = null) {
 		parent::__construct($actionid, $label, $permission);
-		$this->beitragid = $beitragid;
+		$this->beitragids = $beitragids;
+		$this->userid = $userid;
 		$this->gliederungsAnteil = $gliederungsAnteil;
 	}
 
@@ -27,9 +29,19 @@ class CalculateBeitragMitgliederFilterAction extends MitgliederFilterAction {
 		return null;
 	}
 
-	protected function getBeitragID($session) {
-		if ($this->beitragid != null) {
-			return $this->beitragid;
+	protected function getUserID($session) {
+		if ($this->userid != null) {
+			return $this->userid;
+		}
+		if ($session->hasVariable("userid")) {
+			return $session->getVariable("userid");
+		}
+		return null;
+	}
+
+	protected function getBeitragIDs($session) {
+		if ($this->beitragids != null) {
+			return $this->beitragids;
 		}
 		if ($session->hasVariable("beitragid")) {
 			return $session->getVariable("beitragid");
@@ -51,19 +63,22 @@ class CalculateBeitragMitgliederFilterAction extends MitgliederFilterAction {
 	public function execute($config, $session, $filter, $matcher) {
 		$starttimestamp = $this->getStartTimestamp($session);
 		$endtimestamp = $this->getEndTimestamp($session);
-		$beitragid = $this->getBeitragID($session);
+		$userid = $this->getUserID($session);
+		$beitragids = $this->getBeitragIDs($session);
 		$gliederungsAnteile = $this->getGliederungsAnteil($session);
 
-		if ($starttimestamp == null || $endtimestamp == null || $beitragid == null || $gliederungsAnteile == null) {
+		if ($starttimestamp == null || $endtimestamp == null || $beitragids == null || $gliederungsAnteile == null) {
+			$userlist = $session->getStorage()->getUserList();
 			$beitraglist = $session->getStorage()->getBeitragList();
 			$gliederungen = $gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs($this->getPermission()));
-			return array("calculatebeitrag" => "select", "beitraglist" => $beitraglist, "gliederungen" => $gliederungen);
+			return array("calculatebeitrag" => "select", "userlist" => $userlist, "beitraglist" => $beitraglist, "gliederungen" => $gliederungen);
 		}
 
 		$process = new MitgliederFilterCalculateBeitragProcess($session->getStorage());
 		$process->setStartTimestamp($starttimestamp);
 		$process->setEndTimestamp($endtimestamp);
-		$process->setBeitragID($beitragid);
+		$process->setUserID($userid);
+		$process->setBeitragIDs($beitragids);
 		$process->setGliederungsAnteile($gliederungsAnteile);
 		return $this->executeProcess($session, $process, $filter, $matcher);
 	}
@@ -71,7 +86,6 @@ class CalculateBeitragMitgliederFilterAction extends MitgliederFilterAction {
 	public function show($config, $session, $process) {
 		$gliederungen = $session->getStorage()->getGliederungList($session->getAllowedGliederungIDs($this->getPermission()));
 		return array("calculatebeitrag" => "summary",
-		             "beitrag" => $process->getBeitrag(),
 		             "gliederungen" => $gliederungen,
 		             "anteile" => $process->getGliederungsAnteile(),
 		             "gliederungsMitgliedHoehe" => $process->getGliederungsMitgliedHoehe(),

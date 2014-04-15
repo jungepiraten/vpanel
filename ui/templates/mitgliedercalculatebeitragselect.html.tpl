@@ -14,11 +14,23 @@
 				<input type="text" name="endtimestamp" value="{$smarty.now|date_format:"%d.%m.%Y"}" />
 			</div>
 		</div>
+		{if isset($userlist)}
+			<div class="control-group">
+				<label class="control-label" for="userid">{"Benutzer*in:"|__}</label>
+				<div class="controls">
+					<select name="userid">
+						{foreach from=$userlist item=user}
+							<option value="{$user.userid|escape:html}">{$user.username|escape:html}</option>
+						{/foreach}
+					</select>
+				</div>
+			</div>
+		{/if}
 		{if isset($beitraglist)}
 			<div class="control-group">
-				<label class="control-label" for="beitragid">{"Beitrag:"|__}</label>
+				<label class="control-label" for="beitragid[]">{"Beitrag:"|__}</label>
 				<div class="controls">
-					<select name="beitragid">
+					<select name="beitragid[]" multiple="multiple" size="5">
 						{foreach from=$beitraglist item=beitrag}
 							<option value="{$beitrag.beitragid|escape:html}">{$beitrag.label|escape:html}</option>
 						{/foreach}

@@ -5,7 +5,8 @@ require_once(VPANEL_PROCESSES . "/mitgliederfilter.class.php");
 class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 	private $starttimestamp;
 	private $endtimestamp;
-	private $beitragid;
+	private $userid;
+	private $beitragids;
 	private $gliederungsAnteile;
 
 	private $beitrag;
@@ -20,7 +21,8 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 		$process = parent::factory($storage, $row);
 		$process->setStartTimestamp($row["starttimestamp"]);
 		$process->setEndTimestamp($row["endtimestamp"]);
-		$process->setBeitragID($row["beitragid"]);
+		$process->setUserID($row["userid"]);
+		$process->setBeitragIDs($row["beitragids"]);
 		$process->setGliederungsAnteile($row["gliederungsAnteile"]);
 		$process->setGliederungsMitgliedHoehe($row["gliederungsMitgliedHoehe"]);
 		$process->setGliederungsBeitragHoehe($row["gliederungsBeitragHoehe"]);
@@ -44,27 +46,20 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 		$this->endtimestamp = $endtimestamp;
 	}
 
-	public function getBeitragID() {
-		return $this->beitragid;
+	public function getUserID() {
+		return $this->userid;
 	}
 
-	public function setBeitragID($beitragid) {
-		if ($beitragid != $this->beitragid) {
-			$this->beitrag = null;
-		}
-		$this->beitragid = $beitragid;
+	public function setUserID($userid) {
+		$this->userid = $userid;
 	}
 
-	public function getBeitrag() {
-		if ($this->beitrag == null) {
-			$this->beitrag = $this->getStorage()->getBeitrag($this->getBeitragID());
-		}
-		return $this->beitrag;
+	public function getBeitragIDs() {
+		return $this->beitragids;
 	}
 
-	public function setBeitrag($beitrag) {
-		$this->setBeitragID($beitrag->getBeitragID());
-		$this->beitrag = $beitrag;
+	public function setBeitragIDs($beitragids) {
+		$this->beitragids = $beitragids;
 	}
 
 	public function getGliederungsAnteile() {
@@ -111,7 +106,8 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 		$data = parent::getData();
 		$data["starttimestamp"] = $this->getStartTimestamp();
 		$data["endtimestamp"] = $this->getEndTimestamp();
-		$data["beitragid"] = $this->getBeitragID();
+		$data["userid"] = $this->getUserID();
+		$data["beitragids"] = $this->getBeitragIDs();
 		$data["gliederungsAnteile"] = $this->getGliederungsAnteile();
 		$data["gliederungsMitgliedHoehe"] = $this->getGliederungsMitgliedHoehe();
 		$data["gliederungsBeitragHoehe"] = $this->getGliederungsBeitragHoehe();
@@ -125,16 +121,19 @@ class MitgliederFilterCalculateBeitragProcess extends MitgliederFilterProcess {
 			$this->gliederungsHoehe[$mitgliedgliederungid] = 0;
 		}
 
-		$mitgliedbeitrag = $mitglied->getBeitrag($this->getBeitragID());
-		foreach ($mitgliedbeitrag->getBuchungen() as $buchung) {
-			if ( ( $this->getStartTimestamp() == NULL || $this->getStartTimestamp() <= $buchung->getTimestamp() )
-			  && ( $this->getEndTimestamp() == NULL   || $buchung->getTimestamp() < $this->getEndTimestamp() + 24*60*60 ) ) {
-				if (!isset($this->gliederungsBeitragHoehe[$buchung->getGliederungID()])) {
-					$this->gliederungsBeitragHoehe[$buchung->getGliederungID()] = 0;
-				}
-				$this->gliederungsBeitragHoehe[$buchung->getGliederungID()] += $buchung->getHoehe();
+		foreach ($this->getBeitragIDs() as $beitragid) {
+			$mitgliedbeitrag = $mitglied->getBeitrag($beitragid);
+			foreach ($mitgliedbeitrag->getBuchungen() as $buchung) {
+				if ( ( $this->getUserID() == NULL         || $this->getUserID() == $buchung->getUserID() )
+				  && ( $this->getStartTimestamp() == NULL || $this->getStartTimestamp() <= $buchung->getTimestamp() )
+				  && ( $this->getEndTimestamp() == NULL   || $buchung->getTimestamp() < $this->getEndTimestamp() + 24*60*60 ) ) {
+					if (!isset($this->gliederungsBeitragHoehe[$buchung->getGliederungID()])) {
+						$this->gliederungsBeitragHoehe[$buchung->getGliederungID()] = 0;
+					}
+					$this->gliederungsBeitragHoehe[$buchung->getGliederungID()] += $buchung->getHoehe();
 
-				$this->gliederungsHoehe[$mitgliedgliederungid] += $buchung->getHoehe();
+					$this->gliederungsHoehe[$mitgliedgliederungid] += $buchung->getHoehe();
+				}
 			}
 		}
 	}
