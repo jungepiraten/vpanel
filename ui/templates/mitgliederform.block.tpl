@@ -163,14 +163,8 @@
     <div class="controls iban">
         <div class="input-append">
             <input type="text" class="iban" name="iban" value="{if isset($mitgliedrevision.kontakt) && isset($mitgliedrevision.kontakt.konto)}{$mitgliedrevision.kontakt.konto.iban|escape:html}{else}{$data.iban|escape:html}{/if}" onChange="checkIBan(this)" />
-            <button type="button" class="btn btn-info" onClick="showIBanDE()">{"Generieren"|__}</button>
         </div>
         <span class="help-inline"></span>
-    </div>
-    <div class="controls iban-de hide">
-        <input type="text" name="blz" class="blz" placeholder="BLZ" {literal}pattern="[0-9]{8}"{/literal} />
-        <input type="text" name="konto" class="konto" placeholder="Kontonummer" {literal}pattern="[0-9]{1,}"{/literal} />
-        <button type="button" class="btn btn-primary" onClick="saveIBanDE()">{"Übernehmen"|__}</button>
     </div>
 </div>
 {literal}
@@ -228,36 +222,6 @@ function checkIBan(field) {
 	}
 }
 checkIBan(document.getElementsByName("iban")[0]);
-
-function showIBanDE() {
-	var iban = $("#ibanControlGroup .controls.iban .iban").val();
-	$("#ibanControlGroup .controls.iban-de .blz").val(iban.substring(4,12));
-	$("#ibanControlGroup .controls.iban-de .konto").val(iban.substring(12));
-
-	$("#ibanControlGroup .controls.iban").hide();
-	$("#ibanControlGroup .controls.iban-de").show();
-
-	$("#ibanControlGroup").parents("form").submit(saveIBanDE);
-}
-
-function saveIBanDE() {
-	var blz = $("#ibanControlGroup .controls.iban-de .blz").val();
-	var konto = $("#ibanControlGroup .controls.iban-de .konto").val();
-
-	if (blz.length == 8 && konto.length > 0) {
-		while (konto.length < 10) {
-			konto = "0" + konto;
-		}
-		var check = 98 - mod97(iban2ibancheck("DE00" + blz + konto));
-		if (check < 10) {
-			check = "0" + check;
-		}
-		$("#ibanControlGroup .controls.iban .iban").val("DE" + check + blz + konto);
-	}
-
-	$("#ibanControlGroup .controls.iban-de").hide();
-	$("#ibanControlGroup .controls.iban").show();
-}
 
 //--> </script> {/literal}
 
