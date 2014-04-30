@@ -75,6 +75,11 @@ class MitgliedTextReplacer extends VariableTextReplacer {
 				return $kontakt->getKonto()->getIBan();
 			}
 			return "";
+		case "BIC":
+			if ($kontakt->hasKonto()) {
+				return $kontakt->getKonto()->getBIC();
+			}
+			return "";
 		case "MITGLIEDSCHAFT":
 			return $revision->getMitgliedschaft()->getLabel();
 		case "SCHULDEN":
