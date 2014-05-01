@@ -114,9 +114,7 @@ class EBICS_Sepa {
 		if ( !strlen( $this->oPaymentInformation->CdtrSchmeId ) > 7 ) { $this->errors[] = '(PI) Gläubiger-Identifikationsnummer (CI) hat zu wenig Zeichen: ' . $this->oPaymentInformation->CdtrSchmeId; $bError = true; }
 		if ( !strlen( $this->oPaymentInformation->CdtrNm ) > 0 ) { $this->errors[] = '(PI) Name des Gläubigers (Kreditors) ist leer'; $bError = true; }
         if ( strlen( $this->oPaymentInformation->CdtrAgt ) < 8 && strlen($this->oPaymentInformation->CdtrAgt) > 11 ) { $this->errors[] = '(PI) BIC des Gläubigers (Kreditors) hat eine unzulässige Länge: ' . $this->oPaymentInformation->CdtrAgt; $bError = true; }
-		if ( strlen( $this->oPaymentInformation->CdtrAcct ) != 22 ) { $this->errors[] = '(PI) IBAN des Gläubigers (Kreditors) muss 22-stellig sein: '.  $this->oPaymentInformation->CdtrAcct; $bError = true; }
 		// Pruefung IBAN Pruefziffer ???
-        if ( !is_numeric( substr( $this->oPaymentInformation->CdtrAcct, 2 ))) { $this->errors[] = '(PI) IBAN des Gläubigers (Kreditors) ist ab der 3. Stelle keine Zahl: '. $this->oPaymentInformation->CdtrAcct; $bError = true;}
         return $bError;
     }
 
@@ -145,9 +143,7 @@ class EBICS_Sepa {
 		if ( empty( $oTransaction->InstdAmt) || $oTransaction->InstdAmt < 0 ) { $this->errors[] = '(TI) Der Zahlbetrag hat einen unzulaessigen Wert: ' . number_format( $oTransaction->InstdAmt, 2, '.', '' ) . ' EUR'; $bError = true; }
         if ( strlen( $oTransaction->DbtrAgt ) < 8 && strlen( $oTransaction->DbtrAgt ) > 11 ) { $this->errors[] = '(TI) BIC des Schuldners (Debitors) hat eine unzulässige Länge: ' . $oTransaction->DbtrAgt; $bError = true; }
 		if ( !strlen( $oTransaction->DbtrNm ) > 0 ) { $this->errors[] = '(TI) Name des Schuldners (Debitors) ist leer'; $bError = true; }
-		if ( strlen( $oTransaction->DbtrAcct ) != 22 ) { $this->errors[] = '(TI) IBAN des Schuldners (Debitors) muss 22-stellig sein: '.  $oTransaction->DbtrAcct; $bError = true; }
 		// Pruefung IBAN Pruefziffer ???
-        if ( !is_numeric( substr( $oTransaction->DbtrAcct, 2 ))) { $this->errors[] = '(TI) IBAN des Schuldners (Debitors) ist ab der 3. Stelle keine Zahl: '. $oTransaction->DbtrAcct; $bError = true;}
 
         if ( !$bError ) {
 			$this->aTransactionInformation[] = $oTransaction;
