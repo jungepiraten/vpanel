@@ -67,7 +67,7 @@ class SepaTempFileStreamHandler extends TempFileStreamHandler {
 		$this->handler->addTransaction(array(
 			"name" => $row["kontoinhaber"],
 			"iban" => $row["iban"],
-			"bic" => "NASSDE55XXX",
+			"bic" => $row["bic"],
 		), array(
 			"id" => "MITGLIED-" . $row["mitgliedid"],
 			"datum" => date("Y-m-d"),
