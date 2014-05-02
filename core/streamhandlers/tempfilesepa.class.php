@@ -60,7 +60,7 @@ class SepaTempFileStreamHandler extends TempFileStreamHandler {
 			"iban" => $this->iban,
 			"bic" => $this->bic,
 			"glaeubiger_id" => $this->creditor_id,
-		));
+		), date("Y-m-d"));
 	}
 
 	public function writeFile($row) {
