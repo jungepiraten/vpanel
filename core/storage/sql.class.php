@@ -614,7 +614,7 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		if ($matcher instanceof BeitragMissingBelowMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM
-			                            (SELECT `mitgliedid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0) - IFNULL(SUM(`buchung`.`hoehe`),0 AS `missing`
+			                            (SELECT `mitgliedid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0) - IFNULL(SUM(`buchung`.`hoehe`),0) AS `missing`
 			                                   FROM `mitglieder`
 			                                   LEFT JOIN `mitgliederbeitrag` USING (`mitgliedid`)
 			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
@@ -623,7 +623,7 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		if ($matcher instanceof BeitragMissingAboveMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM
-			                            (SELECT `mitgliedid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0)) - IFNULL(SUM(`buchung`.`hoehe`),0 AS `missing`
+			                            (SELECT `mitgliedid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0) - IFNULL(SUM(`buchung`.`hoehe`),0) AS `missing`
 			                                   FROM `mitglieder`
 			                                   LEFT JOIN `mitgliederbeitrag` USING (`mitgliedid`)
 			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
