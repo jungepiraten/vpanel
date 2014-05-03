@@ -13,7 +13,7 @@ class PrintDokumentTransition extends StaticDokumentTransition implements Single
 
 	public function execute($config, $session, $filter, $matcher) {
 		$process = new DokumentTransaktionPrintProcess($session->getStorage());
-		$process->setOptions($options);
+		$process->setOptions($this->options);
 		return $this->executeProcess($session, $process, $filter, $matcher);
 	}
 }

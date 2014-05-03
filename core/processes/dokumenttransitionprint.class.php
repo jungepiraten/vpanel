@@ -25,9 +25,6 @@ class DokumentTransaktionPrintProcess extends DokumentTransitionProcess {
 
 	public function runProcessStep($dokument) {
 		$file = $dokument->getLatestRevision()->getFile();
-		$extension = array_pop(explode(".", $file->getExportFilename()));
-		$this->ziphandler->addFile($file->getAbsoluteFilename(), $file->getExportFilename());
-
 		exec("lp " . $this->lpoptions . " -- " . escapeshellarg($file->getAbsoluteFilename()));
 	}
 
