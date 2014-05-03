@@ -613,20 +613,22 @@ abstract class SQLStorage extends AbstractStorage {
 			                                   HAVING `mitgliederbeitrag`.`hoehe` - IFNULL(SUM(`buchung`.`hoehe`),0) > 0) AS `tmp`)";
 		}
 		if ($matcher instanceof BeitragMissingBelowMitgliederMatcher) {
-			return "`m`.`mitgliedid` IN (SELECT `mitgliedid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0) - IFNULL(SUM(`buchung`.`hoehe`),0 AS `missing`
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM
+			                            (SELECT `mitgliedid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0) - IFNULL(SUM(`buchung`.`hoehe`),0 AS `missing`
 			                                   FROM `mitglieder`
 			                                   LEFT JOIN `mitgliederbeitrag` USING (`mitgliedid`)
 			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
 			                                   GROUP BY `mitgliederbeitrag`.`mitgliederbeitragid`
-			                                   HAVING `missing` <= " . floatval($matcher->getBeitragMark()) . ")";
+			                                   HAVING `missing` <= " . floatval($matcher->getBeitragMark()) . ") )";
 		}
 		if ($matcher instanceof BeitragMissingAboveMitgliederMatcher) {
-			return "`m`.`mitgliedid` IN (SELECT `mitgliedid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0)) - IFNULL(SUM(`buchung`.`hoehe`),0 AS `missing`
+			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM
+			                            (SELECT `mitgliedid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0)) - IFNULL(SUM(`buchung`.`hoehe`),0 AS `missing`
 			                                   FROM `mitglieder`
 			                                   LEFT JOIN `mitgliederbeitrag` USING (`mitgliedid`)
 			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
 			                                   GROUP BY `mitgliederbeitrag`.`mitgliederbeitragid`
-			                                   HAVING `missing` > " . floatval($matcher->getBeitragMark()) . ")";
+			                                   HAVING `missing` > " . floatval($matcher->getBeitragMark()) . ") )";
 		}
 		if ($matcher instanceof DokumentMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitglieddokument` WHERE `dokumentid` = " . intval($matcher->getDokumentID()) . ")";
