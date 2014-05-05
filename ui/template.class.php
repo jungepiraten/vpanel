@@ -1004,10 +1004,12 @@ class Template {
 			$this->smarty->display("dokumentcreate_defaultdate.html.tpl");
 		} else if ($dokumenttemplate instanceof DefaultDokumentTemplate) {
 			$this->smarty->display("dokumentcreate_default.html.tpl");
-		} else if ($dokumenttemplate instanceof SelectPrefixDateDokumentTemplate) {
-			$this->smarty->assign("datefield", $dokumenttemplate->getDateFieldLabel());
+		} else if ($dokumenttemplate instanceof SelectPrefixDokumentTemplate) {
+			if ($dokumenttemplate instanceof SelectPrefixDateDokumentTemplate) {
+				$this->smarty->assign("datefield", $dokumenttemplate->getDateFieldLabel());
+			}
 			$this->smarty->assign("options", $dokumenttemplate->getPrefixOptions());
-			$this->smarty->display("dokumentcreate_selectprefixdate.html.tpl");
+			$this->smarty->display("dokumentcreate_selectprefix.html.tpl");
 		}
 	}
 

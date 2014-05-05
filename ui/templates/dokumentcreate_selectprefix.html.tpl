@@ -8,12 +8,14 @@
         <select name="option">{foreach from=$options key=optionid item=option}<option value="{$optionid|escape:html}">{$option|escape:html}</option>{/foreach}</select>
     </div>
 </div>
+{if isset($datefield)}
 <div class="control-group">
     <label class="control-label" for="timestamp">{$datefield|escape:html}:</label>
     <div class="controls">
         <input type="date" name="timestamp" value="{$smarty.now|date_format:"%Y-%m-%d"}" />
     </div>
 </div>
+{/if}
 {if $showupload}
 <div class="control-group">
     <label class="control-label" for="file">{"Datei:"|__}</label>
