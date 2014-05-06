@@ -75,6 +75,11 @@ class MitgliedTextReplacer extends VariableTextReplacer {
 				return $kontakt->getKonto()->getIBan();
 			}
 			return "";
+		case "IBAN_SCRAMBLED":
+			if ($kontakt->hasKonto()) {
+				return substr($kontakt->getKonto()->getIBan(),0,4) . str_repeat("X", strlen($kontakt->getKonto()->getIBan())-8) . substr($kontakt->getKonto()->getIBan(),-4);
+			}
+			return "";
 		case "BIC":
 			if ($kontakt->hasKonto()) {
 				return $kontakt->getKonto()->getBIC();
