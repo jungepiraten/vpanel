@@ -64,15 +64,15 @@
    <div class="control-group">
     <label class="control-label" for="name">{"Name:"|__}</label>
     <div class="controls">
-     <input type="text" name="vorname" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.vorname|escape:html}{else}{$data.vorname|escape:html}{/if}" />
-     <input type="text" name="name" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.name|escape:html}{else}{$data.name|escape:html}{/if}" />
+     <input type="text" name="vorname" autocomplete="off" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.vorname|escape:html}{else}{$data.vorname|escape:html}{/if}" />
+     <input type="text" name="name" autocomplete="off" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.name|escape:html}{else}{$data.name|escape:html}{/if}" />
     </div>
    </div>
 
    <div class="control-group">
     <label class="control-label" for="geburtsdatum">{"Geboren:"|__}</label>
     <div class="controls">
-     <input type="date" name="geburtsdatum" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.geburtsdatum|date_format:"%Y-%m-%d"}{else}{$data.geburtsdatum}{/if}" />
+     <input type="date" name="geburtsdatum" autocomplete="off" value="{if isset($mitgliedrevision.natperson)}{$mitgliedrevision.natperson.geburtsdatum|date_format:"%Y-%m-%d"}{else}{$data.geburtsdatum}{/if}" />
     </div>
    </div>
 
@@ -87,7 +87,7 @@
    <div class="control-group">
     <label class="control-label" for="firma">{"Firma:"|__}</label>
     <div class="controls">
-     <input type="text" name="firma" value="{if isset($mitgliedrevision.jurperson)}{$mitgliedrevision.jurperson.label|escape:html}{else}{$data.firma|escape:html}{/if}" />
+     <input type="text" name="firma" autocomplete="off" value="{if isset($mitgliedrevision.jurperson)}{$mitgliedrevision.jurperson.label|escape:html}{else}{$data.firma|escape:html}{/if}" />
     </div>
    </div>
   </div>
@@ -97,15 +97,15 @@
 <div class="control-group">
     <label class="control-label" for="adresszusatz">{"Adresszusatz:"|__}</label>
     <div class="controls">
-        <input type="text" name="adresszusatz" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.adresszusatz|escape:html}{else}{$data.adresszusatz|escape:html}{/if}" />
+        <input type="text" name="adresszusatz" autocomplete="off" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.adresszusatz|escape:html}{else}{$data.adresszusatz|escape:html}{/if}" />
     </div>
 </div>
 
 <div class="control-group">
     <label class="control-label" for="strasse">{"Adresse:"|__}</label>
     <div class="controls">
-        <input type="text" name="strasse" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.strasse|escape:html}{else}{$data.strasse|escape:html}{/if}" />
-        <input type="text" name="hausnummer" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.hausnummer|escape:html}{else}{$data.hausnummer|escape:html}{/if}" style="width:4em;" />
+        <input type="text" name="strasse" autocomplete="off" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.strasse|escape:html}{else}{$data.strasse|escape:html}{/if}" />
+        <input type="text" name="hausnummer" autocomplete="off" alue="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.hausnummer|escape:html}{else}{$data.hausnummer|escape:html}{/if}" style="width:4em;" />
     </div>
 </div>
 
@@ -130,21 +130,21 @@
 <div class="control-group">
     <label class="control-label" for="telefon">{"Telefonnummer:"|__}</label>
     <div class="controls">
-        <input type="text" name="telefon" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.telefon|escape:html}{else}{$data.telefon|escape:html}{/if}" />
+        <input type="text" name="telefon" autocomplete="off" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.telefon|escape:html}{else}{$data.telefon|escape:html}{/if}" />
     </div>
 </div>
 
 <div class="control-group">
     <label class="control-label" for="handy">{"Handynummer:"|__}</label>
     <div class="controls">
-        <input type="text" name="handy" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.handy|escape:html}{else}{$data.handy|escape:html}{/if}" />
+        <input type="text" name="handy" autocomplete="off" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.handy|escape:html}{else}{$data.handy|escape:html}{/if}" />
     </div>
 </div>
 
 <div class="control-group">
     <label class="control-label" for="email">{"EMail-Adresse:"|__}</label>
     <div class="controls">
-        <input type="text" name="email" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.email.email|escape:html}{else}{$data.email|escape:html}{/if}" />
+        <input type="text" name="email" autocomplete="off" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.email.email|escape:html}{else}{$data.email|escape:html}{/if}" />
         {if isset($mitgliedrevision.kontakt) && count($mitgliedrevision.kontakt.email.bounces) > 0}
           <a href="{"mitglieder_bouncelist"|___:$mitgliedrevision.revisionid}'" class="btn btn-info">{$mitgliedrevision.kontakt.email.bounces|@count} Bounces</a>
         {/if}
@@ -154,7 +154,7 @@
 <div class="control-group">
     <label class="control-label" for="kontoinhaber">{"Kontoinhaber:"|__}</label>
     <div class="controls">
-        <input type="text" name="kontoinhaber" value="{if isset($mitgliedrevision.kontakt) && isset($mitgliedrevision.kontakt.konto)}{$mitgliedrevision.kontakt.konto.inhaber|escape:html}{else}{$data.kontoinhaber|escape:html}{/if}" />
+        <input type="text" name="kontoinhaber" autocomplete="off" value="{if isset($mitgliedrevision.kontakt) && isset($mitgliedrevision.kontakt.konto)}{$mitgliedrevision.kontakt.konto.inhaber|escape:html}{else}{$data.kontoinhaber|escape:html}{/if}" />
     </div>
 </div>
 
@@ -162,7 +162,7 @@
     <label class="control-label" for="iban">{"Konto (IBAN):"|__}</label>
     <div class="controls iban">
         <div class="input-append">
-            <input type="text" class="iban" name="iban" value="{if isset($mitgliedrevision.kontakt) && isset($mitgliedrevision.kontakt.konto)}{$mitgliedrevision.kontakt.konto.iban|escape:html}{else}{$data.iban|escape:html}{/if}" onChange="checkIBan(this)" />
+            <input type="text" class="iban" name="iban"  autocomplete="off"value="{if isset($mitgliedrevision.kontakt) && isset($mitgliedrevision.kontakt.konto)}{$mitgliedrevision.kontakt.konto.iban|escape:html}{else}{$data.iban|escape:html}{/if}" onChange="checkIBan(this)" />
         </div>
         <span class="help-inline"></span>
     </div>

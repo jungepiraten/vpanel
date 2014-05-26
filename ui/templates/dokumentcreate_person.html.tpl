@@ -13,13 +13,13 @@
 <div class="control-group">
     <label class="control-label" for="vorname">{"Name:"|__}</label>
     <div class="controls">
-        <input type="text" name="vorname" size="20" /> <input type="text" name="name" size="20" />
+        <input type="text" name="vorname" size="20" autocomplete="off" /> <input type="text" name="name" size="20" autocomplete="off"/>
     </div>
 </div>
 <div class="control-group">
     <label class="control-label" for="geburtsdatum">{"Geburtsdatum:"|__}</label>
     <div class="controls">
-        <input type="date" name="geburtsdatum" />
+        <input type="date" name="geburtsdatum" autocomplete="off" />
     </div>
 </div>
 <div class="control-group">
