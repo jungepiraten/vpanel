@@ -105,7 +105,7 @@
     <label class="control-label" for="strasse">{"Adresse:"|__}</label>
     <div class="controls">
         <input type="text" name="strasse" autocomplete="off" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.strasse|escape:html}{else}{$data.strasse|escape:html}{/if}" />
-        <input type="text" name="hausnummer" autocomplete="off" alue="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.hausnummer|escape:html}{else}{$data.hausnummer|escape:html}{/if}" style="width:4em;" />
+        <input type="text" name="hausnummer" autocomplete="off" value="{if isset($mitgliedrevision.kontakt)}{$mitgliedrevision.kontakt.hausnummer|escape:html}{else}{$data.hausnummer|escape:html}{/if}" style="width:4em;" />
     </div>
 </div>
 
