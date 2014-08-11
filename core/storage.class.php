@@ -428,7 +428,7 @@ abstract class AbstractStorage implements Storage {
 		return $this->getProcessResult()->fetchAll();
 	}
 	public function getProcessesListTimeline($start, $count) {
-		return $this->getProccessResultTimeline()->fetchAll();
+		return $this->getProccessesResultTimeline()->fetchAll();
 	}
 
 	public function getDokumentList($matcher, $limit = null, $offset = null) {
