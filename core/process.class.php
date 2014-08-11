@@ -6,6 +6,8 @@ foreach (glob(VPANEL_CORE . "/processes/*.class.php") as $processfile) {
 }
 
 abstract class Process extends StorageClass {
+	private $type;
+	private $typedata;
 	private $processid;
 	private $userid;
 	private $progress;
@@ -18,6 +20,8 @@ abstract class Process extends StorageClass {
 
 	public static function factory(Storage $storage, $row) {
 		$process = $row["type"]::factory($storage, unserialize($row["typedata"]));
+		$process->setType($row["type"]);
+		$process->setTypeData($row["typedata"]);
 		$process->setProcessID($row["processid"]);
 		$process->setUserID($row["userid"]);
 		$process->setProgress($row["progress"]);
@@ -31,6 +35,22 @@ abstract class Process extends StorageClass {
 	public function __construct(Storage $storage) {
 		parent::__construct($storage);
 		$this->setQueued(time());
+	}
+
+	public function getType() {
+		return $this->type;
+	}
+
+	public function setType($type) {
+		$this->type = $type;
+	}
+
+	public function getTypeData() {
+		return $this->typedata;
+	}
+
+	public function setTypeData($data) {
+		$this->typedata = $data;
 	}
 
 	public function getProcessID() {

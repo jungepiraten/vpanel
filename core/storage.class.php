@@ -188,6 +188,8 @@ interface Storage {
 
 	public function getProcessResult();
 	public function getProcessList();
+	public function getProcessesResultTimeline($start, $count);
+	public function getProcessesListTimeline($start, $count);
 	public function getProcess($processid);
 	public function setProcess($processid, $userid, $type, $typedata, $progess, $queued, $started, $finished, $finishedpage);
 	public function delProcess($processid);
@@ -424,6 +426,9 @@ abstract class AbstractStorage implements Storage {
 
 	public function getProcessList() {
 		return $this->getProcessResult()->fetchAll();
+	}
+	public function getProcessesListTimeline($start, $count) {
+		return $this->getProccessResultTimeline()->fetchAll();
 	}
 
 	public function getDokumentList($matcher, $limit = null, $offset = null) {
