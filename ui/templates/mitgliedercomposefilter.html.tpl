@@ -197,6 +197,9 @@ $(function () {
 </script>
 {/literal}
 
+<div class="alert alert-warning" role="alert">Wenn du nichts anderes definierst, wird dein Filter auch Mitglieder betreffen, die bereits ausgetreten sind.
+ Um das zu verhindern, kannst du einen AND-Filter benutzen, der Ausgetretene Mitglieder ausschließt.</div>
+
 <form action="{"mitglieder_composefilter"|___}" method="post">
  <fieldset>
   <div id="filter"></div>
