@@ -85,6 +85,7 @@ $config->registerPage("file_tokenget", "file.php?mode=get&fileid=%d&token=%s");
 $config->registerPage("tempfile_get", "file.php?mode=get&tempfileid=%d");
 
 $config->registerPage("processes_view", "processes.php?mode=view&processid=%d");
+$config->registerPage("processes_timeline_json", "json/processes_timeline.php");
 $config->registerPage("processes_json", "json/processes.php");
 
 ?>

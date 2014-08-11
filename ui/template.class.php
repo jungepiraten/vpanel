@@ -695,6 +695,12 @@ class Template {
 			}
 			$this->smarty->display("dashboard_dokumentrevision_timeline.block.tpl");
 		}
+		if ($widget instanceof ProcessTimelineDashboardWidget) {
+			if ($widget->hasReload()) {
+				$this->smarty->assign("reload", $widget->getReload());
+			}
+			$this->smarty->display("dashboard_process_timeline.block.tpl");
+		}
 	}
 
 	public function viewDashboard($user, $widgets) {

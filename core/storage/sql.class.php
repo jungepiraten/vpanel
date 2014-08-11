@@ -1835,6 +1835,10 @@ abstract class SQLStorage extends AbstractStorage {
 		$sql = "SELECT `processid`, `userid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished`, `finishedpage` FROM `processes`";
 		return $this->getResult($sql, array($this, "parseProcess"));
 	}
+	public function getProcessesResultTimeline($start, $count) {
+		$sql = "SELECT `processid`, `userid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished`, `finishedpage` FROM `processes` ORDER BY `queued` DESC LIMIT " . intval($start) . "," . intval($count);
+		return $this->getResult($sql, array($this, "parseProcess"));
+	}
 	public function getProcess($processid) {
 		$sql = "SELECT `processid`, `userid`, `type`, `typedata`, `progress`, UNIX_TIMESTAMP(`queued`) as `queued`, UNIX_TIMESTAMP(`started`) as `started`, UNIX_TIMESTAMP(`finished`) as `finished`, `finishedpage` FROM `processes` WHERE `processid` = " . intval($processid);
 		return $this->getResult($sql, array($this, "parseProcess"))->fetchRow();
