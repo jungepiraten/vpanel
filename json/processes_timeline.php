@@ -16,6 +16,7 @@ foreach ($processes as $process) {
 	$row["processid"] = $process->getProcessID();
 	$row["type"] = $process->getType();
 	$row["typedata"] = $process->getTypeData();
+	$row["username"] = $process->getUser()->getUserName();
 	$row["progress"] = $process->getProgress();
 	$row["iswaiting"] = $process->isWaiting();
 	$row["isrunning"] = $process->isRunning();
