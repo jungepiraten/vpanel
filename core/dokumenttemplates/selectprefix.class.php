@@ -14,7 +14,7 @@ class SelectPrefixDokumentTemplate extends IdentifierDokumentTemplate {
 		return array_map(create_function('$a', 'return $a["label"];'), $this->prefixes);
 	}
 
-	private function getSelectedOption($session, $value) {
+	protected function getSelectedOption($session, $value) {
 		return $this->prefixes[$session->getVariable("option")][$value];
 	}
 
