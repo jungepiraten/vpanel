@@ -61,7 +61,7 @@ if ($file == null) {
 	$dokument->save();
 	$revision->save();
 
-	$api->output(array("success" => "1"));
+	$api->output(array("success" => "1", "dokumentid" => $dokument->getDokumentID(), "identifier" => $revision->getIdentifier()));
 }
 
 ?>
