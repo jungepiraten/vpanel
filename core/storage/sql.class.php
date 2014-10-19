@@ -419,7 +419,7 @@ abstract class SQLStorage extends AbstractStorage {
 		return $this->getResult($sql, array($this, "parseMitgliedBeitrag"));
 	}
 	public function getMitgliederBeitragByMitgliedBeitrag($mitgliedid, $beitragid) {
-		$sql = "SELECT `mb`.`mitgliederbeitragid` AS `mb_mitgliederbeitragid`, `mb`.`mitgliedid` AS `mb_mitgliedid`, `mb`.`beitragid` AS `mb_beitragid`, `mb`.`hoehe` AS `mb_hoehe`, `b`.`beitragid` AS `b_beitragid`, `b`.`label` AS `b_label`, `b`.`hoehe` AS `b_hoehe`, `b`.`mailtemplateid` AS `b_mailtemplateid` FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`mitgliedid` = " . intval($mitgliedid) . " and `mb`.`beitragid` = " . intval(beitragid);
+		$sql = "SELECT `mb`.`mitgliederbeitragid` AS `mb_mitgliederbeitragid`, `mb`.`mitgliedid` AS `mb_mitgliedid`, `mb`.`beitragid` AS `mb_beitragid`, `mb`.`hoehe` AS `mb_hoehe`, `b`.`beitragid` AS `b_beitragid`, `b`.`label` AS `b_label`, `b`.`hoehe` AS `b_hoehe`, `b`.`mailtemplateid` AS `b_mailtemplateid` FROM `mitgliederbeitrag` `mb` LEFT JOIN `beitraege` `b` USING (`beitragid`) WHERE `mb`.`mitgliedid` = " . intval($mitgliedid) . " and `mb`.`beitragid` = " . intval($beitragid);
 		return $this->getResult($sql, array($this, "parseMitgliedBeitrag"))->fetchRow();
 	}
 	public function getMitgliederBeitrag($beitragid) {
