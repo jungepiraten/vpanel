@@ -29,6 +29,11 @@ if (!$session->isAllowed("mitglieder_modify", $mitglied->getLatestRevision()->ge
 
 $mitgliedbeitrag = $session->getStorage()->getMitgliederBeitragByMitgliedBeitrag($mitglied->getMitgliedID(), $beitrag->getBeitragID());
 
+if ($mitgliedbeitrag == null) {
+	$api->output(array("failed" => "MITGLIEDBEITRAG_MISSING"));
+	exit;
+}
+
 $buchung = new MitgliedBeitragBuchung($session->getStorage());
 $buchung->setMitgliederBeitrag($mitgliedbeitrag);
 $buchung->setGliederung($gliederung);
