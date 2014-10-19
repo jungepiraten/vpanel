@@ -64,6 +64,7 @@ interface Storage {
 	public function getMitgliederBeitragByBeitragCount($beitragid);
 	public function getMitgliederBeitragByBeitragResult($beitragid, $pagesize = null, $offset = null);
 	public function getMitgliederBeitragByBeitragList($beitragid, $pagesize = null, $offset = null);
+	public function getMitgliederBeitragByMitgliedBeitrag($mitgliedid, $beitragid);
 	public function getMitgliederBeitrag($beitragid);
 	public function setMitgliederBeitrag($beitragid, $mitgliedid, $beitragid, $hoehe);
 	public function delMitgliederBeitrag($beitragid);
