@@ -162,7 +162,7 @@
     <label class="control-label" for="iban">{"Konto (IBAN):"|__}</label>
     <div class="controls iban">
         <div class="input-append">
-            <input type="text" class="iban" name="iban"  autocomplete="off"value="{if isset($mitgliedrevision.kontakt) && isset($mitgliedrevision.kontakt.konto)}{$mitgliedrevision.kontakt.konto.iban|escape:html}{else}{$data.iban|escape:html}{/if}" onChange="checkIBan(this)" />
+            <input type="text" class="iban" name="iban"  autocomplete="off" value="{if isset($mitgliedrevision.kontakt) && isset($mitgliedrevision.kontakt.konto)}{$mitgliedrevision.kontakt.konto.iban|escape:html}{else}{$data.iban|escape:html}{/if}" onChange="checkIBan(this)" />
         </div>
         <span class="help-inline"></span>
     </div>
