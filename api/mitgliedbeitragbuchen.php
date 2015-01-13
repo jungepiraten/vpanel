@@ -43,8 +43,18 @@ $buchung->setVermerk($vermerk);
 $buchung->setHoehe($hoehe);
 $buchung->save();
 
-if ($beitrag->getMailTemplateID() !== null) {
-	$mailtemplate = $beitrag->getMailTemplate();
+$mailtemplateid = $beitrag->getMailTemplateID();
+if ($session->hasVariable("mailtemplateid")) {
+	$mailtemplateid = $session->getVariable("mailtemplateid");
+	if (empty($mailtemplateid)) {
+		$mailtemplateid = null;
+	} else {
+		$mailtemplateid = intval($mailtemplateid);
+	}
+}
+
+if ($mailtemplateid !== null) {
+	$mailtemplate = $session->getStorage()->getMailTemplate($mailtemplateid);
 	if ($mailtemplate != null) {
 		$mail = $mailtemplate->generateMail($mitglied->getLatestRevision()->getKontakt()->getEMail(), new MitgliedTextReplacer($mitglied));
 		$mail->send();
