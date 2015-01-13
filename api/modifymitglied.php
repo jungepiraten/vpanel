@@ -96,12 +96,22 @@ if ($revision->getKontakt()->hasKonto()) {
 
 // Change some values
 foreach ($session->getListVariable("changes") as $changeVar => $changeValue) {
-	if (!array_key_exists($changeVar, $mitgliedValues)) {
-		$api->output(array("failed" => "INVALID_CHANGE", "variable" => $changeVar), 400);
-		exit;
-	}
+	if ($changeVar == "flags") {
+		foreach ($changeValue as $flagid => $flag) {
+			if ($flag) {
+				$revision->setFlag($session->getStorage()->getMitgliedFlag($flagid));
+			} else {
+				$revision->delFlag($flagid);
+			}
+		}
+	} else {
+		if (!array_key_exists($changeVar, $mitgliedValues)) {
+			$api->output(array("failed" => "INVALID_CHANGE", "variable" => $changeVar), 400);
+			exit;
+		}
 
-	$mitgliedValues[$changeVar] = $changeValue;
+		$mitgliedValues[$changeVar] = $changeValue;
+	}
 }
 
 // Save new Values
