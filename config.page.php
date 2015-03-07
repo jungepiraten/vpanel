@@ -22,7 +22,7 @@ $config->registerPage("roles_adduser", "user.php?mode=addrole&roleid=%d");
 $config->registerPage("roles_deluser", "user.php?mode=delrole&roleid=%d&userid=%d");
 
 $config->registerPage("dokumente", "documents.php");
-$config->registerPage("dokumente_page", "documents.php?gliederungid=%d&kategorieid=%d&statusid=%d&page=%d");
+$config->registerPage("dokumente_page", "documents.php?gliederungid=%d&kategorieid=%d&statusid=%d&dokumentsuche=%s&page=%d");
 $config->registerPage("dokumente_del", "documents.php?mode=delete&dokumentid=%d");
 $config->registerPage("dokumente_json", "json/dokumente.php");
 $config->registerPage("dokumente_create", "documents.php?mode=create&dokumenttemplateid=%d");

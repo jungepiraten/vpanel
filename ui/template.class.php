@@ -1019,7 +1019,7 @@ class Template {
 		}
 	}
 
-	public function viewDokumentList($dokumente, $templates, $transitionen, $gliederungen, $filter, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount) {
+	public function viewDokumentList($dokumente, $templates, $transitionen, $gliederungen, $filter, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $suchquery, $page, $pagecount) {
 		if ($gliederung != null) {
 			$this->smarty->assign("gliederung", $this->parseGliederung($gliederung));
 		}
@@ -1032,6 +1032,7 @@ class Template {
 		if ($filter != null) {
 			$this->smarty->assign("filter", $this->parseDokumentFilter($filter));
 		}
+		$this->smarty->assign("suchquery", $suchquery);
 		$this->smarty->assign("page", $page);
 		$this->smarty->assign("pagecount", $pagecount);
 		$this->smarty->assign("dokumente", $this->parseDokumente($dokumente));

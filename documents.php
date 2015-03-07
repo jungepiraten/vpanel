@@ -221,11 +221,13 @@ default:
 		$gliederungids = array_intersect($gliederungids, array($gliederung->getGliederungID()));
 	}
 
+	$suchquery = $session->hasVariable("dokumentsuche") ? $session->getVariable("dokumentsuche") : "";
+
 	$matcher = new AndDokumentMatcher(
 		new GliederungDokumentMatcher($gliederungids),
 		($dokumentkategorie == null ? new TrueDokumentMatcher() : new KategorieDokumentMatcher($dokumentkategorie)),
 		($dokumentstatus == null ? new TrueDokumentMatcher() : new StatusDokumentMatcher($dokumentstatus)),
-		($session->hasVariable("dokumentsuche") ? new SearchDokumentMatcher($session->getVariable("dokumentsuche")) : new TrueDokumentMatcher()) );
+		($suchquery ? new SearchDokumentMatcher($suchquery) : new TrueDokumentMatcher()) );
 
 	$filter = $session->addDokumentMatcher($matcher);
 
@@ -246,7 +248,7 @@ default:
 	$transitionen = $session->getStorage()->getMultiDokumentTransitionList($session, $dokumentkategorie, $dokumentstatus);
 	$dokumentkategorien = $session->getStorage()->getDokumentKategorieList();
 	$dokumentstatuslist = $session->getStorage()->getDokumentStatusList();
-	$ui->viewDokumentList($dokumente, $templates, $transitionen, $gliederungen, $filter, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $page, $pagecount);
+	$ui->viewDokumentList($dokumente, $templates, $transitionen, $gliederungen, $filter, $gliederung, $dokumentkategorien, $dokumentkategorie, $dokumentstatuslist, $dokumentstatus, $suchquery, $page, $pagecount);
 	exit;
 }
 
