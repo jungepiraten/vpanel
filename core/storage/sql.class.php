@@ -625,7 +625,7 @@ abstract class SQLStorage extends AbstractStorage {
 			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
 			                                   GROUP BY `mitgliederbeitrag`.`mitgliederbeitragid`) AS `tmp`
 			                            GROUP BY `mitgliedid`
-			                            HAVING `sum_missing` <= " . floatval($matcher->getBeitragMark()) . "))";
+			                            HAVING `sum_missing` <= " . floatval($matcher->getBeitragMark()) . ") AS `tmp2`)";
 		}
 		if ($matcher instanceof BeitragMissingAboveMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM
@@ -636,7 +636,7 @@ abstract class SQLStorage extends AbstractStorage {
 			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
 			                                   GROUP BY `mitgliederbeitrag`.`mitgliederbeitragid`) AS `tmp`
 			                            GROUP BY `mitgliedid`
-			                            HAVING `sum_missing` > " . floatval($matcher->getBeitragMark()) . "))";
+			                            HAVING `sum_missing` > " . floatval($matcher->getBeitragMark()) . ") AS `tmp2`)";
 		}
 		if ($matcher instanceof DokumentMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitglieddokument` WHERE `dokumentid` = " . intval($matcher->getDokumentID()) . ")";
