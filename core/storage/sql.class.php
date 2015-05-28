@@ -618,21 +618,25 @@ abstract class SQLStorage extends AbstractStorage {
 		}
 		if ($matcher instanceof BeitragMissingBelowMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM
-			                            (SELECT `mitgliedid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0) - IFNULL(SUM(`buchung`.`hoehe`),0) AS `missing`
+			                            (SELECT `mitgliedid`, SUM(`tmp`.`missing`) AS `sum_missing` FROM
+			                            (SELECT `mitgliedid`, `mitgliederbeitrag`.`beitragid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0) - IFNULL(SUM(`buchung`.`hoehe`),0) AS `missing`
 			                                   FROM `mitglieder`
 			                                   LEFT JOIN `mitgliederbeitrag` USING (`mitgliedid`)
 			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
-			                                   GROUP BY `mitgliederbeitrag`.`mitgliederbeitragid`
-			                                   HAVING `missing` <= " . floatval($matcher->getBeitragMark()) . ") AS `tmp`)";
+			                                   GROUP BY `mitgliederbeitrag`.`mitgliederbeitragid`) AS `tmp`
+			                            GROUP BY `mitgliedid`
+			                            HAVING `sum_missing` <= " . floatval($matcher->getBeitragMark()) . "))";
 		}
 		if ($matcher instanceof BeitragMissingAboveMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM
-			                            (SELECT `mitgliedid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0) - IFNULL(SUM(`buchung`.`hoehe`),0) AS `missing`
+			                            (SELECT `mitgliedid`, SUM(`tmp`.`missing`) AS `sum_missing` FROM
+			                            (SELECT `mitgliedid`, `mitgliederbeitrag`.`beitragid`, IFNULL(`mitgliederbeitrag`.`hoehe`,0) - IFNULL(SUM(`buchung`.`hoehe`),0) AS `missing`
 			                                   FROM `mitglieder`
 			                                   LEFT JOIN `mitgliederbeitrag` USING (`mitgliedid`)
 			                                   LEFT JOIN `mitgliederbeitragbuchung` `buchung` ON (`buchung`.`beitragid` = `mitgliederbeitrag`.`mitgliederbeitragid`)
-			                                   GROUP BY `mitgliederbeitrag`.`mitgliederbeitragid`
-			                                   HAVING `missing` > " . floatval($matcher->getBeitragMark()) . ") AS `tmp`)";
+			                                   GROUP BY `mitgliederbeitrag`.`mitgliederbeitragid`) AS `tmp`
+			                            GROUP BY `mitgliedid`
+			                            HAVING `sum_missing` > " . floatval($matcher->getBeitragMark()) . "))";
 		}
 		if ($matcher instanceof DokumentMitgliederMatcher) {
 			return "`m`.`mitgliedid` IN (SELECT `mitgliedid` FROM `mitglieddokument` WHERE `dokumentid` = " . intval($matcher->getDokumentID()) . ")";
